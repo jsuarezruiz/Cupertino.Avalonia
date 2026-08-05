@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cupertino.Gallery.Desktop", "samples\Cupertino.Gallery.Desktop\Cupertino.Gallery.Desktop.csproj", "{3357CF85-5A09-4717-AAAA-8A9921231461}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cupertino.Gallery", "samples\Cupertino.Gallery\Cupertino.Gallery.csproj", "{A7FC0297-DC9D-47F7-B383-A027D309280E}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cupertino.Avalonia", "src\Cupertino.Avalonia\Cupertino.Avalonia.csproj", "{6F790825-3D2A-4EBE-88A0-A0B76666051B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cupertino.Avalonia.Tests", "tests\Cupertino.Avalonia.Tests\Cupertino.Avalonia.Tests.csproj", "{FF757B06-B038-4068-AC10-59D0DFB210C8}"
@@ -37,6 +39,18 @@ Global
 		{3357CF85-5A09-4717-AAAA-8A9921231461}.Release|x64.Build.0 = Release|Any CPU
 		{3357CF85-5A09-4717-AAAA-8A9921231461}.Release|x86.ActiveCfg = Release|Any CPU
 		{3357CF85-5A09-4717-AAAA-8A9921231461}.Release|x86.Build.0 = Release|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Debug|x64.Build.0 = Debug|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Debug|x86.Build.0 = Debug|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Release|x64.ActiveCfg = Release|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Release|x64.Build.0 = Release|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Release|x86.ActiveCfg = Release|Any CPU
+		{A7FC0297-DC9D-47F7-B383-A027D309280E}.Release|x86.Build.0 = Release|Any CPU
 		{6F790825-3D2A-4EBE-88A0-A0B76666051B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6F790825-3D2A-4EBE-88A0-A0B76666051B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F790825-3D2A-4EBE-88A0-A0B76666051B}.Debug|x64.ActiveCfg = Debug|Any CPU

@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Specialized;
-using System.Reflection;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -35,9 +34,6 @@ public class CupertinoSearchController : TemplatedControl
         AvaloniaProperty.Register<CupertinoSearchController, string?>(
             nameof(Query), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
-    public static readonly StyledProperty<string?> SearchTextPathProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, string?>(nameof(SearchTextPath));
-
     public static readonly StyledProperty<IList<string>?> ScopesProperty =
         AvaloniaProperty.Register<CupertinoSearchController, IList<string>?>(nameof(Scopes));
 
@@ -69,7 +65,6 @@ public class CupertinoSearchController : TemplatedControl
 
     public IEnumerable? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
     public string? Query { get => GetValue(QueryProperty); set => SetValue(QueryProperty, value); }
-    public string? SearchTextPath { get => GetValue(SearchTextPathProperty); set => SetValue(SearchTextPathProperty, value); }
     public IList<string>? Scopes { get => GetValue(ScopesProperty); set => SetValue(ScopesProperty, value); }
     public int SelectedScopeIndex { get => GetValue(SelectedScopeIndexProperty); set => SetValue(SelectedScopeIndexProperty, value); }
     public object? SelectedItem { get => GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
@@ -80,6 +75,7 @@ public class CupertinoSearchController : TemplatedControl
     public IReadOnlyList<object> FilteredItems => _filteredItems;
 
     private Func<object, string, int, bool>? _filter;
+    private Func<object, string?>? _searchTextSelector;
 
     /// <summary>
     /// Gets or sets the custom item filter.
@@ -96,6 +92,21 @@ public class CupertinoSearchController : TemplatedControl
         }
     }
 
+    /// <summary>
+    /// Gets or sets the text selector used by the default filter.
+    /// </summary>
+    public Func<object, string?>? SearchTextSelector
+    {
+        get => _searchTextSelector;
+        set
+        {
+            if (ReferenceEquals(_searchTextSelector, value))
+                return;
+            _searchTextSelector = value;
+            ApplyFilter();
+        }
+    }
+
     public event EventHandler? SearchSubmitted;
 
     private TextBox? _field;
@@ -103,7 +114,6 @@ public class CupertinoSearchController : TemplatedControl
     private ListBox? _results;
     private INotifyCollectionChanged? _observableSource;
     private INotifyCollectionChanged? _observableScopes;
-    private readonly Dictionary<(Type Type, string Path), PropertyInfo?> _propertyCache = new();
     private bool _isAttached;
     private bool _syncing;
     private int _scopeSynchronizationGeneration;
@@ -228,8 +238,7 @@ public class CupertinoSearchController : TemplatedControl
             ConnectSource();
             ApplyFilter();
         }
-        else if (change.Property == QueryProperty || change.Property == SearchTextPathProperty ||
-                 change.Property == SelectedScopeIndexProperty)
+        else if (change.Property == QueryProperty || change.Property == SelectedScopeIndexProperty)
         {
             if (change.Property == SelectedScopeIndexProperty)
             {
@@ -240,8 +249,6 @@ public class CupertinoSearchController : TemplatedControl
                     return;
                 }
             }
-            if (change.Property == SearchTextPathProperty)
-                _propertyCache.Clear();
             _syncing = true;
             try
             {
@@ -372,19 +379,8 @@ public class CupertinoSearchController : TemplatedControl
     {
         if (query.Length == 0)
             return true;
-        object? value = item;
-        if (!string.IsNullOrWhiteSpace(SearchTextPath))
-        {
-            var key = (item.GetType(), SearchTextPath!);
-            if (!_propertyCache.TryGetValue(key, out var property))
-            {
-                property = key.Item1.GetProperty(
-                    key.Item2, BindingFlags.Public | BindingFlags.Instance);
-                _propertyCache[key] = property;
-            }
-            value = property?.GetValue(item);
-        }
-        return value?.ToString()?.Contains(query, StringComparison.CurrentCultureIgnoreCase) == true;
+        var text = SearchTextSelector is { } selector ? selector(item) : item.ToString();
+        return text?.Contains(query, StringComparison.CurrentCultureIgnoreCase) == true;
     }
 
     private void UpdatePseudoClasses()

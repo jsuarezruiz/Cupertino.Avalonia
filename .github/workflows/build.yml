@@ -1,0 +1,84 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portability:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Behavior tests
+        run: dotnet test tests/Cupertino.Avalonia.Tests/Cupertino.Avalonia.Tests.csproj --configuration Release
+      - name: Render tests
+        run: dotnet test tests/Cupertino.Avalonia.RenderTests/Cupertino.Avalonia.RenderTests.csproj --configuration Release
+
+      - name: Upload render differences
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: render-differences-${{ matrix.os }}
+          path: tests/Cupertino.Avalonia.RenderTests/TestResults/RenderDiffs
+          if-no-files-found: ignore
+
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --verbosity minimal
+
+      - name: Pack
+        run: dotnet pack src/Cupertino.Avalonia/Cupertino.Avalonia.csproj --no-build --configuration Release --output artifacts
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*.nupkg
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install iOS workload
+        run: dotnet workload install ios
+
+      - name: Select simulator runtime
+        shell: bash
+        run: |
+          if [[ "$(uname -m)" == "arm64" ]]; then
+            echo "IOS_RUNTIME=iossimulator-arm64" >> "$GITHUB_ENV"
+          else
+            echo "IOS_RUNTIME=iossimulator-x64" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build iOS gallery
+        run: dotnet build samples/Cupertino.Gallery.iOS/Cupertino.Gallery.iOS.csproj --configuration Release --runtime "$IOS_RUNTIME" --verbosity minimal

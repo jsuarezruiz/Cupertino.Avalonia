@@ -61,6 +61,20 @@ public class NewPrimitiveTests
     }
 
     [AvaloniaFact]
+    public void Search_controller_uses_text_selector()
+    {
+        var items = new[] { new SearchItem("Ada"), new SearchItem("Grace") };
+        var search = new CupertinoSearchController
+        {
+            ItemsSource = items,
+            Query = "ada",
+            SearchTextSelector = item => ((SearchItem)item).Name,
+        };
+
+        Assert.Same(items[0], Assert.Single(search.FilteredItems));
+    }
+
+    [AvaloniaFact]
     public void Page_control_clamps_its_state_and_measures_all_dots()
     {
         var pages = new CupertinoPageControl
@@ -115,6 +129,8 @@ public class NewPrimitiveTests
         Assert.All(panel.Children, child => Assert.True(child.Bounds.Height >= 44));
     }
 }
+
+file sealed record SearchItem(string Name);
 
 public class AccessibilityAndDirectionTests
 {

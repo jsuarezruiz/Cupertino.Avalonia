@@ -132,7 +132,6 @@ public class CupertinoActivityIndicator : Control
             var dx = Math.Cos(angle);
             var dy = Math.Sin(angle);
 
-        // Inset both ends so round caps do not fill the hub.
             var from = inner + thickness / 2;
             var to = radius - thickness / 2;
             if (to <= from)
