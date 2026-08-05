@@ -62,7 +62,7 @@ There is an iOS head at `samples/Cupertino.Gallery.iOS`.
     <td align="center" width="33%"><a href="images/typography.png"><img src="images/typography.png" alt="Typography" width="100%"></a><br><sub>Typography</sub></td>
   </tr>
   <tr>
-    <td align="center" colspan="3"><a href="images/icons.png"><img src="images/icons.png" alt="Icons" width="100%"></a><br><sub>Icons</sub></td>
+    <td align="center" colspan="3"><a href="images/icons.png"><img src="images/icons.png" alt="Icons" width="33%"></a><br><sub>Icons</sub></td>
   </tr>
   <tr>
     <td align="center" width="33%"><a href="images/photos.png"><img src="images/photos.png" alt="Photos" width="100%"></a><br><sub>Photos</sub></td>
@@ -119,8 +119,8 @@ There is an iOS head at `samples/Cupertino.Gallery.iOS`.
     <td align="center" width="25%"><a href="images/toggle-switch.png"><img src="images/toggle-switch.png" alt="Toggle switch" width="100%"></a><br><sub>Toggle switch</sub></td>
   </tr>
   <tr>
-    <td align="center" width="50%"><a href="images/slider.png"><img src="images/slider.png" alt="Slider" width="100%"></a><br><sub>Slider</sub></td>
-    <td align="center" width="50%"><a href="images/color-picker.png"><img src="images/color-picker.png" alt="Colour picker" width="100%"></a><br><sub>Colour picker</sub></td>
+    <td align="center" width="50%" colspan="2"><a href="images/slider.png"><img src="images/slider.png" alt="Slider" width="50%"></a><br><sub>Slider</sub></td>
+    <td align="center" width="50%" colspan="2"><a href="images/color-picker.png"><img src="images/color-picker.png" alt="Colour picker" width="50%"></a><br><sub>Colour picker</sub></td>
   </tr>
 </table>
 
@@ -139,13 +139,13 @@ There is an iOS head at `samples/Cupertino.Gallery.iOS`.
 
 <table width="100%">
   <tr>
-    <td align="center" width="33%"><a href="images/list-and-search.png"><img src="images/list-and-search.png" alt="List and search" width="100%"></a><br><sub>List and search</sub></td>
-    <td align="center" width="33%"><a href="images/list-box.png"><img src="images/list-box.png" alt="List box" width="100%"></a><br><sub>List box</sub></td>
-    <td align="center" width="33%"><a href="images/tree-view.png"><img src="images/tree-view.png" alt="Tree view" width="100%"></a><br><sub>Tree view</sub></td>
+    <td align="center" width="33%" colspan="2"><a href="images/list-and-search.png"><img src="images/list-and-search.png" alt="List and search" width="100%"></a><br><sub>List and search</sub></td>
+    <td align="center" width="33%" colspan="2"><a href="images/list-box.png"><img src="images/list-box.png" alt="List box" width="100%"></a><br><sub>List box</sub></td>
+    <td align="center" width="33%" colspan="2"><a href="images/tree-view.png"><img src="images/tree-view.png" alt="Tree view" width="100%"></a><br><sub>Tree view</sub></td>
   </tr>
   <tr>
-    <td align="center" width="50%"><a href="images/swipe-view.png"><img src="images/swipe-view.png" alt="Swipe view" width="100%"></a><br><sub>Swipe view</sub></td>
-    <td align="center" width="50%"><a href="images/expander.png"><img src="images/expander.png" alt="Expander" width="100%"></a><br><sub>Expander</sub></td>
+    <td align="center" width="50%" colspan="3"><a href="images/swipe-view.png"><img src="images/swipe-view.png" alt="Swipe view" width="66%"></a><br><sub>Swipe view</sub></td>
+    <td align="center" width="50%" colspan="3"><a href="images/expander.png"><img src="images/expander.png" alt="Expander" width="66%"></a><br><sub>Expander</sub></td>
   </tr>
 </table>
 
@@ -165,8 +165,8 @@ There is an iOS head at `samples/Cupertino.Gallery.iOS`.
     <td align="center" width="25%"><a href="images/context-menu.png"><img src="images/context-menu.png" alt="Context menu" width="100%"></a><br><sub>Context menu</sub></td>
   </tr>
   <tr>
-    <td align="center" width="50%"><a href="images/menu.png"><img src="images/menu.png" alt="Menu" width="100%"></a><br><sub>Menu</sub></td>
-    <td align="center" width="50%"><a href="images/tool-tip-and-label.png"><img src="images/tool-tip-and-label.png" alt="Tool tip and label" width="100%"></a><br><sub>Tool tip and label</sub></td>
+    <td align="center" width="50%" colspan="2"><a href="images/menu.png"><img src="images/menu.png" alt="Menu" width="50%"></a><br><sub>Menu</sub></td>
+    <td align="center" width="50%" colspan="2"><a href="images/tool-tip-and-label.png"><img src="images/tool-tip-and-label.png" alt="Tool tip and label" width="50%"></a><br><sub>Tool tip and label</sub></td>
   </tr>
 </table>
 
