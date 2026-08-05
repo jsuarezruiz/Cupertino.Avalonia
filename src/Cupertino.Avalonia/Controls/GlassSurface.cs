@@ -338,10 +338,16 @@ public class GlassSurface : Decorator
                     return;
                 }
 
-                // Invalidate the top level once for all glass surfaces.
-                _top.InvalidateVisual();
-
                 var now = DateTime.UtcNow;
+                foreach (var surface in _surfaces)
+                {
+                    if (surface.IsEffectivelyVisible
+                        && (surface.IsLive || now < surface._pulseUntil))
+                    {
+                        surface.InvalidateVisual();
+                    }
+                }
+
                 if (_surfaces.Any(surface => surface.IsEffectivelyVisible
                     && (surface.IsLive || now < surface._pulseUntil)))
                 {

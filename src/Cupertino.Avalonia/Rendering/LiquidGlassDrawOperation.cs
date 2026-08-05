@@ -213,6 +213,13 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
 
         canvas.Save();
         canvas.SetMatrix(SKMatrix.Identity);
+        using (var clip = CreateRoundRect(
+                   deviceRect,
+                   _params.RadiusTopLeft * scale,
+                   _params.RadiusTopRight * scale,
+                   _params.RadiusBottomRight * scale,
+                   _params.RadiusBottomLeft * scale))
+            canvas.ClipRoundRect(clip, antialias: true);
         canvas.DrawRect(SKRect.Inflate(deviceRect, 1, 1), paint);
         canvas.Restore();
     }
