@@ -4,6 +4,15 @@ An iOS 26 design system for [Avalonia](https://avaloniaui.net): control themes, 
 
 ![Cupertino.Avalonia banner](images/cupertino-avalonia-banner.png)
 
+<table width="100%">
+  <tr>
+    <td align="center" width="25%"><a href="images/cupertino-avalonia-tabs.gif"><img src="images/cupertino-avalonia-tabs.gif" alt="Tabs" width="100%"></a><br><sub>Tabs</sub></td>
+    <td align="center" width="25%"><a href="images/cupertino-avalonia-slider.gif"><img src="images/cupertino-avalonia-slider.gif" alt="Slider" width="100%"></a><br><sub>Slider</sub></td>
+    <td align="center" width="25%"><a href="images/cupertino-avalonia-timepicker.gif"><img src="images/cupertino-avalonia-timepicker.gif" alt="Time picker" width="100%"></a><br><sub>Time picker</sub></td>
+    <td align="center" width="25%"><a href="images/cupertino-avalonia-toggleswitch.gif"><img src="images/cupertino-avalonia-toggleswitch.gif" alt="Toggle switch" width="100%"></a><br><sub>Toggle switch</sub></td>
+  </tr>
+</table>
+
 ## Install
 
 ```bash
@@ -57,17 +66,15 @@ There is an iOS head at `samples/Cupertino.Gallery.iOS`.
 
 <table width="100%">
   <tr>
-    <td align="center" width="33%"><a href="images/liquid-glass.png"><img src="images/liquid-glass.png" alt="Liquid Glass" width="100%"></a><br><sub>Liquid Glass</sub></td>
-    <td align="center" width="33%"><a href="images/colors.png"><img src="images/colors.png" alt="Colours" width="100%"></a><br><sub>Colours</sub></td>
-    <td align="center" width="33%"><a href="images/typography.png"><img src="images/typography.png" alt="Typography" width="100%"></a><br><sub>Typography</sub></td>
+    <td align="center" width="25%" colspan="3"><a href="images/liquid-glass.png"><img src="images/liquid-glass.png" alt="Liquid Glass" width="100%"></a><br><sub>Liquid Glass</sub></td>
+    <td align="center" width="25%" colspan="3"><a href="images/colors.png"><img src="images/colors.png" alt="Colours" width="100%"></a><br><sub>Colours</sub></td>
+    <td align="center" width="25%" colspan="3"><a href="images/typography.png"><img src="images/typography.png" alt="Typography" width="100%"></a><br><sub>Typography</sub></td>
+    <td align="center" width="25%" colspan="3"><a href="images/icons.png"><img src="images/icons.png" alt="Icons" width="100%"></a><br><sub>Icons</sub></td>
   </tr>
   <tr>
-    <td align="center" colspan="3"><a href="images/icons.png"><img src="images/icons.png" alt="Icons" width="33%"></a><br><sub>Icons</sub></td>
-  </tr>
-  <tr>
-    <td align="center" width="33%"><a href="images/photos.png"><img src="images/photos.png" alt="Photos" width="100%"></a><br><sub>Photos</sub></td>
-    <td align="center" width="33%"><a href="images/lock-screen.png"><img src="images/lock-screen.png" alt="Lock screen" width="100%"></a><br><sub>Lock screen</sub></td>
-    <td align="center" width="33%"><a href="images/side-by-side.png"><img src="images/side-by-side.png" alt="Light and dark themes side by side" width="100%"></a><br><sub>Light and dark themes</sub></td>
+    <td align="center" width="33%" colspan="4"><a href="images/photos.png"><img src="images/photos.png" alt="Photos" width="100%"></a><br><sub>Photos</sub></td>
+    <td align="center" width="33%" colspan="4"><a href="images/lock-screen.png"><img src="images/lock-screen.png" alt="Lock screen" width="100%"></a><br><sub>Lock screen</sub></td>
+    <td align="center" width="33%" colspan="4"><a href="images/side-by-side.png"><img src="images/side-by-side.png" alt="Light and dark themes side by side" width="100%"></a><br><sub>Light and dark themes</sub></td>
   </tr>
 </table>
 
