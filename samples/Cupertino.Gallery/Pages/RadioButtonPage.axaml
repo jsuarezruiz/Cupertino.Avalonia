@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.RadioButtonPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="The companion idiom: a 22pt circle that fills with a white centre dot. GroupName makes selection exclusive.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Group" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <RadioButton Content="Small" GroupName="size" />
+              <RadioButton Content="Medium" GroupName="size" IsChecked="True" />
+              <RadioButton Content="Large" GroupName="size" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="AS A LIST"
+                         Footer="A single choice reads best as rows in a card, the way iOS presents an exclusive setting.">
+        <StackPanel>
+          <Grid Classes="case" Height="30">
+            <RadioButton Content="Every day" GroupName="freq" IsChecked="True" />
+          </Grid>
+          <Rectangle Classes="hair" Margin="48,0,0,0" />
+          <Grid Classes="case" Height="30">
+            <RadioButton Content="Weekdays" GroupName="freq" />
+          </Grid>
+          <Rectangle Classes="hair" Margin="48,0,0,0" />
+          <Grid Classes="case" Height="30">
+            <RadioButton Content="Weekends" GroupName="freq" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="A scoped CupertinoAccentBrush override recolors one group.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Custom accent" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <RadioButton Content="Mint" GroupName="tint" IsChecked="True">
+                <RadioButton.Resources>
+                  <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FF00C7BE" />
+                </RadioButton.Resources>
+              </RadioButton>
+              <RadioButton Content="Pink" GroupName="tint">
+                <RadioButton.Resources>
+                  <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FFFF2D55" />
+                </RadioButton.Resources>
+              </RadioButton>
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="Disabled keeps the value and dims.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <RadioButton Content="On" IsChecked="True" IsEnabled="False" />
+              <RadioButton Content="Off" IsEnabled="False" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.ShellView">
+
+  <UserControl.Styles>
+    <Style Selector="Grid.case">
+      <Setter Property="Margin" Value="16,11" />
+    </Style>
+    <Style Selector="TextBlock.case">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Width" Value="96" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+    <Style Selector="WrapPanel.specimens">
+      <Setter Property="Orientation" Value="Horizontal" />
+      <Setter Property="ItemSpacing" Value="10" />
+      <Setter Property="LineSpacing" Value="10" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Rectangle.hair">
+      <Setter Property="Height" Value="0.5" />
+      <Setter Property="Fill" Value="{DynamicResource CupertinoSeparatorBrush}" />
+      <Setter Property="Margin" Value="16,0,0,0" />
+    </Style>
+  </UserControl.Styles>
+
+  <cupertino:CupertinoNavigationPage x:Name="Nav" RootTitle="Cupertino" />
+</UserControl>

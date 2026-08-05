@@ -1,0 +1,75 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ToolTipAndLabelPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="TOOLTIP"
+                         Footer="iOS has none; the tip follows the menu material, as macOS does. Hover to see it.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Hover" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Save" ToolTip.Tip="Writes the document to disk" />
+            <Button Content="Share" ToolTip.Tip="Opens the share sheet" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="The tip is arbitrary content, and ToolTip.Placement picks the edge it appears on.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Rich tip" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Storage">
+              <ToolTip.Tip>
+                <StackPanel Spacing="4" MaxWidth="220">
+                  <TextBlock Text="Storage almost full" FontWeight="SemiBold" />
+                  <TextBlock Text="Only 500 MB remain. Offload unused apps to free space."
+                             TextWrapping="Wrap" FontSize="12"
+                             Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+                </StackPanel>
+              </ToolTip.Tip>
+            </Button>
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Placement" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Below" ToolTip.Tip="Anchored under the button" ToolTip.Placement="Bottom" />
+            <Button Content="Beside" ToolTip.Tip="Anchored to the right" ToolTip.Placement="Right" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="LABEL"
+                         Footer="A Label is a plain 17pt caption that passes focus to its target; disable it with the field it names.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="For a field" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+            <Label Content="_Name" Target="NameField" VerticalAlignment="Center" />
+            <TextBox x:Name="NameField" MinWidth="160" />
+          </StackPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+            <Label Content="_Serial" Target="SerialField" IsEnabled="False" VerticalAlignment="Center" />
+            <TextBox x:Name="SerialField" MinWidth="160" IsEnabled="False" />
+          </StackPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

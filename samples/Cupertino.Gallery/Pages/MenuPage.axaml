@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.MenuPage">
+
+  <UserControl.Styles>
+    <Style Selector="Path.menuicon">
+      <Setter Property="Width" Value="16" />
+      <Setter Property="Height" Value="16" />
+      <Setter Property="Stretch" Value="Uniform" />
+      <Setter Property="Fill" Value="{DynamicResource CupertinoLabelBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="A desktop menu bar: top-level items as quiet buttons, each dropping the thick-material menu panel.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Menu bar" />
+          <Menu Grid.Column="1">
+            <MenuItem Header="File">
+              <MenuItem Header="New" />
+              <MenuItem Header="Open…" />
+              <Separator />
+              <MenuItem Header="Close" />
+            </MenuItem>
+            <MenuItem Header="Edit">
+              <MenuItem Header="Cut" />
+              <MenuItem Header="Copy" />
+              <MenuItem Header="Paste" />
+              <Separator />
+              <MenuItem Header="Delete" Classes="destructive" />
+            </MenuItem>
+            <MenuItem Header="Help">
+              <MenuItem Header="About" />
+            </MenuItem>
+          </Menu>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="MenuItem.Icon puts a glyph in the leading column; the destructive row tints its own.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="With icons" />
+          <Menu Grid.Column="1">
+            <MenuItem Header="Actions">
+              <MenuItem Header="Go home">
+                <MenuItem.Icon>
+                  <Path Classes="menuicon" Data="{StaticResource CupertinoHouseGeometry}" />
+                </MenuItem.Icon>
+              </MenuItem>
+              <MenuItem Header="Search…">
+                <MenuItem.Icon>
+                  <Path Data="{StaticResource CupertinoSearchGeometry}"
+                        Stroke="{DynamicResource CupertinoLabelBrush}"
+                        StrokeThickness="1.8" StrokeLineCap="Round"
+                        Width="16" Height="16" Stretch="Uniform" />
+                </MenuItem.Icon>
+              </MenuItem>
+              <MenuItem Header="Preferences">
+                <MenuItem.Icon>
+                  <Path Classes="menuicon" Data="{StaticResource CupertinoGearGeometry}" />
+                </MenuItem.Icon>
+              </MenuItem>
+              <Separator />
+              <MenuItem Header="Remove" Classes="destructive">
+                <MenuItem.Icon>
+                  <Path Data="{StaticResource CupertinoXMarkGeometry}"
+                        Stroke="{DynamicResource CupertinoDangerBrush}"
+                        StrokeThickness="1.8" StrokeLineCap="Round"
+                        Width="14" Height="14" Stretch="Uniform" />
+                </MenuItem.Icon>
+              </MenuItem>
+            </MenuItem>
+          </Menu>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A disabled item dims and ignores the pointer; a whole top-level item can be disabled too.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <Menu Grid.Column="1">
+            <MenuItem Header="History">
+              <MenuItem Header="Undo" />
+              <MenuItem Header="Redo" IsEnabled="False" />
+              <Separator />
+              <MenuItem Header="Paste" IsEnabled="False" />
+              <MenuItem Header="Paste and Match Style" IsEnabled="False" />
+            </MenuItem>
+            <MenuItem Header="Window" IsEnabled="False" />
+          </Menu>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

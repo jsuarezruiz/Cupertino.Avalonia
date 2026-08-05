@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ExpanderPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="Expander renders as an iOS disclosure group: a 52pt row whose chevron turns down, with the revealed rows indented 21pt.">
+        <Expander Header="Wi-Fi Networks" Margin="16,0">
+          <StackPanel>
+            <!-- Center fixed-height rows with a container. -->
+            <Panel Height="52">
+              <TextBlock Text="Home" FontSize="17" VerticalAlignment="Center"
+                         Foreground="{DynamicResource CupertinoLabelBrush}" />
+            </Panel>
+            <Rectangle Height="0.5" Fill="{DynamicResource CupertinoSeparatorBrush}" />
+            <Panel Height="52">
+              <TextBlock Text="Office" FontSize="17" VerticalAlignment="Center"
+                         Foreground="{DynamicResource CupertinoLabelBrush}" />
+            </Panel>
+          </StackPanel>
+        </Expander>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="Header takes any content, and ExpandDirection=&quot;Up&quot; is accepted although the disclosure idiom always reveals its rows beneath.">
+        <StackPanel>
+          <Expander Margin="16,0">
+            <Expander.Header>
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Text="&#x2726;" FontSize="15" VerticalAlignment="Center"
+                           Foreground="{DynamicResource CupertinoAccentBrush}" />
+                <TextBlock Text="Known Networks" FontSize="17" VerticalAlignment="Center"
+                           Foreground="{DynamicResource CupertinoLabelBrush}" />
+              </StackPanel>
+            </Expander.Header>
+            <Panel Height="52">
+              <TextBlock Text="Coffee Shop" FontSize="17" VerticalAlignment="Center"
+                         Foreground="{DynamicResource CupertinoLabelBrush}" />
+            </Panel>
+          </Expander>
+          <Rectangle Classes="hair" />
+          <Expander Header="Direction Up" ExpandDirection="Up" Margin="16,0">
+            <Panel Height="52">
+              <TextBlock Text="Still revealed below" FontSize="17" VerticalAlignment="Center"
+                         Foreground="{DynamicResource CupertinoLabelBrush}" />
+            </Panel>
+          </Expander>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="IsExpanded presets the group open, and a disabled group dims to 40 percent with its chevron still.">
+        <StackPanel>
+          <Expander Header="Advanced" Margin="16,0" IsExpanded="True">
+            <Panel Height="52">
+              <TextBlock Text="Private Wi-Fi Address" FontSize="17" VerticalAlignment="Center"
+                         Foreground="{DynamicResource CupertinoLabelBrush}" />
+            </Panel>
+          </Expander>
+          <Rectangle Classes="hair" />
+          <Expander Header="Unavailable" Margin="16,0" IsEnabled="False">
+            <Panel Height="52">
+              <TextBlock Text="Hidden while disabled" FontSize="17" VerticalAlignment="Center"
+                         Foreground="{DynamicResource CupertinoLabelBrush}" />
+            </Panel>
+          </Expander>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

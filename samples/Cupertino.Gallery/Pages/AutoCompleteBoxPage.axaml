@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.AutoCompleteBoxPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC" Footer="The bordered text field with a suggestions list on the popover material. Type a fruit.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Suggest" />
+            <AutoCompleteBox x:Name="Fruits" Grid.Column="1"
+                             PlaceholderText="Fruit"
+                             FilterMode="StartsWith" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED" Footer="FilterMode picks the match rule; MinimumPrefixLength holds the popup back until enough is typed.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Contains" />
+            <AutoCompleteBox x:Name="FruitsContains" Grid.Column="1"
+                             PlaceholderText="Matches anywhere"
+                             FilterMode="Contains" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Two letters" />
+            <AutoCompleteBox x:Name="FruitsMin" Grid.Column="1"
+                             PlaceholderText="Type two letters"
+                             FilterMode="StartsWith"
+                             MinimumPrefixLength="2" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES" Footer="A disabled box is a dimmed bordered field; no popup ever opens.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <AutoCompleteBox Grid.Column="1" PlaceholderText="Unavailable" IsEnabled="False" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

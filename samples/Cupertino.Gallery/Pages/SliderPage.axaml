@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.SliderPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC" Footer="5.7pt rail, 37×24pt thumb, the same capsule the switch uses; the accent fill tracks the value.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Value" />
+            <Slider Grid.Column="1" Value="35" Maximum="100" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED" Footer="Minimum, Maximum and Value set the range; a fixed Width makes a compact inline slider. Overriding CupertinoAccentBrush in a slider's Resources recolors its fill alone.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Range 10–20" />
+            <Slider Grid.Column="1" Minimum="10" Maximum="20" Value="16" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Narrow" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <Slider Width="140" Value="30" Maximum="100" VerticalAlignment="Center" />
+              <Slider Width="140" Value="80" Maximum="100" VerticalAlignment="Center" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Custom fill" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <Slider Width="140" Value="60" Maximum="100" VerticalAlignment="Center">
+                <Slider.Resources>
+                  <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FFFF9500" />
+                </Slider.Resources>
+              </Slider>
+              <Slider Width="140" Value="45" Maximum="100" VerticalAlignment="Center">
+                <Slider.Resources>
+                  <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FFAF52DE" />
+                </Slider.Resources>
+              </Slider>
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES" Footer="A disabled slider dims and ignores the pointer; the value stays put.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <Slider Grid.Column="1" Value="50" Maximum="100" IsEnabled="False" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

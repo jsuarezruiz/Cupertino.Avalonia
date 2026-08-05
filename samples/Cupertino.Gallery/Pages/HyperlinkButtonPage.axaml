@@ -1,0 +1,74 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.HyperlinkButtonPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="A link is accent label text with no capsule at all; give it a NavigateUri and it opens in the default browser.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Link" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <HyperlinkButton Content="Learn more" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="External" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <HyperlinkButton Content="avaloniaui.net"
+                             NavigateUri="https://avaloniaui.net" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="The link is ordinary text, so text properties restyle it, and composed content can add a glyph.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Text" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <HyperlinkButton Content="Fine print" FontSize="13" />
+            <HyperlinkButton Content="Body" />
+            <HyperlinkButton Content="Headline" FontSize="20" FontWeight="SemiBold" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="With icon" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <HyperlinkButton>
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="See all" VerticalAlignment="Center" />
+                <Path Data="M 6,3.5 L 11,8 L 6,12.5"
+                      Stroke="{DynamicResource CupertinoAccentBrush}"
+                      StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+                      Width="16" Height="16" Stretch="None"
+                      VerticalAlignment="Center" />
+              </StackPanel>
+            </HyperlinkButton>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A disabled link keeps its accent colour but washes to 40% and ignores the pointer.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <HyperlinkButton Content="Unavailable" IsEnabled="False" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

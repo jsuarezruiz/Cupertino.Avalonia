@@ -1,0 +1,57 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.DialogPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+    <cupertino:Section Header="BASIC"
+                       Footer="Dialog.ShowAsync awaits the chosen action; with no actions given it shows a single OK. Hosted in the window's overlay layer, so the glass samples the app behind it.">
+      <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Message" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Show alert" Classes="bordered" Click="OnInfo" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Confirm" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Delete Photo…" Classes="bordered" Click="OnAlert" />
+          </WrapPanel>
+        </Grid>
+      </StackPanel>
+    </cupertino:Section>
+
+    <cupertino:Section Header="CUSTOMIZED"
+                       Footer="Actions carry a role: Cancel renders quiet, Destructive renders red. ShowSheetAsync stacks them as full-width capsules.">
+      <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Three actions" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Close document…" Classes="bordered" Click="OnThreeActions" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Action sheet" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Photo options…" Classes="bordered" Click="OnSheet" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Chosen" />
+          <TextBlock x:Name="Result" Grid.Column="1" Text="—"
+                     FontSize="15" VerticalAlignment="Center"
+                     Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+        </Grid>
+      </StackPanel>
+    </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

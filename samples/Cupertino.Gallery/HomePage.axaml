@@ -1,0 +1,119 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             x:Class="Cupertino.Gallery.HomePage">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.stat">
+      <Setter Property="FontSize" Value="26" />
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    </Style>
+    <Style Selector="TextBlock.statLabel">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+    <Style Selector="TextBlock.feature">
+      <Setter Property="FontSize" Value="17" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    </Style>
+    <Style Selector="TextBlock.featureBody">
+      <Setter Property="FontSize" Value="14" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="0,150,0,120">
+
+      <TextBlock Text="An iOS 26 design system for Avalonia: controls, typography, colour and motion."
+                 FontSize="15" Margin="20,0,20,22"
+                 Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+
+      <cupertino:Section Header="MATERIAL"
+                         Footer="The surface samples what is behind it: blur, refraction, a chromatic edge and a specular rim, in one Skia shader.">
+        <Panel Height="188" Margin="16,14">
+          <Border CornerRadius="18" ClipToBounds="True">
+            <Panel>
+              <Border>
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Offset="0.0" Color="#FF3A1C71" />
+                    <GradientStop Offset="0.5" Color="#FFD76D77" />
+                    <GradientStop Offset="1.0" Color="#FFFFAF7B" />
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+              <Ellipse Width="150" Height="150" Margin="-40,-30,0,0"
+                       HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.7">
+                <Ellipse.Fill>
+                  <RadialGradientBrush>
+                    <GradientStop Offset="0" Color="#FF4CC2FF" />
+                    <GradientStop Offset="1" Color="#0000C2FF" />
+                  </RadialGradientBrush>
+                </Ellipse.Fill>
+              </Ellipse>
+            </Panel>
+          </Border>
+
+          <cupertino:GlassSurface CornerRadius="20" IsLive="True"
+                                  Width="236" Height="116"
+                                  BlurRadius="24" GlassThickness="11"
+                                  RefractionStrength="18" ChromaticAberration="0.5"
+                                  DepthEffect="0.28" Saturation="1.3"
+                                  LightIntensity="0.9" FresnelStrength="1.2"
+                                  ShadowOpacity="0.26" ShadowBlur="28" ShadowOffset="10">
+            <StackPanel Margin="18,16" Spacing="6">
+              <TextBlock Text="GlassSurface" FontSize="17" FontWeight="SemiBold"
+                         Foreground="White" />
+              <TextBlock Text="Every surface in the library is built on this one control."
+                         FontSize="12" TextWrapping="Wrap" Foreground="#D9FFFFFF" />
+            </StackPanel>
+          </cupertino:GlassSurface>
+        </Panel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="AT A GLANCE">
+        <Grid ColumnDefinitions="*,*,*" Margin="16,16">
+          <StackPanel Spacing="1">
+            <TextBlock Classes="stat" Text="20+" />
+            <TextBlock Classes="statLabel" Text="controls" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="1">
+            <TextBlock Classes="stat" Text="70" />
+            <TextBlock Classes="statLabel" Text="tests" />
+          </StackPanel>
+          <StackPanel Grid.Column="2" Spacing="1">
+            <TextBlock Classes="stat" Text="R=86pt" />
+            <TextBlock Classes="statLabel" Text="wheel radius" />
+          </StackPanel>
+        </Grid>
+      </cupertino:Section>
+
+      <cupertino:Section Header="HOW IT IS BUILT"
+                         Footer="Open Controls for every control with its main cases, or Settings to switch theme and accessibility.">
+        <StackPanel>
+          <StackPanel Spacing="3" Margin="16,12">
+            <TextBlock Classes="feature" Text="Faithful geometry and motion" />
+            <TextBlock Classes="featureBody"
+                       Text="The picker wheel is a real cylinder at R=86pt, the tab blob peaks at 2.02x its width, and the navigation title hands over at 68pt of scroll." />
+          </StackPanel>
+          <Rectangle Classes="hair" />
+          <StackPanel Spacing="3" Margin="16,12">
+            <TextBlock Classes="feature" Text="Stock controls where they fit" />
+            <TextBlock Classes="featureBody"
+                       Text="ToggleSwitch, Slider, Expander and the whole button family are themes over Avalonia's own controls. Custom types appear only where Avalonia has none." />
+          </StackPanel>
+          <Rectangle Classes="hair" />
+          <StackPanel Spacing="3" Margin="16,12">
+            <TextBlock Classes="feature" Text="Accessible by design" />
+            <TextBlock Classes="featureBody"
+                       Text="Reduce Transparency swaps the material for a flat fill without shifting a pixel, and Reduce Motion drops the travel while keeping what it meant." />
+          </StackPanel>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

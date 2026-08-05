@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.IconsPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="GLYPHS"
+                         Footer="Original vector glyphs are used because SF Symbols cannot be redistributed. CupertinoIcon handles alignment and paint mode.">
+        <WrapPanel x:Name="IconGrid" Margin="16,14" ItemSpacing="4" LineSpacing="14" />
+      </cupertino:Section>
+
+      <cupertino:Section Header="USAGE"
+                         Footer="Size scales the design box uniformly; Foreground defaults to the label colour and follows the theme.">
+        <StackPanel Orientation="Horizontal" Spacing="14" Margin="16,14">
+          <cupertino:CupertinoIcon Glyph="camera" Size="16" VerticalAlignment="Center" />
+          <cupertino:CupertinoIcon Glyph="camera" Size="24" VerticalAlignment="Center" />
+          <cupertino:CupertinoIcon Glyph="camera" Size="36" VerticalAlignment="Center" />
+          <cupertino:CupertinoIcon Glyph="camera" Size="48" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource CupertinoAccentBrush}" />
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

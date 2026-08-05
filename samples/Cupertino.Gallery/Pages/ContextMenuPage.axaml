@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ContextMenuPage">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.target">
+      <Setter Property="FontSize" Value="17" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+    <Style Selector="Path.menuicon">
+      <Setter Property="Width" Value="16" />
+      <Setter Property="Height" Value="16" />
+      <Setter Property="Stretch" Value="Uniform" />
+      <Setter Property="Fill" Value="{DynamicResource CupertinoLabelBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="The menu opens on the popover material; destructive items render red.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*" Height="52">
+            <TextBlock Classes="case" Text="Right click" />
+            <Border Grid.Column="1" Background="Transparent">
+              <TextBlock Classes="target" Text="Right-click me" />
+              <Border.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Duplicate" />
+                  <MenuItem Header="Rename" />
+                  <Separator />
+                  <MenuItem Header="Delete" Classes="destructive" />
+                </ContextMenu>
+              </Border.ContextMenu>
+            </Border>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="MenuItem.Icon puts a glyph in the leading column; the rows are the same 44pt menu rows a flyout uses.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*" Height="52">
+            <TextBlock Classes="case" Text="With icons" />
+            <Border Grid.Column="1" Background="Transparent">
+              <TextBlock Classes="target" Text="Right-click for icons" />
+              <Border.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Home">
+                    <MenuItem.Icon>
+                      <Path Classes="menuicon" Data="{StaticResource CupertinoHouseGeometry}" />
+                    </MenuItem.Icon>
+                  </MenuItem>
+                  <MenuItem Header="Search…">
+                    <MenuItem.Icon>
+                      <Path Data="{StaticResource CupertinoSearchGeometry}"
+                        Stroke="{DynamicResource CupertinoLabelBrush}"
+                        StrokeThickness="1.8" StrokeLineCap="Round"
+                        Width="16" Height="16" Stretch="Uniform" />
+                    </MenuItem.Icon>
+                  </MenuItem>
+                  <Separator />
+                  <MenuItem Header="Remove" Classes="destructive">
+                    <MenuItem.Icon>
+                      <Path Data="{StaticResource CupertinoXMarkGeometry}"
+                            Stroke="{DynamicResource CupertinoDangerBrush}"
+                            StrokeThickness="1.8" StrokeLineCap="Round"
+                            Width="14" Height="14" Stretch="Uniform" />
+                    </MenuItem.Icon>
+                  </MenuItem>
+                </ContextMenu>
+              </Border.ContextMenu>
+            </Border>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A disabled item dims and ignores the pointer.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*" Height="52">
+            <TextBlock Classes="case" Text="Disabled" />
+            <Border Grid.Column="1" Background="Transparent">
+              <TextBlock Classes="target" Text="Right-click: some rows disabled" />
+              <Border.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Undo" />
+                  <MenuItem Header="Redo" IsEnabled="False" />
+                  <Separator />
+                  <MenuItem Header="Paste" IsEnabled="False" />
+                </ContextMenu>
+              </Border.ContextMenu>
+            </Border>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

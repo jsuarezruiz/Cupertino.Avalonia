@@ -1,0 +1,113 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.BadgePage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="WinUI's InfoBadge value model on the iOS anatomy: a number shows the capsule, counts cap at 99+, negative is the plain dot.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Counts" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoBadge Value="3" />
+              <cupertino:CupertinoBadge Value="12" />
+              <cupertino:CupertinoBadge Value="120" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Dot" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoBadge Value="-1" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="ON TABS"
+                         Footer="Tabs.BadgeValue puts one on a tab item's icon corner; null removes it.">
+        <Grid Classes="case">
+          <Border CornerRadius="10" ClipToBounds="True" Height="220"
+                  Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
+            <TabControl Classes="bottom" SelectedIndex="0">
+              <TabItem x:Name="BadgeHomeTab" cupertino:Tabs.BadgeValue="3">
+                <TabItem.Header>
+                  <StackPanel Spacing="2">
+                    <Panel Height="24">
+                      <Viewbox Width="23" Height="23" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Panel Width="24" Height="24">
+                          <Path Data="{StaticResource CupertinoHouseGeometry}"
+                                Fill="{Binding #BadgeHomeTab.Foreground}"
+                                IsVisible="{Binding #BadgeHomeTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                          <Path Data="{StaticResource CupertinoHouseGeometry}"
+                                Stroke="{Binding #BadgeHomeTab.Foreground}"
+                                StrokeThickness="1.7" StrokeJoin="Round" StrokeLineCap="Round"
+                                IsVisible="{Binding !#BadgeHomeTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                        </Panel>
+                      </Viewbox>
+                    </Panel>
+                    <TextBlock Text="Inbox" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </TabItem.Header>
+                <Panel />
+              </TabItem>
+              <TabItem x:Name="BadgeNewTab" cupertino:Tabs.BadgeValue="-1">
+                <TabItem.Header>
+                  <StackPanel Spacing="2">
+                    <Panel Height="24">
+                      <Viewbox Width="21.5" Height="21.5" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Panel Width="24" Height="24">
+                          <Path Data="{StaticResource CupertinoSparkleGeometry}"
+                                Fill="{Binding #BadgeNewTab.Foreground}"
+                                IsVisible="{Binding #BadgeNewTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                          <Path Data="{StaticResource CupertinoSparkleGeometry}"
+                                Stroke="{Binding #BadgeNewTab.Foreground}"
+                                StrokeThickness="1.7" StrokeJoin="Round" StrokeLineCap="Round"
+                                IsVisible="{Binding !#BadgeNewTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                        </Panel>
+                      </Viewbox>
+                    </Panel>
+                    <TextBlock Text="New" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </TabItem.Header>
+                <Panel />
+              </TabItem>
+              <TabItem x:Name="BadgePlainTab">
+                <TabItem.Header>
+                  <StackPanel Spacing="2">
+                    <Panel Height="24">
+                      <Viewbox Width="21" Height="21" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Panel Width="24" Height="24">
+                          <Path Data="{StaticResource CupertinoGearGeometry}"
+                                Fill="{Binding #BadgePlainTab.Foreground}"
+                                IsVisible="{Binding #BadgePlainTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                          <Path Data="{StaticResource CupertinoGearGeometry}"
+                                Stroke="{Binding #BadgePlainTab.Foreground}"
+                                StrokeThickness="1.7" StrokeJoin="Round" StrokeLineCap="Round"
+                                IsVisible="{Binding !#BadgePlainTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                        </Panel>
+                      </Viewbox>
+                    </Panel>
+                    <TextBlock Text="Settings" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </TabItem.Header>
+                <Panel />
+              </TabItem>
+            </TabControl>
+          </Border>
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

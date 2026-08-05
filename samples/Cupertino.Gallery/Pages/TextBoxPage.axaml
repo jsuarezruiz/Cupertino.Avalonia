@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.TextBoxPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC" Footer="The default field is a bordered 34pt capsule; PlaceholderText shows until you type.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Field" />
+            <TextBox Grid.Column="1" PlaceholderText="Bordered field" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="With text" />
+            <TextBox Grid.Column="1" Text="Typed value" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED" Footer="Classes plain and search restyle the chrome; PasswordChar and AcceptsReturn reshape the input.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Plain" />
+            <TextBox Grid.Column="1" Classes="plain" PlaceholderText="Borderless list row" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Search" />
+            <TextBox Grid.Column="1" Classes="search" PlaceholderText="Search" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Password" />
+            <TextBox Grid.Column="1" PasswordChar="●" PlaceholderText="Password" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Multiline" />
+            <TextBox Grid.Column="1" AcceptsReturn="True" TextWrapping="Wrap" Height="88"
+                     PlaceholderText="Notes" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES" Footer="Read-only text can still be selected and copied; a disabled field dims entirely.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Read-only" />
+            <TextBox Grid.Column="1" Text="Locked" IsReadOnly="True" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <TextBox Grid.Column="1" PlaceholderText="Disabled" IsEnabled="False" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

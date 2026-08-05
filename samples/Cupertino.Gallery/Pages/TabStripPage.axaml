@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.TabStripPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="TabStrip is the bar without pages: the same segmented capsule, selection only.">
+        <StackPanel Margin="16,14">
+          <TabStrip Classes="segmented" SelectedIndex="0">
+            <TabStripItem Content="Years" />
+            <TabStripItem Content="Months" />
+            <TabStripItem Content="Days" />
+          </TabStrip>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="Bring your own content: the strip drives whatever the app pairs it with, here a TransitioningContentControl cross-fades on selection.">
+        <StackPanel>
+          <Grid Classes="case">
+            <TabStrip x:Name="ModeStrip" Classes="segmented" SelectedIndex="0"
+                      SelectionChanged="OnModeChanged">
+              <TabStripItem Content="Overview" />
+              <TabStripItem Content="Detail" />
+            </TabStrip>
+          </Grid>
+          <Grid Classes="case">
+            <TransitioningContentControl x:Name="ModeStage" Height="56"
+                                         VerticalContentAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="BOTTOM STRIP"
+                         Footer="Classes=&quot;bottom&quot; on a TabStrip is the floating glass bar alone, with the same lens, gestures and detached accessory as the TabControl one, with no page host.">
+        <Grid Classes="case">
+          <Border CornerRadius="10" ClipToBounds="True" Height="300">
+            <Panel>
+              <Image Source="avares://Cupertino.Gallery/Assets/Photos/harbor.jpg" Stretch="UniformToFill" />
+              <TabStrip Classes="bottom" SelectedIndex="0"
+                        VerticalAlignment="Bottom" Margin="0,0,0,26">
+                <cupertino:Tabs.Accessory>
+                  <Button Theme="{StaticResource CupertinoAccessoryButton}">
+                    <Viewbox Width="22" Height="22">
+                      <Path Data="{StaticResource CupertinoSearchGeometry}"
+                            Stroke="{DynamicResource CupertinoLabelBrush}"
+                            StrokeThickness="1.67" StrokeLineCap="Round"
+                            Width="16" Height="16" Stretch="None" />
+                    </Viewbox>
+                  </Button>
+                </cupertino:Tabs.Accessory>
+                <TabStripItem x:Name="StripPhotosTab">
+                  <StackPanel Spacing="2">
+                    <Panel Height="24">
+                      <Viewbox Width="22" Height="22" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Panel Width="24" Height="24">
+                          <Path Data="{StaticResource CupertinoPhotoGeometry}"
+                                Fill="{Binding #StripPhotosTab.Foreground}"
+                                IsVisible="{Binding #StripPhotosTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                          <Path Data="{StaticResource CupertinoPhotoGeometry}"
+                                Stroke="{Binding #StripPhotosTab.Foreground}"
+                                StrokeThickness="1.7" StrokeJoin="Round" StrokeLineCap="Round"
+                                IsVisible="{Binding !#StripPhotosTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                        </Panel>
+                      </Viewbox>
+                    </Panel>
+                    <TextBlock Text="Library" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </TabStripItem>
+                <TabStripItem x:Name="StripAlbumsTab">
+                  <StackPanel Spacing="2">
+                    <Panel Height="24">
+                      <Viewbox Width="22" Height="22" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Panel Width="24" Height="24">
+                          <Path Data="{StaticResource CupertinoStackGeometry}"
+                                Fill="{Binding #StripAlbumsTab.Foreground}"
+                                IsVisible="{Binding #StripAlbumsTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                          <Path Data="{StaticResource CupertinoStackGeometry}"
+                                Stroke="{Binding #StripAlbumsTab.Foreground}"
+                                StrokeThickness="1.7" StrokeJoin="Round" StrokeLineCap="Round"
+                                IsVisible="{Binding !#StripAlbumsTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                        </Panel>
+                      </Viewbox>
+                    </Panel>
+                    <TextBlock Text="Albums" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </TabStripItem>
+              </TabStrip>
+            </Panel>
+          </Border>
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.SwipeViewPage">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.row">
+      <Setter Property="Margin" Value="16,0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="Mail's rows: drag left to reveal the actions, keep going for the full swipe, and the outermost action fires and the row shuts. A short drag springs back.">
+        <StackPanel>
+          <cupertino:CupertinoSwipeView Height="44">
+            <cupertino:CupertinoSwipeView.TrailingActions>
+              <Button Classes="swipe swipe-destructive" Content="Delete" Click="OnDelete" />
+            </cupertino:CupertinoSwipeView.TrailingActions>
+            <TextBlock Classes="row" Text="Drag me left" />
+          </cupertino:CupertinoSwipeView>
+          <Rectangle Classes="hair" />
+          <cupertino:CupertinoSwipeView Height="44">
+            <cupertino:CupertinoSwipeView.TrailingActions>
+              <Button Classes="swipe swipe-destructive" Content="Delete" Click="OnDelete" />
+            </cupertino:CupertinoSwipeView.TrailingActions>
+            <TextBlock Classes="row" Text="Me too" />
+          </cupertino:CupertinoSwipeView>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="Both sides, several actions: leading marks read, trailing flags or deletes. Any control can ride in the slabs.">
+        <StackPanel>
+          <cupertino:CupertinoSwipeView x:Name="RichRow" Height="52">
+            <cupertino:CupertinoSwipeView.LeadingActions>
+              <Button Classes="swipe" Content="Read" Click="OnAction"
+                      Background="{DynamicResource CupertinoAccentBrush}" />
+            </cupertino:CupertinoSwipeView.LeadingActions>
+            <cupertino:CupertinoSwipeView.TrailingActions>
+              <StackPanel Orientation="Horizontal">
+                <Button Classes="swipe" Content="Flag" Click="OnAction"
+                        Background="{DynamicResource CupertinoSystemOrangeBrush}" />
+                <Button Classes="swipe swipe-destructive" Content="Delete" Click="OnDelete" />
+              </StackPanel>
+            </cupertino:CupertinoSwipeView.TrailingActions>
+            <StackPanel VerticalAlignment="Center" Margin="16,0" Spacing="2">
+              <TextBlock Classes="headline" Text="Team lunch"
+                         Foreground="{DynamicResource CupertinoLabelBrush}" />
+              <TextBlock Classes="footnote" Text="Both directions work on this one"
+                         Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+            </StackPanel>
+          </cupertino:CupertinoSwipeView>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="RESULT">
+        <TextBlock x:Name="Log" Classes="row" Margin="16,13" Text="No action yet" />
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

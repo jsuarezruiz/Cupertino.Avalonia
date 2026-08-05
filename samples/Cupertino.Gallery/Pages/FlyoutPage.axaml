@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.FlyoutPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="A plain Flyout drops arbitrary content on the popover material, hosted in the window's overlay layer so the glass is live.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Flyout" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Show details">
+              <Button.Flyout>
+                <Flyout>
+                  <StackPanel Spacing="6" MinWidth="180">
+                    <TextBlock Text="Now Playing" FontWeight="SemiBold" />
+                    <TextBlock Text="Glass on every surface: the popover samples the app behind it."
+                               TextWrapping="Wrap" FontSize="13"
+                               Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+                  </StackPanel>
+                </Flyout>
+              </Button.Flyout>
+            </Button>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="The popover can hold a small form; it stays open while the field has focus.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Form" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Rename…">
+              <Button.Flyout>
+                <Flyout>
+                  <StackPanel Spacing="10" MinWidth="220">
+                    <TextBlock Text="Rename document" FontWeight="SemiBold" />
+                    <TextBox PlaceholderText="New name" />
+                    <Button Content="Rename" Classes="prominent" HorizontalAlignment="Right" />
+                  </StackPanel>
+                </Flyout>
+              </Button.Flyout>
+            </Button>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="PLACEMENT"
+                         Footer="Placement picks the edge the popover anchors to; it flips when the window edge is too close.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Edge" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Above">
+              <Button.Flyout>
+                <Flyout Placement="Top">
+                  <TextBlock Text="Anchored above the button." FontSize="13" />
+                </Flyout>
+              </Button.Flyout>
+            </Button>
+            <Button Content="Below">
+              <Button.Flyout>
+                <Flyout Placement="Bottom">
+                  <TextBlock Text="Anchored below the button." FontSize="13" />
+                </Flyout>
+              </Button.Flyout>
+            </Button>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

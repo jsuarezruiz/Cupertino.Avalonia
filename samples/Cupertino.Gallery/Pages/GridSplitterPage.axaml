@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.GridSplitterPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="COLUMNS"
+                         Footer="Drag the hairline to resize the columns; it brightens to the accent under the pointer.">
+        <Grid Classes="case">
+          <Border CornerRadius="10" ClipToBounds="True" Height="160"
+                  Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
+            <Grid ColumnDefinitions="*,Auto,*">
+              <TextBlock Text="Leading" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <GridSplitter Grid.Column="1" />
+              <TextBlock Grid.Column="2" Text="Trailing" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+        </Grid>
+      </cupertino:Section>
+
+      <cupertino:Section Header="ROWS"
+                         Footer="ResizeDirection=&quot;Rows&quot; turns the hairline sideways to resize the rows instead.">
+        <Grid Classes="case">
+          <Border CornerRadius="10" ClipToBounds="True" Height="200"
+                  Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
+            <Grid RowDefinitions="*,Auto,*">
+              <TextBlock Text="Upper" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <GridSplitter Grid.Row="1" ResizeDirection="Rows" />
+              <TextBlock Grid.Row="2" Text="Lower" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

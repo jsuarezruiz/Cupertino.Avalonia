@@ -1,0 +1,210 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.LockScreenShowcasePage">
+
+  <UserControl.Styles>
+    <Style Selector="Border.aurora">
+      <Style.Animations>
+        <Animation Duration="0:0:9" IterationCount="Infinite" PlaybackDirection="Alternate"
+                   Easing="SineEaseInOut">
+          <KeyFrame Cue="0%"><Setter Property="Opacity" Value="0" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1" /></KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="cupertino|GlassSurface.notif1">
+      <Style.Animations>
+        <Animation Duration="0:0:0.5" Delay="0:0:0.2" FillMode="Backward" Easing="QuadraticEaseOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="TranslateTransform.Y" Value="-24" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.drift">
+      <Style.Animations>
+        <Animation Duration="0:0:14" IterationCount="Infinite" PlaybackDirection="Alternate"
+                   Easing="SineEaseInOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="TranslateTransform.X" Value="-50" />
+            <Setter Property="Opacity" Value="0.25" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="TranslateTransform.X" Value="50" />
+            <Setter Property="Opacity" Value="0.5" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="cupertino|GlassSurface.notif2">
+      <Style.Animations>
+        <Animation Duration="0:0:0.5" Delay="0:0:0.45" FillMode="Backward" Easing="QuadraticEaseOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="TranslateTransform.Y" Value="-24" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+  </UserControl.Styles>
+
+  <Panel Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
+    <Border Width="402" CornerRadius="44" ClipToBounds="True"
+            Margin="0,88,0,24" HorizontalAlignment="Center"
+            BoxShadow="0 24 60 0 #59000000">
+  <Panel>
+    <Border>
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+          <GradientStop Offset="0.0" Color="#FF0F1B3D" />
+          <GradientStop Offset="0.55" Color="#FF3E2A68" />
+          <GradientStop Offset="1.0" Color="#FF7A3B6E" />
+        </LinearGradientBrush>
+      </Border.Background>
+    </Border>
+    <Border Classes="aurora">
+      <Border.Background>
+        <LinearGradientBrush StartPoint="100%,0%" EndPoint="0%,100%">
+          <GradientStop Offset="0.0" Color="#FF16324F" />
+          <GradientStop Offset="0.5" Color="#FF2C6E49" />
+          <GradientStop Offset="1.0" Color="#FF3E2A68" />
+        </LinearGradientBrush>
+      </Border.Background>
+    </Border>
+    <Ellipse Width="420" Height="420" Margin="0,-80,-160,0" Opacity="0.4"
+             HorizontalAlignment="Right" VerticalAlignment="Top">
+      <Ellipse.Fill>
+        <RadialGradientBrush>
+          <GradientStop Offset="0" Color="#FF4CC2FF" />
+          <GradientStop Offset="1" Color="#004CC2FF" />
+        </RadialGradientBrush>
+      </Ellipse.Fill>
+    </Ellipse>
+    <Ellipse Classes="drift" Width="300" Height="300" Margin="0,0,0,-40"
+             HorizontalAlignment="Center" VerticalAlignment="Bottom">
+      <Ellipse.Fill>
+        <RadialGradientBrush>
+          <GradientStop Offset="0" Color="#FFFF6482" />
+          <GradientStop Offset="1" Color="#00FF6482" />
+        </RadialGradientBrush>
+      </Ellipse.Fill>
+    </Ellipse>
+
+    <Viewbox Width="18" Height="18" HorizontalAlignment="Center"
+             VerticalAlignment="Top" Margin="0,58,0,0">
+      <Path Data="{StaticResource CupertinoLockGeometry}"
+            Fill="White" Width="24" Height="24" Stretch="None" />
+    </Viewbox>
+    <StackPanel VerticalAlignment="Top" Margin="0,86,0,0" Spacing="0">
+      <TextBlock x:Name="DateLine" Text="Thursday, July 31" FontSize="20" FontWeight="Medium"
+                 Foreground="#D9FFFFFF" HorizontalAlignment="Center" />
+      <TextBlock x:Name="ClockLine" Text="9:41" FontSize="92" FontWeight="Medium"
+                 Foreground="White" HorizontalAlignment="Center" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center"
+                  Margin="0,10,0,0">
+        <cupertino:GlassSurface CornerRadius="14" IsLive="True"
+                                BlurRadius="18" GlassThickness="0.5"
+                                RefractionStrength="1" Saturation="1.2"
+                                LightIntensity="0.2" FresnelStrength="0.5"
+                                IsAdaptive="False" Tint="#4D101014"
+                                ShadowOpacity="0" ShadowBlur="0" ShadowOffset="0">
+          <TextBlock Text="24° Sunny" FontSize="13" FontWeight="Medium"
+                     Foreground="#E6FFFFFF" Margin="12,5" />
+        </cupertino:GlassSurface>
+        <cupertino:GlassSurface CornerRadius="14" IsLive="True"
+                                BlurRadius="18" GlassThickness="0.5"
+                                RefractionStrength="1" Saturation="1.2"
+                                LightIntensity="0.2" FresnelStrength="0.5"
+                                IsAdaptive="False" Tint="#4D101014"
+                                ShadowOpacity="0" ShadowBlur="0" ShadowOffset="0">
+          <TextBlock Text="Design review · 10:00" FontSize="13" FontWeight="Medium"
+                     Foreground="#E6FFFFFF" Margin="12,5" />
+        </cupertino:GlassSurface>
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel VerticalAlignment="Bottom" Margin="16,0,16,130" Spacing="10">
+      <cupertino:GlassSurface Classes="notif1" CornerRadius="22" IsLive="True"
+                              BlurRadius="28" Saturation="1.8"
+                              GlassThickness="0.35" RefractionStrength="0.10"
+                              DepthEffect="0.25" IsAdaptive="True"
+                              ShadowOpacity="0.20" ShadowBlur="24" ShadowOffset="8">
+        <Grid ColumnDefinitions="Auto,*,Auto" Margin="16,12">
+          <Border Width="38" Height="38" CornerRadius="9" Background="#FF34C759">
+            <Path Data="{StaticResource CupertinoCheckmarkGeometry}"
+                  Stroke="White" StrokeThickness="2.4" StrokeLineCap="Round" StrokeJoin="Round"
+                  Width="16" Height="16" Stretch="None"
+                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <StackPanel Grid.Column="1" Margin="12,0" Spacing="1" VerticalAlignment="Center">
+            <TextBlock Classes="subheadline emphasized" Text="Reminders" Foreground="White" />
+            <TextBlock Classes="footnote" Text="Water the plants" Foreground="#CCFFFFFF" />
+          </StackPanel>
+          <TextBlock Grid.Column="2" Classes="caption1" Text="now"
+                     Foreground="#99FFFFFF" VerticalAlignment="Top" />
+        </Grid>
+      </cupertino:GlassSurface>
+
+      <cupertino:GlassSurface Classes="notif2" CornerRadius="22" IsLive="True"
+                              BlurRadius="28" Saturation="1.8"
+                              GlassThickness="0.35" RefractionStrength="0.10"
+                              DepthEffect="0.25" IsAdaptive="True"
+                              ShadowOpacity="0.20" ShadowBlur="24" ShadowOffset="8">
+        <Grid ColumnDefinitions="Auto,*,Auto" Margin="16,12">
+          <Border Width="38" Height="38" CornerRadius="9" Background="#FF5E5CE6">
+            <Viewbox Width="18" Height="18" HorizontalAlignment="Center"
+                     VerticalAlignment="Center">
+              <Path Data="{StaticResource CupertinoMusicNoteGeometry}"
+                    Fill="White" Width="24" Height="24" Stretch="None" />
+            </Viewbox>
+          </Border>
+          <StackPanel Grid.Column="1" Margin="12,0" Spacing="1" VerticalAlignment="Center">
+            <TextBlock Classes="subheadline emphasized" Text="Music" Foreground="White" />
+            <TextBlock Classes="footnote" Text="Deep Focus is playing nearby" Foreground="#CCFFFFFF" />
+          </StackPanel>
+          <TextBlock Grid.Column="2" Classes="caption1" Text="12m"
+                     Foreground="#99FFFFFF" VerticalAlignment="Top" />
+        </Grid>
+      </cupertino:GlassSurface>
+    </StackPanel>
+
+    <Grid ColumnDefinitions="Auto,*,Auto" Margin="44,0,44,42" VerticalAlignment="Bottom">
+      <cupertino:GlassSurface Width="52" Height="52" CornerRadius="26" IsLive="True"
+                              BlurRadius="22" GlassThickness="1"
+                              RefractionStrength="2" Saturation="1.2"
+                              LightIntensity="0.25" FresnelStrength="0.6"
+                              IsAdaptive="False" Tint="#66101014"
+                              ShadowOpacity="0.18" ShadowBlur="12" ShadowOffset="3">
+        <Path Data="{StaticResource CupertinoFlashlightGeometry}"
+              Fill="White" Width="24" Height="24" Stretch="None"
+              HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </cupertino:GlassSurface>
+      <cupertino:GlassSurface Grid.Column="2" Width="52" Height="52" CornerRadius="26" IsLive="True"
+                              BlurRadius="22" GlassThickness="1"
+                              RefractionStrength="2" Saturation="1.2"
+                              LightIntensity="0.25" FresnelStrength="0.6"
+                              IsAdaptive="False" Tint="#66101014"
+                              ShadowOpacity="0.18" ShadowBlur="12" ShadowOffset="3">
+        <Path Data="{StaticResource CupertinoCameraGeometry}"
+              Fill="White" Width="24" Height="24" Stretch="None"
+              HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </cupertino:GlassSurface>
+    </Grid>
+
+    <Border Width="134" Height="5" CornerRadius="2.5" Background="#E6FFFFFF"
+            HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,9" />
+  </Panel>
+    </Border>
+  </Panel>
+</UserControl>

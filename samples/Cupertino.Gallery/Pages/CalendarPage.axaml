@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.CalendarPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="Avalonia's Calendar with Cupertino styling, accent selection and subdued adjacent months.">
+        <Panel Margin="8,8">
+          <Calendar x:Name="DemoCalendar" HorizontalAlignment="Center" />
+        </Panel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="SelectionMode=&quot;MultipleRange&quot; sweeps whole runs of days, while DisplayDateStart and DisplayDateEnd fence the dates the grid will offer.">
+        <StackPanel>
+          <Grid Classes="case">
+            <StackPanel Spacing="10">
+              <TextBlock FontSize="13" Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                         Text="Multiple range" />
+              <Calendar x:Name="RangeCalendar" SelectionMode="MultipleRange"
+                        HorizontalAlignment="Center" />
+            </StackPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case">
+            <StackPanel Spacing="10">
+              <TextBlock FontSize="13" Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                         Text="Bounded to the current month" />
+              <Calendar x:Name="BoundedCalendar" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="IsTodayHighlighted=&quot;False&quot; drops the accent on today, and a disabled calendar dims and ignores the pointer.">
+        <StackPanel>
+          <Grid Classes="case">
+            <StackPanel Spacing="10">
+              <TextBlock FontSize="13" Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                         Text="Today not highlighted" />
+              <Calendar IsTodayHighlighted="False" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case">
+            <StackPanel Spacing="10">
+              <TextBlock FontSize="13" Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                         Text="Disabled" />
+              <Calendar x:Name="DisabledCalendar" IsEnabled="False" HorizontalAlignment="Center" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

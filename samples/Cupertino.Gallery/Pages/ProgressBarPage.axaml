@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ProgressBarPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="A determinate bar is a 4pt accent capsule over a system-fill track.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Value 25" />
+            <ProgressBar Grid.Column="1" Value="25" Maximum="100" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Value 60" />
+            <ProgressBar Grid.Column="1" Value="60" Maximum="100" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Full" />
+            <ProgressBar Grid.Column="1" Value="100" Maximum="100" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="Foreground retints the capsule; the track keeps the system fill.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Purple" />
+            <ProgressBar Grid.Column="1" Value="60" Maximum="100" Foreground="#FF5E5CE6" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Green" />
+            <ProgressBar Grid.Column="1" Value="80" Maximum="100" Foreground="#FF34C759" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="INDETERMINATE"
+                         Footer="IsIndeterminate swaps the capsule for the iOS eight-spoke spinner.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Spinner" />
+            <ProgressBar Grid.Column="1" IsIndeterminate="True" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="ACTIVITY INDICATOR"
+                         Footer="CupertinoActivityIndicator is the spinner on its own: 20pt by default, sized by Width, and hidden entirely when IsActive is false.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Regular" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoActivityIndicator VerticalAlignment="Center" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Large" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoActivityIndicator Width="35" Height="35" VerticalAlignment="Center" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Tinted" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoActivityIndicator Foreground="{DynamicResource CupertinoAccentBrush}"
+                                                    VerticalAlignment="Center" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Hides stopped" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoActivityIndicator IsActive="{Binding #SpinSwitch.IsChecked}"
+                                                    VerticalAlignment="Center" />
+              <ToggleSwitch x:Name="SpinSwitch" IsChecked="True" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

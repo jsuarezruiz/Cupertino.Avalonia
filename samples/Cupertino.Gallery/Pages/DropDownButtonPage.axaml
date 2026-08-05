@@ -1,0 +1,123 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.DropDownButtonPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="The capsule plus a menu chevron; it opens a MenuFlyout on thick material.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Drop-down" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <DropDownButton Content="Sort">
+              <DropDownButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Name" />
+                  <MenuItem Header="Date" />
+                  <MenuItem Header="Size" />
+                </MenuFlyout>
+              </DropDownButton.Flyout>
+            </DropDownButton>
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="With icon" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <DropDownButton>
+              <DropDownButton.Content>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Path Data="M 8,2.5 L 8,13.5 M 2.5,8 L 13.5,8"
+                        Stroke="{DynamicResource CupertinoLabelBrush}"
+                        StrokeThickness="2" StrokeLineCap="Round"
+                        Width="16" Height="16" Stretch="None"
+                        VerticalAlignment="Center" />
+                  <TextBlock Text="New" VerticalAlignment="Center" />
+                </StackPanel>
+              </DropDownButton.Content>
+              <DropDownButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Document" />
+                  <MenuItem Header="Folder" />
+                </MenuFlyout>
+              </DropDownButton.Flyout>
+            </DropDownButton>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="DropDownButton shares Button's class hooks: prominent, plain, small and large; the chevron always follows the label colour.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Fills" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <DropDownButton Content="Prominent" Classes="prominent">
+              <DropDownButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Duplicate" />
+                  <MenuItem Header="Rename" />
+                </MenuFlyout>
+              </DropDownButton.Flyout>
+            </DropDownButton>
+            <DropDownButton Content="Plain" Classes="plain">
+              <DropDownButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Day" />
+                  <MenuItem Header="Week" />
+                </MenuFlyout>
+              </DropDownButton.Flyout>
+            </DropDownButton>
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Sizes" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <DropDownButton Content="Small" Classes="small">
+              <DropDownButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="All" />
+                  <MenuItem Header="Unread" />
+                </MenuFlyout>
+              </DropDownButton.Flyout>
+            </DropDownButton>
+            <DropDownButton Content="Large" Classes="large">
+              <DropDownButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="All" />
+                  <MenuItem Header="Unread" />
+                </MenuFlyout>
+              </DropDownButton.Flyout>
+            </DropDownButton>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A disabled DropDownButton washes to half opacity and its flyout will not open.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <DropDownButton Content="Sort" IsEnabled="False">
+              <DropDownButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Name" />
+                </MenuFlyout>
+              </DropDownButton.Flyout>
+            </DropDownButton>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

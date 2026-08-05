@@ -1,0 +1,83 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.CheckBoxPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="iOS has no standalone checkbox; this follows the Reminders idiom: a 22pt circle that fills with the accent and shows a white checkmark.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Marks" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <CheckBox Content="Checked" IsChecked="True" />
+              <CheckBox Content="Unchecked" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="AS A LIST"
+                         Footer="The natural habitat: task rows in an inset card, the way Reminders draws them.">
+        <StackPanel>
+          <Grid Classes="case" Height="30">
+            <CheckBox Content="Water the plants" IsChecked="True" />
+          </Grid>
+          <Rectangle Classes="hair" Margin="48,0,0,0" />
+          <Grid Classes="case" Height="30">
+            <CheckBox Content="Book the flights" />
+          </Grid>
+          <Rectangle Classes="hair" Margin="48,0,0,0" />
+          <Grid Classes="case" Height="30">
+            <CheckBox Content="Review the changes" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="IsThreeState adds an indeterminate dash; a scoped CupertinoAccentBrush override recolors one mark.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Three-state" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <CheckBox Content="Mixed" IsThreeState="True" IsChecked="{x:Null}" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Custom accent" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <CheckBox Content="Orange" IsChecked="True">
+                <CheckBox.Resources>
+                  <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FFFF9500" />
+                </CheckBox.Resources>
+              </CheckBox>
+              <CheckBox Content="Purple" IsChecked="True">
+                <CheckBox.Resources>
+                  <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FFAF52DE" />
+                </CheckBox.Resources>
+              </CheckBox>
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A disabled mark keeps its value and dims; a press dims with a fade.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <CheckBox Content="On" IsChecked="True" IsEnabled="False" />
+              <CheckBox Content="Off" IsEnabled="False" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

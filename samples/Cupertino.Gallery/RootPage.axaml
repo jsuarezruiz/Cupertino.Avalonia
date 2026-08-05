@@ -1,0 +1,168 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.RootPage"
+             x:DataType="local:RootPage">
+
+  <UserControl.Resources>
+    <DataTemplate x:Key="EntryTemplate" x:DataType="local:CatalogEntry">
+      <Grid ColumnDefinitions="29,*,Auto" Height="52">
+        <Border Width="29" Height="29" CornerRadius="7"
+                Background="{Binding TileBrush}" VerticalAlignment="Center">
+          <TextBlock Text="{Binding Glyph}" FontSize="17" FontWeight="Medium"
+                     Foreground="White"
+                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+        <TextBlock Grid.Column="1" Text="{Binding Title}" FontSize="17"
+                   Margin="12,0,0,0" VerticalAlignment="Center"
+                   Foreground="{DynamicResource CupertinoLabelBrush}" />
+        <Path Grid.Column="2"
+              Data="{StaticResource CupertinoChevronRightGeometry}"
+              Stroke="{DynamicResource CupertinoTertiaryLabelBrush}"
+              StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+              Width="16" Height="16" Stretch="None"
+              VerticalAlignment="Center" />
+      </Grid>
+    </DataTemplate>
+  </UserControl.Resources>
+
+  <ScrollViewer>
+    <StackPanel Margin="0,113,0,120">
+
+      <cupertino:Section>
+        <Panel x:Name="Hero" Height="188" Margin="16,14" Background="Transparent">
+          <Panel.Transitions>
+            <Transitions>
+              <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+            </Transitions>
+          </Panel.Transitions>
+          <Border CornerRadius="18" ClipToBounds="True">
+            <Panel>
+              <Border>
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Offset="0.0" Color="#FF3A1C71" />
+                    <GradientStop Offset="0.5" Color="#FFD76D77" />
+                    <GradientStop Offset="1.0" Color="#FFFFAF7B" />
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+              <Ellipse Width="150" Height="150" Margin="-40,-30,0,0"
+                       HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.7">
+                <Ellipse.Fill>
+                  <RadialGradientBrush>
+                    <GradientStop Offset="0" Color="#FF4CC2FF" />
+                    <GradientStop Offset="1" Color="#0000C2FF" />
+                  </RadialGradientBrush>
+                </Ellipse.Fill>
+              </Ellipse>
+            </Panel>
+          </Border>
+
+          <cupertino:GlassSurface CornerRadius="20" IsLive="True"
+                                  Width="236" Height="116"
+                                  BlurRadius="24" GlassThickness="11"
+                                  RefractionStrength="18" ChromaticAberration="0.5"
+                                  DepthEffect="0.28" Saturation="1.3"
+                                  LightIntensity="0.9" FresnelStrength="1.2"
+                                  ShadowOpacity="0.26" ShadowBlur="28" ShadowOffset="10">
+            <StackPanel Margin="18,16" Spacing="6">
+              <TextBlock Text="Cupertino" FontSize="17" FontWeight="SemiBold"
+                         Foreground="White" />
+              <TextBlock Text="An iOS design system for Avalonia: controls, typography, colour, motion and Liquid Glass."
+                         FontSize="12" TextWrapping="Wrap" Foreground="#D9FFFFFF" />
+            </StackPanel>
+          </cupertino:GlassSurface>
+
+          <TextBlock x:Name="HeroVersion" FontSize="11" Foreground="#CCFFFFFF"
+                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                     Margin="0,0,14,10" />
+        </Panel>
+      </cupertino:Section>
+
+      <cupertino:Section>
+        <TextBox x:Name="Filter" Classes="search" Margin="16,10"
+                 PlaceholderText="Search"
+                 TextChanged="OnFilterChanged" />
+      </cupertino:Section>
+
+      <cupertino:Section x:Name="ControlsSection" Header="CONTROLS"
+                         Footer="Every control, with its main cases. Tap one to open it.">
+        <ListBox x:Name="Catalog"
+                 ItemsSource="{Binding ControlEntries}"
+                 ItemTemplate="{StaticResource EntryTemplate}"
+                 SelectionMode="Single"
+                 SelectionChanged="OnSelectionChanged">
+          <!-- Virtualisation cannot measure inside Section's StackPanel. -->
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+        </ListBox>
+      </cupertino:Section>
+
+      <cupertino:Section x:Name="CupertinoSection" Header="CUPERTINO CONTROLS"
+                         Footer="Controls this library adds: iOS experiences with no stock Avalonia counterpart.">
+        <ListBox x:Name="CupertinoCatalog"
+                 ItemsSource="{Binding CupertinoEntries}"
+                 ItemTemplate="{StaticResource EntryTemplate}"
+                 SelectionMode="Single"
+                 SelectionChanged="OnSelectionChanged">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+        </ListBox>
+      </cupertino:Section>
+
+      <cupertino:Section x:Name="PresentationSection" Header="PRESENTATION"
+                         Footer="Overlays that present over the app: alerts, sheets, popovers and banners.">
+        <ListBox x:Name="PresentationCatalog"
+                 ItemsSource="{Binding PresentationEntries}"
+                 ItemTemplate="{StaticResource EntryTemplate}"
+                 SelectionMode="Single"
+                 SelectionChanged="OnSelectionChanged">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+        </ListBox>
+      </cupertino:Section>
+
+      <cupertino:Section x:Name="ShowcasesSection" Header="SHOWCASES"
+                         Footer="Whole screens composed from the shipped controls, glass over live content.">
+        <ListBox x:Name="ShowcasesCatalog"
+                 ItemsSource="{Binding ShowcaseEntries}"
+                 ItemTemplate="{StaticResource EntryTemplate}"
+                 SelectionMode="Single"
+                 SelectionChanged="OnSelectionChanged">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+        </ListBox>
+      </cupertino:Section>
+
+      <cupertino:Section x:Name="StylesSection" Header="STYLES"
+                         Footer="The design system behind the controls: type ramp, palette and the material.">
+        <ListBox x:Name="StylesCatalog"
+                 ItemsSource="{Binding StyleEntries}"
+                 ItemTemplate="{StaticResource EntryTemplate}"
+                 SelectionMode="Single"
+                 SelectionChanged="OnSelectionChanged">
+          <ListBox.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel />
+            </ItemsPanelTemplate>
+          </ListBox.ItemsPanel>
+        </ListBox>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ListBoxPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="A plain ListBox is transparent, so the Section supplies the inset-grouped card around its 44pt rows.">
+        <ListBox SelectionMode="Single" SelectedIndex="0">
+          <ListBoxItem Content="First row" />
+          <ListBoxItem Content="Second row" />
+          <ListBoxItem Content="Third row" />
+        </ListBox>
+      </cupertino:Section>
+
+      <TextBlock Text="CUSTOMIZED" FontSize="13" TextWrapping="Wrap"
+                 Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                 Margin="32,0,32,7" />
+      <ListBox Classes="inset icons" Margin="16,0" SelectionMode="Single" SelectedIndex="0">
+        <ListBoxItem>
+          <Grid ColumnDefinitions="29,*">
+            <Border Width="29" Height="29" CornerRadius="7"
+                    Background="#FF007AFF" VerticalAlignment="Center">
+              <TextBlock Text="&#x2726;" FontSize="15" Foreground="White"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Grid.Column="1" Text="Wi-Fi" FontSize="17"
+                       Margin="12,0,0,0" VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+          </Grid>
+        </ListBoxItem>
+        <ListBoxItem>
+          <Grid ColumnDefinitions="29,*">
+            <Border Width="29" Height="29" CornerRadius="7"
+                    Background="#FF34C759" VerticalAlignment="Center">
+              <TextBlock Text="&#x26AD;" FontSize="15" Foreground="White"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Grid.Column="1" Text="Personal Hotspot" FontSize="17"
+                       Margin="12,0,0,0" VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+          </Grid>
+        </ListBoxItem>
+        <ListBoxItem>
+          <Grid ColumnDefinitions="29,*">
+            <Border Width="29" Height="29" CornerRadius="7"
+                    Background="#FFFF9500" VerticalAlignment="Center">
+              <TextBlock Text="&#x2708;" FontSize="15" Foreground="White"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Grid.Column="1" Text="Airplane Mode" FontSize="17"
+                       Margin="12,0,0,0" VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+          </Grid>
+        </ListBoxItem>
+      </ListBox>
+      <TextBlock FontSize="13" TextWrapping="Wrap"
+                 Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                 Margin="32,7,32,24"
+                 Text="Classes=&quot;inset&quot; draws the grouped card itself; adding &quot;icons&quot; switches to 52pt rows whose separator starts at the label, past the 29pt tile." />
+
+      <cupertino:Section Header="STATES"
+                         Footer="SelectionMode=&quot;Multiple&quot; keeps every tapped row lit, and a row with IsEnabled=&quot;False&quot; dims and ignores the tap.">
+        <ListBox SelectionMode="Multiple">
+          <ListBoxItem Content="Shared album" IsSelected="True" />
+          <ListBoxItem Content="Family photos" IsSelected="True" />
+          <ListBoxItem Content="Screenshots" />
+          <ListBoxItem Content="Hidden" IsEnabled="False" />
+        </ListBox>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

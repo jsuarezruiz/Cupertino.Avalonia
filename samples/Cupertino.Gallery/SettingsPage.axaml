@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             x:Class="Cupertino.Gallery.SettingsPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="APPEARANCE"
+                         Footer="Reduce transparency and reduce motion mirror the iOS switches. An app wires them to the platform setting; the controls read them.">
+        <StackPanel Margin="16,14" Spacing="12">
+          <TabStrip x:Name="AppearanceStrip" Classes="segmented" SelectedIndex="0"
+                    SelectionChanged="OnAppearanceChanged">
+            <TabStripItem Content="Automatic" />
+            <TabStripItem Content="Light" />
+            <TabStripItem Content="Dark" />
+          </TabStrip>
+
+          <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+            <TextBlock Text="Reduce transparency" FontSize="17"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <ToggleSwitch x:Name="ReduceGlass" Grid.Column="1"
+                          IsCheckedChanged="OnReduceGlassChanged" />
+          </Grid>
+
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Reduce motion" FontSize="17"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <ToggleSwitch x:Name="ReduceMotion" Grid.Column="1"
+                          IsCheckedChanged="OnReduceMotionChanged" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="LAYOUT DIRECTION"
+                         Footer="System follows the current UI culture. LTR and RTL force the whole gallery so mirrored layout, gestures, calendars, and navigation can be inspected live.">
+        <StackPanel Margin="16,14" Spacing="8">
+          <TextBlock Text="Direction" FontSize="17"
+                     Foreground="{DynamicResource CupertinoLabelBrush}" />
+          <TabStrip x:Name="DirectionStrip" Classes="segmented"
+                    SelectionChanged="OnDirectionChanged">
+            <TabStripItem Content="System" />
+            <TabStripItem Content="LTR" />
+            <TabStripItem Content="RTL" />
+          </TabStrip>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="ACCENT"
+                         Footer="CupertinoTheme.Accent retints the whole accent family (buttons, focus, selection) in both variants, at runtime.">
+        <StackPanel x:Name="AccentRow" Orientation="Horizontal" Spacing="12" Margin="16,14" />
+      </cupertino:Section>
+
+      <cupertino:Section Header="ABOUT">
+        <StackPanel>
+          <StackPanel Margin="16,12" Spacing="6">
+            <TextBlock Text="Cupertino.Avalonia" FontSize="17" FontWeight="SemiBold"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <TextBlock Text="An iOS design system for Avalonia"
+                       FontSize="13" TextWrapping="Wrap"
+                       Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+          </StackPanel>
+          <Rectangle Height="0.5" Fill="{DynamicResource CupertinoSeparatorBrush}"
+                     Margin="16,0,0,0" />
+          <Grid ColumnDefinitions="*,Auto" Height="44" Margin="16,0">
+            <TextBlock Text="Version" FontSize="17" VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <TextBlock x:Name="LibVersion" Grid.Column="1" FontSize="17"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+          </Grid>
+          <Rectangle Height="0.5" Fill="{DynamicResource CupertinoSeparatorBrush}"
+                     Margin="16,0,0,0" />
+          <Grid ColumnDefinitions="*,Auto" Height="44" Margin="16,0">
+            <TextBlock Text="Avalonia" FontSize="17" VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <TextBlock x:Name="AvaloniaVersion" Grid.Column="1" FontSize="17"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+          </Grid>
+          <Rectangle Height="0.5" Fill="{DynamicResource CupertinoSeparatorBrush}"
+                     Margin="16,0,0,0" />
+          <Grid ColumnDefinitions="*,Auto" Height="44" Margin="16,0">
+            <TextBlock Text=".NET" FontSize="17" VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <TextBlock x:Name="RuntimeVersion" Grid.Column="1" FontSize="17"
+                       VerticalAlignment="Center"
+                       Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

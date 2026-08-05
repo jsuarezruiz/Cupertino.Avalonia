@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.MaskedTextBoxPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC" Footer="A MaskedTextBox is the bordered text field with an input mask; 0 stands for a required digit.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Phone" />
+            <MaskedTextBox Grid.Column="1" Mask="(000) 000-0000" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED" Footer="The mask grammar covers literal separators, case shifting (&gt;) and escaped literals (\#).">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Date" />
+            <MaskedTextBox Grid.Column="1" Mask="00/00/0000" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Hex colour" />
+            <MaskedTextBox Grid.Column="1" Mask="\#&gt;AAAAAA" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES" Footer="A disabled field keeps its chrome at full strength. Only the ink greys and input stops, as iOS does.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <MaskedTextBox Grid.Column="1" Mask="(000) 000-0000" IsEnabled="False" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -12,12 +12,13 @@ dotnet add package Cupertino.Avalonia
 
 ## Use
 
-Add the theme to your `Application`, and your existing Avalonia controls take the iOS look.
+Add `CupertinoTheme` after your base theme.
 
 ```xml
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:cupertino="https://cupertino.avaloniaui.net">
   <Application.Styles>
+    <FluentTheme />
     <cupertino:CupertinoTheme />
   </Application.Styles>
 </Application>
@@ -34,9 +35,9 @@ Add the theme to your `Application`, and your existing Avalonia controls take th
 
 ## What is included
 
-**Themed Avalonia controls.** Buttons in every role and size, switches, sliders, text fields including search and masked variants, checkboxes and radios, pickers for date and time, lists, trees, tabs, menus, flyouts, dialogs, progress, expanders and more.
+**Themed Avalonia controls.** Buttons in every role and size, switches, sliders, text fields including search and masked variants, checkboxes and radios, pickers for date and time, lists, trees, tabs, menus, flyouts, dialogs, progress, refresh and expanders.
 
-**Controls iOS has that Avalonia does not.** `CupertinoSheet` with detents, `CupertinoSwipeView` for row actions, `CupertinoBadge`, `CupertinoToolbar`, `CupertinoNavigationPage` with the interactive back gesture and restorable routes, reusable `CupertinoListCell` and `CupertinoFormRow`, `CupertinoSearchController`, `CupertinoPageControl`, inline/compact date, time, duration and paired date-time pickers, `RefreshContainer` `CupertinoCalendarView`, `CupertinoIcon` and the Liquid Glass surface itself.
+**Controls iOS has that Avalonia does not.** `CupertinoSheet` with detents, `CupertinoSwipeView` for row actions, `CupertinoBadge`, `CupertinoToolbar`, `CupertinoNavigationPage` with the interactive back gesture and restorable routes, reusable `CupertinoListCell` and `CupertinoFormRow`, `CupertinoSearchController`, `CupertinoPageControl`, inline and compact date, time, duration and paired date-time pickers, `CupertinoCalendarView`, `CupertinoIcon` and the Liquid Glass surface itself.
 
 **The design language.** Dynamic Type scaling, inherited RTL layout, the colour system in both light and dark variants, motion curves, and `GlassSurface`, a shader based material that samples and refracts what passes beneath it.
 
@@ -52,8 +53,6 @@ There is an iOS head at `samples/Cupertino.Gallery.iOS`.
 
 ### Screenshots
 
-Click any screenshot to view it at full size.
-
 #### Design language
 
 <table>
@@ -64,6 +63,8 @@ Click any screenshot to view it at full size.
     <td align="center" width="25%"><a href="images/icons.png"><img src="images/icons.png" alt="Icons" width="200"></a><br><sub>Icons</sub></td>
   </tr>
   <tr>
+    <td align="center" width="25%"><a href="images/photos.png"><img src="images/photos.png" alt="Photos" width="200"></a><br><sub>Photos</sub></td>
+    <td align="center" width="25%"><a href="images/lock-screen.png"><img src="images/lock-screen.png" alt="Lock screen" width="200"></a><br><sub>Lock screen</sub></td>
     <td align="center" width="25%"><a href="images/side-by-side.png"><img src="images/side-by-side.png" alt="Light and dark themes side by side" width="200"></a><br><sub>Light and dark themes</sub></td>
   </tr>
 </table>
@@ -72,7 +73,7 @@ Click any screenshot to view it at full size.
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="images/navigation-bar.png"><img src="images/navigation-bar.png" alt="Navigation bar" width="200"></a><br><sub>Nav bar</sub></td>
+    <td align="center" width="25%"><a href="images/navigation-bar.png"><img src="images/navigation-bar.png" alt="Navigation bar" width="200"></a><br><sub>Navigation bar</sub></td>
     <td align="center" width="25%"><a href="images/toolbar.png"><img src="images/toolbar.png" alt="Toolbar" width="200"></a><br><sub>Toolbar</sub></td>
     <td align="center" width="25%"><a href="images/tab-control.png"><img src="images/tab-control.png" alt="Tab control" width="200"></a><br><sub>Tab control</sub></td>
     <td align="center" width="25%"><a href="images/tab-strip.png"><img src="images/tab-strip.png" alt="Tab strip" width="200"></a><br><sub>Tab strip</sub></td>
@@ -81,7 +82,7 @@ Click any screenshot to view it at full size.
     <td align="center" width="25%"><a href="images/split-view.png"><img src="images/split-view.png" alt="Split view" width="200"></a><br><sub>Split view</sub></td>
     <td align="center" width="25%"><a href="images/grid-splitter.png"><img src="images/grid-splitter.png" alt="Grid splitter" width="200"></a><br><sub>Grid splitter</sub></td>
     <td align="center" width="25%"><a href="images/carousel.png"><img src="images/carousel.png" alt="Carousel" width="200"></a><br><sub>Carousel</sub></td>
-    <td align="center" width="25%"><a href="images/transitioning-content-control.png"><img src="images/transitioning-content-control.png" alt="Transitioning content control" width="200"></a><br><sub>Transitions</sub></td>
+    <td align="center" width="25%"><a href="images/transitioning-content-control.png"><img src="images/transitioning-content-control.png" alt="Transitioning content control" width="200"></a><br><sub>Transitioning content</sub></td>
   </tr>
 </table>
 
@@ -89,14 +90,14 @@ Click any screenshot to view it at full size.
 
 <table>
   <tr>
-    <td align="center" width="25%"><a href="images/button.png"><img src="images/button.png" alt="Buttons" width="200"></a><br><sub>Default Button</sub></td>
+    <td align="center" width="25%"><a href="images/button.png"><img src="images/button.png" alt="Button" width="200"></a><br><sub>Button</sub></td>
     <td align="center" width="25%"><a href="images/repeat-button.png"><img src="images/repeat-button.png" alt="Repeat button" width="200"></a><br><sub>Repeat button</sub></td>
     <td align="center" width="25%"><a href="images/hyperlink-button.png"><img src="images/hyperlink-button.png" alt="Hyperlink button" width="200"></a><br><sub>Hyperlink button</sub></td>
     <td align="center" width="25%"><a href="images/toggle-button.png"><img src="images/toggle-button.png" alt="Toggle button" width="200"></a><br><sub>Toggle button</sub></td>
   </tr>
   <tr>
     <td align="center" width="25%"><a href="images/split-button.png"><img src="images/split-button.png" alt="Split button" width="200"></a><br><sub>Split button</sub></td>
-    <td align="center" width="25%"><a href="images/drop-down-button.png"><img src="images/drop-down-button.png" alt="Drop-down button" width="200"></a><br><sub>Drop-down</sub></td>
+    <td align="center" width="25%"><a href="images/drop-down-button.png"><img src="images/drop-down-button.png" alt="Drop-down button" width="200"></a><br><sub>Drop-down button</sub></td>
   </tr>
 </table>
 
@@ -105,15 +106,15 @@ Click any screenshot to view it at full size.
 <table>
   <tr>
     <td align="center" width="25%"><a href="images/text-box.png"><img src="images/text-box.png" alt="Text box" width="200"></a><br><sub>Text box</sub></td>
-    <td align="center" width="25%"><a href="images/masked-text-box.png"><img src="images/masked-text-box.png" alt="Masked text box" width="200"></a><br><sub>Masked</sub></td>
-    <td align="center" width="25%"><a href="images/numeric-up-down.png"><img src="images/numeric-up-down.png" alt="Numeric up-down" width="200"></a><br><sub>Up-down</sub></td>
+    <td align="center" width="25%"><a href="images/masked-text-box.png"><img src="images/masked-text-box.png" alt="Masked text box" width="200"></a><br><sub>Masked text box</sub></td>
+    <td align="center" width="25%"><a href="images/numeric-up-down.png"><img src="images/numeric-up-down.png" alt="Numeric up-down" width="200"></a><br><sub>Numeric up-down</sub></td>
     <td align="center" width="25%"><a href="images/combo-box.png"><img src="images/combo-box.png" alt="Combo box" width="200"></a><br><sub>Combo box</sub></td>
   </tr>
   <tr>
-    <td align="center" width="25%"><a href="images/auto-complete-box.png"><img src="images/auto-complete-box.png" alt="Auto-complete box" width="200"></a><br><sub>Autocomplete</sub></td>
+    <td align="center" width="25%"><a href="images/auto-complete-box.png"><img src="images/auto-complete-box.png" alt="Auto-complete box" width="200"></a><br><sub>Auto-complete box</sub></td>
     <td align="center" width="25%"><a href="images/check-box.png"><img src="images/check-box.png" alt="Check box" width="200"></a><br><sub>Check box</sub></td>
-    <td align="center" width="25%"><a href="images/radio-button.png"><img src="images/radio-button.png" alt="Radio button" width="200"></a><br><sub>RadioButton</sub></td>
-    <td align="center" width="25%"><a href="images/toggle-switch.png"><img src="images/toggle-switch.png" alt="Toggle switch" width="200"></a><br><sub>Switch</sub></td>
+    <td align="center" width="25%"><a href="images/radio-button.png"><img src="images/radio-button.png" alt="Radio button" width="200"></a><br><sub>Radio button</sub></td>
+    <td align="center" width="25%"><a href="images/toggle-switch.png"><img src="images/toggle-switch.png" alt="Toggle switch" width="200"></a><br><sub>Toggle switch</sub></td>
   </tr>
   <tr>
     <td align="center" width="25%"><a href="images/slider.png"><img src="images/slider.png" alt="Slider" width="200"></a><br><sub>Slider</sub></td>
@@ -132,7 +133,7 @@ Click any screenshot to view it at full size.
   </tr>
 </table>
 
-#### Collections
+#### Lists and collections
 
 <table>
   <tr>
@@ -169,7 +170,6 @@ Click any screenshot to view it at full size.
 
 ## Documentation
 
-* [Contributing](CONTRIBUTING.md), including the measurement workflow and code style
 * [FAQ](FAQ.md)
 
 ## Requirements

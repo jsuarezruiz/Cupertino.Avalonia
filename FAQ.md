@@ -2,7 +2,7 @@
 
 ### Is this a wrapper around UIKit or SwiftUI?
 
-No. These are Avalonia controls styled and behaving like their iOS ounterparts. Nothing calls into Apple frameworks, and the library runs anywhere Avalonia runs.
+No. These are Avalonia controls styled and behaving like their iOS counterparts. Nothing calls Apple frameworks, and the library runs anywhere Avalonia runs.
 
 ### Does it work on platforms other than iOS?
 
@@ -18,11 +18,11 @@ Apple does not permit redistributing them. `CupertinoIcon` renders original vect
 
 ### How faithful is it really?
 
-Every metric that is written as measured was taken from official Figma documents, running native apps on the iOS Simulator and verified against our own render.
+The design follows public Apple guidance and native iOS behaviour.
 
 ### Does it support dark mode?
 
-Yes, through Avalonia's theme variants, with a full set of dark resources. Be aware that most measurements so far were captured in light mode, so dark values are derived rather than measured, and a dark measurement pass is on the roadmap.
+Yes. Avalonia theme variants provide complete light and dark resources.
 
 ### Does it support accessibility settings?
 

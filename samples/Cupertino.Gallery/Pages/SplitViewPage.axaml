@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.SplitViewPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="OVERLAY"
+                         Footer="Overlay slides the pane in over a dismissing scrim. The sidebar idiom belongs to iPad and Mac.">
+        <StackPanel>
+        <Grid Classes="case">
+          <ToggleButton x:Name="PaneToggle" Content="Toggle pane"
+                        IsChecked="{Binding #Split.IsPaneOpen, Mode=TwoWay}" />
+        </Grid>
+        <Grid Classes="case">
+          <Border CornerRadius="10" ClipToBounds="True" Height="240"
+                  Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
+            <SplitView x:Name="Split" DisplayMode="Overlay" OpenPaneLength="180">
+              <SplitView.Pane>
+                <StackPanel Margin="12" Spacing="8">
+                  <TextBlock Text="Sidebar" FontWeight="SemiBold" />
+                  <TextBlock Text="Recents" />
+                  <TextBlock Text="Shared" />
+                  <TextBlock Text="Deleted" />
+                </StackPanel>
+              </SplitView.Pane>
+              <TextBlock Text="Content" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </SplitView>
+          </Border>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="INLINE"
+                         Footer="Inline gives the pane its own column and the content yields instead of being covered.">
+        <StackPanel>
+        <Grid Classes="case">
+          <ToggleButton Content="Toggle pane"
+                        IsChecked="{Binding #InlineSplit.IsPaneOpen, Mode=TwoWay}" />
+        </Grid>
+        <Grid Classes="case">
+          <Border CornerRadius="10" ClipToBounds="True" Height="240"
+                  Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
+            <SplitView x:Name="InlineSplit" DisplayMode="Inline" OpenPaneLength="180"
+                       IsPaneOpen="True">
+              <SplitView.Pane>
+                <StackPanel Margin="12" Spacing="8">
+                  <TextBlock Text="Sidebar" FontWeight="SemiBold" />
+                  <TextBlock Text="Library" />
+                  <TextBlock Text="For You" />
+                  <TextBlock Text="Albums" />
+                </StackPanel>
+              </SplitView.Pane>
+              <TextBlock Text="Content" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </SplitView>
+          </Border>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

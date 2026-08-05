@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ComboBoxPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="ComboBox renders as the iOS menu button: accent label plus a chevron.up.chevron.down, with a thick-material dropdown.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Picker" />
+            <ComboBox Grid.Column="1" SelectedIndex="1" HorizontalAlignment="Right">
+              <ComboBoxItem Content="Small" />
+              <ComboBoxItem Content="Medium" />
+              <ComboBoxItem Content="Large" />
+            </ComboBox>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="In a row" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+              <TextBlock Text="Quality" FontSize="17" VerticalAlignment="Center"
+                         Foreground="{DynamicResource CupertinoLabelBrush}" />
+              <ComboBox SelectedIndex="0">
+                <ComboBoxItem Content="Automatic" />
+                <ComboBoxItem Content="High" />
+                <ComboBoxItem Content="Low" />
+              </ComboBox>
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="ComboBoxItem takes any content, and PlaceholderText labels the button until a choice is made.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Item content" />
+            <ComboBox Grid.Column="1" SelectedIndex="0" HorizontalAlignment="Right">
+              <ComboBoxItem>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="&#x2726;" FontSize="15" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoAccentBrush}" />
+                  <TextBlock Text="Wi-Fi" FontSize="17" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoLabelBrush}" />
+                </StackPanel>
+              </ComboBoxItem>
+              <ComboBoxItem>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="&#x2727;" FontSize="15" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoAccentBrush}" />
+                  <TextBlock Text="Bluetooth" FontSize="17" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoLabelBrush}" />
+                </StackPanel>
+              </ComboBoxItem>
+              <ComboBoxItem>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="&#x2708;" FontSize="15" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoAccentBrush}" />
+                  <TextBlock Text="Airplane Mode" FontSize="17" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoLabelBrush}" />
+                </StackPanel>
+              </ComboBoxItem>
+            </ComboBox>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Placeholder" />
+            <ComboBox Grid.Column="1" PlaceholderText="Choose a size" HorizontalAlignment="Right">
+              <ComboBoxItem Content="Small" />
+              <ComboBoxItem Content="Medium" />
+              <ComboBoxItem Content="Large" />
+            </ComboBox>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A disabled picker drops to 40 percent opacity and stops opening its menu.">
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <ComboBox Grid.Column="1" SelectedIndex="0" IsEnabled="False" HorizontalAlignment="Right">
+            <ComboBoxItem Content="Unavailable" />
+          </ComboBox>
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

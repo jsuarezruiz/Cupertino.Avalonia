@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.CupertinoNavigationBarPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+    <cupertino:Section Header="BASIC"
+                       Footer="Large title collapsing to an inline one over 68pt of scroll. CollapseProgress is settable, so both ends are shown here without a scroller; bind Scroller to drive it from real content.">
+      <StackPanel Spacing="10" Margin="16,8,16,12">
+        <Border Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
+                CornerRadius="10" ClipToBounds="True" Height="168">
+          <cupertino:CupertinoNavigationBar Title="Settings" CollapseProgress="0">
+            <cupertino:CupertinoNavigationBar.LeadingContent>
+              <Button Content="Edit" Classes="plain" />
+            </cupertino:CupertinoNavigationBar.LeadingContent>
+            <cupertino:CupertinoNavigationBar.TrailingContent>
+              <Button Content="+" Classes="plain" />
+            </cupertino:CupertinoNavigationBar.TrailingContent>
+          </cupertino:CupertinoNavigationBar>
+        </Border>
+
+        <Border Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
+                CornerRadius="10" ClipToBounds="True" Height="116">
+          <cupertino:CupertinoNavigationBar Title="Settings" CollapseProgress="1">
+            <cupertino:CupertinoNavigationBar.LeadingContent>
+              <Button Content="Edit" Classes="plain" />
+            </cupertino:CupertinoNavigationBar.LeadingContent>
+            <cupertino:CupertinoNavigationBar.TrailingContent>
+              <Button Content="+" Classes="plain" />
+            </cupertino:CupertinoNavigationBar.TrailingContent>
+          </cupertino:CupertinoNavigationBar>
+        </Border>
+      </StackPanel>
+    </cupertino:Section>
+
+    <cupertino:Section Header="CUSTOMIZED"
+                       Footer="IsLargeTitle=False makes an always-inline bar. The inline title holds the screen's centre line and truncates clear of whichever button is wider.">
+      <StackPanel Spacing="10" Margin="16,8,16,12">
+        <Border Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
+                CornerRadius="10" ClipToBounds="True" Height="72">
+          <cupertino:CupertinoNavigationBar Title="Inline only" IsLargeTitle="False">
+            <cupertino:CupertinoNavigationBar.TrailingContent>
+              <Button Content="Done" Classes="plain" />
+            </cupertino:CupertinoNavigationBar.TrailingContent>
+          </cupertino:CupertinoNavigationBar>
+        </Border>
+
+        <Border Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
+                CornerRadius="10" ClipToBounds="True" Height="72">
+          <cupertino:CupertinoNavigationBar Title="A Very Long Destination Title"
+                                            IsLargeTitle="False">
+            <cupertino:CupertinoNavigationBar.LeadingContent>
+              <Button Content="‹ All Settings" Classes="plain" />
+            </cupertino:CupertinoNavigationBar.LeadingContent>
+            <cupertino:CupertinoNavigationBar.TrailingContent>
+              <Button Content="Edit" Classes="plain" />
+            </cupertino:CupertinoNavigationBar.TrailingContent>
+          </cupertino:CupertinoNavigationBar>
+        </Border>
+      </StackPanel>
+    </cupertino:Section>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

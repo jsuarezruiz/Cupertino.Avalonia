@@ -1,0 +1,238 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cupertino="https://cupertino.avaloniaui.net"
+        x:Class="Cupertino.Gallery.MainWindow"
+        Width="460" Height="840"
+        CanResize="True"
+        Title="Avalonia Liquid Glass — Layer 1">
+
+  <Window.Styles>
+    <Style Selector="Ellipse.blob">
+      <Setter Property="RenderTransform">
+        <Setter.Value>
+          <TranslateTransform />
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style Selector="Ellipse.blob1">
+      <Style.Animations>
+        <Animation Duration="0:0:7" IterationCount="INFINITE" PlaybackDirection="Alternate" Easing="SineEaseInOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="TranslateTransform.X" Value="0" />
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="TranslateTransform.X" Value="150" />
+            <Setter Property="TranslateTransform.Y" Value="60" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.blob2">
+      <Style.Animations>
+        <Animation Duration="0:0:9" IterationCount="INFINITE" PlaybackDirection="Alternate" Easing="SineEaseInOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="TranslateTransform.X" Value="0" />
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="TranslateTransform.X" Value="-170" />
+            <Setter Property="TranslateTransform.Y" Value="-90" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="Ellipse.blob3">
+      <Style.Animations>
+        <Animation Duration="0:0:11" IterationCount="INFINITE" PlaybackDirection="Alternate" Easing="SineEaseInOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="TranslateTransform.Y" Value="-140" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="TextBlock.rowTitle">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="TextBlock.rowSub">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Foreground" Value="#B0FFFFFF" />
+    </Style>
+    <Style Selector="TextBlock.knob">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="Foreground" Value="#D0FFFFFF" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Slider">
+      <Setter Property="Margin" Value="0,2" />
+    </Style>
+  </Window.Styles>
+
+  <Panel x:Name="Root">
+
+    <Border>
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+          <GradientStop Offset="0.0" Color="#FF1B0E3F" />
+          <GradientStop Offset="0.35" Color="#FF5B2A86" />
+          <GradientStop Offset="0.65" Color="#FFB93B8F" />
+          <GradientStop Offset="1.0" Color="#FFFF8A50" />
+        </LinearGradientBrush>
+      </Border.Background>
+    </Border>
+
+    <Canvas>
+      <Ellipse Classes="blob blob1" Width="320" Height="320" Canvas.Left="-80" Canvas.Top="60">
+        <Ellipse.Fill>
+          <RadialGradientBrush>
+            <GradientStop Offset="0" Color="#E066E0FF" />
+            <GradientStop Offset="1" Color="#0066E0FF" />
+          </RadialGradientBrush>
+        </Ellipse.Fill>
+      </Ellipse>
+      <Ellipse Classes="blob blob2" Width="380" Height="380" Canvas.Left="220" Canvas.Top="380">
+        <Ellipse.Fill>
+          <RadialGradientBrush>
+            <GradientStop Offset="0" Color="#E0FFD34D" />
+            <GradientStop Offset="1" Color="#00FFD34D" />
+          </RadialGradientBrush>
+        </Ellipse.Fill>
+      </Ellipse>
+      <Ellipse Classes="blob blob3" Width="260" Height="260" Canvas.Left="60" Canvas.Top="560">
+        <Ellipse.Fill>
+          <RadialGradientBrush>
+            <GradientStop Offset="0" Color="#D04DFFA1" />
+            <GradientStop Offset="1" Color="#004DFFA1" />
+          </RadialGradientBrush>
+        </Ellipse.Fill>
+      </Ellipse>
+    </Canvas>
+
+    <ScrollViewer>
+      <StackPanel Margin="24,90,24,120" Spacing="14">
+        <TextBlock Text="Behind the glass" FontSize="28" FontWeight="Bold" Foreground="White" />
+        <TextBlock Text="Scroll me — the glass refracts live content."
+                   FontSize="14" Foreground="#C0FFFFFF" Margin="0,0,0,8" />
+
+        <Border CornerRadius="14" Padding="16" Background="#30FFFFFF">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="rowTitle" Text="Sharp edges test ▛▜▙▟" />
+            <TextBlock Classes="rowSub" Text="High-frequency detail shows the frost blur." />
+          </StackPanel>
+        </Border>
+        <Border CornerRadius="14" Padding="16" Background="#402BD9FE">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="rowTitle" Text="Cyan card" />
+            <TextBlock Classes="rowSub" Text="Saturation boost should make this pop through." />
+          </StackPanel>
+        </Border>
+        <Border CornerRadius="14" Padding="16" Background="#40FF5470">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="rowTitle" Text="Pink card" />
+            <TextBlock Classes="rowSub" Text="Drag the glass panel over me." />
+          </StackPanel>
+        </Border>
+        <Border CornerRadius="14" Padding="16" Background="#40FFD34D">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="rowTitle" Text="Amber card" />
+            <TextBlock Classes="rowSub" Text="Edge refraction bends me near the border." />
+          </StackPanel>
+        </Border>
+        <Border CornerRadius="14" Padding="16" Background="#4058FF7E">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="rowTitle" Text="Green card" />
+            <TextBlock Classes="rowSub" Text="Chromatic aberration splits my edges." />
+          </StackPanel>
+        </Border>
+        <Border CornerRadius="14" Padding="16" Background="#30FFFFFF">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="rowTitle" Text="Typography ABCDEFGH 012345" />
+            <TextBlock Classes="rowSub" Text="Text legibility through the material matters most." />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+
+    <cupertino:GlassSurface x:Name="SwitchCard" Width="300"
+                     CornerRadius="20"
+                     HorizontalAlignment="Center" VerticalAlignment="Top"
+                     Margin="0,296,0,0"
+                     BlurRadius="14" RefractionStrength="12" GlassThickness="9">
+      <StackPanel Margin="18,12" Spacing="4">
+        <ToggleSwitch Content="Wi-Fi" IsChecked="True" HorizontalAlignment="Stretch" Foreground="White" />
+        <ToggleSwitch x:Name="BtSwitch" Content="Bluetooth" IsChecked="False" HorizontalAlignment="Stretch" Foreground="White" />
+        <ToggleSwitch Content="Airplane Mode" IsChecked="True" IsEnabled="False" HorizontalAlignment="Stretch" Foreground="White" />
+      </StackPanel>
+    </cupertino:GlassSurface>
+
+    <cupertino:GlassSurface x:Name="Hero"
+                     Width="300" Height="170"
+                     CornerRadius="28"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Margin="0,330,0,0"
+                     Cursor="Hand">
+      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6">
+        <TextBlock Text="Liquid Glass" FontSize="26" FontWeight="Bold"
+                   Foreground="White" HorizontalAlignment="Center" />
+        <TextBlock Text="GlassSurface · drag me" FontSize="13"
+                   Foreground="#D0FFFFFF" HorizontalAlignment="Center" />
+      </StackPanel>
+    </cupertino:GlassSurface>
+
+    <cupertino:GlassSurface Width="300"
+                     CornerRadius="20"
+                     HorizontalAlignment="Center" VerticalAlignment="Top"
+                     Margin="0,96,0,0"
+                     BlurRadius="12" RefractionStrength="14" GlassThickness="10">
+      <Grid Margin="16,12" ColumnDefinitions="86,*" RowDefinitions="Auto,Auto,Auto,Auto">
+        <TextBlock Classes="knob" Grid.Row="0" Grid.Column="0" Text="Blur" />
+        <Slider Grid.Row="0" Grid.Column="1" Minimum="0" Maximum="60"
+                Value="{Binding #Hero.BlurRadius, Mode=TwoWay}" />
+        <TextBlock Classes="knob" Grid.Row="1" Grid.Column="0" Text="Refraction" />
+        <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="80"
+                Value="{Binding #Hero.RefractionStrength, Mode=TwoWay}" />
+        <TextBlock Classes="knob" Grid.Row="2" Grid.Column="0" Text="Aberration" />
+        <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1"
+                Value="{Binding #Hero.ChromaticAberration, Mode=TwoWay}" />
+        <TextBlock Classes="knob" Grid.Row="3" Grid.Column="0" Text="Light" />
+        <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="4"
+                Value="{Binding #Hero.LightIntensity, Mode=TwoWay}" />
+      </Grid>
+    </cupertino:GlassSurface>
+
+    <StackPanel Orientation="Horizontal" Spacing="10"
+                HorizontalAlignment="Center" VerticalAlignment="Top"
+                Margin="0,36,0,0">
+      <Button Content="Glass" />
+      <Button Content="Bordered" Classes="bordered" />
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="10"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                Margin="0,0,0,106">
+      <Button Content="Glass" />
+      <Button Content="Prominent" Classes="prominent" />
+      <Button Content="Small" Classes="small" />
+      <Button Content="Off" IsEnabled="False" />
+    </StackPanel>
+
+    <cupertino:GlassSurface Width="330" Height="64"
+                     CornerRadius="32"
+                     HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                     Margin="0,0,0,28"
+                     GlassThickness="12" RefractionStrength="18">
+      <UniformGrid Columns="4" VerticalAlignment="Center">
+        <TextBlock Text="⌂" FontSize="24" Foreground="White" HorizontalAlignment="Center" />
+        <TextBlock Text="♥" FontSize="22" Foreground="#C0FFFFFF" HorizontalAlignment="Center" />
+        <TextBlock Text="♪" FontSize="22" Foreground="#C0FFFFFF" HorizontalAlignment="Center" />
+        <TextBlock Text="⚙" FontSize="22" Foreground="#C0FFFFFF" HorizontalAlignment="Center" />
+      </UniformGrid>
+    </cupertino:GlassSurface>
+
+  </Panel>
+</Window>

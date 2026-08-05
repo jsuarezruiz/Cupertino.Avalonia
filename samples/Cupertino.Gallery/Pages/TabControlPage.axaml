@@ -1,0 +1,171 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.TabControlPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="Classes=&quot;segmented&quot; is UISegmentedControl: a 32pt track, the selection slides as a white pill.">
+        <StackPanel Margin="16,14">
+          <TabControl Classes="segmented" SelectedIndex="0">
+            <TabItem Header="Years">
+              <TextBlock Text="Years" HorizontalAlignment="Center" Margin="0,24" />
+            </TabItem>
+            <TabItem Header="Months">
+              <TextBlock Text="Months" HorizontalAlignment="Center" Margin="0,24" />
+            </TabItem>
+            <TabItem Header="Days">
+              <TextBlock Text="Days" HorizontalAlignment="Center" Margin="0,24" />
+            </TabItem>
+          </TabControl>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="A segment header is arbitrary content, so a glyph can ride beside the text.">
+        <StackPanel Margin="16,14">
+          <TabControl Classes="segmented" SelectedIndex="0">
+            <TabItem x:Name="SegHomeTab">
+              <TabItem.Header>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <Path Data="{StaticResource CupertinoHouseGeometry}"
+                        Fill="{Binding #SegHomeTab.Foreground}"
+                        Width="14" Height="14" Stretch="Uniform"
+                        VerticalAlignment="Center" />
+                  <TextBlock Text="Home" VerticalAlignment="Center" />
+                </StackPanel>
+              </TabItem.Header>
+            </TabItem>
+            <TabItem x:Name="SegNewTab">
+              <TabItem.Header>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <Path Data="{StaticResource CupertinoSparkleGeometry}"
+                        Fill="{Binding #SegNewTab.Foreground}"
+                        Width="14" Height="14" Stretch="Uniform"
+                        VerticalAlignment="Center" />
+                  <TextBlock Text="New" VerticalAlignment="Center" />
+                </StackPanel>
+              </TabItem.Header>
+            </TabItem>
+            <TabItem x:Name="SegSettingsTab">
+              <TabItem.Header>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                  <Path Data="{StaticResource CupertinoGearGeometry}"
+                        Fill="{Binding #SegSettingsTab.Foreground}"
+                        Width="14" Height="14" Stretch="Uniform"
+                        VerticalAlignment="Center" />
+                  <TextBlock Text="Settings" VerticalAlignment="Center" />
+                </StackPanel>
+              </TabItem.Header>
+            </TabItem>
+          </TabControl>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="BOTTOM BAR"
+                         Footer="Classes=&quot;bottom&quot; floats the 62pt glass bar over live content. Scroll the Home photos and the glass re-reads what passes beneath. Drag the selection: the lens stretches, refracts what it crosses, and can ride onto the circle, which IS a tab, detached by Tabs.IsDetached; a second tap on it returns to the previous tab.">
+        <Grid Classes="case">
+          <Border CornerRadius="10" ClipToBounds="True" Height="340">
+            <TabControl Classes="bottom" SelectedIndex="0">
+              <TabItem x:Name="BarHomeTab">
+                <TabItem.Header>
+                  <StackPanel Spacing="2">
+                    <Panel Height="24">
+                      <Viewbox Width="23" Height="23" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Panel Width="24" Height="24">
+                          <Path Data="{StaticResource CupertinoHouseGeometry}"
+                                Fill="{Binding #BarHomeTab.Foreground}"
+                                IsVisible="{Binding #BarHomeTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                          <Path Data="{StaticResource CupertinoHouseGeometry}"
+                                Stroke="{Binding #BarHomeTab.Foreground}"
+                                StrokeThickness="1.7" StrokeJoin="Round" StrokeLineCap="Round"
+                                IsVisible="{Binding !#BarHomeTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                        </Panel>
+                      </Viewbox>
+                    </Panel>
+                    <TextBlock Text="Home" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </TabItem.Header>
+                <ScrollViewer x:Name="BarHomeScroll">
+                  <StackPanel>
+                    <Image Source="avares://Cupertino.Gallery/Assets/Photos/alps.jpg" Stretch="UniformToFill" Height="340" />
+                    <Image Source="avares://Cupertino.Gallery/Assets/Photos/fjord.jpg" Stretch="UniformToFill" Height="340" />
+                    <Image Source="avares://Cupertino.Gallery/Assets/Photos/dunes.jpg" Stretch="UniformToFill" Height="340" />
+                    <Image Source="avares://Cupertino.Gallery/Assets/Photos/reef.jpg" Stretch="UniformToFill" Height="340" />
+                  </StackPanel>
+                </ScrollViewer>
+              </TabItem>
+              <TabItem x:Name="BarNewTab">
+                <TabItem.Header>
+                  <StackPanel Spacing="2">
+                    <Panel Height="24">
+                      <Viewbox Width="21.5" Height="21.5" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Panel Width="24" Height="24">
+                          <Path Data="{StaticResource CupertinoSparkleGeometry}"
+                                Fill="{Binding #BarNewTab.Foreground}"
+                                IsVisible="{Binding #BarNewTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                          <Path Data="{StaticResource CupertinoSparkleGeometry}"
+                                Stroke="{Binding #BarNewTab.Foreground}"
+                                StrokeThickness="1.7" StrokeJoin="Round" StrokeLineCap="Round"
+                                IsVisible="{Binding !#BarNewTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                        </Panel>
+                      </Viewbox>
+                    </Panel>
+                    <TextBlock Text="New" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </TabItem.Header>
+                <Image Source="avares://Cupertino.Gallery/Assets/Photos/aurora.jpg" Stretch="UniformToFill" />
+              </TabItem>
+              <TabItem x:Name="BarSettingsTab">
+                <TabItem.Header>
+                  <StackPanel Spacing="2">
+                    <Panel Height="24">
+                      <Viewbox Width="21" Height="21" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Panel Width="24" Height="24">
+                          <Path Data="{StaticResource CupertinoGearGeometry}"
+                                Fill="{Binding #BarSettingsTab.Foreground}"
+                                IsVisible="{Binding #BarSettingsTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                          <Path Data="{StaticResource CupertinoGearGeometry}"
+                                Stroke="{Binding #BarSettingsTab.Foreground}"
+                                StrokeThickness="1.7" StrokeJoin="Round" StrokeLineCap="Round"
+                                IsVisible="{Binding !#BarSettingsTab.IsSelected}"
+                                Width="24" Height="24" Stretch="None" />
+                        </Panel>
+                      </Viewbox>
+                    </Panel>
+                    <TextBlock Text="Settings" HorizontalAlignment="Center" />
+                  </StackPanel>
+                </TabItem.Header>
+                <Image Source="avares://Cupertino.Gallery/Assets/Photos/city.jpg" Stretch="UniformToFill" />
+              </TabItem>
+              <TabItem x:Name="BarSearchTab" cupertino:Tabs.IsDetached="True">
+                <TabItem.Header>
+                  <Viewbox Width="22" Height="22">
+                    <Path Data="{StaticResource CupertinoSearchGeometry}"
+                          Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="1.67" StrokeLineCap="Round"
+                          Width="16" Height="16" Stretch="None" />
+                  </Viewbox>
+                </TabItem.Header>
+                <Panel>
+                  <Image Source="avares://Cupertino.Gallery/Assets/Photos/meadow.jpg" Stretch="UniformToFill" />
+                  <TextBox Classes="search" Width="250" PlaceholderText="Search"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Panel>
+              </TabItem>
+            </TabControl>
+          </Border>
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

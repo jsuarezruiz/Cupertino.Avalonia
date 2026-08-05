@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ToggleSwitchPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC" Footer="63×28pt track, 37×24pt capsule knob. Drag the knob and the track colour follows it.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Switch" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <ToggleSwitch IsChecked="True" />
+              <ToggleSwitch IsChecked="False" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED" Footer="Content puts a label beside the switch; OnContent/OffContent swap the text with the state. Every colour resolves through DynamicResource, so overriding CupertinoSwitchTrackOnTint in a control's Resources recolors that switch alone.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="With label" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <ToggleSwitch Content="Wi-Fi" IsChecked="True" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="On/off text" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <ToggleSwitch OnContent="On" OffContent="Off" IsChecked="True" />
+              <ToggleSwitch OnContent="On" OffContent="Off" IsChecked="False" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Track tint" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <ToggleSwitch IsChecked="True">
+                <ToggleSwitch.Resources>
+                  <Color x:Key="CupertinoSwitchTrackOnTint">#FFFF9500</Color>
+                </ToggleSwitch.Resources>
+              </ToggleSwitch>
+              <ToggleSwitch IsChecked="True">
+                <ToggleSwitch.Resources>
+                  <Color x:Key="CupertinoSwitchTrackOnTint">#FFAF52DE</Color>
+                </ToggleSwitch.Resources>
+              </ToggleSwitch>
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES" Footer="A disabled switch keeps its value. It only dims.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Enabled" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <ToggleSwitch IsChecked="True" />
+              <ToggleSwitch IsChecked="False" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <ToggleSwitch IsChecked="True" IsEnabled="False" />
+              <ToggleSwitch IsChecked="False" IsEnabled="False" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

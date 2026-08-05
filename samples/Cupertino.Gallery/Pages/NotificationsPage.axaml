@@ -1,0 +1,83 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.NotificationsPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="A banner on the thick material, top centre as iOS shows them; it dismisses itself after a moment.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Show" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Show banner" Click="OnInfo" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="TYPES"
+                         Footer="The four NotificationType values differ only in the small leading dot.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Type" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Info" Click="OnInfo" />
+            <Button Content="Success" Click="OnSuccess" />
+            <Button Content="Warning" Click="OnWarning" />
+            <Button Content="Error" Click="OnError" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="DURATION"
+                         Footer="Expiration sets how long a banner stays; TimeSpan.Zero pins it until dismissed. Hover it for the close button.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Timing" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Quick (2 s)" Click="OnQuick" />
+            <Button Content="Slow (10 s)" Click="OnSlow" />
+            <Button Content="Sticky" Click="OnSticky" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOM CONTENT"
+                         Footer="Show(control) hosts arbitrary content in the banner; the INotification path is just a convenience template.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Content" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Now playing…" Click="OnCustomContent" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CALLBACKS"
+                         Footer="OnClick and OnClose report back; clicking a banner dismisses it.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Wired" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Show and watch" Click="OnCallbacks" />
+          </WrapPanel>
+        </Grid>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Last event" />
+          <TextBlock x:Name="CallbackResult" Grid.Column="1" Text="—"
+                     FontSize="15" VerticalAlignment="Center"
+                     Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

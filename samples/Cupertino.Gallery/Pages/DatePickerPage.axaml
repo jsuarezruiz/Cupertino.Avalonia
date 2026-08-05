@@ -1,0 +1,64 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.DatePickerPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="Compact fields are capsules in iOS 26. Tapping the date opens a calendar popover.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Date" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoDatePicker x:Name="DemoDate" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="Paired capsules sit 4pt apart, as iOS shows a date next to its time.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Date and time" />
+            <cupertino:CupertinoDateTimePicker x:Name="DemoDateTime" Grid.Column="1"
+                                              HorizontalAlignment="Right" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Inline bounded" />
+            <cupertino:CupertinoDatePicker x:Name="DemoInlineDate" Grid.Column="1"
+                                           DisplayMode="Inline" HorizontalAlignment="Right" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="AVALONIA DATEPICKER"
+                         Footer="Avalonia's stock DatePicker wears the same capsule and opens its own column presenter.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Stock control" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <DatePicker />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A disabled field washes to 40%, as every Cupertino control does.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoDatePicker x:Name="DemoDateOff" IsEnabled="False" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

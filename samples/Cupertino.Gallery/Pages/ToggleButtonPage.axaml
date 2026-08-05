@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ToggleButtonPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="iOS has no sunken button, so a checked ToggleButton takes the prominent accent fill rather than shading.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Toggle" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <ToggleButton Content="Off" />
+            <ToggleButton Content="On" IsChecked="True" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="Any content fits the capsule: styled glyphs make formatting toggles, and a composed panel makes a labelled one.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Formatting" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <ToggleButton>
+              <TextBlock Text="B" FontWeight="Bold" />
+            </ToggleButton>
+            <ToggleButton IsChecked="True">
+              <TextBlock Text="I" FontStyle="Italic" />
+            </ToggleButton>
+            <ToggleButton>
+              <TextBlock Text="U" TextDecorations="Underline" />
+            </ToggleButton>
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="With content" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <ToggleButton IsChecked="True">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="&#x2713;" VerticalAlignment="Center" />
+                <TextBlock Text="Following" VerticalAlignment="Center" />
+              </StackPanel>
+            </ToggleButton>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="IsThreeState adds an indeterminate stop that dims the capsule to 60%; disabled washes to 40% whichever state it holds.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Three-state" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <ToggleButton Content="Mixed" IsThreeState="True" IsChecked="{x:Null}" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <ToggleButton Content="Off" IsEnabled="False" />
+            <ToggleButton Content="On" IsChecked="True" IsEnabled="False" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

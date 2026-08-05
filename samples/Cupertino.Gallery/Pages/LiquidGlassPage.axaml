@@ -1,0 +1,183 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.LiquidGlassPage">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.chip">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Grid.case">
+      <Setter Property="Margin" Value="16,7" />
+    </Style>
+    <Style Selector="TextBlock.case">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+    <Style Selector="TextBlock.dialvalue">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="CLEAR GLASS"
+                         Footer="The lens: blur, refraction, a chromatic edge and a specular rim, sampling the content behind it live.">
+        <Panel Height="170" Margin="16,14">
+          <Border CornerRadius="18" ClipToBounds="True">
+            <Border>
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                  <GradientStop Offset="0.0" Color="#FF3A1C71" />
+                  <GradientStop Offset="0.5" Color="#FFD76D77" />
+                  <GradientStop Offset="1.0" Color="#FFFFAF7B" />
+                </LinearGradientBrush>
+              </Border.Background>
+            </Border>
+          </Border>
+          <cupertino:GlassSurface CornerRadius="20" IsLive="True"
+                                  Width="200" Height="100"
+                                  BlurRadius="24" GlassThickness="11"
+                                  RefractionStrength="18" ChromaticAberration="0.5"
+                                  DepthEffect="0.28" Saturation="1.3"
+                                  LightIntensity="0.9" FresnelStrength="1.2"
+                                  ShadowOpacity="0.26" ShadowBlur="28" ShadowOffset="10">
+            <TextBlock Classes="chip" Text="Clear" />
+          </cupertino:GlassSurface>
+        </Panel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="THICK MATERIAL"
+                         Footer="The alert's material: flat and vibrant. Saturation is boosted, not reduced, so the panel keeps the backdrop's chroma while staying legible.">
+        <Panel Height="170" Margin="16,14">
+          <Border CornerRadius="18" ClipToBounds="True">
+            <Border>
+              <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                  <GradientStop Offset="0.0" Color="#FF3A1C71" />
+                  <GradientStop Offset="0.5" Color="#FFD76D77" />
+                  <GradientStop Offset="1.0" Color="#FFFFAF7B" />
+                </LinearGradientBrush>
+              </Border.Background>
+            </Border>
+          </Border>
+          <cupertino:GlassSurface CornerRadius="20" IsLive="True"
+                                  Width="200" Height="100"
+                                  BlurRadius="30" GlassThickness="3"
+                                  RefractionStrength="3" ChromaticAberration="0"
+                                  Saturation="4.2" LightIntensity="0"
+                                  FresnelStrength="1.1" IsAdaptive="False"
+                                  Tint="{DynamicResource CupertinoThickMaterialTint}"
+                                  ShadowOpacity="0.16" ShadowBlur="24" ShadowOffset="6">
+            <TextBlock Classes="chip" Text="Thick"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+          </cupertino:GlassSurface>
+        </Panel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="PLAYGROUND"
+                         Footer="The material's dials, live. These are the same GlassSurface properties every control's surface tunes.">
+        <StackPanel>
+          <Panel Height="190" Margin="16,14">
+            <Border CornerRadius="18" ClipToBounds="True">
+              <Panel>
+                <Border>
+                  <Border.Background>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                      <GradientStop Offset="0.0" Color="#FF3A1C71" />
+                      <GradientStop Offset="0.5" Color="#FFD76D77" />
+                      <GradientStop Offset="1.0" Color="#FFFFAF7B" />
+                    </LinearGradientBrush>
+                  </Border.Background>
+                </Border>
+                <Ellipse Width="140" Height="140" Margin="-30,-30,0,0"
+                         HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0.7">
+                  <Ellipse.Fill>
+                    <RadialGradientBrush>
+                      <GradientStop Offset="0" Color="#FF4CC2FF" />
+                      <GradientStop Offset="1" Color="#0000C2FF" />
+                    </RadialGradientBrush>
+                  </Ellipse.Fill>
+                </Ellipse>
+                <TextBlock Text="backdrop" FontSize="13" Foreground="#66FFFFFF"
+                           HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                           Margin="0,0,12,8" />
+              </Panel>
+            </Border>
+            <cupertino:GlassSurface x:Name="Play" IsLive="True"
+                                    CornerRadius="20" Width="220" Height="110"
+                                    BlurRadius="{Binding #BlurDial.Value}"
+                                    GlassThickness="{Binding #ThicknessDial.Value}"
+                                    RefractionStrength="{Binding #RefractionDial.Value}"
+                                    ChromaticAberration="{Binding #AberrationDial.Value}"
+                                    Saturation="{Binding #SaturationDial.Value}"
+                                    LightIntensity="{Binding #LightDial.Value}"
+                                    FresnelStrength="{Binding #FresnelDial.Value}"
+                                    DepthEffect="{Binding #DepthDial.Value}"
+                                    Magnification="{Binding #MagnifyDial.Value}"
+                                    ShadowOpacity="0.26" ShadowBlur="28" ShadowOffset="10">
+              <TextBlock Classes="chip" Text="Liquid Glass" />
+            </cupertino:GlassSurface>
+          </Panel>
+
+          <Grid Classes="case" ColumnDefinitions="96,*,44">
+            <TextBlock Classes="case" Text="Blur" />
+            <Slider x:Name="BlurDial" Grid.Column="1" Maximum="40" Value="24" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #BlurDial.Value, StringFormat='{}{0:0.0}'}" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="96,*,44">
+            <TextBlock Classes="case" Text="Thickness" />
+            <Slider x:Name="ThicknessDial" Grid.Column="1" Maximum="20" Value="11" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #ThicknessDial.Value, StringFormat='{}{0:0.0}'}" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="96,*,44">
+            <TextBlock Classes="case" Text="Refraction" />
+            <Slider x:Name="RefractionDial" Grid.Column="1" Maximum="30" Value="18" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #RefractionDial.Value, StringFormat='{}{0:0.0}'}" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="96,*,44">
+            <TextBlock Classes="case" Text="Aberration" />
+            <Slider x:Name="AberrationDial" Grid.Column="1" Maximum="2" Value="0.5" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #AberrationDial.Value, StringFormat='{}{0:0.00}'}" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="96,*,44">
+            <TextBlock Classes="case" Text="Saturation" />
+            <Slider x:Name="SaturationDial" Grid.Column="1" Maximum="5" Value="1.3" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #SaturationDial.Value, StringFormat='{}{0:0.0}'}" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="96,*,44">
+            <TextBlock Classes="case" Text="Specular" />
+            <Slider x:Name="LightDial" Grid.Column="1" Maximum="2" Value="0.9" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #LightDial.Value, StringFormat='{}{0:0.0}'}" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="96,*,44">
+            <TextBlock Classes="case" Text="Fresnel" />
+            <Slider x:Name="FresnelDial" Grid.Column="1" Maximum="3" Value="1.2" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #FresnelDial.Value, StringFormat='{}{0:0.0}'}" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="96,*,44">
+            <TextBlock Classes="case" Text="Depth" />
+            <Slider x:Name="DepthDial" Grid.Column="1" Maximum="1" Value="0.28" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #DepthDial.Value, StringFormat='{}{0:0.00}'}" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="96,*,44">
+            <TextBlock Classes="case" Text="Magnify" />
+            <Slider x:Name="MagnifyDial" Grid.Column="1" Minimum="1" Maximum="1.4" Value="1" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #MagnifyDial.Value, StringFormat='{}{0:0.00}'}" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

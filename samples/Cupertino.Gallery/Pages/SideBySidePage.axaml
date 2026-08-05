@@ -1,0 +1,270 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             x:Class="Cupertino.Gallery.Pages.SideBySidePage">
+
+  <UserControl.Styles>
+    <Style Selector="TextBlock.case">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Width" Value="88" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+    <Style Selector="TextBlock.colhead">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+    <Style Selector="ContentControl.native">
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer x:Name="Scroller">
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="CONTROLS"
+                         Footer="Each pair sets the same value on both sides. The left specimen is UIKit, rendered live by iOS inside this app. The right specimen is this library.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="colhead" Grid.Column="1" Text="iOS" />
+            <TextBlock Classes="colhead" Grid.Column="2" Text="Avalonia" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Switch" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeSwitch"
+                            Width="63" Height="28" />
+            <ToggleSwitch Grid.Column="2" IsChecked="True"
+                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Slider" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeSlider"
+                            Width="110" Height="34" />
+            <Slider Grid.Column="2" Width="110" Value="40" Maximum="100"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Segmented" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeSegmented"
+                            Width="110" Height="32" />
+            <TabStrip Grid.Column="2" Classes="segmented" Width="110" SelectedIndex="0"
+                      HorizontalAlignment="Center" VerticalAlignment="Center">
+              <TabStripItem Content="One" />
+              <TabStripItem Content="Two" />
+            </TabStrip>
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Progress" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeProgress"
+                            Width="110" Height="4" />
+            <ProgressBar Grid.Column="2" Width="110" Value="60" Maximum="100"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Spinner" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeSpinner"
+                            Width="20" Height="20" />
+            <cupertino:CupertinoActivityIndicator Grid.Column="2" IsActive="True"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Prominent" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeFilledButton"
+                            Width="100" Height="36" />
+            <Button Grid.Column="2" Classes="prominent" Content="Button" Width="100"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Plain button" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativePlainButton"
+                            Width="100" Height="36" />
+            <Button Grid.Column="2" Classes="plain" Content="Button" Width="100"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Stepper" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeStepper"
+                            Width="94" Height="32" />
+            <NumericUpDown Grid.Column="2" Classes="stepper" Value="5" Width="94"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="BARS AND NAVIGATION"
+                         Footer="Compact bars use two destinations so both live implementations keep valid intrinsic spacing. Full-size variants remain available on their individual gallery pages.">
+        <StackPanel>
+          <Grid Margin="16,11,16,7" ColumnDefinitions="*,*" ColumnSpacing="8">
+            <TextBlock Classes="colhead" Text="iOS" />
+            <TextBlock Classes="colhead" Grid.Column="1" Text="Avalonia" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <TextBlock Text="Tab bar" FontSize="13" Margin="16,10,16,5"
+                     Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+          <Grid Margin="8,0,8,10" ColumnDefinitions="*,*" ColumnSpacing="6" Height="83">
+            <ContentControl Classes="native" x:Name="NativeTabBar"
+                            Width="160" Height="83" />
+            <TabStrip Grid.Column="1" Classes="bottom" Width="160" Height="62"
+                      SelectedIndex="0" HorizontalAlignment="Center" VerticalAlignment="Top"
+                      Margin="0,3.5,0,0">
+              <TabStripItem x:Name="CompareHomeTab">
+                <Grid Height="62" MinWidth="59">
+                  <cupertino:CupertinoIcon Glyph="house" Size="32" StrokeThickness="1.9"
+                                           IsVisible="{Binding !#CompareHomeTab.IsSelected}"
+                                           Foreground="{Binding #CompareHomeTab.Foreground}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Top"
+                                           Margin="0,4.9,0,0"
+                                           RenderTransform="scale(0.99,0.96) translate(0.15px,0px)" />
+                  <cupertino:CupertinoIcon Glyph="house.fill" Size="33"
+                                           IsVisible="{Binding #CompareHomeTab.IsSelected}"
+                                           Foreground="{Binding #CompareHomeTab.Foreground}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Top"
+                                           Margin="0,4.5,0,0"
+                                           RenderTransform="scale(1.019,0.986) translate(0.15px,-0.15px)" />
+                  <TextBlock Text="Home" HorizontalAlignment="Center" VerticalAlignment="Top"
+                             Margin="0,35.8,0,0" RenderTransform="scale(1.095,1)" />
+                </Grid>
+              </TabStripItem>
+              <TabStripItem x:Name="CompareSettingsTab">
+                <Grid Height="62" MinWidth="59">
+                  <cupertino:CupertinoIcon Glyph="gearshape" Size="26.3" StrokeThickness="1.7"
+                                           IsVisible="{Binding !#CompareSettingsTab.IsSelected}"
+                                           Foreground="{Binding #CompareSettingsTab.Foreground}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Top"
+                                           Margin="0,7.1,0,0" RenderTransform="scale(1,0.98)" />
+                  <cupertino:CupertinoIcon Glyph="gearshape.fill" Size="27.5"
+                                           IsVisible="{Binding #CompareSettingsTab.IsSelected}"
+                                           Foreground="{Binding #CompareSettingsTab.Foreground}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Top"
+                                           Margin="0,6.8,0,0" RenderTransform="scale(1,0.973)" />
+                  <TextBlock Text="Settings" HorizontalAlignment="Center" VerticalAlignment="Top"
+                             Margin="0,35.8,0,0" RenderTransform="scale(1.01,1)" />
+                </Grid>
+              </TabStripItem>
+            </TabStrip>
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <TextBlock Text="Navigation bar" FontSize="13" Margin="16,10,16,5"
+                     Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+          <Grid Margin="8,0,8,10" ColumnDefinitions="*,*" ColumnSpacing="6" Height="61">
+            <ContentControl Classes="native" x:Name="NativeNavigationBar"
+                            Width="160" Height="61" />
+            <cupertino:CupertinoNavigationBar Grid.Column="1" Classes="embedded" Width="160"
+                                              Title="Library" IsLargeTitle="False"
+                                              HorizontalAlignment="Center">
+              <cupertino:CupertinoNavigationBar.TrailingContent>
+                <Button Theme="{StaticResource CupertinoBarButton}" Width="44">
+                  <TextBlock Text="+" FontSize="35" FontWeight="Light"
+                             VerticalAlignment="Center"
+                             RenderTransform="translate(0px,-2px)" />
+                </Button>
+              </cupertino:CupertinoNavigationBar.TrailingContent>
+            </cupertino:CupertinoNavigationBar>
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <TextBlock Text="Toolbar" FontSize="13" Margin="16,10,16,5"
+                     Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+          <Grid Margin="8,0,8,12" ColumnDefinitions="*,*" ColumnSpacing="6" Height="60">
+            <ContentControl Classes="native" x:Name="NativeToolbar"
+                            Width="160" Height="60" />
+            <cupertino:CupertinoToolbar Grid.Column="1" Classes="embedded" Width="160"
+                                       Margin="4,0,4,12.5" HorizontalAlignment="Center">
+              <Button>
+                <cupertino:CupertinoIcon Glyph="chevron.left" Size="24" StrokeThickness="2"
+                                         RenderTransformOrigin="50%,50%">
+                  <cupertino:CupertinoIcon.RenderTransform>
+                    <TransformGroup>
+                      <ScaleTransform ScaleX="1.12" />
+                      <TranslateTransform Y="-3" />
+                    </TransformGroup>
+                  </cupertino:CupertinoIcon.RenderTransform>
+                </cupertino:CupertinoIcon>
+              </Button>
+              <Button>
+                <cupertino:CupertinoIcon Glyph="chevron.right" Size="24" StrokeThickness="2"
+                                         RenderTransformOrigin="50%,50%">
+                  <cupertino:CupertinoIcon.RenderTransform>
+                    <TransformGroup>
+                      <ScaleTransform ScaleX="1.12" />
+                      <TranslateTransform Y="-3" />
+                    </TransformGroup>
+                  </cupertino:CupertinoIcon.RenderTransform>
+                </cupertino:CupertinoIcon>
+              </Button>
+              <cupertino:ToolbarSpacer />
+              <Button><cupertino:CupertinoIcon Glyph="magnifyingglass" Size="28" StrokeThickness="2.1" /></Button>
+            </cupertino:CupertinoToolbar>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="FIELDS AND PICKERS"
+                         Footer="The two pickers open their own popovers: the left one is the UIKit compact style, the right one is this library's capsule.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Text field" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeTextField"
+                            Width="120" Height="34" />
+            <TextBox Grid.Column="2" Width="120" PlaceholderText="Placeholder"
+                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Search field" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeSearchField"
+                            Width="120" Height="47" />
+            <TextBox Grid.Column="2" Classes="search" Width="120" PlaceholderText="Search"
+                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Date" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeDate"
+                            Width="120" Height="36" />
+            <cupertino:CupertinoDatePicker Grid.Column="2" x:Name="OurDate"
+                                           DateFormat="MMM d, yyyy"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+          <Rectangle Classes="hair" />
+
+          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+            <TextBlock Classes="case" Text="Time" />
+            <ContentControl Classes="native" Grid.Column="1" x:Name="NativeTime"
+                            Width="90" Height="36" />
+            <cupertino:CupertinoTimePicker Grid.Column="2" x:Name="OurTime"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="NOTES"
+                         Footer="Native views live in their own layer above the Avalonia surface, so glass, clipping and transforms do not apply to the left column. A small colour shift can come from colour management rather than the theme.">
+        <StackPanel />
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

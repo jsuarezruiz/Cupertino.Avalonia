@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ColorPickerPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="The colour well: tap the swatch and the picker opens in a popover, as tapping a colour control does on iOS.">
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Colour well" />
+          <ColorPicker Grid.Column="1" Color="#FF007AFF" HorizontalAlignment="Left" />
+        </Grid>
+      </cupertino:Section>
+
+      <cupertino:Section Header="FULL VIEW"
+                         Footer="ColorView is the picker surface itself: Grid, Spectrum and Sliders segments, alpha, and the hex field, arranged as UIColorPickerViewController lays them out. The sliders segment is labelled for RGB, the default here.">
+        <Grid Classes="case">
+          <ColorView Color="#FFFF9500" HorizontalAlignment="Center" />
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

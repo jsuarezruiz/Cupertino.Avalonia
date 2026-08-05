@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             x:Class="Cupertino.Gallery.Pages.ListAndSearchPage">
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120" Spacing="18">
+      <cupertino:Section Header="LIST CELLS"
+                         Footer="Cells share one layout API for leading content, subtitles, detail values, separators, and standard accessories.">
+        <Border CornerRadius="12" ClipToBounds="True" Margin="16,12">
+          <StackPanel>
+            <cupertino:CupertinoListCell Title="Wi-Fi" Detail="Studio"
+                                        AccessoryKind="Disclosure">
+              <cupertino:CupertinoListCell.Leading>
+                <cupertino:CupertinoIcon Glyph="location" Size="22" Foreground="{DynamicResource CupertinoAccentBrush}" />
+              </cupertino:CupertinoListCell.Leading>
+            </cupertino:CupertinoListCell>
+            <cupertino:CupertinoListCell Title="Notifications" Subtitle="Banners, sounds, and badges"
+                                        AccessoryKind="Disclosure">
+              <cupertino:CupertinoListCell.Leading>
+                <cupertino:CupertinoIcon Glyph="bell" Size="22" Foreground="{DynamicResource CupertinoSystemRedBrush}" />
+              </cupertino:CupertinoListCell.Leading>
+            </cupertino:CupertinoListCell>
+            <cupertino:CupertinoListCell Title="Selected option" AccessoryKind="Checkmark" ShowsSeparator="False" />
+          </StackPanel>
+        </Border>
+      </cupertino:Section>
+
+      <cupertino:Section Header="FORM ROWS"
+                         Footer="Help and validation messages occupy one stable row beneath the editor.">
+        <StackPanel>
+          <cupertino:CupertinoFormRow Label="Name" HelpText="Visible to collaborators" IsRequired="True">
+            <TextBox PlaceholderText="Display name" />
+          </cupertino:CupertinoFormRow>
+          <cupertino:CupertinoFormRow Label="Email" ErrorText="Enter a valid email address">
+            <TextBox Text="not-an-email" />
+          </cupertino:CupertinoFormRow>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="SEARCH"
+                         Footer="The compact search button expands into a query field, optional scopes, and a filtered result list.">
+        <cupertino:CupertinoSearchController x:Name="SearchDemo" Margin="16,12"
+                                             Presentation="Collapsible" IsActive="False" />
+      </cupertino:Section>
+
+      <cupertino:Section Header="PAGE CONTROL"
+                         Footer="Drag across the dots or use arrow, Home, and End keys. Ordering mirrors in right-to-left layouts.">
+        <cupertino:CupertinoPageControl Margin="16,12" NumberOfPages="5" CurrentPage="2"
+                                        HorizontalAlignment="Center" />
+      </cupertino:Section>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

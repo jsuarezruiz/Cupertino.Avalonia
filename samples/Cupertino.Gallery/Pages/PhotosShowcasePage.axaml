@@ -1,0 +1,190 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.PhotosShowcasePage">
+
+  <!-- Bundled photos are freely licensed placeholders. -->
+  <Panel Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
+    <Border Width="402" CornerRadius="44" ClipToBounds="True"
+            Margin="0,88,0,24" HorizontalAlignment="Center"
+            BoxShadow="0 24 60 0 #59000000">
+    <Panel>
+    <Border Background="{DynamicResource CupertinoCardBrush}" />
+
+    <TabControl Classes="bottom" SelectedIndex="0">
+      <cupertino:Tabs.Accessory>
+        <Button Theme="{StaticResource CupertinoAccessoryButton}" Click="OnOpenSearch">
+          <Viewbox Width="22" Height="22">
+            <Path Data="{StaticResource CupertinoSearchGeometry}"
+                  Stroke="{DynamicResource CupertinoLabelBrush}"
+                  StrokeThickness="1.67" StrokeLineCap="Round"
+                  Width="16" Height="16" Stretch="None" />
+          </Viewbox>
+        </Button>
+      </cupertino:Tabs.Accessory>
+
+      <TabItem x:Name="LibraryTab">
+        <TabItem.Header>
+          <StackPanel Spacing="2">
+            <Path Data="{StaticResource CupertinoPhotoGeometry}"
+                  Fill="{Binding #LibraryTab.Foreground}"
+                  Width="24" Height="24" Stretch="None" HorizontalAlignment="Center" />
+            <TextBlock Text="Library" HorizontalAlignment="Center" />
+          </StackPanel>
+        </TabItem.Header>
+
+        <Panel>
+          <ScrollViewer x:Name="LibraryScroller">
+            <StackPanel>
+              <Panel Height="150" />
+              <UniformGrid x:Name="LibraryGrid" Columns="3" />
+              <TextBlock x:Name="LibraryCount" Classes="subheadline"
+                         Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                         HorizontalAlignment="Center" Margin="0,18,0,0" />
+              <Panel Height="110" />
+            </StackPanel>
+          </ScrollViewer>
+
+          <cupertino:CupertinoNavigationBar x:Name="LibraryBar"
+                                            Title="Library" VerticalAlignment="Top">
+            <cupertino:CupertinoNavigationBar.TrailingContent>
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Theme="{StaticResource CupertinoAccessoryButton}" Width="44" Height="44">
+                  <Viewbox Width="18" Height="18">
+                    <Path Data="{StaticResource CupertinoFilterGeometry}"
+                          Stroke="{DynamicResource CupertinoLabelBrush}"
+                          StrokeThickness="2" StrokeLineCap="Round"
+                          Width="24" Height="24" Stretch="None" />
+                  </Viewbox>
+                </Button>
+                <Button Content="Select" Classes="small" />
+              </StackPanel>
+            </cupertino:CupertinoNavigationBar.TrailingContent>
+          </cupertino:CupertinoNavigationBar>
+        </Panel>
+      </TabItem>
+
+      <TabItem x:Name="CollectionsTab">
+        <TabItem.Header>
+          <StackPanel Spacing="2">
+            <Path Data="{StaticResource CupertinoStackGeometry}"
+                  Fill="{Binding #CollectionsTab.Foreground}"
+                  Width="24" Height="24" Stretch="None" HorizontalAlignment="Center" />
+            <TextBlock Text="Collections" HorizontalAlignment="Center" />
+          </StackPanel>
+        </TabItem.Header>
+
+        <Panel>
+          <StackPanel Margin="16,168,16,0" Spacing="14">
+            <TextBlock Classes="title2 emphasized" Text="Pinned"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <StackPanel x:Name="PinnedRow" Orientation="Horizontal" Spacing="10" />
+            <TextBlock Classes="title2 emphasized" Text="Albums" Margin="0,14,0,0"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <Border CornerRadius="16" Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
+                    Height="120">
+              <TextBlock Classes="subheadline" Text="No Albums Available"
+                         Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+          </StackPanel>
+
+          <cupertino:CupertinoNavigationBar Title="Collections" VerticalAlignment="Top">
+            <cupertino:CupertinoNavigationBar.TrailingContent>
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Theme="{StaticResource CupertinoAccessoryButton}" Width="44" Height="44">
+                  <TextBlock Text="⋯" FontSize="18" FontWeight="SemiBold"
+                             Foreground="{DynamicResource CupertinoLabelBrush}" />
+                </Button>
+                <Button Theme="{StaticResource CupertinoAccessoryButton}" Width="44" Height="44">
+                  <Viewbox Width="20" Height="20">
+                    <Path Data="{StaticResource CupertinoPersonGeometry}"
+                          Fill="{DynamicResource CupertinoAccentBrush}"
+                          Width="24" Height="24" Stretch="None" />
+                  </Viewbox>
+                </Button>
+              </StackPanel>
+            </cupertino:CupertinoNavigationBar.TrailingContent>
+          </cupertino:CupertinoNavigationBar>
+        </Panel>
+      </TabItem>
+    </TabControl>
+
+    <Panel x:Name="SearchLayer" IsVisible="False" Opacity="0"
+           Background="{DynamicResource CupertinoCardBrush}">
+      <Panel.Transitions>
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+        </Transitions>
+      </Panel.Transitions>
+
+      <ScrollViewer>
+        <StackPanel>
+          <Panel Height="130" />
+          <UniformGrid x:Name="SearchGrid" Columns="3" />
+          <TextBlock x:Name="SearchEmpty" Classes="subheadline" Text="No Results"
+                     Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                     HorizontalAlignment="Center" Margin="0,120,0,0" IsVisible="False" />
+          <Panel Height="110" />
+        </StackPanel>
+      </ScrollViewer>
+
+      <cupertino:CupertinoNavigationBar Title="Search" VerticalAlignment="Top" />
+
+      <Panel x:Name="SearchDock" Height="52" Margin="16,0,16,26" VerticalAlignment="Bottom">
+        <cupertino:GlassSurface x:Name="SearchField" Width="52" Height="52" CornerRadius="26"
+                                HorizontalAlignment="Left"
+                                BlurRadius="18" GlassThickness="10"
+                                RefractionStrength="14" LightIntensity="0.5"
+                                FresnelStrength="1.25"
+                                Tint="{DynamicResource CupertinoTabBarTint}"
+                                ShadowOpacity="0.10" ShadowBlur="9" ShadowOffset="3">
+          <StackPanel x:Name="SearchFieldContent" Orientation="Horizontal" Spacing="8"
+                      Margin="16,0" Opacity="0" ClipToBounds="True">
+            <StackPanel.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+              </Transitions>
+            </StackPanel.Transitions>
+            <Path Data="{StaticResource CupertinoSearchGeometry}"
+                  Stroke="{DynamicResource CupertinoSecondaryLabelBrush}"
+                  StrokeThickness="1.67" StrokeLineCap="Round"
+                  Width="16" Height="16" Stretch="None" VerticalAlignment="Center" />
+            <TextBox x:Name="SearchBox" Classes="plain" Width="180" MinHeight="0"
+                     VerticalAlignment="Center" PlaceholderText="Photos, People, Places"
+                     TextChanged="OnSearchChanged" />
+          </StackPanel>
+        </cupertino:GlassSurface>
+        <Button x:Name="SearchCancel" Content="Cancel" Click="OnCloseSearch"
+                HorizontalAlignment="Right" VerticalAlignment="Center" Opacity="0">
+          <Button.Transitions>
+            <Transitions>
+              <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+            </Transitions>
+          </Button.Transitions>
+        </Button>
+      </Panel>
+    </Panel>
+
+    <Panel x:Name="Viewer" IsVisible="False" Opacity="0" Background="#F2000000">
+      <Panel.Transitions>
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+        </Transitions>
+      </Panel.Transitions>
+      <Image x:Name="ViewerImage" Stretch="Uniform" Margin="0,72,0,90" />
+      <Button Theme="{StaticResource CupertinoAccessoryButton}" Width="44" Height="44"
+              HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,54,0,0"
+              Click="OnCloseViewer">
+        <Path Data="{StaticResource CupertinoXMarkGeometry}"
+              Stroke="White" StrokeThickness="2" StrokeLineCap="Round"
+              Width="16" Height="16" Stretch="None" />
+      </Button>
+      <TextBlock x:Name="ViewerTitle" Classes="headline" Foreground="White"
+                 HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,64,0,0" />
+    </Panel>
+    </Panel>
+    </Border>
+  </Panel>
+</UserControl>

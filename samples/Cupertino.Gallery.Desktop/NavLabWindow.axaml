@@ -1,0 +1,54 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cupertino="https://cupertino.avaloniaui.net"
+        x:Class="Cupertino.Gallery.NavLabWindow"
+        Width="402" Height="874"
+        Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
+        Title="Navigation bar lab">
+  <Panel>
+    <ScrollViewer x:Name="Scroller" Padding="0">
+      <StackPanel Margin="0,150,0,40">
+        <cupertino:Section>
+          <StackPanel>
+            <TextBlock Classes="row" Text="Row 0" />
+            <TextBlock Classes="row" Text="Row 1" />
+            <TextBlock Classes="row" Text="Row 2" />
+            <TextBlock Classes="row" Text="Row 3" />
+            <TextBlock Classes="row" Text="Row 4" />
+            <TextBlock Classes="row" Text="Row 5" />
+            <TextBlock Classes="row" Text="Row 6" />
+            <TextBlock Classes="row" Text="Row 7" />
+            <TextBlock Classes="row" Text="Row 8" />
+            <TextBlock Classes="row" Text="Row 9" />
+            <TextBlock Classes="row" Text="Row 10" />
+            <TextBlock Classes="row" Text="Row 11" />
+            <TextBlock Classes="row" Text="Row 12" />
+            <TextBlock Classes="row" Text="Row 13" />
+            <TextBlock Classes="row" Text="Row 14" />
+          </StackPanel>
+        </cupertino:Section>
+      </StackPanel>
+    </ScrollViewer>
+
+    <cupertino:CupertinoNavigationBar x:Name="Nav"
+                                      Title="Settings"
+                                      Scroller="{Binding #Scroller}">
+      <cupertino:CupertinoNavigationBar.LeadingContent>
+        <Button Content="Edit" />
+      </cupertino:CupertinoNavigationBar.LeadingContent>
+      <cupertino:CupertinoNavigationBar.TrailingContent>
+        <Button Content="+" Width="34" Height="34" Padding="0" CornerRadius="17" />
+      </cupertino:CupertinoNavigationBar.TrailingContent>
+    </cupertino:CupertinoNavigationBar>
+  </Panel>
+
+  <Window.Styles>
+    <Style Selector="TextBlock.row">
+      <Setter Property="FontSize" Value="17" />
+      <Setter Property="Height" Value="52" />
+      <Setter Property="Padding" Value="16,0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    </Style>
+  </Window.Styles>
+</Window>

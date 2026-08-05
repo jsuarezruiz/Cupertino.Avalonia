@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cupertino="https://cupertino.avaloniaui.net"
+        x:Class="Cupertino.Gallery.CalLabWindow"
+        Width="402" Height="420"
+        Background="White"
+        WindowDecorations="None"
+        Title="Calendar lab">
+  <Border Width="330" Background="White"
+          HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0">
+    <cupertino:CupertinoCalendarView x:Name="Cal" />
+  </Border>
+</Window>

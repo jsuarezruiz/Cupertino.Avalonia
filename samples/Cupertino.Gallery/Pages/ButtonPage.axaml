@@ -1,0 +1,109 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ButtonPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+    <cupertino:Section Header="BASIC"
+                       Footer="The default Button is a 34.3pt capsule of live glass with a 17pt medium label, and it holds any content you compose.">
+      <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Glass" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Glass" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="With icon" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button>
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Path Data="M 8,2.5 L 8,13.5 M 2.5,8 L 13.5,8"
+                      Stroke="{DynamicResource CupertinoLabelBrush}"
+                      StrokeThickness="2" StrokeLineCap="Round"
+                      Width="16" Height="16" Stretch="None"
+                      VerticalAlignment="Center" />
+                <TextBlock Text="New" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </WrapPanel>
+        </Grid>
+      </StackPanel>
+    </cupertino:Section>
+
+    <cupertino:Section Header="CUSTOMIZED"
+                       Footer="The prominent class fills the capsule with accent glass and a white label; bordered is a flat translucent capsule; plain keeps just the accent label. A scoped CupertinoProminentTint override recolors one prominent capsule.">
+      <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Prominent" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Prominent" Classes="prominent" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Flat" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Bordered" Classes="bordered" />
+            <Button Content="Plain" Classes="plain" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Custom tint" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Buy" Classes="prominent">
+              <Button.Resources>
+                <Color x:Key="CupertinoProminentTint">#F5FF9500</Color>
+              </Button.Resources>
+            </Button>
+            <Button Content="Delete" Classes="prominent">
+              <Button.Resources>
+                <Color x:Key="CupertinoProminentTint">#F5FF3B30</Color>
+              </Button.Resources>
+            </Button>
+            <Button Content="Link" Classes="plain">
+              <Button.Resources>
+                <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FFAF52DE" />
+              </Button.Resources>
+            </Button>
+          </WrapPanel>
+        </Grid>
+      </StackPanel>
+    </cupertino:Section>
+
+    <cupertino:Section Header="SIZES"
+                       Footer="The small class is the 28pt capsule and large the 50pt one; either combines with a fill class.">
+      <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Sizes" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Small" Classes="small" />
+            <Button Content="Regular" />
+            <Button Content="Large" Classes="large prominent" />
+          </WrapPanel>
+        </Grid>
+      </StackPanel>
+    </cupertino:Section>
+
+    <cupertino:Section Header="STATES"
+                       Footer="A disabled Button washes to half opacity, whichever style it wears, and the glass stops reacting to the pointer.">
+      <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <Button Content="Glass" IsEnabled="False" />
+            <Button Content="Prominent" Classes="prominent" IsEnabled="False" />
+            <Button Content="Bordered" Classes="bordered" IsEnabled="False" />
+          </WrapPanel>
+        </Grid>
+      </StackPanel>
+    </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

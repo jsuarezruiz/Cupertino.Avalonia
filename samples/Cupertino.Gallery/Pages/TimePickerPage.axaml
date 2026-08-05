@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.TimePickerPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="Tapping the capsule opens the wheel, which spins, flings and settles, and a tap on any visible row scrolls it into the selection.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Time" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoTimePicker x:Name="DemoTime" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="DURATION AND INLINE"
+                         Footer="CountdownDuration uses elapsed hours and minutes; Inline keeps the same wheels in the page instead of a popover.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Duration" />
+            <cupertino:CupertinoTimePicker x:Name="DemoDuration" Grid.Column="1"
+                                           Mode="CountdownDuration" MinuteIncrement="5" />
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Inline wheel" />
+            <cupertino:CupertinoTimePicker x:Name="DemoInlineTime" Grid.Column="1"
+                                           DisplayMode="Inline" ClockIdentifier="24HourClock"
+                                           MinuteIncrement="5" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="ClockIdentifier switches the wheel to 24-hour; MinuteIncrement steps the minute column.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="24-hour, 5 min" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoTimePicker x:Name="DemoTime24"
+                                             ClockIdentifier="24HourClock"
+                                             MinuteIncrement="5" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="AVALONIA TIMEPICKER"
+                         Footer="Avalonia's stock TimePicker wears the same capsule and opens its own column presenter.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Stock control" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <TimePicker />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A disabled field washes to 40%, as every Cupertino control does.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <cupertino:CupertinoTimePicker x:Name="DemoTimeOff" IsEnabled="False" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

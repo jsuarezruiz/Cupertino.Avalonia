@@ -1,0 +1,106 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.TypographyPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="TYPE RAMP"
+                         Footer="The iOS text styles as TextBlock classes, SF Pro metrics at the default Dynamic Type size. The family comes from the app; the demo renders Inter.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="34 / 41" />
+            <TextBlock Grid.Column="1" Classes="largetitle" Text="Large Title" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="28 / 34" />
+            <TextBlock Grid.Column="1" Classes="title1" Text="Title 1" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="22 / 28" />
+            <TextBlock Grid.Column="1" Classes="title2" Text="Title 2" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="20 / 25" />
+            <TextBlock Grid.Column="1" Classes="title3" Text="Title 3" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="17 sb / 22" />
+            <TextBlock Grid.Column="1" Classes="headline" Text="Headline" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="17 / 22" />
+            <TextBlock Grid.Column="1" Classes="body" Text="Body" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="16 / 21" />
+            <TextBlock Grid.Column="1" Classes="callout" Text="Callout" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="15 / 20" />
+            <TextBlock Grid.Column="1" Classes="subheadline" Text="Subheadline" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="13 / 18" />
+            <TextBlock Grid.Column="1" Classes="footnote" Text="Footnote" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="12 / 16" />
+            <TextBlock Grid.Column="1" Classes="caption1" Text="Caption 1" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="11 / 13" />
+            <TextBlock Grid.Column="1" Classes="caption2" Text="Caption 2" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="EMPHASIZED"
+                         Footer="Add the emphasized class beside any ramp class for the bold cut.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="title2" />
+            <TextBlock Grid.Column="1" Classes="title2 emphasized" Text="Emphasized Title 2" />
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="body" />
+            <TextBlock Grid.Column="1" Classes="body emphasized" Text="Emphasized Body" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="LABEL HIERARCHY"
+                         Footer="The four label levels; every text style can carry any of them.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Levels" />
+            <StackPanel Grid.Column="1" Spacing="4">
+              <TextBlock Classes="body" Text="Label"
+                         Foreground="{DynamicResource CupertinoLabelBrush}" />
+              <TextBlock Classes="body" Text="Secondary label"
+                         Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+              <TextBlock Classes="body" Text="Tertiary label"
+                         Foreground="{DynamicResource CupertinoTertiaryLabelBrush}" />
+              <TextBlock Classes="body" Text="Placeholder"
+                         Foreground="{DynamicResource CupertinoPlaceholderBrush}" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

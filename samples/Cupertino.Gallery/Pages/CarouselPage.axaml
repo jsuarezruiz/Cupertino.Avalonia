@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.CarouselPage">
+
+  <UserControl.Styles>
+    <Style Selector="Image.slide">
+      <Setter Property="Stretch" Value="UniformToFill" />
+    </Style>
+    <Style Selector="TextBlock.caption">
+      <Setter Property="FontSize" Value="17" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="White" />
+    </Style>
+    <Style Selector="TextBlock.captionsub">
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="Foreground" Value="#CCFFFFFF" />
+    </Style>
+    <Style Selector="Border.scrim">
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+      <Setter Property="Padding" Value="14,28,14,12" />
+      <Setter Property="Background">
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+          <GradientStop Color="#00000000" Offset="0" />
+          <GradientStop Color="#99000000" Offset="1" />
+        </LinearGradientBrush>
+      </Setter>
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="A Carousel shows one page at a time; the theme cross-fades between pages. The dots track SelectedIndex, the way a UIPageControl does.">
+        <StackPanel>
+          <Grid Classes="case">
+            <Border CornerRadius="10" ClipToBounds="True" Height="180">
+              <Carousel x:Name="Pager">
+                <Image Classes="slide" Source="avares://Cupertino.Gallery/Assets/Photos/alps.jpg" />
+                <Image Classes="slide" Source="avares://Cupertino.Gallery/Assets/Photos/fjord.jpg" />
+                <Image Classes="slide" Source="avares://Cupertino.Gallery/Assets/Photos/dunes.jpg" />
+              </Carousel>
+            </Border>
+          </Grid>
+          <Grid Classes="case" ColumnDefinitions="Auto,*,Auto">
+            <Button Content="Previous" Click="OnPrevious" />
+            <cupertino:CupertinoPageControl Grid.Column="1" NumberOfPages="3"
+                                           CurrentPage="{Binding #Pager.SelectedIndex}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Button Grid.Column="2" Content="Next" Click="OnNext" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="PageTransition is swappable; this one slides horizontally like a paged scroll view, and each slide carries its own caption over a scrim.">
+        <StackPanel>
+          <Grid Classes="case">
+            <Border CornerRadius="10" ClipToBounds="True" Height="180">
+              <Carousel x:Name="Cards">
+                <Carousel.PageTransition>
+                  <PageSlide Duration="0:0:0.3" Orientation="Horizontal" />
+                </Carousel.PageTransition>
+                <Panel>
+                  <Image Classes="slide" Source="avares://Cupertino.Gallery/Assets/Photos/aurora.jpg" />
+                  <Border Classes="scrim">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="caption" Text="Aurora" />
+                      <TextBlock Classes="captionsub" Text="Slides are arbitrary content" />
+                    </StackPanel>
+                  </Border>
+                </Panel>
+                <Panel>
+                  <Image Classes="slide" Source="avares://Cupertino.Gallery/Assets/Photos/canyon.jpg" />
+                  <Border Classes="scrim">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="caption" Text="Canyon" />
+                      <TextBlock Classes="captionsub" Text="Each carries its own layout" />
+                    </StackPanel>
+                  </Border>
+                </Panel>
+                <Panel>
+                  <Image Classes="slide" Source="avares://Cupertino.Gallery/Assets/Photos/reef.jpg" />
+                  <Border Classes="scrim">
+                    <StackPanel Spacing="2">
+                      <TextBlock Classes="caption" Text="Reef" />
+                      <TextBlock Classes="captionsub" Text="Paged exactly like the plain one" />
+                    </StackPanel>
+                  </Border>
+                </Panel>
+              </Carousel>
+            </Border>
+          </Grid>
+          <Grid Classes="case">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Content="Previous" Click="OnPreviousCards" />
+              <Button Content="Next" Click="OnNextCards" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

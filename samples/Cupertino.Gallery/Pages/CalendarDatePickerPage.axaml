@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.CalendarDatePickerPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="Avalonia's compact field and calendar control with Cupertino styling.">
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Pick a date" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <CalendarDatePicker PlaceholderText="Select date" />
+          </WrapPanel>
+        </Grid>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="SelectedDateFormat switches between Short and Long text, and Custom hands the shape to CustomDateFormatString.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Preset date" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <CalendarDatePicker x:Name="PresetPicker" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Long format" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <CalendarDatePicker x:Name="LongPicker" SelectedDateFormat="Long" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Custom format" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <CalendarDatePicker x:Name="IsoPicker"
+                                  SelectedDateFormat="Custom"
+                                  CustomDateFormatString="yyyy-MM-dd" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A disabled field dims to 40 percent and never drops its calendar.">
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <CalendarDatePicker PlaceholderText="Unavailable" IsEnabled="False" />
+            <CalendarDatePicker x:Name="DisabledPreset" IsEnabled="False" />
+          </WrapPanel>
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,129 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.ColorsPage">
+
+  <UserControl.Styles>
+    <Style Selector="StackPanel.swatch">
+      <Setter Property="Width" Value="64" />
+      <Setter Property="Spacing" Value="4" />
+    </Style>
+    <Style Selector="StackPanel.swatch > Border">
+      <Setter Property="Height" Value="44" />
+      <Setter Property="CornerRadius" Value="10" />
+    </Style>
+    <Style Selector="StackPanel.swatch > TextBlock">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="SYSTEM COLORS"
+                         Footer="The twelve iOS system colours as CupertinoSystem*Brush resources; each swaps its value with the theme variant.">
+        <Grid Classes="case">
+          <WrapPanel Classes="specimens">
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemRedBrush}" />
+              <TextBlock Text="Red" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemOrangeBrush}" />
+              <TextBlock Text="Orange" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemYellowBrush}" />
+              <TextBlock Text="Yellow" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemGreenBrush}" />
+              <TextBlock Text="Green" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemMintBrush}" />
+              <TextBlock Text="Mint" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemTealBrush}" />
+              <TextBlock Text="Teal" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemCyanBrush}" />
+              <TextBlock Text="Cyan" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemBlueBrush}" />
+              <TextBlock Text="Blue" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemIndigoBrush}" />
+              <TextBlock Text="Indigo" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemPurpleBrush}" />
+              <TextBlock Text="Purple" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemPinkBrush}" />
+              <TextBlock Text="Pink" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSystemBrownBrush}" />
+              <TextBlock Text="Brown" />
+            </StackPanel>
+          </WrapPanel>
+        </Grid>
+      </cupertino:Section>
+
+      <cupertino:Section Header="SEMANTIC ROLES"
+                         Footer="Roles, not hues: controls resolve these by name, which is what makes a scoped override or a theme change work.">
+        <Grid Classes="case">
+          <WrapPanel Classes="specimens">
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoAccentBrush}" />
+              <TextBlock Text="Accent" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoDangerBrush}" />
+              <TextBlock Text="Danger" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoSuccessBrush}" />
+              <TextBlock Text="Success" />
+            </StackPanel>
+            <StackPanel Classes="swatch">
+              <Border Background="{DynamicResource CupertinoWarningBrush}" />
+              <TextBlock Text="Warning" />
+            </StackPanel>
+          </WrapPanel>
+        </Grid>
+      </cupertino:Section>
+
+      <cupertino:Section Header="SURFACES"
+                         Footer="Card over grouped background, split by the hairline separator. The inset-grouped list is these three resources.">
+        <Grid Classes="case">
+          <Border CornerRadius="10" ClipToBounds="True"
+                  Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
+            <StackPanel Margin="16,14" Spacing="10">
+              <Border CornerRadius="10" Background="{DynamicResource CupertinoCardBrush}">
+                <StackPanel>
+                  <TextBlock Classes="body" Text="Card" Margin="16,12" />
+                  <Rectangle Classes="hair" />
+                  <TextBlock Classes="body" Text="Separated row" Margin="16,12" />
+                </StackPanel>
+              </Border>
+              <TextBlock Classes="footnote" Text="Grouped background"
+                         Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                         Margin="16,0,0,4" />
+            </StackPanel>
+          </Border>
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

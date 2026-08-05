@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Cupertino.Gallery.MatteWindow"
+        Width="402" Height="400" CanResize="False"
+        Title="Material test">
+  <Grid RowDefinitions="*,*" x:Name="Root">
+    <Panel Grid.Row="0" Background="#2B1550">
+      <StackPanel Orientation="Horizontal" Spacing="16"
+                  HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Button Content="Glass" />
+        <Button Content="Bordered" Classes="bordered" />
+      </StackPanel>
+    </Panel>
+    <Panel Grid.Row="1" Background="#EFEFF0">
+      <StackPanel Orientation="Horizontal" Spacing="16"
+                  HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Button Content="Glass" />
+        <Button Content="Bordered" Classes="bordered" />
+      </StackPanel>
+    </Panel>
+  </Grid>
+</Window>

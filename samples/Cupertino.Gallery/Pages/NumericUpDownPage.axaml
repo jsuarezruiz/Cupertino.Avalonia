@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.NumericUpDownPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC" Footer="NumericUpDown is a capsule field with a +/- stepper; Minimum and Maximum clamp the value.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="With value" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <NumericUpDown Value="3" Minimum="0" Maximum="10" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED" Footer="Increment sets the step and FormatString the display; Classes=&quot;stepper&quot; drops the text field.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Fractional" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <NumericUpDown Value="2.5" Increment="0.5" Minimum="0" Maximum="5" FormatString="0.0" />
+            </WrapPanel>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Stepper only" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <NumericUpDown Classes="stepper" Value="2" Minimum="0" Maximum="10" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES" Footer="A disabled stepper dims; the value stays put.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Disabled" />
+            <WrapPanel Grid.Column="1" Classes="specimens">
+              <NumericUpDown Value="3" Minimum="0" Maximum="10" IsEnabled="False" />
+              <NumericUpDown Classes="stepper" Value="0" Minimum="0" Maximum="10" IsEnabled="False" />
+            </WrapPanel>
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

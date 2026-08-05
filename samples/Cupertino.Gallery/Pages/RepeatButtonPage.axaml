@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.RepeatButtonPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="RepeatButton keeps firing while held: a 500ms delay, then every 80ms.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Repeat" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <RepeatButton Content="Hold me" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="Delay is the wait in milliseconds before repeating starts; Interval is the gap between repeats once it has.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Timing" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <RepeatButton Content="Eager" Delay="200" Interval="40" />
+            <RepeatButton Content="Deliberate" Delay="1000" Interval="300" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="Hold a stepper and the count keeps moving; a disabled RepeatButton washes to 40% and never fires.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Counter" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <RepeatButton x:Name="RepeatDown" Content="&#x2212;" />
+            <TextBlock x:Name="RepeatReadout" Text="0" MinWidth="36"
+                       TextAlignment="Center" VerticalAlignment="Center"
+                       FontWeight="Medium" />
+            <RepeatButton x:Name="RepeatUp" Content="+" />
+          </WrapPanel>
+        </Grid>
+        <Rectangle Classes="hair" />
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <RepeatButton Content="Off" IsEnabled="False" />
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

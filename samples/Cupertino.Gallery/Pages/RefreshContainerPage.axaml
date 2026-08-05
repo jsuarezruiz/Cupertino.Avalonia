@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.RefreshContainerPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="UIRefreshControl: press inside the list, drag DOWN past its top and let go. The spinner materialises under the pull and holds while the refresh runs. Touch pulls it on a phone; IsMouseEnabled makes the same drag work with the mouse here (the wheel scrolls, only a drag pulls). The spinner steps with the visualizer's state; iOS fills its ticks continuously with pull distance, which the control does not surface.">
+        <Grid Classes="case">
+          <Border CornerRadius="10" ClipToBounds="True" Height="360"
+                  Background="{DynamicResource CupertinoCardBrush}">
+            <RefreshContainer x:Name="Refresher" IsMouseEnabled="True"
+                              RefreshRequested="OnRefreshRequested">
+              <ScrollViewer>
+                <StackPanel x:Name="Rows" />
+              </ScrollViewer>
+            </RefreshContainer>
+          </Border>
+        </Grid>
+      </cupertino:Section>
+
+      <cupertino:Section Header="PROGRAMMATIC"
+                         Footer="RequestRefresh() runs the same cycle without a gesture: what an app calls after a push arrives.">
+        <Grid Classes="case">
+          <Button Content="RequestRefresh()" Click="OnRequestRefresh" />
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.TreeViewPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="iOS has no tree, so this follows the list idiom: 44pt rows and the Expander's turning chevron.">
+        <Grid Classes="case">
+          <TreeView>
+            <TreeViewItem Header="Library" IsExpanded="True">
+              <TreeViewItem Header="Music">
+                <TreeViewItem Header="Recently Added" />
+                <TreeViewItem Header="Artists" />
+                <TreeViewItem Header="Albums" />
+              </TreeViewItem>
+              <TreeViewItem Header="Podcasts">
+                <TreeViewItem Header="Shows" />
+                <TreeViewItem Header="Episodes" />
+              </TreeViewItem>
+              <TreeViewItem Header="Audiobooks" />
+            </TreeViewItem>
+          </TreeView>
+        </Grid>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="TreeViewItem.Header takes any content, so a row can carry a glyph beside its label.">
+        <Grid Classes="case">
+          <TreeView>
+            <TreeViewItem IsExpanded="True">
+              <TreeViewItem.Header>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="&#x2726;" FontSize="15" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoAccentBrush}" />
+                  <TextBlock Text="Favourites" FontSize="17" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoLabelBrush}" />
+                </StackPanel>
+              </TreeViewItem.Header>
+              <TreeViewItem Header="Morning mix" />
+              <TreeViewItem Header="Deep focus" />
+            </TreeViewItem>
+            <TreeViewItem>
+              <TreeViewItem.Header>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="&#x2727;" FontSize="15" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoAccentBrush}" />
+                  <TextBlock Text="Shared" FontSize="17" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoLabelBrush}" />
+                </StackPanel>
+              </TreeViewItem.Header>
+              <TreeViewItem Header="Family" />
+            </TreeViewItem>
+          </TreeView>
+        </Grid>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="A tapped row keeps the quiet fill of iOS selection, and a branch with IsEnabled=&quot;False&quot; dims and will not open.">
+        <Grid Classes="case">
+          <TreeView>
+            <TreeViewItem Header="Devices" IsExpanded="True">
+              <TreeViewItem Header="iPhone" IsSelected="True" />
+              <TreeViewItem Header="iPad" />
+              <TreeViewItem Header="Apple Watch" IsEnabled="False" />
+            </TreeViewItem>
+          </TreeView>
+        </Grid>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

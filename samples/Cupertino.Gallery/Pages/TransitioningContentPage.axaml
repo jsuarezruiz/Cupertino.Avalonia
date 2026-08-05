@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.TransitioningContentPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="TransitioningContentControl runs its transition each time Content changes; the theme default is a 0.25s cross-fade.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="Default" />
+            <TransitioningContentControl x:Name="Stage" Grid.Column="1" Height="60"
+                                         VerticalContentAlignment="Center" />
+          </Grid>
+          <Grid Classes="case">
+            <Button Content="Swap content" Click="OnSwap" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="PageTransition takes any transition: a slower explicit CrossFade, or a horizontal PageSlide. One swap drives both, so the curves run side by side.">
+        <StackPanel>
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="CrossFade" />
+            <TransitioningContentControl x:Name="Fade" Grid.Column="1" Height="60"
+                                         VerticalContentAlignment="Center">
+              <TransitioningContentControl.PageTransition>
+                <CrossFade Duration="0:0:0.4" />
+              </TransitioningContentControl.PageTransition>
+            </TransitioningContentControl>
+          </Grid>
+          <Rectangle Classes="hair" />
+          <Grid Classes="case" ColumnDefinitions="Auto,*">
+            <TextBlock Classes="case" Text="PageSlide" />
+            <Border Grid.Column="1" ClipToBounds="True">
+              <TransitioningContentControl x:Name="Slide" Height="60"
+                                           VerticalContentAlignment="Center">
+                <TransitioningContentControl.PageTransition>
+                  <PageSlide Duration="0:0:0.3" Orientation="Horizontal" />
+                </TransitioningContentControl.PageTransition>
+              </TransitioningContentControl>
+            </Border>
+          </Grid>
+          <Grid Classes="case">
+            <Button Content="Swap content" Click="OnSwap" />
+          </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             x:Class="Cupertino.Gallery.Pages.SheetPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="DETENTS"
+                         Footer="A floating sheet with detents. Drag the grabber, flick down or tap the scrim to dismiss.">
+        <StackPanel>
+          <Button x:Name="MediumLargeButton" Classes="plain" Margin="16,11"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                  Content="Medium and large" Click="OnMediumLarge" />
+          <Rectangle Height="0.5" Margin="16,0,0,0"
+                     Fill="{DynamicResource CupertinoSeparatorBrush}" />
+          <Button x:Name="LargeButton" Classes="plain" Margin="16,11"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                  Content="Large only" Click="OnLarge" />
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

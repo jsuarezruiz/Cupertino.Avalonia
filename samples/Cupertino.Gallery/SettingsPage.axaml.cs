@@ -1,0 +1,139 @@
+using System.Globalization;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Media;
+using Avalonia.Styling;
+using Avalonia.VisualTree;
+using Cupertino.Controls;
+
+namespace Cupertino.Gallery;
+
+public partial class SettingsPage : UserControl
+{
+    private static int s_directionPreference;
+    private static readonly (string Name, Avalonia.Media.Color? Color)[] Accents =
+    [
+        ("Blue", null),
+        ("Orange", Avalonia.Media.Color.Parse("#FFFF9500")),
+        ("Green", Avalonia.Media.Color.Parse("#FF34C759")),
+        ("Purple", Avalonia.Media.Color.Parse("#FFAF52DE")),
+        ("Pink", Avalonia.Media.Color.Parse("#FFFF2D55")),
+        ("Red", Avalonia.Media.Color.Parse("#FFFF3B30")),
+    ];
+
+    public SettingsPage()
+    {
+        InitializeComponent();
+
+        if (Application.Current is { } app)
+        {
+            var strip = this.FindControl<TabStrip>("AppearanceStrip")!;
+            strip.SelectedIndex = app.RequestedThemeVariant == ThemeVariant.Light ? 1
+                : app.RequestedThemeVariant == ThemeVariant.Dark ? 2
+                : 0;
+        }
+        this.FindControl<TabStrip>("DirectionStrip")!.SelectedIndex = s_directionPreference;
+
+        var row = this.FindControl<StackPanel>("AccentRow")!;
+        var theme = Application.Current?.Styles.OfType<Cupertino.Themes.CupertinoTheme>()
+            .FirstOrDefault();
+        var rings = new List<(Border Ring, Avalonia.Media.Color? Color)>();
+
+        void Select(Avalonia.Media.Color? selected)
+        {
+            foreach (var (ring, ringColor) in rings)
+                ring.BorderBrush = ringColor == selected
+                    ? new Avalonia.Media.SolidColorBrush(
+                        ringColor ?? Avalonia.Media.Color.Parse("#FF007AFF"))
+                    : Avalonia.Media.Brushes.Transparent;
+        }
+
+        foreach (var (name, color) in Accents)
+        {
+            var ring = new Border
+            {
+                Width = 42,
+                Height = 42,
+                CornerRadius = new CornerRadius(21),
+                BorderThickness = new Thickness(2),
+                BorderBrush = Avalonia.Media.Brushes.Transparent,
+                Child = new Avalonia.Controls.Shapes.Ellipse
+                {
+                    Width = 30,
+                    Height = 30,
+                    Fill = new Avalonia.Media.SolidColorBrush(
+                        color ?? Avalonia.Media.Color.Parse("#FF007AFF")),
+                },
+            };
+            rings.Add((ring, color));
+
+            var dot = new Button { Padding = new Thickness(0), MinHeight = 0, Content = ring };
+            dot.Classes.Add("plain");
+            ToolTip.SetTip(dot, name);
+            dot.Click += (_, _) =>
+            {
+                if (theme is not null)
+                    theme.Accent = color;
+                Select(color);
+            };
+            row.Children.Add(dot);
+        }
+        Select(theme?.Accent);
+
+        var avalonia = typeof(AvaloniaObject).Assembly
+            .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
+            .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
+            .FirstOrDefault()?.InformationalVersion ?? "unknown";
+
+        this.FindControl<TextBlock>("LibVersion")!.Text = Cupertino.Themes.CupertinoTheme.Version;
+        this.FindControl<TextBlock>("AvaloniaVersion")!.Text = Trim(avalonia);
+        this.FindControl<TextBlock>("RuntimeVersion")!.Text = Environment.Version.ToString();
+
+        static string Trim(string version)
+        {
+            var plus = version.IndexOf('+');
+            return plus > 0 ? version[..plus] : version;
+        }
+    }
+
+    private void OnAppearanceChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (Application.Current is not { } app || sender is not TabStrip strip)
+            return;
+
+        app.RequestedThemeVariant = strip.SelectedIndex switch
+        {
+            1 => ThemeVariant.Light,
+            2 => ThemeVariant.Dark,
+            _ => ThemeVariant.Default,
+        };
+    }
+
+    private void OnReduceGlassChanged(object? sender, RoutedEventArgs e) =>
+        CupertinoAccessibility.ReduceTransparency =
+            this.FindControl<ToggleSwitch>("ReduceGlass")?.IsChecked == true;
+
+    private void OnReduceMotionChanged(object? sender, RoutedEventArgs e) =>
+        CupertinoAccessibility.ReduceMotion =
+            this.FindControl<ToggleSwitch>("ReduceMotion")?.IsChecked == true;
+
+    private void OnDirectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (sender is not TabStrip strip)
+            return;
+        s_directionPreference = Math.Clamp(strip.SelectedIndex, 0, 2);
+        var direction = s_directionPreference switch
+        {
+            1 => FlowDirection.LeftToRight,
+            2 => FlowDirection.RightToLeft,
+            _ => CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft
+                ? FlowDirection.RightToLeft
+                : FlowDirection.LeftToRight,
+        };
+
+        if (TopLevel.GetTopLevel(this) is { } topLevel)
+            topLevel.FlowDirection = direction;
+    }
+}

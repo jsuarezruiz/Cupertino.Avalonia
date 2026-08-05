@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cupertino="https://cupertino.avaloniaui.net"
+        x:Class="Cupertino.Gallery.WheelLabWindow"
+        Width="402" Height="500"
+        Background="White"
+        WindowDecorations="None"
+        Title="Wheel lab">
+  <Panel>
+    <Panel VerticalAlignment="Top" Margin="0,144,0,0" Height="216">
+      <Border Background="#14767680" CornerRadius="17" Height="34" Width="302"
+              HorizontalAlignment="Center" VerticalAlignment="Center" />
+      <Grid ColumnDefinitions="Auto,32,Auto,32,Auto" HorizontalAlignment="Center">
+        <cupertino:CupertinoWheel x:Name="Days"   Grid.Column="0" TextAlignment="Right" />
+        <cupertino:CupertinoWheel x:Name="Months" Grid.Column="2" TextAlignment="Left" />
+        <cupertino:CupertinoWheel x:Name="Years"  Grid.Column="4" TextAlignment="Left"
+                                  ShouldLoop="False" />
+      </Grid>
+    </Panel>
+  </Panel>
+</Window>

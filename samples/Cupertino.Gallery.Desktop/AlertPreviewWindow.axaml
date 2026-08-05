@@ -1,0 +1,24 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cupertino="https://cupertino.avaloniaui.net"
+        x:Class="Cupertino.Gallery.AlertPreviewWindow"
+        Width="402" Height="500" CanResize="False"
+        Title="Alert preview">
+  <Panel>
+    <Border>
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+          <GradientStop Offset="0" Color="#FF17103A" />
+          <GradientStop Offset="1" Color="#FFD84D8B" />
+        </LinearGradientBrush>
+      </Border.Background>
+    </Border>
+    <TextBlock Text="Backdrop" FontSize="34" FontWeight="Bold" Foreground="White"
+               HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,60,0,0" />
+    <Border Background="#66000000" />
+    <cupertino:Dialog x:Name="Alert"
+                      Title="Delete Photo?"
+                      Message="This photo will be deleted from all your devices."
+                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+  </Panel>
+</Window>

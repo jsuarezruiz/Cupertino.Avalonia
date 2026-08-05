@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             xmlns:local="using:Cupertino.Gallery"
+             x:Class="Cupertino.Gallery.Pages.SplitButtonPage">
+
+  <ScrollViewer>
+    <StackPanel Margin="0,74,0,120">
+
+      <cupertino:Section Header="BASIC"
+                         Footer="One capsule split by a hairline: the action on the left, a flyout chevron on the right. Destructive menu items read in red.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Split" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <SplitButton Content="Share">
+              <SplitButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Copy Link" />
+                  <MenuItem Header="AirDrop" />
+                  <Separator />
+                  <MenuItem Header="Remove" Classes="destructive" />
+                </MenuFlyout>
+              </SplitButton.Flyout>
+            </SplitButton>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="CUSTOMIZED"
+                         Footer="The action half holds any composed content; whatever it shows, the chevron half still opens the Flyout.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="With icon" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <SplitButton>
+              <SplitButton.Content>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                  <Path Data="M 8,2.5 L 8,13.5 M 2.5,8 L 13.5,8"
+                        Stroke="{DynamicResource CupertinoLabelBrush}"
+                        StrokeThickness="2" StrokeLineCap="Round"
+                        Width="16" Height="16" Stretch="None"
+                        VerticalAlignment="Center" />
+                  <TextBlock Text="New" VerticalAlignment="Center" />
+                </StackPanel>
+              </SplitButton.Content>
+              <SplitButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Document" />
+                  <MenuItem Header="Folder" />
+                  <MenuItem Header="Scan" />
+                </MenuFlyout>
+              </SplitButton.Flyout>
+            </SplitButton>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="TOGGLE"
+                         Footer="ToggleSplitButton flips IsChecked when the action half is clicked; the chevron half opens the flyout as usual.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Toggle split" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <ToggleSplitButton Content="Wrap">
+              <ToggleSplitButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Soft Wrap" />
+                  <MenuItem Header="Wrap at Column" />
+                </MenuFlyout>
+              </ToggleSplitButton.Flyout>
+            </ToggleSplitButton>
+            <ToggleSplitButton Content="Pinned" IsChecked="True">
+              <ToggleSplitButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Pin to Top" />
+                  <MenuItem Header="Pin to Sidebar" />
+                </MenuFlyout>
+              </ToggleSplitButton.Flyout>
+            </ToggleSplitButton>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+      <cupertino:Section Header="STATES"
+                         Footer="Disabling a SplitButton washes the whole capsule, both halves, to 40%.">
+        <StackPanel>
+        <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <TextBlock Classes="case" Text="Disabled" />
+          <WrapPanel Grid.Column="1" Classes="specimens">
+            <SplitButton Content="Share" IsEnabled="False">
+              <SplitButton.Flyout>
+                <MenuFlyout>
+                  <MenuItem Header="Copy Link" />
+                </MenuFlyout>
+              </SplitButton.Flyout>
+            </SplitButton>
+          </WrapPanel>
+        </Grid>
+        </StackPanel>
+      </cupertino:Section>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
