@@ -12,11 +12,6 @@ namespace Cupertino.Themes;
 /// </summary>
 public class CupertinoTheme : Styles
 {
-    /// <summary>
-    /// Gets the library version.
-    /// </summary>
-    public const string Version = "0.1.0-preview.1";
-
     public static readonly StyledProperty<Color?> AccentProperty =
         AvaloniaProperty.Register<CupertinoTheme, Color?>(nameof(Accent));
 

@@ -8,10 +8,14 @@
     <RootNamespace>Cupertino</RootNamespace>
     <AssemblyName>Cupertino.Avalonia</AssemblyName>
     <PackageId>Cupertino.Avalonia</PackageId>
+    <Authors>Javier Suárez Ruiz</Authors>
     <Description>An iOS 26 design system for Avalonia with control themes, typography, colour, motion, custom controls and Liquid Glass.</Description>
     <Version>0.1.0-preview.1</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/jsuarezruiz/Cupertino.Avalonia</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/jsuarezruiz/Cupertino.Avalonia</RepositoryUrl>
+    <PackageReadmeFile>README.NuGet.md</PackageReadmeFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- Public API documentation is incomplete. -->
     <NoWarn>$(NoWarn);CS1591</NoWarn>
@@ -24,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="../../README.NuGet.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>

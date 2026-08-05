@@ -34,7 +34,7 @@ public partial class RootPage : UserControl
         Refill(string.Empty);
 
         this.FindControl<TextBlock>("HeroVersion")!.Text =
-            "Version " + Cupertino.Themes.CupertinoTheme.Version;
+            "Version " + VersionInfo.Library;
 
         var hero = this.FindControl<Panel>("Hero")!;
         hero.PointerPressed += (_, _) => hero.Opacity = 0.75;

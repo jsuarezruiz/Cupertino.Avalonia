@@ -82,20 +82,9 @@ public partial class SettingsPage : UserControl
         }
         Select(theme?.Accent);
 
-        var avalonia = typeof(AvaloniaObject).Assembly
-            .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
-            .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
-            .FirstOrDefault()?.InformationalVersion ?? "unknown";
-
-        this.FindControl<TextBlock>("LibVersion")!.Text = Cupertino.Themes.CupertinoTheme.Version;
-        this.FindControl<TextBlock>("AvaloniaVersion")!.Text = Trim(avalonia);
+        this.FindControl<TextBlock>("LibVersion")!.Text = VersionInfo.Library;
+        this.FindControl<TextBlock>("AvaloniaVersion")!.Text = VersionInfo.Avalonia;
         this.FindControl<TextBlock>("RuntimeVersion")!.Text = Environment.Version.ToString();
-
-        static string Trim(string version)
-        {
-            var plus = version.IndexOf('+');
-            return plus > 0 ? version[..plus] : version;
-        }
     }
 
     private void OnAppearanceChanged(object? sender, SelectionChangedEventArgs e)
