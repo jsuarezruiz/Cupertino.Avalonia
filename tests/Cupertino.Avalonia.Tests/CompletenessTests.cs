@@ -1,0 +1,429 @@
+using System.Collections.ObjectModel;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Media;
+using Avalonia.Styling;
+using Avalonia.VisualTree;
+using Cupertino.Controls;
+using Cupertino.Themes;
+using Xunit;
+
+namespace Cupertino.Avalonia.Tests;
+
+public class NewPrimitiveTests
+{
+    [AvaloniaFact]
+    public void Search_controller_filters_and_respects_scopes()
+    {
+        var search = new CupertinoSearchController
+        {
+            ItemsSource = new[] { "Ada", "Alan", "Grace", "Design notes" },
+            Query = "a",
+            Scopes = new[] { "All", "People" },
+            SelectedScopeIndex = 1,
+        };
+        search.Filter = (item, query, scope) =>
+            item.ToString()!.Contains(query, StringComparison.OrdinalIgnoreCase) &&
+            (scope == 0 || !item.ToString()!.Contains(' '));
+        search.Refresh();
+
+        Assert.Equal(new[] { "Ada", "Alan", "Grace" }, search.FilteredItems.Cast<string>());
+
+        search.Query = "zz";
+        Assert.Empty(search.FilteredItems);
+        search.Cancel();
+        Assert.Equal(string.Empty, search.Query);
+    }
+
+    [AvaloniaFact]
+    public void Search_controller_observes_scope_mutations_and_clamps_selection()
+    {
+        var scopes = new ObservableCollection<string> { "All", "People" };
+        var search = new CupertinoSearchController
+        {
+            ItemsSource = new[] { "Ada", "Design notes" },
+            Scopes = scopes,
+            SelectedScopeIndex = 1,
+            Filter = (item, _, scope) => scope == 0 || !item.ToString()!.Contains(' '),
+        };
+        var window = new Window { Width = 400, Height = 300, Content = search };
+        window.Show();
+        window.UpdateLayout();
+
+        Assert.Single(search.FilteredItems);
+        scopes.RemoveAt(1);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(0, search.SelectedScopeIndex);
+        Assert.Equal(2, search.FilteredItems.Count);
+    }
+
+    [AvaloniaFact]
+    public void Page_control_clamps_its_state_and_measures_all_dots()
+    {
+        var pages = new CupertinoPageControl
+        {
+            NumberOfPages = 4,
+            CurrentPage = 99,
+            DotSize = 7,
+            DotSpacing = 9,
+        };
+        var window = new Window { Width = 200, Height = 80, Content = pages };
+        window.Show();
+        window.UpdateLayout();
+
+        Assert.Equal(3, pages.CurrentPage);
+        Assert.True(pages.DesiredSize.Width >= 4 * 7 + 3 * 9);
+
+        pages.NumberOfPages = 1;
+        window.UpdateLayout();
+        Assert.Equal(0, pages.CurrentPage);
+        Assert.Equal(0, pages.DesiredSize.Width);
+    }
+
+    [AvaloniaFact]
+    public void Page_control_raises_one_change_for_a_coerced_value()
+    {
+        var pages = new CupertinoPageControl { NumberOfPages = 4 };
+        var changes = 0;
+        pages.CurrentPageChanged += (_, _) => changes++;
+
+        pages.CurrentPage = 99;
+
+        Assert.Equal(3, pages.CurrentPage);
+        Assert.Equal(1, changes);
+    }
+
+    [AvaloniaFact]
+    public void List_and_form_rows_build_their_cupertino_templates()
+    {
+        var panel = new StackPanel
+        {
+            Children =
+            {
+                new CupertinoListCell { Title = "Wi-Fi", Detail = "Studio", AccessoryKind = CupertinoListAccessory.Disclosure },
+                new CupertinoFormRow { Label = "Name", HelpText = "Required", Content = new TextBox() },
+            },
+        };
+        var window = new Window { Width = 360, Height = 180, Content = panel };
+        window.Show();
+        window.UpdateLayout();
+
+        Assert.All(panel.Children, child => Assert.True(child.GetVisualChildren().Any()));
+        Assert.All(panel.Children, child => Assert.True(child.Bounds.Height >= 44));
+    }
+}
+
+public class AccessibilityAndDirectionTests
+{
+    [AvaloniaFact]
+    public async Task Accessibility_notifications_are_marshaled_to_the_ui_thread()
+    {
+        var original = CupertinoAccessibility.ReduceTransparency;
+        var uiThread = Environment.CurrentManagedThreadId;
+        var notificationThread = -1;
+        void Handler(object? sender, EventArgs e) =>
+            notificationThread = Environment.CurrentManagedThreadId;
+
+        CupertinoAccessibility.Changed += Handler;
+        try
+        {
+            await Task.Run(() => CupertinoAccessibility.ReduceTransparency = !original);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(!original, CupertinoAccessibility.ReduceTransparency);
+            Assert.Equal(uiThread, notificationThread);
+        }
+        finally
+        {
+            CupertinoAccessibility.Changed -= Handler;
+            CupertinoAccessibility.ReduceTransparency = original;
+        }
+    }
+
+    [AvaloniaFact]
+    public void Dynamic_type_updates_the_theme_tokens()
+    {
+        var old = CupertinoAccessibility.TextScaleFactor;
+        try
+        {
+            CupertinoAccessibility.TextScaleFactor = 1.5;
+            var theme = new CupertinoTheme();
+            Assert.Equal(25.5, Assert.IsType<double>(theme.Resources["CupertinoFontSize17"]), 3);
+
+            CupertinoAccessibility.TextScaleFactor = 2;
+            Assert.Equal(34, Assert.IsType<double>(theme.Resources["CupertinoFontSize17"]), 3);
+        }
+        finally
+        {
+            CupertinoAccessibility.TextScaleFactor = old;
+        }
+    }
+
+    [AvaloniaFact]
+    public void Rtl_calendar_mirrors_visual_columns_and_hit_testing()
+    {
+        var grid = new CupertinoMonthGrid
+        {
+            Width = 298,
+            DisplayMonth = new DateTime(2026, 7, 1),
+            FlowDirection = FlowDirection.RightToLeft,
+            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top,
+        };
+        var window = new Window { Width = 330, Height = 360, Content = grid };
+        window.Show();
+        window.UpdateLayout();
+
+        var cell = 298 / 7.0;
+        var weekday = cell * 0.314;
+        DateTime? picked = null;
+        grid.DayPicked += (_, date) => picked = date;
+        grid.RaiseEvent(new PointerReleasedEventArgs(
+            grid, new Pointer(8, PointerType.Mouse, true), grid,
+            new Point(cell * 4.5, weekday + cell * .5), 0,
+            new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonReleased),
+            KeyModifiers.None, MouseButton.Left));
+
+        Assert.Equal(new DateTime(2026, 7, 1), picked);
+    }
+
+    [AvaloniaTheory]
+    [InlineData("Light", "LeftToRight", 1.0)]
+    [InlineData("Dark", "LeftToRight", 1.35)]
+    [InlineData("Light", "RightToLeft", 1.35)]
+    [InlineData("Dark", "RightToLeft", 2.0)]
+    public void New_controls_layout_across_theme_direction_and_scale(
+        string themeName, string directionName, double scale)
+    {
+        var old = CupertinoAccessibility.TextScaleFactor;
+        try
+        {
+            CupertinoAccessibility.TextScaleFactor = scale;
+            var panel = new StackPanel
+            {
+                FlowDirection = directionName == "RightToLeft" ? FlowDirection.RightToLeft : FlowDirection.LeftToRight,
+                Children =
+                {
+                    new CupertinoListCell { Title = "Title", Subtitle = "Secondary", AccessoryKind = CupertinoListAccessory.Disclosure },
+                    new CupertinoFormRow { Label = "Name", Content = new TextBox { Text = "Value" } },
+                    new CupertinoPageControl { NumberOfPages = 4, CurrentPage = 1 },
+                    new CupertinoSearchController { ItemsSource = new[] { "One", "Two" }, Query = "o" },
+                    new CupertinoDateTimePicker { SelectedDateTime = DateTimeOffset.Now },
+                },
+            };
+            var window = new Window
+            {
+                Width = 430,
+                Height = 700,
+                RequestedThemeVariant = themeName == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light,
+                Content = panel,
+            };
+            window.Show();
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.All(panel.Children, child => Assert.True(child.Bounds.Width > 0 && child.Bounds.Height > 0,
+                $"{child.GetType().Name} laid out empty in {themeName}/{directionName}/{scale}"));
+        }
+        finally
+        {
+            CupertinoAccessibility.TextScaleFactor = old;
+        }
+    }
+}
+
+public class PickerCompletenessTests
+{
+    [AvaloniaFact]
+    public void Date_and_time_constraints_coerce_external_values()
+    {
+        var minimum = new DateTimeOffset(2026, 8, 1, 0, 0, 0, TimeSpan.Zero);
+        var maximum = minimum.AddDays(5);
+        var date = new CupertinoDatePicker { MinimumDate = minimum, MaximumDate = maximum, SelectedDate = minimum.AddDays(-3) };
+        Assert.Equal(minimum.Date, date.SelectedDate?.Date);
+
+        var time = new CupertinoTimePicker
+        {
+            MinimumTime = TimeSpan.FromHours(9),
+            MaximumTime = TimeSpan.FromHours(17),
+            SelectedTime = TimeSpan.FromHours(20),
+        };
+        Assert.Equal(TimeSpan.FromHours(17), time.SelectedTime);
+    }
+
+    [AvaloniaFact]
+    public void Countdown_mode_supports_elapsed_hours_and_caps_duration()
+    {
+        var picker = new CupertinoTimePicker
+        {
+            Mode = CupertinoTimePickerMode.CountdownDuration,
+            MaximumDuration = TimeSpan.FromHours(3),
+            SelectedTime = TimeSpan.FromMinutes(250),
+        };
+        Assert.Equal(TimeSpan.FromHours(3), picker.SelectedTime);
+        Assert.StartsWith("3 hr", picker.DisplayText);
+    }
+
+    [AvaloniaFact]
+    public void Countdown_mode_normalizes_unsafe_ranges_before_building_wheels()
+    {
+        var picker = new CupertinoTimePicker
+        {
+            Mode = CupertinoTimePickerMode.CountdownDuration,
+            MaximumDuration = TimeSpan.MaxValue,
+            MinuteIncrement = 100,
+            DisplayMode = CupertinoPickerDisplayMode.Inline,
+        };
+        var window = new Window { Width = 320, Height = 300, Content = picker };
+        window.Show();
+        window.UpdateLayout();
+
+        Assert.Equal(TimeSpan.FromHours(23) + TimeSpan.FromMinutes(59), picker.MaximumDuration);
+        Assert.Equal(59, picker.MinuteIncrement);
+        var wheels = picker.GetVisualDescendants().OfType<CupertinoWheel>().ToList();
+        Assert.Contains(wheels, wheel => wheel.Items?.Count == 24);
+        Assert.Contains(wheels, wheel => wheel.Items?.SequenceEqual(new[] { "00", "59" }) == true);
+    }
+}
+
+public class NavigationLifecycleTests
+{
+    private static CupertinoNavigationPage Show()
+    {
+        var nav = new CupertinoNavigationPage { RootTitle = "Root", RootContent = new TextBlock { Text = "root" } };
+        var window = new Window { Width = 402, Height = 600, Content = nav };
+        window.Show();
+        window.UpdateLayout();
+        return nav;
+    }
+
+    [AvaloniaFact]
+    public void Navigation_can_be_cancelled_and_state_round_trips()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = true;
+        try
+        {
+            var nav = Show();
+            Assert.True(nav.TryPush("first", "First", new TextBlock(), 42));
+            Assert.True(nav.TryPush("second", "Second", new TextBlock(), "payload"));
+            Assert.Equal("second", nav.CurrentEntry?.Route);
+
+            nav.Navigating += CancelPop;
+            Assert.False(nav.TryPop());
+            Assert.Equal(2, nav.Depth);
+            nav.Navigating -= CancelPop;
+
+            var state = nav.CaptureState();
+            Assert.True(nav.TryPopToRoot());
+            Assert.True(nav.RestoreState(state, saved => new TextBlock { Text = saved.Route }));
+            Assert.Equal(new[] { "first", "second" }, nav.Stack.Select(entry => entry.Route));
+            Assert.Equal("payload", nav.CurrentEntry?.Parameter);
+            Assert.True(nav.PopToRoute("first"));
+            Assert.Equal("first", nav.CurrentEntry?.Route);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = old;
+        }
+
+        static void CancelPop(object? sender, CupertinoNavigatingEventArgs args)
+        {
+            if (args.Kind == CupertinoNavigationKind.Pop)
+                args.Cancel = true;
+        }
+    }
+
+    [AvaloniaFact]
+    public void Pop_to_root_without_root_content_does_not_clear_the_stack()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = true;
+        try
+        {
+            var nav = new CupertinoNavigationPage { RootTitle = "Root" };
+            var window = new Window { Width = 402, Height = 600, Content = nav };
+            window.Show();
+            window.UpdateLayout();
+
+            Assert.True(nav.TryPush("detail", "Detail", new TextBlock()));
+            Assert.False(nav.TryPopToRoot());
+            Assert.Equal(1, nav.Depth);
+            Assert.Equal("detail", nav.CurrentEntry?.Route);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = old;
+        }
+    }
+
+    [AvaloniaFact]
+    public void Restoring_during_a_transition_completes_it_before_rebuilding_the_host()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        try
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            var nav = Show();
+            Assert.True(nav.TryPush("first", "First", new TextBlock()));
+            var state = nav.CaptureState();
+
+            var completed = new List<CupertinoNavigationKind>();
+            nav.NavigationCompleted += (_, args) => completed.Add(args.Kind);
+
+            CupertinoAccessibility.ReduceMotion = false;
+            Assert.True(nav.TryPush("second", "Second", new TextBlock()));
+            Assert.True(nav.RestoreState(state, saved => new TextBlock { Text = saved.Route }));
+            Assert.Equal(new[] { CupertinoNavigationKind.Push, CupertinoNavigationKind.Restore }, completed);
+
+            CupertinoAccessibility.ReduceMotion = true;
+            Assert.True(nav.TryPush("third", "Third", new TextBlock()));
+            Assert.Equal(new[]
+            {
+                CupertinoNavigationKind.Push,
+                CupertinoNavigationKind.Restore,
+                CupertinoNavigationKind.Push,
+            }, completed);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = old;
+        }
+    }
+
+    [AvaloniaFact]
+    public void Pop_to_route_during_a_transition_does_not_leave_a_stale_completion()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        try
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            var nav = Show();
+            Assert.True(nav.TryPush("first", "First", new TextBlock()));
+            Assert.True(nav.TryPush("second", "Second", new TextBlock()));
+
+            var completed = new List<CupertinoNavigationKind>();
+            nav.NavigationCompleted += (_, args) => completed.Add(args.Kind);
+
+            CupertinoAccessibility.ReduceMotion = false;
+            Assert.True(nav.TryPush("third", "Third", new TextBlock()));
+            Assert.True(nav.PopToRoute("first"));
+            Assert.Equal(new[] { CupertinoNavigationKind.Push, CupertinoNavigationKind.PopToRoute }, completed);
+
+            CupertinoAccessibility.ReduceMotion = true;
+            Assert.True(nav.TryPush("fourth", "Fourth", new TextBlock()));
+            Assert.Equal(new[]
+            {
+                CupertinoNavigationKind.Push,
+                CupertinoNavigationKind.PopToRoute,
+                CupertinoNavigationKind.Push,
+            }, completed);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = old;
+        }
+    }
+}

@@ -17,6 +17,7 @@ x86/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+tests/Cupertino.Avalonia.RenderTests/TestResults/
 
 # Visual Studio cache/options directory
 .vs/
