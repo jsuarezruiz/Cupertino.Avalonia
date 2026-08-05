@@ -4,6 +4,8 @@ An iOS 26 design system for [Avalonia](https://avaloniaui.net): control themes, 
 
 ![Cupertino.Avalonia banner](images/cupertino-avalonia-banner.png)
 
+<p align="center"><strong>Controls in action</strong><br>Fluid transitions, responsive effects and Liquid Glass in motion.</p>
+
 <table width="100%">
   <tr>
     <td align="center" width="25%"><a href="images/cupertino-avalonia-tabs.gif"><img src="images/cupertino-avalonia-tabs.gif" alt="Tabs" width="100%"></a><br><sub>Tabs</sub></td>
