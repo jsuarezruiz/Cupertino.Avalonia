@@ -1,0 +1,330 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls"
+                    xmlns:conv="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls.ColorPicker">
+
+  <!-- Part names are required by Avalonia's ColorPicker controls. -->
+
+  <VisualBrush x:Key="CupertinoCheckeredBrush" TileMode="Tile"
+               SourceRect="0,0,12,12" DestinationRect="0,0,12,12" Stretch="None">
+    <VisualBrush.Visual>
+      <Canvas Width="12" Height="12" Background="White">
+        <Rectangle Width="6" Height="6" Fill="#FFD4D4D4" />
+        <Rectangle Canvas.Left="6" Canvas.Top="6" Width="6" Height="6" Fill="#FFD4D4D4" />
+      </Canvas>
+    </VisualBrush.Visual>
+  </VisualBrush>
+
+  <conv:ToBrushConverter x:Key="CupertinoColorToBrush" />
+  <conv:DoNothingForNullConverter x:Key="CupertinoIgnoreNull" />
+
+  <ControlTheme x:Key="CupertinoColorSliderThumb" TargetType="Thumb">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="White" CornerRadius="999" Margin="1"
+                BoxShadow="0 1 4 0 #59000000" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ColorSlider}" TargetType="ColorSlider">
+    <Style Selector="^:horizontal">
+      <Setter Property="Height" Value="28" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="Template">
+        <ControlTemplate TargetType="{x:Type ColorSlider}">
+          <Grid Margin="{TemplateBinding Padding}">
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="28"
+                    Background="{StaticResource CupertinoCheckeredBrush}"
+                    CornerRadius="{TemplateBinding CornerRadius}" />
+            <Border HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="28"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}" />
+            <Track Name="PART_Track" Height="28"
+                   HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                   Minimum="{TemplateBinding Minimum}"
+                   Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value, Mode=TwoWay}"
+                   IsDirectionReversed="{TemplateBinding IsDirectionReversed}"
+                   Orientation="Horizontal">
+              <Track.DecreaseButton>
+                <RepeatButton Name="PART_DecreaseButton" Background="Transparent" Focusable="False"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                  <RepeatButton.Template>
+                    <ControlTemplate>
+                      <Border Background="Transparent" />
+                    </ControlTemplate>
+                  </RepeatButton.Template>
+                </RepeatButton>
+              </Track.DecreaseButton>
+              <Track.IncreaseButton>
+                <RepeatButton Name="PART_IncreaseButton" Background="Transparent" Focusable="False"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                  <RepeatButton.Template>
+                    <ControlTemplate>
+                      <Border Background="Transparent" />
+                    </ControlTemplate>
+                  </RepeatButton.Template>
+                </RepeatButton>
+              </Track.IncreaseButton>
+              <Thumb Name="ColorSliderThumb"
+                     Theme="{StaticResource CupertinoColorSliderThumb}"
+                     Width="28" Height="28" />
+            </Track>
+          </Grid>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <Style Selector="^:vertical">
+      <Setter Property="Width" Value="28" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="Template">
+        <ControlTemplate TargetType="{x:Type ColorSlider}">
+          <Grid Margin="{TemplateBinding Padding}">
+            <Border VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="28"
+                    Background="{StaticResource CupertinoCheckeredBrush}"
+                    CornerRadius="{TemplateBinding CornerRadius}" />
+            <Border VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="28"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}" />
+            <Track Name="PART_Track" Width="28"
+                   VerticalAlignment="Stretch" HorizontalAlignment="Center"
+                   Minimum="{TemplateBinding Minimum}"
+                   Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value, Mode=TwoWay}"
+                   IsDirectionReversed="{TemplateBinding IsDirectionReversed}"
+                   Orientation="Vertical">
+              <Track.DecreaseButton>
+                <RepeatButton Name="PART_DecreaseButton" Background="Transparent" Focusable="False"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                  <RepeatButton.Template>
+                    <ControlTemplate>
+                      <Border Background="Transparent" />
+                    </ControlTemplate>
+                  </RepeatButton.Template>
+                </RepeatButton>
+              </Track.DecreaseButton>
+              <Track.IncreaseButton>
+                <RepeatButton Name="PART_IncreaseButton" Background="Transparent" Focusable="False"
+                              HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                  <RepeatButton.Template>
+                    <ControlTemplate>
+                      <Border Background="Transparent" />
+                    </ControlTemplate>
+                  </RepeatButton.Template>
+                </RepeatButton>
+              </Track.IncreaseButton>
+              <Thumb Name="ColorSliderThumb"
+                     Theme="{StaticResource CupertinoColorSliderThumb}"
+                     Width="28" Height="28" />
+            </Track>
+          </Grid>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ColorSpectrum}" TargetType="ColorSpectrum">
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="{x:Type ColorSpectrum}">
+        <Panel x:Name="PART_LayoutRoot" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+          <Panel x:Name="PART_SizingPanel" HorizontalAlignment="Center" VerticalAlignment="Center"
+                 ClipToBounds="True">
+            <Rectangle x:Name="PART_SpectrumRectangle" IsHitTestVisible="False"
+                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                       RadiusX="8" RadiusY="8" />
+            <Rectangle x:Name="PART_SpectrumOverlayRectangle" IsHitTestVisible="False"
+                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                       RadiusX="8" RadiusY="8" />
+            <Ellipse x:Name="PART_SpectrumEllipse" IsHitTestVisible="False" IsVisible="False"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            <Ellipse x:Name="PART_SpectrumOverlayEllipse" IsHitTestVisible="False" IsVisible="False"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            <Canvas x:Name="PART_InputTarget" Background="Transparent"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+              <Panel x:Name="PART_SelectionEllipsePanel" Width="28" Height="28"
+                     ToolTip.VerticalOffset="-10" ToolTip.Placement="Top">
+                <Ellipse x:Name="SelectionEllipse" StrokeThickness="3" Stroke="White"
+                         IsHitTestVisible="False"
+                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                  <Ellipse.Effect>
+                    <DropShadowEffect BlurRadius="4" OffsetX="0" OffsetY="1" Opacity="0.35" />
+                  </Ellipse.Effect>
+                </Ellipse>
+                <ToolTip.Tip>
+                </ToolTip.Tip>
+              </Panel>
+            </Canvas>
+          </Panel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoPaletteItem" TargetType="ListBoxItem">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="3" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="{x:Type ListBoxItem}">
+        <Panel>
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Border x:Name="Ring" CornerRadius="11" Margin="-5"
+                  BorderThickness="2.5" IsVisible="False"
+                  BorderBrush="{DynamicResource CupertinoAccentBrush}" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:selected /template/ Border#Ring">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ColorView}" TargetType="ColorView">
+    <Setter Property="ColorModel" Value="Rgba" />
+    <Setter Property="Width" Value="300" />
+    <Setter Property="Palette">
+      <FlatHalfColorPalette />
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="{x:Type ColorView}">
+        <Grid RowDefinitions="Auto,*" Margin="12">
+          <TabControl x:Name="PART_TabControl"
+                      Classes="segmented"
+                      SelectedIndex="{TemplateBinding SelectedIndex, Mode=TwoWay}"
+                      Padding="0,12,0,0"
+                      Margin="0,0,0,12">
+
+            <TabItem Header="Grid" IsVisible="{TemplateBinding IsColorPaletteVisible}">
+              <ListBox ItemsSource="{TemplateBinding PaletteColors}"
+                       SelectedItem="{Binding Color, RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource CupertinoIgnoreNull}, Mode=TwoWay}"
+                       ItemContainerTheme="{StaticResource CupertinoPaletteItem}"
+                       Background="Transparent" Height="264">
+                <ListBox.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                  </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Border Width="28" Height="28" CornerRadius="6"
+                            BorderBrush="{DynamicResource CupertinoSeparatorBrush}"
+                            BorderThickness="0.5"
+                            Background="{Binding Converter={StaticResource CupertinoColorToBrush}}" />
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </TabItem>
+
+            <TabItem Header="Spectrum" IsVisible="{TemplateBinding IsColorSpectrumVisible}">
+              <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto" Height="264">
+                <ColorSpectrum x:Name="ColorSpectrum"
+                               HsvColor="{Binding HsvColor, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                               Shape="{TemplateBinding ColorSpectrumShape}"
+                               Components="{TemplateBinding ColorSpectrumComponents}"
+                               HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                <ColorSlider Grid.Column="1" Margin="12,0,0,0"
+                             Orientation="Vertical"
+                             IsAlphaVisible="False" ColorModel="Hsva"
+                             ColorComponent="{Binding ThirdComponent, ElementName=ColorSpectrum}"
+                             HsvColor="{Binding HsvColor, ElementName=ColorSpectrum, Mode=TwoWay}"
+                             IsVisible="{TemplateBinding IsColorSpectrumSliderVisible}" />
+                <ColorSlider Grid.Row="1" Grid.ColumnSpan="2" Margin="0,12,0,0"
+                             Orientation="Horizontal"
+                             ColorModel="Hsva" ColorComponent="Alpha"
+                             HsvColor="{Binding HsvColor, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                             IsVisible="{TemplateBinding IsAlphaVisible}"
+                             IsEnabled="{TemplateBinding IsAlphaEnabled}" />
+              </Grid>
+            </TabItem>
+
+            <TabItem Header="Sliders" IsVisible="{TemplateBinding IsColorComponentsVisible}">
+              <StackPanel Spacing="10" Height="264">
+                <TextBlock Classes="footnote" Text="RED"
+                           Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+                <ColorSlider ColorComponent="Component1"
+                             ColorModel="{TemplateBinding ColorModel, Mode=OneWay}"
+                             HsvColor="{Binding HsvColor, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+                <TextBlock Classes="footnote" Text="GREEN"
+                           Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+                <ColorSlider ColorComponent="Component2"
+                             ColorModel="{TemplateBinding ColorModel, Mode=OneWay}"
+                             HsvColor="{Binding HsvColor, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+                <TextBlock Classes="footnote" Text="BLUE"
+                           Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+                <ColorSlider ColorComponent="Component3"
+                             ColorModel="{TemplateBinding ColorModel, Mode=OneWay}"
+                             HsvColor="{Binding HsvColor, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+                <Grid ColumnDefinitions="Auto,*" Margin="0,4,0,0">
+                  <TextBlock Classes="footnote" Text="HEX" VerticalAlignment="Center"
+                             Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+                  <TextBox x:Name="PART_HexTextBox" Grid.Column="1" Margin="10,0,0,0"
+                           MaxLength="9" />
+                </Grid>
+              </StackPanel>
+            </TabItem>
+          </TabControl>
+
+          <Grid Grid.Row="1" VerticalAlignment="Bottom" Margin="0,12,0,0"
+                IsVisible="{TemplateBinding IsColorPreviewVisible}">
+            <Border Height="32" CornerRadius="10"
+                    Background="{StaticResource CupertinoCheckeredBrush}" />
+            <Border Height="32" CornerRadius="10"
+                    Background="{TemplateBinding Color, Converter={StaticResource CupertinoColorToBrush}}" />
+          </Grid>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <!-- Avoid recursive backdrop sampling in the overlay layer. -->
+  <ControlTheme x:Key="CupertinoColorFlyoutPresenter" TargetType="FlyoutPresenter">
+    <Setter Property="Background" Value="{DynamicResource CupertinoMenuPanelBrush}" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                BoxShadow="0 8 40 0 #30000000" Margin="12">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ColorPicker}" TargetType="ColorPicker">
+    <Setter Property="ColorModel" Value="Rgba" />
+    <!-- Repeat the palette because the exact-type theme replaces ColorView's. -->
+    <Setter Property="Palette">
+      <FlatHalfColorPalette />
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate TargetType="{x:Type ColorPicker}">
+        <Button Classes="plain" Padding="0" CornerRadius="999"
+                HorizontalAlignment="Left">
+          <Button.Flyout>
+            <Flyout Placement="BottomEdgeAlignedLeft"
+                    FlyoutPresenterTheme="{StaticResource CupertinoColorFlyoutPresenter}">
+              <ColorView Color="{Binding Color, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                         Palette="{Binding Palette, RelativeSource={RelativeSource TemplatedParent}}"
+                         IsAlphaVisible="{Binding IsAlphaVisible, RelativeSource={RelativeSource TemplatedParent}}"
+                         IsAlphaEnabled="{Binding IsAlphaEnabled, RelativeSource={RelativeSource TemplatedParent}}" />
+            </Flyout>
+          </Button.Flyout>
+          <Panel Width="36" Height="36">
+            <Ellipse Fill="{StaticResource CupertinoCheckeredBrush}" />
+            <Ellipse Fill="{TemplateBinding Color, Converter={StaticResource CupertinoColorToBrush}}" />
+            <Ellipse Stroke="{DynamicResource CupertinoSeparatorBrush}" StrokeThickness="1" />
+          </Panel>
+        </Button>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

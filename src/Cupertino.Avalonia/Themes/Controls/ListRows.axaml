@@ -1,0 +1,114 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:CupertinoListCell}" TargetType="controls:CupertinoListCell">
+    <Setter Property="Background" Value="{DynamicResource CupertinoCardBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="PART_Root"
+                Background="{TemplateBinding Background}"
+                BorderBrush="{DynamicResource CupertinoSeparatorBrush}"
+                BorderThickness="0,0,0,0.5"
+                Padding="{TemplateBinding Padding}">
+          <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="44">
+            <ContentPresenter Content="{TemplateBinding Leading}"
+                              Margin="0,0,12,0"
+                              VerticalContentAlignment="Center" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1" Margin="0,8">
+              <TextBlock Text="{TemplateBinding Title}"
+                         FontSize="{DynamicResource CupertinoFontSize17}"
+                         Foreground="{TemplateBinding Foreground}"
+                         TextTrimming="CharacterEllipsis" />
+              <TextBlock Name="PART_Subtitle" Text="{TemplateBinding Subtitle}"
+                         FontSize="{DynamicResource CupertinoFontSize15}"
+                         Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                         TextTrimming="CharacterEllipsis" IsVisible="False" />
+            </StackPanel>
+            <TextBlock Name="PART_Detail" Grid.Column="2" Text="{TemplateBinding Detail}"
+                       Margin="12,0,0,0" VerticalAlignment="Center"
+                       FontSize="{DynamicResource CupertinoFontSize17}"
+                       Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                       TextTrimming="CharacterEllipsis" IsVisible="False" />
+            <Grid Grid.Column="3" Margin="10,0,0,0" VerticalAlignment="Center">
+              <ContentPresenter Name="PART_Accessory" Content="{TemplateBinding Accessory}" IsVisible="False" />
+              <Path Name="PART_Disclosure" Data="{DynamicResource CupertinoChevronRightGeometry}"
+                    Stroke="{DynamicResource CupertinoTertiaryLabelBrush}" StrokeThickness="2"
+                    Width="8" Height="14" Stretch="Uniform" IsVisible="False" />
+              <Path Name="PART_Checkmark" Data="{DynamicResource CupertinoCheckmarkGeometry}"
+                    Stroke="{DynamicResource CupertinoAccentBrush}" StrokeThickness="2.2"
+                    Width="15" Height="12" Stretch="Uniform" IsVisible="False" />
+            </Grid>
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource CupertinoRowHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#PART_Root">
+      <Setter Property="Background" Value="{DynamicResource CupertinoRowPressedBrush}" />
+    </Style>
+    <Style Selector="^:subtitle /template/ TextBlock#PART_Subtitle">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:detail /template/ TextBlock#PART_Detail">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:customaccessory /template/ ContentPresenter#PART_Accessory">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:disclosure /template/ Path#PART_Disclosure">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:checkmark /template/ Path#PART_Checkmark">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:noseparator /template/ Border#PART_Root">
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="^:destructive">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoDangerBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:CupertinoFormRow}" TargetType="controls:CupertinoFormRow">
+    <Setter Property="Background" Value="{DynamicResource CupertinoCardBrush}" />
+    <Setter Property="Padding" Value="16,10" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+          <Grid ColumnDefinitions="112,*" RowDefinitions="Auto,Auto">
+            <StackPanel Orientation="Horizontal" Spacing="3" Margin="0,7,16,0">
+              <ContentPresenter Content="{TemplateBinding Label}"
+                                FontSize="{DynamicResource CupertinoFontSize17}"
+                                Foreground="{DynamicResource CupertinoLabelBrush}" />
+              <TextBlock Name="PART_Required" Text="*" IsVisible="False"
+                         Foreground="{DynamicResource CupertinoDangerBrush}" />
+            </StackPanel>
+            <ContentPresenter Grid.Column="1" Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              HorizontalContentAlignment="Stretch" />
+            <TextBlock Name="PART_Help" Grid.Row="1" Grid.Column="1" Margin="0,5,0,0"
+                       Text="{TemplateBinding HelpText}" IsVisible="False"
+                       FontSize="{DynamicResource CupertinoFontSize13}"
+                       Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+            <TextBlock Name="PART_Error" Grid.Row="1" Grid.Column="1" Margin="0,5,0,0"
+                       Text="{TemplateBinding ErrorText}" IsVisible="False"
+                       FontSize="{DynamicResource CupertinoFontSize13}"
+                       Foreground="{DynamicResource CupertinoDangerBrush}" />
+          </Grid>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:help /template/ TextBlock#PART_Help"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:error /template/ TextBlock#PART_Help"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:error /template/ TextBlock#PART_Error"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:required /template/ TextBlock#PART_Required"><Setter Property="IsVisible" Value="True" /></Style>
+  </ControlTheme>
+</ResourceDictionary>

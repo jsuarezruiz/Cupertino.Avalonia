@@ -1,0 +1,55 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+  <Style Selector="TextBlock.largetitle">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize34}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightLargeTitle}" />
+  </Style>
+  <Style Selector="TextBlock.title1">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize28}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightTitle1}" />
+  </Style>
+  <Style Selector="TextBlock.title2">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize22}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightTitle2}" />
+  </Style>
+  <Style Selector="TextBlock.title3">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize20}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightTitle3}" />
+  </Style>
+  <Style Selector="TextBlock.headline">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightHeadline}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="TextBlock.body">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightBody}" />
+  </Style>
+  <Style Selector="TextBlock.callout">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize16}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightCallout}" />
+  </Style>
+  <Style Selector="TextBlock.subheadline">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize15}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightSubheadline}" />
+  </Style>
+  <Style Selector="TextBlock.footnote">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize13}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightFootnote}" />
+  </Style>
+  <Style Selector="TextBlock.caption1">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize12}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightCaption1}" />
+  </Style>
+  <Style Selector="TextBlock.caption2">
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize11}" />
+    <Setter Property="LineHeight" Value="{DynamicResource CupertinoLineHeightCaption2}" />
+  </Style>
+
+  <Style Selector="TextBlock.emphasized">
+    <Setter Property="FontWeight" Value="Bold" />
+  </Style>
+
+</Styles>

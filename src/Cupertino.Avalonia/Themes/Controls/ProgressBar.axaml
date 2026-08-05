@@ -1,0 +1,81 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Cupertino.Controls">
+
+  <ControlTheme x:Key="CupertinoProgressBar" TargetType="ProgressBar">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
+    <Setter Property="Background" Value="{DynamicResource CupertinoProgressTrackBrush}" />
+    <Setter Property="MinHeight" Value="4" />
+    <Setter Property="MinWidth" Value="80" />
+    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="PART_Track"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Height="{TemplateBinding MinHeight}" />
+          <Border x:Name="PART_Indicator"
+                  Background="{TemplateBinding Foreground}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Height="{TemplateBinding MinHeight}"
+                  HorizontalAlignment="Left">
+            <Border.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Width" Duration="0:0:0.25" Easing="SineEaseOut" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:vertical">
+      <Setter Property="MinWidth" Value="4" />
+      <Setter Property="MinHeight" Value="80" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel>
+            <Border x:Name="PART_Track"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    Width="{TemplateBinding MinWidth}" />
+            <Border x:Name="PART_Indicator"
+                    Background="{TemplateBinding Foreground}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    Width="{TemplateBinding MinWidth}"
+                    VerticalAlignment="Bottom" />
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <Style Selector="^:indeterminate">
+      <Setter Property="MinHeight" Value="20" />
+      <Setter Property="MinWidth" Value="20" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel>
+            <c:CupertinoActivityIndicator
+                Width="{TemplateBinding MinHeight}"
+                Height="{TemplateBinding MinHeight}"
+                Foreground="{TemplateBinding Foreground}" />
+            <!-- ProgressBar requires both named parts. -->
+            <Border x:Name="PART_Track" IsVisible="False" />
+            <Border x:Name="PART_Indicator" IsVisible="False" />
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ProgressBar}"
+                TargetType="ProgressBar"
+                BasedOn="{StaticResource CupertinoProgressBar}" />
+
+</ResourceDictionary>

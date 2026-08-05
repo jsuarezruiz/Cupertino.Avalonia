@@ -1,0 +1,94 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <ControlTheme x:Key="CupertinoScrollBarThumb" TargetType="Thumb">
+    <Setter Property="Background" Value="{DynamicResource CupertinoScrollIndicatorBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border x:Name="Bar" Background="{TemplateBinding Background}" CornerRadius="2.5">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.15" />
+              <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.15" />
+            </Transitions>
+          </Border.Transitions>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+    <!-- Thicken the indicator while scrubbing. -->
+    <Style Selector="^:pointerover /template/ Border#Bar">
+      <Setter Property="RenderTransform" Value="scaleX(1.6)" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#Bar">
+      <Setter Property="Background" Value="{DynamicResource CupertinoScrollIndicatorPressedBrush}" />
+      <Setter Property="RenderTransform" Value="scaleX(1.6)" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoScrollBar" TargetType="ScrollBar">
+    <Setter Property="Cursor" Value="Arrow" />
+    <Setter Property="AllowAutoHide" Value="True" />
+    <Setter Property="Opacity" Value="1" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+      </Transitions>
+    </Setter>
+
+    <Style Selector="^:vertical">
+      <Setter Property="Width" Value="7" />
+      <Setter Property="Margin" Value="0,2,2,2" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel Background="Transparent">
+            <Track Name="PART_Track"
+                   Orientation="Vertical"
+                   Minimum="{TemplateBinding Minimum}"
+                   Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value, Mode=TwoWay}"
+                   ViewportSize="{TemplateBinding ViewportSize}"
+                   DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+                   IsDirectionReversed="True">
+              <Thumb Theme="{StaticResource CupertinoScrollBarThumb}"
+                     Width="3" MinHeight="36" HorizontalAlignment="Right" />
+            </Track>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <Style Selector="^:horizontal">
+      <Setter Property="Height" Value="7" />
+      <Setter Property="Margin" Value="2,0,2,2" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel Background="Transparent">
+            <Track Name="PART_Track"
+                   Orientation="Horizontal"
+                   Minimum="{TemplateBinding Minimum}"
+                   Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value, Mode=TwoWay}"
+                   ViewportSize="{TemplateBinding ViewportSize}"
+                   DeferThumbDrag="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}">
+              <Thumb Theme="{StaticResource CupertinoScrollBarThumb}"
+                     Height="3" MinWidth="36" VerticalAlignment="Bottom" />
+            </Track>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <!-- Auto-hide: invisible at rest, fades in while scrolling or on hover. -->
+    <Style Selector="^[IsExpanded=False]">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:pointerover">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ScrollBar}"
+                TargetType="ScrollBar"
+                BasedOn="{StaticResource CupertinoScrollBar}" />
+
+</ResourceDictionary>

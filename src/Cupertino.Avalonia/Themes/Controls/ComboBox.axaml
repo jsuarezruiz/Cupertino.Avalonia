@@ -1,0 +1,130 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+  <!-- The overlay layer keeps live glass inside the window. -->
+
+  <ControlTheme x:Key="CupertinoComboBoxItem" TargetType="ComboBoxItem">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Row" Background="Transparent">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.18" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+          <Grid ColumnDefinitions="*,Auto" Margin="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              VerticalAlignment="Center" />
+            <Path x:Name="Tick" Grid.Column="1"
+                  Data="{StaticResource CupertinoCheckmarkGeometry}"
+                  Stroke="{DynamicResource CupertinoAccentBrush}"
+                  StrokeThickness="2" StrokeLineCap="Round"
+                  Width="16" Height="16" Stretch="None"
+                  VerticalAlignment="Center"
+                  IsVisible="False" />
+          </Grid>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:selected /template/ Path#Tick">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#Row">
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowHoverBrush}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#Row">
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#Row">
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowPressedBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoComboBox" TargetType="ComboBox">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Right" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ItemContainerTheme" Value="{StaticResource CupertinoComboBoxItem}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="FocusRing"
+                  CornerRadius="10" Margin="-6,-2"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
+          <Grid ColumnDefinitions="*,Auto" Background="Transparent">
+            <ContentControl x:Name="ContentPresenter"
+                            Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding ItemTemplate}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center" />
+            <Path Grid.Column="1"
+                  Data="{StaticResource CupertinoChevronUpDownGeometry}"
+                  Stroke="{TemplateBinding Foreground}"
+                  StrokeThickness="1.9" StrokeLineCap="Round"
+                  Width="16" Height="18" Stretch="None"
+                  Margin="6,0,0,0" VerticalAlignment="Center" />
+          </Grid>
+
+          <Popup Name="PART_Popup"
+                 WindowManagerAddShadowHint="False"
+                 ShouldUseOverlayLayer="True"
+                 IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                 PlacementTarget="{TemplateBinding}"
+                 IsLightDismissEnabled="True">
+            <Panel Classes="cupertino-popover" Margin="18,10,18,18">
+              <controls:GlassSurface CornerRadius="14"
+                                     BlurRadius="28" Saturation="1.8"
+                                     GlassThickness="0.35" RefractionStrength="0.10"
+                                     ChromaticAberration="0" DepthEffect="0.25"
+                                     IsAdaptive="True"
+                                     ShadowOpacity="0.20" ShadowBlur="30" ShadowOffset="10"
+                                     MinWidth="220">
+                <Border CornerRadius="14" ClipToBounds="True">
+                  <ItemsPresenter Name="PART_ItemsPresenter"
+                                  ItemsPanel="{TemplateBinding ItemsPanel}"
+                                  Margin="0,6" />
+                </Border>
+              </controls:GlassSurface>
+            </Panel>
+          </Popup>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pressed">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ComboBox}" TargetType="ComboBox"
+                BasedOn="{StaticResource CupertinoComboBox}" />
+  <ControlTheme x:Key="{x:Type ComboBoxItem}" TargetType="ComboBoxItem"
+                BasedOn="{StaticResource CupertinoComboBoxItem}" />
+
+</ResourceDictionary>

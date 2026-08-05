@@ -1,0 +1,198 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls"
+                    xmlns:anim="clr-namespace:Cupertino.Animation">
+
+  <!-- PART_SwitchKnob width defines travel and the drag threshold. -->
+  <ControlTheme x:Key="CupertinoToggleSwitch" TargetType="ToggleSwitch">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize15}" />
+    <Setter Property="(controls:SwitchInteraction.IsEnabled)" Value="True" />
+    <Setter Property="(controls:SwitchInteraction.OnTint)" Value="{DynamicResource CupertinoSwitchTrackOnTint}" />
+    <Setter Property="(controls:SwitchInteraction.OffTint)" Value="{DynamicResource CupertinoSwitchTrackOffTint}" />
+    <Setter Property="KnobTransitions">
+      <Transitions>
+        <DoubleTransition Property="Canvas.Left" Duration="0:0:0.334">
+          <DoubleTransition.Easing>
+            <anim:SwitchTravelEasing />
+          </DoubleTransition.Easing>
+        </DoubleTransition>
+        <TransformOperationsTransition Property="RenderTransform"
+                                       Duration="0:0:0.11"
+                                       Easing="SineEaseOut" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="*,Auto" Background="Transparent" ClipToBounds="False">
+
+          <ContentPresenter Grid.Column="0"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Margin="0,0,12,0" />
+
+          <Grid Grid.Column="1" VerticalAlignment="Center" ClipToBounds="False">
+
+            <Border x:Name="FocusRing"
+                    Width="71" Height="36" CornerRadius="18"
+                    BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                    BorderThickness="2"
+                    Opacity="0">
+              <Border.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+
+            <Border x:Name="Track"
+                    Width="63" Height="28" CornerRadius="14"
+                    Background="{DynamicResource CupertinoSwitchTrackOffTint}" />
+
+            <ContentPresenter x:Name="PART_OnContentPresenter" IsVisible="False"
+                              Content="{TemplateBinding OnContent}"
+                              ContentTemplate="{TemplateBinding OnContentTemplate}" />
+            <ContentPresenter x:Name="PART_OffContentPresenter" IsVisible="False"
+                              Content="{TemplateBinding OffContent}"
+                              ContentTemplate="{TemplateBinding OffContentTemplate}" />
+
+            <Canvas x:Name="PART_SwitchKnob"
+                    Width="22" Height="24"
+                    HorizontalAlignment="Left" VerticalAlignment="Center"
+                    Margin="6,0,0,0" ClipToBounds="False">
+              <Grid x:Name="PART_MovingKnobs"
+                    Width="37" Height="24"
+                    ClipToBounds="False"
+                    RenderTransform="scale(1.0)"
+                    RenderTransformOrigin="50%,50%">
+                <ContentControl x:Name="KnobRest"
+                                Theme="{StaticResource CupertinoKnobRest}">
+                  <ContentControl.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0.07" />
+                    </Transitions>
+                  </ContentControl.Transitions>
+                </ContentControl>
+
+                <!-- Keep the base clear so the track remains the refracted content. -->
+                <ContentControl x:Name="KnobHeld"
+                                Theme="{StaticResource CupertinoKnobHeld}"
+                                Background="Transparent"
+                                Opacity="0">
+                  <ContentControl.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0.09" />
+                    </Transitions>
+                  </ContentControl.Transitions>
+                  <Grid IsHitTestVisible="False">
+                    <controls:GlassSurface x:Name="KnobHeldGlass"
+                                           Width="37" Height="24" CornerRadius="12"
+                                           BlurRadius="1"
+                                           GlassThickness="7"
+                                           RefractionStrength="8"
+                                           ChromaticAberration="0.35"
+                                           DepthEffect="0.30"
+                                           Saturation="1"
+                                           LightIntensity="0.2"
+                                           FresnelStrength="0.55"
+                                           ShadowOpacity="0"
+                                           Tint="#08FFFFFF" />
+                    <Grid x:Name="KnobHeldRim">
+                      <Panel Height="12" VerticalAlignment="Top" ClipToBounds="True">
+                        <Border Height="24" VerticalAlignment="Top"
+                                CornerRadius="12" BorderThickness="0.667">
+                          <Border.BorderBrush>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                              <GradientStop Offset="0" Color="#D9000000" />
+                              <GradientStop Offset="0.55" Color="#A8000000" />
+                              <GradientStop Offset="0.75" Color="#805C5964" />
+                              <GradientStop Offset="0.90" Color="#A05CCBFF" />
+                              <GradientStop Offset="1" Color="#A0FFFFFF" />
+                            </LinearGradientBrush>
+                          </Border.BorderBrush>
+                        </Border>
+                      </Panel>
+                      <Panel Height="12" VerticalAlignment="Bottom" ClipToBounds="True">
+                        <Border Height="24" VerticalAlignment="Bottom"
+                                CornerRadius="12" BorderThickness="0.667">
+                          <Border.BorderBrush>
+                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                              <GradientStop Offset="0" Color="#80FF8266" />
+                              <GradientStop Offset="0.20" Color="#70FFB1A3" />
+                              <GradientStop Offset="0.60" Color="#70E6C8FF" />
+                              <GradientStop Offset="0.82" Color="#A060DFFF" />
+                              <GradientStop Offset="1" Color="#A0FFFFFF" />
+                            </LinearGradientBrush>
+                          </Border.BorderBrush>
+                        </Border>
+                      </Panel>
+                    </Grid>
+                  </Grid>
+                </ContentControl>
+              </Grid>
+            </Canvas>
+
+          </Grid>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:checked /template/ Border#Track">
+      <Setter Property="Background" Value="{DynamicResource CupertinoSwitchTrackOnTint}" />
+    </Style>
+
+    <Style Selector="^:pressed /template/ Grid#PART_MovingKnobs">
+      <Setter Property="RenderTransform" Value="scale(1.5,1.55)" />
+    </Style>
+    <Style Selector="^:dragging /template/ Grid#PART_MovingKnobs">
+      <Setter Property="RenderTransform" Value="scale(1.5,1.55)" />
+    </Style>
+    <Style Selector="^:pressed /template/ ContentControl#KnobRest">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:dragging /template/ ContentControl#KnobRest">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^:pressed /template/ ContentControl#KnobHeld">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:dragging /template/ ContentControl#KnobHeld">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^.cupertino-switch-releasing /template/ ContentControl#KnobRest">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^.cupertino-switch-releasing /template/ ContentControl#KnobHeld">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^.cupertino-switch-releasing /template/ controls|GlassSurface#KnobHeldGlass">
+      <Setter Property="Tint" Value="#4DFFFFFF" />
+      <Setter Property="BlurRadius" Value="5" />
+    </Style>
+    <Style Selector="^.cupertino-switch-releasing /template/ Grid#KnobHeldRim">
+      <Setter Property="Opacity" Value="0.18" />
+    </Style>
+
+    <Style Selector="^:indeterminate /template/ Grid#PART_MovingKnobs">
+      <Setter Property="Opacity" Value="0.85" />
+    </Style>
+
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ToggleSwitch}"
+                TargetType="ToggleSwitch"
+                BasedOn="{StaticResource CupertinoToggleSwitch}" />
+
+</ResourceDictionary>

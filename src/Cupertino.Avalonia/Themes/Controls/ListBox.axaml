@@ -1,0 +1,120 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <ControlTheme x:Key="CupertinoListBoxItem" TargetType="ListBoxItem">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="RowBackground" Background="{TemplateBinding Background}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.18" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+          <ContentPresenter x:Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+          <Border x:Name="FocusRing"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2"
+                  CornerRadius="4"
+                  Margin="2"
+                  IsVisible="False" />
+          <Rectangle x:Name="Separator"
+                     Height="0.5"
+                     VerticalAlignment="Bottom"
+                     Margin="16,0,0,0"
+                     Fill="{DynamicResource CupertinoSeparatorBrush}" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:nth-last-child(1) /template/ Rectangle#Separator">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Border#RowBackground">
+      <Setter Property="Background" Value="{DynamicResource CupertinoRowHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#RowBackground">
+      <Setter Property="Background" Value="{DynamicResource CupertinoRowPressedBrush}" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#RowBackground">
+      <Setter Property="Background" Value="{DynamicResource CupertinoAccentSubtleBrush}" />
+    </Style>
+    <Style Selector="^:nth-child(1) /template/ Border#RowBackground">
+      <Setter Property="CornerRadius" Value="10,10,0,0" />
+    </Style>
+    <Style Selector="^:nth-last-child(1) /template/ Border#RowBackground">
+      <Setter Property="CornerRadius" Value="0,0,10,10" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoListBoxItemWithIcon"
+                TargetType="ListBoxItem"
+                BasedOn="{StaticResource CupertinoListBoxItem}">
+    <Setter Property="MinHeight" Value="52" />
+    <Style Selector="^ /template/ Rectangle#Separator">
+      <Setter Property="Margin" Value="59,0,0,0" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoListBox" TargetType="ListBox">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="ItemContainerTheme" Value="{StaticResource CupertinoListBoxItem}" />
+    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}"
+                BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                        VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+            <ItemsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" />
+          </ScrollViewer>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^.inset">
+      <Setter Property="Background" Value="{DynamicResource CupertinoCardBrush}" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Margin" Value="16,0,16,24" />
+    </Style>
+    <Style Selector="^.icons">
+      <Setter Property="ItemContainerTheme" Value="{StaticResource CupertinoListBoxItemWithIcon}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ListBoxItem}"
+                TargetType="ListBoxItem"
+                BasedOn="{StaticResource CupertinoListBoxItem}" />
+
+  <ControlTheme x:Key="{x:Type ListBox}"
+                TargetType="ListBox"
+                BasedOn="{StaticResource CupertinoListBox}" />
+
+</ResourceDictionary>

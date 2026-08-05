@@ -1,0 +1,338 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+
+  <ControlTheme x:Key="CupertinoSliderRailHorizontal" TargetType="RepeatButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid Background="Transparent" MinHeight="24" ClipToBounds="False">
+          <Border Background="{TemplateBinding Foreground}"
+                  Height="5.7" CornerRadius="2.85"
+                  VerticalAlignment="Center" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoSliderRailVertical" TargetType="RepeatButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Focusable" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid Background="Transparent" MinWidth="24" ClipToBounds="False">
+          <Border Background="{TemplateBinding Foreground}"
+                  Width="5.7" CornerRadius="2.85"
+                  HorizontalAlignment="Center" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoSliderThumb" TargetType="Thumb">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Width" Value="37" />
+    <Setter Property="Height" Value="24" />
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <Grid x:Name="ThumbKnob"
+                ClipToBounds="False"
+                RenderTransform="scale(1.0)">
+            <Grid.Transitions>
+              <Transitions>
+                <TransformOperationsTransition Property="RenderTransform"
+                                               Duration="0:0:0.11"
+                                               Easing="SineEaseOut" />
+              </Transitions>
+            </Grid.Transitions>
+
+            <!-- Keep the shadow outside the reusable lens to avoid clipping. -->
+            <Panel x:Name="ThumbDragShadow"
+                   Width="37" Height="48"
+                   Margin="0,12,0,-36"
+                   HorizontalAlignment="Center" VerticalAlignment="Top"
+                   ClipToBounds="True" Opacity="0"
+                   IsHitTestVisible="False">
+              <Panel.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.09" />
+                </Transitions>
+              </Panel.Transitions>
+              <Border Width="37" Height="24" Margin="0,-12,0,0"
+                      HorizontalAlignment="Center" VerticalAlignment="Top"
+                      CornerRadius="12"
+                      Background="{DynamicResource CupertinoSliderThumbDragBaseBrush}"
+                      BoxShadow="0 16.5 10 0 #24002F50" />
+            </Panel>
+
+            <Border x:Name="ThumbRestShadow"
+                    Width="37" Height="24"
+                    CornerRadius="12"
+                    Background="{DynamicResource CupertinoKnobBrush}"
+                    BoxShadow="0 3 12 0 #24000000, 0 0 1 0 #1F000000">
+              <Border.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.07" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+
+            <ContentControl x:Name="ThumbRest"
+                            Theme="{StaticResource CupertinoKnobRest}">
+              <ContentControl.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.07" />
+                </Transitions>
+              </ContentControl.Transitions>
+            </ContentControl>
+
+            <!-- A flat base prevents backdrop self-sampling while held. -->
+            <ContentControl x:Name="ThumbHeld"
+                            Theme="{StaticResource CupertinoKnobHeld}"
+                            Background="{DynamicResource CupertinoSliderThumbDragBaseBrush}"
+                            Opacity="0">
+              <ContentControl.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.09" />
+                </Transitions>
+              </ContentControl.Transitions>
+              <Grid>
+
+            <!-- Separate rims preserve chromatic edges without darkening the sides. -->
+            <Grid x:Name="ThumbDragRim"
+                  IsHitTestVisible="False">
+              <Panel Height="12" VerticalAlignment="Top" ClipToBounds="True">
+                <Border x:Name="ThumbDragRimTop"
+                        Height="24"
+                        VerticalAlignment="Top"
+                        CornerRadius="12"
+                        BorderThickness="0.667"
+                        BorderBrush="{TemplateBinding (controls:SliderInteraction.RimTopBrush)}" />
+              </Panel>
+              <Panel Height="12" VerticalAlignment="Bottom" ClipToBounds="True">
+                <Border x:Name="ThumbDragRimBottom"
+                        Height="24"
+                        VerticalAlignment="Bottom"
+                        CornerRadius="12"
+                        BorderThickness="0.667"
+                        BorderBrush="{TemplateBinding (controls:SliderInteraction.RimBottomBrush)}" />
+              </Panel>
+            </Grid>
+
+            <Grid x:Name="ThumbDragRail"
+                  ColumnDefinitions="49.1*,50.9*"
+                  Height="3.8"
+                  VerticalAlignment="Center"
+                  Clip="{TemplateBinding (controls:SliderInteraction.RailClip)}"
+                  IsHitTestVisible="False">
+              <Border Grid.ColumnSpan="2"
+                      CornerRadius="0">
+                <Border.Background>
+                  <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                    <GradientStop Offset="0" Color="#FFE1E2E1" />
+                    <GradientStop Offset="0.70" Color="#FFE1E2E1" />
+                    <GradientStop Offset="0.80" Color="#FFDFE0DF" />
+                    <GradientStop Offset="0.90" Color="#FFDCDCDA" />
+                    <GradientStop Offset="1" Color="#FFD4D3D1" />
+                  </LinearGradientBrush>
+                </Border.Background>
+              </Border>
+              <Border x:Name="ThumbDragAccentOuter"
+                      Background="{TemplateBinding Foreground}"
+                      CornerRadius="0,1.9,1.9,0" />
+              <Grid Grid.ColumnSpan="2"
+                    ColumnDefinitions="49.1*,50.9*"
+                    Height="2.58"
+                    VerticalAlignment="Center"
+                    Opacity="0.33"
+                    RenderTransform="translate(0px,0.1075px)">
+                <Border Grid.ColumnSpan="2" CornerRadius="0">
+                  <Border.Background>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                      <GradientStop Offset="0" Color="#FFE1E2E1" />
+                      <GradientStop Offset="0.70" Color="#FFE1E2E1" />
+                      <GradientStop Offset="0.80" Color="#FFDFE0DF" />
+                      <GradientStop Offset="0.90" Color="#FFDCDCDA" />
+                      <GradientStop Offset="1" Color="#FFD4D3D1" />
+                    </LinearGradientBrush>
+                  </Border.Background>
+                </Border>
+                <Border x:Name="ThumbDragAccentSoft"
+                        Background="{TemplateBinding Foreground}"
+                        CornerRadius="0,1.29,1.29,0" />
+              </Grid>
+              <Grid Grid.ColumnSpan="2"
+                    ColumnDefinitions="49.1*,50.9*"
+                    Height="1.67"
+                    VerticalAlignment="Center">
+                <Border Grid.ColumnSpan="2" CornerRadius="0">
+                  <Border.Background>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,0%">
+                      <GradientStop Offset="0" Color="#FFE1E2E1" />
+                      <GradientStop Offset="0.70" Color="#FFE1E2E1" />
+                      <GradientStop Offset="0.80" Color="#FFDFE0DF" />
+                      <GradientStop Offset="0.90" Color="#FFDCDCDA" />
+                      <GradientStop Offset="1" Color="#FFD4D3D1" />
+                    </LinearGradientBrush>
+                  </Border.Background>
+                </Border>
+                <Border x:Name="ThumbDragAccentCore"
+                        Background="{TemplateBinding Foreground}"
+                        CornerRadius="0,1,1,0" />
+              </Grid>
+            </Grid>
+              </Grid>
+            </ContentControl>
+          </Grid>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Grid#ThumbKnob">
+      <Setter Property="RenderTransform" Value="scale(1.04)" />
+    </Style>
+    <Style Selector="^.cupertino-active /template/ Grid#ThumbKnob">
+      <Setter Property="RenderTransform" Value="scale(1.5,1.55)" />
+    </Style>
+    <Style Selector="^.cupertino-active /template/ ContentControl#ThumbRest">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^.cupertino-active /template/ Border#ThumbRestShadow">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^.cupertino-active /template/ Panel#ThumbDragShadow">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^.cupertino-active /template/ ContentControl#ThumbHeld">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <!-- Handle exact rail endpoints without zero-sized grid columns. -->
+    <Style Selector="^.cupertino-at-minimum /template/ Border#ThumbDragAccentOuter,
+                     ^.cupertino-at-minimum /template/ Border#ThumbDragAccentSoft,
+                     ^.cupertino-at-minimum /template/ Border#ThumbDragAccentCore">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="^.cupertino-at-maximum /template/ Border#ThumbDragAccentOuter,
+                     ^.cupertino-at-maximum /template/ Border#ThumbDragAccentSoft,
+                     ^.cupertino-at-maximum /template/ Border#ThumbDragAccentCore">
+      <Setter Property="Grid.ColumnSpan" Value="2" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoSliderThumbVertical"
+                TargetType="Thumb"
+                BasedOn="{StaticResource CupertinoSliderThumb}">
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="37" />
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoSlider" TargetType="Slider">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
+    <Setter Property="Background" Value="{DynamicResource CupertinoSliderRemainderBrush}" />
+    <Setter Property="Focusable" Value="True" />
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="(controls:SliderInteraction.IsEnabled)" Value="True" />
+
+    <Style Selector="^:horizontal">
+      <Setter Property="MinHeight" Value="28" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Grid Background="Transparent" ClipToBounds="False">
+            <Border x:Name="FocusRing"
+                    CornerRadius="14"
+                    Margin="-6,-2"
+                    BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                    BorderThickness="2"
+                    Opacity="0">
+              <Border.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+            <Track Name="PART_Track"
+                   ClipToBounds="False"
+                   Minimum="{TemplateBinding Minimum}"
+                   Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value, Mode=TwoWay}"
+                   IsDirectionReversed="{TemplateBinding IsDirectionReversed}"
+                   Orientation="Horizontal">
+              <Track.DecreaseButton>
+                <RepeatButton Name="PART_DecreaseButton"
+                              Theme="{StaticResource CupertinoSliderRailHorizontal}"
+                              Foreground="{TemplateBinding Foreground}" />
+              </Track.DecreaseButton>
+              <Track.IncreaseButton>
+                <RepeatButton Name="PART_IncreaseButton"
+                              Theme="{StaticResource CupertinoSliderRailHorizontal}"
+                              Foreground="{TemplateBinding Background}" />
+              </Track.IncreaseButton>
+              <Thumb Name="thumb" Theme="{StaticResource CupertinoSliderThumb}"
+                     Foreground="{TemplateBinding Foreground}" />
+            </Track>
+          </Grid>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <Style Selector="^:vertical">
+      <Setter Property="MinWidth" Value="28" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Grid Background="Transparent" ClipToBounds="False">
+            <Border x:Name="FocusRing"
+                    CornerRadius="14"
+                    Margin="-2,-6"
+                    BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                    BorderThickness="2"
+                    Opacity="0">
+              <Border.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+            <Track Name="PART_Track"
+                   ClipToBounds="False"
+                   Minimum="{TemplateBinding Minimum}"
+                   Maximum="{TemplateBinding Maximum}"
+                   Value="{TemplateBinding Value, Mode=TwoWay}"
+                   IsDirectionReversed="{TemplateBinding IsDirectionReversed}"
+                   Orientation="Vertical">
+              <Track.DecreaseButton>
+                <RepeatButton Name="PART_DecreaseButton"
+                              Theme="{StaticResource CupertinoSliderRailVertical}"
+                              Foreground="{TemplateBinding Foreground}" />
+              </Track.DecreaseButton>
+              <Track.IncreaseButton>
+                <RepeatButton Name="PART_IncreaseButton"
+                              Theme="{StaticResource CupertinoSliderRailVertical}"
+                              Foreground="{TemplateBinding Background}" />
+              </Track.IncreaseButton>
+              <Thumb Name="thumb" Theme="{StaticResource CupertinoSliderThumbVertical}"
+                     Foreground="{TemplateBinding Foreground}" />
+            </Track>
+          </Grid>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type Slider}"
+                TargetType="Slider"
+                BasedOn="{StaticResource CupertinoSlider}" />
+
+</ResourceDictionary>

@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+  <ControlTheme x:Key="{x:Type controls:CupertinoPageControl}" TargetType="controls:CupertinoPageControl">
+    <Setter Property="MinHeight" Value="20" />
+    <Setter Property="DotSize" Value="7" />
+    <Setter Property="DotSpacing" Value="9" />
+    <Setter Property="ActiveBrush" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="InactiveBrush" Value="{DynamicResource CupertinoTertiaryLabelBrush}" />
+  </ControlTheme>
+</ResourceDictionary>

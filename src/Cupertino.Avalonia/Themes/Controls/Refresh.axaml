@@ -1,0 +1,58 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+  <!-- Part names are required by RefreshContainer. -->
+
+  <ControlTheme x:Key="{x:Type RefreshContainer}" TargetType="RefreshContainer">
+    <Setter Property="(controls:RefreshInteraction.IsEnabled)" Value="True" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid>
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+          <Grid Name="PART_RefreshVisualizerPresenter" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type RefreshVisualizer}" TargetType="RefreshVisualizer">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid Name="PART_Root" Background="Transparent">
+          <controls:CupertinoActivityIndicator x:Name="Spinner"
+                                               Width="24" Height="24"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               Opacity="0">
+            <controls:CupertinoActivityIndicator.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+              </Transitions>
+            </controls:CupertinoActivityIndicator.Transitions>
+          </controls:CupertinoActivityIndicator>
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^[RefreshVisualizerState=Peeking] /template/ controls|CupertinoActivityIndicator#Spinner">
+      <Setter Property="Opacity" Value="0.4" />
+      <Setter Property="IsActive" Value="True" />
+    </Style>
+    <Style Selector="^[RefreshVisualizerState=Interacting] /template/ controls|CupertinoActivityIndicator#Spinner">
+      <Setter Property="Opacity" Value="0.6" />
+      <Setter Property="IsActive" Value="True" />
+    </Style>
+    <Style Selector="^[RefreshVisualizerState=Pending] /template/ controls|CupertinoActivityIndicator#Spinner">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="IsActive" Value="True" />
+    </Style>
+    <Style Selector="^[RefreshVisualizerState=Refreshing] /template/ controls|CupertinoActivityIndicator#Spinner">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="IsActive" Value="True" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

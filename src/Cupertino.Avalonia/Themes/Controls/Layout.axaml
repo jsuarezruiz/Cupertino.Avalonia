@@ -1,0 +1,182 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls"
+                    xmlns:anim="clr-namespace:Cupertino.Animation">
+
+  <ControlTheme x:Key="{x:Type SplitView}" TargetType="SplitView">
+    <Setter Property="PaneBackground" Value="{DynamicResource CupertinoGroupedBackgroundBrush}" />
+    <Setter Property="OpenPaneLength" Value="300" />
+    <Setter Property="CompactPaneLength" Value="52" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}" />
+
+          <!-- Disable the dismiss layer while the pane is closed. -->
+          <Border x:Name="Scrim"
+                  Background="#33000000"
+                  Opacity="0"
+                  IsHitTestVisible="False">
+            <Border.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+
+          <Panel x:Name="PART_PaneRoot"
+                 Width="{TemplateBinding OpenPaneLength}"
+                 HorizontalAlignment="Left"
+                 ClipToBounds="True"
+                 RenderTransformOrigin="0%,0%">
+            <Panel.Transitions>
+              <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3">
+                  <TransformOperationsTransition.Easing>
+                    <anim:CriticallyDampedEasing OmegaDuration="8.4" />
+                  </TransformOperationsTransition.Easing>
+                </TransformOperationsTransition>
+              </Transitions>
+            </Panel.Transitions>
+            <Border Background="{TemplateBinding PaneBackground}" />
+            <Rectangle Width="0.5" HorizontalAlignment="Right"
+                       Fill="{DynamicResource CupertinoSeparatorBrush}" />
+            <ContentPresenter x:Name="PART_PanePresenter"
+                              Content="{TemplateBinding Pane}"
+                              ContentTemplate="{TemplateBinding PaneTemplate}" />
+          </Panel>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^ /template/ Panel#PART_PaneRoot">
+      <Setter Property="RenderTransform" Value="translateX(-300px)" />
+    </Style>
+    <Style Selector="^:open /template/ Panel#PART_PaneRoot">
+      <Setter Property="RenderTransform" Value="translateX(0px)" />
+    </Style>
+    <Style Selector="^:open /template/ Border#Scrim">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="IsHitTestVisible" Value="True" />
+    </Style>
+
+    <Style Selector="^[DisplayMode=Inline] /template/ Panel#PART_PaneRoot">
+      <Setter Property="RenderTransform" Value="translateX(0px)" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type GridSplitter}" TargetType="GridSplitter">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="MinWidth" Value="8" />
+    <Setter Property="MinHeight" Value="8" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="{TemplateBinding Background}">
+          <Border x:Name="Line" Width="0.5"
+                  Background="{DynamicResource CupertinoSeparatorBrush}"
+                  HorizontalAlignment="Center" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pointerover /template/ Border#Line">
+      <Setter Property="Background" Value="{DynamicResource CupertinoAccentBrush}" />
+      <Setter Property="Width" Value="1.5" />
+    </Style>
+    <Style Selector="^[ResizeDirection=Rows]:pointerover /template/ Border#Line">
+      <Setter Property="Background" Value="{DynamicResource CupertinoAccentBrush}" />
+      <Setter Property="Width" Value="NaN" />
+      <Setter Property="Height" Value="1.5" />
+    </Style>
+    <Style Selector="^[ResizeDirection=Rows] /template/ Border#Line">
+      <Setter Property="Width" Value="NaN" />
+      <Setter Property="Height" Value="0.5" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type Carousel}" TargetType="Carousel">
+    <Setter Property="(controls:CarouselGestures.IsEnabled)" Value="True" />
+    <Setter Property="PageTransition">
+      <CrossFade Duration="0:0:0.25" />
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ItemsPresenter Name="PART_ItemsPresenter"
+                        ItemsPanel="{TemplateBinding ItemsPanel}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type TransitioningContentControl}" TargetType="TransitioningContentControl">
+    <Setter Property="PageTransition">
+      <CrossFade Duration="0:0:0.25" />
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ContentPresenter Name="PART_ContentPresenter"
+                          Content="{TemplateBinding Content}"
+                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                          Padding="{TemplateBinding Padding}"
+                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type CalendarDatePicker}" TargetType="CalendarDatePicker">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Background" Value="{DynamicResource CupertinoPickerFieldBrush}" />
+    <Setter Property="CornerRadius" Value="17" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border Background="{TemplateBinding Background}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  MinHeight="34" Padding="13,0"
+                  VerticalAlignment="Center">
+            <Panel>
+              <TextBox x:Name="PART_TextBox"
+                       Classes="plain"
+                       IsVisible="False"
+                       PlaceholderText="{TemplateBinding PlaceholderText}" />
+              <TextBlock Text="{Binding #PART_TextBox.Text}"
+                         FontSize="{TemplateBinding FontSize}"
+                         Foreground="{TemplateBinding Foreground}"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center" />
+              <Button x:Name="PART_Button"
+                      Classes="plain" MinHeight="0"
+                      Background="Transparent" Padding="0"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      FocusAdorner="{x:Null}" />
+            </Panel>
+          </Border>
+          <Popup x:Name="PART_Popup" IsLightDismissEnabled="True"
+                 Placement="BottomEdgeAlignedLeft">
+            <Panel Classes="cupertino-popover" Margin="18,10,18,18">
+              <controls:GlassSurface CornerRadius="14"
+                                     BlurRadius="28" Saturation="1.8"
+                                     GlassThickness="0.35" RefractionStrength="0.10"
+                                     ChromaticAberration="0" DepthEffect="0.25"
+                                     IsAdaptive="True"
+                                     ShadowOpacity="0.20" ShadowBlur="30" ShadowOffset="10">
+                <Border CornerRadius="14" ClipToBounds="True">
+                  <Calendar x:Name="PART_Calendar" Background="Transparent" />
+                </Border>
+              </controls:GlassSurface>
+            </Panel>
+          </Popup>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

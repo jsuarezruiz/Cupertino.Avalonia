@@ -1,0 +1,39 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+  <ControlTheme x:Key="{x:Type controls:CupertinoBadge}" TargetType="controls:CupertinoBadge">
+    <Setter Property="Background" Value="{DynamicResource CupertinoSystemRedBrush}" />
+    <Setter Property="Foreground" Value="White" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize13}" />
+    <Setter Property="MinWidth" Value="18" />
+    <Setter Property="Height" Value="18" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                CornerRadius="9"
+                MinWidth="{TemplateBinding MinWidth}"
+                Height="{TemplateBinding Height}"
+                Padding="5,0">
+          <TextBlock Text="{TemplateBinding Text}"
+                     FontSize="{TemplateBinding FontSize}"
+                     Foreground="{TemplateBinding Foreground}"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center" />
+        </Border>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:dot">
+      <Setter Property="MinWidth" Value="10" />
+      <Setter Property="Height" Value="10" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}" CornerRadius="5"
+                  Width="10" Height="10" />
+        </ControlTemplate>
+      </Setter>
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

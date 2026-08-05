@@ -1,0 +1,63 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls"
+                    xmlns:sys="using:System">
+
+  <ControlTheme x:Key="{x:Type controls:Section}" TargetType="controls:Section">
+    <Setter Property="Margin" Value="0,0,0,24" />
+    <Setter Property="HeaderTemplate">
+      <DataTemplate DataType="sys:String">
+        <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+      </DataTemplate>
+    </Setter>
+    <Setter Property="FooterTemplate">
+      <DataTemplate DataType="sys:String">
+        <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+      </DataTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel>
+          <ContentPresenter x:Name="PART_HeaderPresenter"
+                            Content="{TemplateBinding Header}"
+                            ContentTemplate="{TemplateBinding HeaderTemplate}"
+                            Margin="32,0,32,7"
+                            IsVisible="False"
+                            TextElement.FontSize="{DynamicResource CupertinoFontSize13}"
+                            TextElement.Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+
+          <Border x:Name="Card"
+                  Background="{DynamicResource CupertinoCardBrush}"
+                  CornerRadius="10"
+                  Margin="16,0"
+                  ClipToBounds="True">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+          </Border>
+
+          <ContentPresenter x:Name="PART_FooterPresenter"
+                            Content="{TemplateBinding Footer}"
+                            ContentTemplate="{TemplateBinding FooterTemplate}"
+                            Margin="32,7,32,0"
+                            IsVisible="False"
+                            TextElement.FontSize="{DynamicResource CupertinoFontSize13}"
+                            TextElement.Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:has-header /template/ ContentPresenter#PART_HeaderPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:has-footer /template/ ContentPresenter#PART_FooterPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <Style Selector="^.plain /template/ Border#Card">
+      <Setter Property="Background" Value="{DynamicResource CupertinoCardBrush}" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Margin" Value="0" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

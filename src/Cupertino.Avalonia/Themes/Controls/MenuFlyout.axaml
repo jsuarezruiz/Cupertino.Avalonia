@@ -1,0 +1,110 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+  <ControlTheme x:Key="{x:Type MenuItem}" TargetType="MenuItem">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="Padding" Value="16,0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Row" Background="Transparent">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.18" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+          <Grid ColumnDefinitions="*,Auto,Auto" Margin="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Header}"
+                              VerticalAlignment="Center" />
+            <ContentPresenter Grid.Column="1"
+                              Content="{TemplateBinding Icon}"
+                              VerticalAlignment="Center" />
+            <Path x:Name="SubChevron" Grid.Column="2"
+                  Data="{StaticResource CupertinoChevronRightGeometry}"
+                  Stroke="{DynamicResource CupertinoTertiaryLabelBrush}"
+                  StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+                  Width="16" Height="16" Stretch="None"
+                  Margin="8,0,0,0" VerticalAlignment="Center" />
+          </Grid>
+          <Popup x:Name="PART_Popup"
+                 IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
+                 Placement="RightEdgeAlignedTop">
+            <Panel Classes="cupertino-popover" Margin="18,10,18,18">
+              <controls:GlassSurface CornerRadius="14"
+                                     BlurRadius="28" Saturation="1.8"
+                                     GlassThickness="0.35" RefractionStrength="0.10"
+                                     ChromaticAberration="0" DepthEffect="0.25"
+                                     IsAdaptive="True"
+                                     ShadowOpacity="0.20" ShadowBlur="30" ShadowOffset="10"
+                                     MinWidth="220">
+                <Border CornerRadius="14" ClipToBounds="True">
+                  <ItemsPresenter Name="PART_ItemsPresenter"
+                                  ItemsPanel="{TemplateBinding ItemsPanel}"
+                                  Margin="0,6" />
+                </Border>
+              </controls:GlassSurface>
+            </Panel>
+          </Popup>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:empty /template/ Path#SubChevron">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#Row">
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowHoverBrush}" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#Row">
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#Row">
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowPressedBrush}" />
+    </Style>
+    <Style Selector="^.destructive">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoDangerBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type Separator}" TargetType="Separator">
+    <Setter Property="Height" Value="0.5" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="Background" Value="{DynamicResource CupertinoSeparatorBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}" Height="0.5" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type MenuFlyoutPresenter}" TargetType="MenuFlyoutPresenter">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Classes="cupertino-popover" Margin="18,10,18,18">
+          <controls:GlassSurface CornerRadius="14"
+                                 BlurRadius="28" Saturation="1.8"
+                                 GlassThickness="0.35" RefractionStrength="0.10"
+                                 ChromaticAberration="0" DepthEffect="0.25"
+                                 IsAdaptive="True"
+                                 ShadowOpacity="0.20" ShadowBlur="30" ShadowOffset="10"
+                                 MinWidth="220">
+            <Border CornerRadius="14" ClipToBounds="True">
+              <ItemsPresenter Name="PART_ItemsPresenter"
+                              ItemsPanel="{TemplateBinding ItemsPanel}"
+                              Margin="0,6" />
+            </Border>
+          </controls:GlassSurface>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

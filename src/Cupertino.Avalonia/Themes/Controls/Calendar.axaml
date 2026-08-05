@@ -1,0 +1,214 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="using:System"
+                    xmlns:c="using:Cupertino.Controls">
+
+  <ControlTheme x:Key="{x:Type CalendarDayButton}" TargetType="CalendarDayButton">
+    <Setter Property="Width" Value="44" />
+    <Setter Property="Height" Value="44" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize14}" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <Ellipse x:Name="Disc" Width="34.6" Height="34.6"
+                   Fill="{DynamicResource CupertinoAccentSubtleBrush}"
+                   IsVisible="False" />
+          <ContentPresenter x:Name="Content"
+                            Content="{TemplateBinding Content}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:selected /template/ Ellipse#Disc">
+      <Style.Animations>
+        <Animation Duration="0:0:0.18" Easing="QuadraticEaseOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="ScaleTransform.ScaleX" Value="0.5" />
+            <Setter Property="ScaleTransform.ScaleY" Value="0.5" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="ScaleTransform.ScaleX" Value="1" />
+            <Setter Property="ScaleTransform.ScaleY" Value="1" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:selected">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="^:today">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style Selector="^:inactive">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoTertiaryLabelBrush}" />
+      <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Ellipse#Disc">
+      <Setter Property="IsVisible" Value="True" />
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+    <Style Selector="^:pressed /template/ Ellipse#Disc">
+      <Setter Property="IsVisible" Value="True" />
+      <Setter Property="Opacity" Value="0.8" />
+    </Style>
+    <Style Selector="^:blackout">
+      <Setter Property="Opacity" Value="0.3" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.35" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type CalendarButton}" TargetType="CalendarButton">
+    <Setter Property="MinWidth" Value="64" />
+    <Setter Property="Height" Value="44" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize15}" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <Border x:Name="Pill" CornerRadius="16" Margin="4,3"
+                  Background="{DynamicResource CupertinoAccentSubtleBrush}"
+                  IsVisible="False" />
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:selected /template/ Border#Pill">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:selected">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="^:inactive">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoTertiaryLabelBrush}" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Border#Pill">
+      <Setter Property="IsVisible" Value="True" />
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoCalendarHeaderButton" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            HorizontalContentAlignment="Left"
+                            VerticalContentAlignment="Center" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pressed">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoCalendarPagingButton" TargetType="Button">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Width" Value="45.7" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pressed">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.3" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type CalendarItem}" TargetType="CalendarItem">
+    <Setter Property="DayTitleTemplate">
+      <Template x:DataType="sys:String">
+        <TextBlock Text="{Binding Converter={x:Static c:CupertinoConverters.DayInitial}}"
+                   FontSize="{DynamicResource CupertinoFontSize10}"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Foreground="{DynamicResource CupertinoTertiaryLabelBrush}" />
+      </Template>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid RowDefinitions="Auto,*" Margin="8,6,8,10">
+          <Grid ColumnDefinitions="*,Auto,Auto" Margin="8,2,0,4">
+            <Button x:Name="PART_HeaderButton" Grid.Column="0"
+                    Theme="{StaticResource CupertinoCalendarHeaderButton}"
+                    HorizontalAlignment="Left" />
+            <Button x:Name="PART_PreviousButton" Grid.Column="1"
+                    Theme="{StaticResource CupertinoCalendarPagingButton}">
+              <Path Data="{StaticResource CupertinoChevronLeftGeometry}"
+                    Stroke="{DynamicResource CupertinoAccentBrush}"
+                    StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
+                    Width="16" Height="16" Stretch="None"
+                    RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
+            </Button>
+            <Button x:Name="PART_NextButton" Grid.Column="2"
+                    Theme="{StaticResource CupertinoCalendarPagingButton}">
+              <Path Data="{StaticResource CupertinoChevronRightGeometry}"
+                    Stroke="{DynamicResource CupertinoAccentBrush}"
+                    StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
+                    Width="16" Height="16" Stretch="None"
+                    RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
+            </Button>
+          </Grid>
+
+          <Grid x:Name="PART_MonthView" Grid.Row="1" IsVisible="False"
+                ColumnDefinitions="*,*,*,*,*,*,*"
+                RowDefinitions="Auto,*,*,*,*,*,*" />
+          <Grid x:Name="PART_YearView" Grid.Row="1" IsVisible="False"
+                ColumnDefinitions="*,*,*,*"
+                RowDefinitions="*,*,*" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type Calendar}" TargetType="Calendar">
+    <Setter Property="Background" Value="{DynamicResource CupertinoCardBrush}" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel x:Name="PART_Root">
+          <Border Background="{TemplateBinding Background}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <CalendarItem x:Name="PART_CalendarItem" />
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

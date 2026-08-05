@@ -1,0 +1,264 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+
+  <ControlTheme x:Key="CupertinoTextBoxClearButton" TargetType="Button">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Focusable" Value="False" />
+    <!-- Expand the hit target without shrinking the text viewport. -->
+    <Setter Property="Width" Value="30" />
+    <Setter Property="Height" Value="47" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="0" />
+    <Setter Property="RenderTransform" Value="scale(1.0)" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel x:Name="ClearVisual"
+               Width="17" Height="17"
+               HorizontalAlignment="Right" VerticalAlignment="Center">
+          <Ellipse x:Name="ClearDisc"
+                   Fill="{DynamicResource CupertinoTertiaryLabelBrush}" />
+          <Path Data="{StaticResource CupertinoXMarkGeometry}"
+                Stroke="White" StrokeThickness="1.6" StrokeLineCap="Round"
+                Width="16" Height="16" Stretch="None"
+                RenderTransform="scale(0.62)"
+                HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pressed /template/ Panel#ClearVisual">
+      <Setter Property="Opacity" Value="0.18" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoTextBox" TargetType="TextBox">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource CupertinoFieldBorderBrush}" />
+    <Setter Property="BorderThickness" Value="0.333" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="MinHeight" Value="34" />
+    <Setter Property="Padding" Value="10,0" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="CaretBrush" Value="{DynamicResource CupertinoAccentBrush}" />
+    <Setter Property="SelectionBrush" Value="{DynamicResource CupertinoSelectionBrush}" />
+    <Setter Property="SelectionForegroundBrush" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <controls:GlassSurface x:Name="GlassBg"
+                                 IsVisible="False"
+                                 CornerRadius="{TemplateBinding CornerRadius}"
+                                 BlurRadius="14" GlassThickness="7"
+                                 RefractionStrength="8" ChromaticAberration="0.15"
+                                 LightIntensity="0.15" FresnelStrength="0.3"
+                                 ShadowOpacity="0.10" ShadowBlur="8" ShadowOffset="2"
+                                 Tint="{DynamicResource CupertinoGlassButtonTint}" />
+          <Border x:Name="FlatBg"
+                  Background="{DynamicResource CupertinoCardBrush}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+
+          <Grid ColumnDefinitions="Auto,*" Margin="{TemplateBinding Padding}">
+            <Path x:Name="SearchGlyph"
+                  Grid.Column="0"
+                  Data="{StaticResource CupertinoSearchGeometry}"
+                  Stroke="{DynamicResource CupertinoSecondaryLabelBrush}"
+                  StrokeThickness="1.67"
+                  StrokeLineCap="Round"
+                  Width="17" Height="17"
+                  Stretch="None"
+                  IsVisible="False"
+                  Margin="0,0,8,0"
+                  VerticalAlignment="Center" />
+
+            <ScrollViewer Grid.Column="1"
+                          Name="PART_ScrollViewer"
+                          HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                          VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                          IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                          AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
+              <Panel>
+                <TextBlock x:Name="PART_Watermark"
+                           Text="{TemplateBinding PlaceholderText}"
+                           Opacity="0"
+                           TextAlignment="{TemplateBinding TextAlignment}"
+                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                           Foreground="{DynamicResource CupertinoPlaceholderBrush}" />
+                <TextPresenter Name="PART_TextPresenter"
+                               Text="{TemplateBinding Text, Mode=TwoWay}"
+                               CaretIndex="{TemplateBinding CaretIndex}"
+                               SelectionStart="{TemplateBinding SelectionStart}"
+                               SelectionEnd="{TemplateBinding SelectionEnd}"
+                               TextAlignment="{TemplateBinding TextAlignment}"
+                               TextWrapping="{TemplateBinding TextWrapping}"
+                               LineHeight="{TemplateBinding LineHeight}"
+                               PasswordChar="{TemplateBinding PasswordChar}"
+                               RevealPassword="{TemplateBinding RevealPassword}"
+                               SelectionBrush="{TemplateBinding SelectionBrush}"
+                               SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                               CaretBrush="{TemplateBinding CaretBrush}"
+                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                <controls:CupertinoSearchCaret x:Name="SearchCaret"
+                                               IsVisible="False"
+                                               IsHitTestVisible="False"
+                                               Brush="{DynamicResource CupertinoSearchCaretBrush}"
+                                               CaretWidth="2" CaretHeight="23" />
+              </Panel>
+            </ScrollViewer>
+
+            <Button x:Name="ClearButton"
+                    Grid.Column="1"
+                    Theme="{StaticResource CupertinoTextBoxClearButton}"
+                    IsVisible="False"
+                    Command="{Binding $parent[TextBox].Clear}"
+                    HorizontalAlignment="Right" VerticalAlignment="Center" />
+          </Grid>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:empty /template/ TextBlock#PART_Watermark">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Border#FlatBg">
+      <Setter Property="BorderBrush" Value="{DynamicResource CupertinoFieldBorderHoverBrush}" />
+    </Style>
+
+    <!-- Keep a keyboard-only focus cue for desktop accessibility. -->
+    <Style Selector="^:focus-visible /template/ Path#SearchGlyph">
+      <Setter Property="Stroke" Value="{DynamicResource CupertinoAccentBrush}" />
+    </Style>
+
+    <Style Selector="^:focus-visible /template/ Border#FlatBg">
+      <Setter Property="BorderBrush" Value="{DynamicResource CupertinoAccentBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style Selector="^[IsReadOnly=True] /template/ Border#FlatBg">
+      <Setter Property="Background" Value="{DynamicResource CupertinoReadOnlyFieldBrush}" />
+    </Style>
+
+    <Style Selector="^.error /template/ Border#FlatBg">
+      <Setter Property="BorderBrush" Value="{DynamicResource CupertinoDangerBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Setter Property="(controls:MaskedPrompt.IsEnabled)" Value="True" />
+    <Style Selector="^.cupertino-prompt">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoPlaceholderBrush}" />
+    </Style>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoPlaceholderBrush}" />
+    </Style>
+
+    <Style Selector="^.plain /template/ Border#FlatBg">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="^.plain">
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="MinHeight" Value="51" />
+      <Setter Property="Padding" Value="0" />
+    </Style>
+    <Style Selector="^.plain:focus /template/ Border#FlatBg">
+      <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <Style Selector="^.search">
+      <Setter Property="MinHeight" Value="47" />
+      <!-- Let the capsule shadow extend beyond the text viewport. -->
+      <Setter Property="ClipToBounds" Value="False" />
+      <Setter Property="CornerRadius" Value="23.5" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="14,0,16,0" />
+      <Setter Property="LetterSpacing" Value="0.47" />
+      <Setter Property="LineHeight" Value="23" />
+      <Setter Property="(controls:CupertinoSearchFieldShadow.IsAdornerEnabled)" Value="True" />
+      <Setter Property="CaretBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="^.search /template/ Border#FlatBg">
+      <Setter Property="Background" Value="{DynamicResource CupertinoSearchFieldBrush}" />
+      <Setter Property="Margin" Value="0,0.667" />
+      <Setter Property="CornerRadius" Value="22.5" />
+    </Style>
+    <Style Selector="^.search /template/ Path#SearchGlyph">
+      <Setter Property="IsVisible" Value="True" />
+      <Setter Property="Stroke" Value="{DynamicResource CupertinoLabelBrush}" />
+      <Setter Property="StrokeThickness" Value="1.44" />
+      <Setter Property="Margin" Value="0,0,8.667,0" />
+    </Style>
+    <Style Selector="^.search /template/ TextBlock#PART_Watermark">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSearchPlaceholderBrush}" />
+    </Style>
+    <Style Selector="^.search /template/ Ellipse#ClearDisc">
+      <Setter Property="Fill" Value="{DynamicResource CupertinoSearchClearBrush}" />
+    </Style>
+    <Style Selector="^.search /template/ controls|CupertinoSearchCaret#SearchCaret">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <!-- Reserve text space without shrinking the clear target. -->
+    <Style Selector="^.search /template/ Button#ClearButton">
+      <Setter Property="IsVisible" Value="True" />
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
+    <Style Selector="^.search:not(:empty) /template/ Button#ClearButton">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="IsHitTestVisible" Value="True" />
+    </Style>
+    <Style Selector="^.search:not(:empty) /template/ ScrollViewer#PART_ScrollViewer">
+      <Setter Property="Margin" Value="0,0,24,0" />
+    </Style>
+
+    <Style Selector="^.glass">
+      <Setter Property="MinHeight" Value="47" />
+      <Setter Property="CornerRadius" Value="23.5" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding" Value="14,0" />
+    </Style>
+    <Style Selector="^.glass /template/ controls|GlassSurface#GlassBg">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.glass /template/ Border#FlatBg">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^.glass:pointerover /template/ controls|GlassSurface#GlassBg">
+      <Setter Property="LightIntensity" Value="0.35" />
+    </Style>
+    <Style Selector="^.glass:focus-visible /template/ controls|GlassSurface#GlassBg">
+      <Setter Property="LightIntensity" Value="0.5" />
+    </Style>
+    <Style Selector="^.glass /template/ Path#SearchGlyph">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.glass:not(:empty) /template/ Button#ClearButton">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.glass:not(:empty) /template/ ScrollViewer#PART_ScrollViewer">
+      <Setter Property="Margin" Value="0,0,24,0" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type TextBox}"
+                TargetType="TextBox"
+                BasedOn="{StaticResource CupertinoTextBox}" />
+
+</ResourceDictionary>

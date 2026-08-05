@@ -1,0 +1,117 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Spin buttons must remain inside ButtonSpinner's template. -->
+
+  <ControlTheme x:Key="CupertinoStepperButton" TargetType="RepeatButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Width" Value="47" />
+    <Setter Property="Height" Value="32" />
+    <Setter Property="Delay" Value="500" />
+    <Setter Property="Interval" Value="80" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Transitions">
+      <Transitions>
+        <BrushTransition Property="Foreground" Duration="0:0:0.1" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <Border x:Name="Fill" Background="Transparent">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.18" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            RenderTransform="translate(0px,-1.5px)" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pressed">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoTertiaryLabelBrush}" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.35" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type ButtonSpinner}" TargetType="ButtonSpinner">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Orientation="Horizontal">
+          <ContentPresenter x:Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            VerticalContentAlignment="Center" />
+
+          <Border x:Name="Capsule"
+                  Background="{DynamicResource CupertinoSegmentTrackBrush}"
+                  CornerRadius="16" Height="32" Width="94"
+                  ClipToBounds="True"
+                  VerticalAlignment="Center">
+            <Grid ColumnDefinitions="*,0.5,*">
+              <RepeatButton x:Name="PART_DecreaseButton"
+                            Theme="{StaticResource CupertinoStepperButton}"
+                            Content="&#x2212;" FontSize="26" />
+              <Rectangle x:Name="Divider" Grid.Column="1"
+                         Fill="{DynamicResource CupertinoSeparatorBrush}" Margin="0,6" />
+              <RepeatButton Grid.Column="2" x:Name="PART_IncreaseButton"
+                            Theme="{StaticResource CupertinoStepperButton}"
+                            Content="+" FontSize="25" />
+            </Grid>
+          </Border>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoNumericUpDown" TargetType="NumericUpDown">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ButtonSpinner x:Name="PART_Spinner"
+                       IsTabStop="False"
+                       ButtonSpinnerLocation="Right"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Center">
+          <TextBox x:Name="PART_TextBox"
+                   Text="{TemplateBinding Text, Mode=TwoWay}"
+                   PlaceholderText="{TemplateBinding PlaceholderText}"
+                   IsReadOnly="{TemplateBinding IsReadOnly}"
+                   MinWidth="70"
+                   VerticalAlignment="Center" />
+        </ButtonSpinner>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Hide the text field in stepper mode. -->
+    <Style Selector="^.stepper /template/ TextBox#PART_TextBox">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.45" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type NumericUpDown}" TargetType="NumericUpDown"
+                BasedOn="{StaticResource CupertinoNumericUpDown}" />
+
+</ResourceDictionary>

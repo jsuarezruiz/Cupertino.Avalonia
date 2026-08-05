@@ -1,0 +1,130 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+
+  <ControlTheme x:Key="CupertinoDialogAction" TargetType="Button">
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Height" Value="46" />
+    <Setter Property="MinHeight" Value="46" />
+    <Setter Property="CornerRadius" Value="23" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border x:Name="Fill"
+                  Background="{DynamicResource CupertinoDialogActionBrush}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.18" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" />
+          <Border x:Name="FocusRing"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2"
+                  IsVisible="False" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <!-- Scaling creates a composition seam, so pressed feedback uses a fill. -->
+    <Style Selector="^:pointerover /template/ Border#Fill">
+      <Setter Property="Background" Value="{DynamicResource CupertinoDialogActionHoverBrush}" />
+    </Style>
+    <Style Selector="^:pressed /template/ Border#Fill">
+      <Setter Property="Background" Value="{DynamicResource CupertinoDialogActionPressedBrush}" />
+    </Style>
+
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+
+    <Style Selector="^.destructive">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoDangerBrush}" />
+    </Style>
+    <Style Selector="^.cancel">
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type controls:Dialog}" TargetType="controls:Dialog">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Width" Value="320" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <controls:GlassSurface CornerRadius="30"
+                               BlurRadius="30"
+                               GlassThickness="3"
+                               RefractionStrength="3"
+                               ChromaticAberration="0"
+                               Saturation="4.2"
+                               LightIntensity="0"
+                               FresnelStrength="0.5"
+                               IsAdaptive="False"
+                               Tint="{DynamicResource CupertinoThickMaterialTint}"
+                               ShadowOpacity="0.14" ShadowBlur="22" ShadowOffset="5"
+                               ShadowContactWeight="0.25">
+          <StackPanel Margin="22,20,22,18" Spacing="0">
+            <TextBlock x:Name="TitleText"
+                       Text="{TemplateBinding Title}"
+                       FontSize="{DynamicResource CupertinoFontSize18}" FontWeight="Bold"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <TextBlock x:Name="MessageText"
+                       Text="{TemplateBinding Message}"
+                       FontSize="{DynamicResource CupertinoFontSize15}"
+                       Margin="0,4,0,0"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource CupertinoLabelBrush}" />
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Margin="0,10,0,0" />
+            <ItemsControl x:Name="PART_Actions" Margin="0,18,0,0" BorderThickness="0" Background="Transparent">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <UniformGrid x:Name="ActionsPanel" Rows="1" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="controls:DialogAction">
+                  <Button Content="{Binding Title}"
+                          Theme="{StaticResource CupertinoDialogAction}"
+                          Margin="4,0"
+                          Classes.destructive="{Binding IsDestructive}"
+                          Classes.cancel="{Binding IsCancel}"
+                          Command="{Binding $parent[controls:Dialog].InvokeActionCommand}"
+                          CommandParameter="{Binding}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </controls:GlassSurface>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:stacked /template/ ItemsControl#PART_Actions">
+      <Setter Property="ItemsPanel">
+        <ItemsPanelTemplate>
+          <StackPanel Spacing="8" />
+        </ItemsPanelTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^:stacked /template/ ItemsControl#PART_Actions Button">
+      <Setter Property="Margin" Value="0" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>

@@ -1,0 +1,107 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <ControlTheme x:Key="CupertinoExpander" TargetType="Expander">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel Background="{TemplateBinding Background}">
+          <Panel>
+            <ToggleButton x:Name="PART_toggle"
+                          Theme="{StaticResource CupertinoExpanderToggle}"
+                          IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}">
+              <Grid ColumnDefinitions="*,Auto">
+                <ContentPresenter Content="{TemplateBinding Header}"
+                                  ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                  VerticalAlignment="Center" />
+                <Path x:Name="Chevron" Grid.Column="1"
+                      Data="{StaticResource CupertinoChevronRightGeometry}"
+                      Stroke="{DynamicResource CupertinoSecondaryLabelBrush}"
+                      StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+                      Width="16" Height="16" Stretch="None"
+                      VerticalAlignment="Center"
+                      RenderTransformOrigin="50%,50%">
+                  <Path.Transitions>
+                    <Transitions>
+                      <TransformOperationsTransition Property="RenderTransform"
+                                                     Duration="0:0:0.25" />
+                    </Transitions>
+                  </Path.Transitions>
+                </Path>
+              </Grid>
+            </ToggleButton>
+          </Panel>
+
+          <Panel x:Name="ContentHost" IsVisible="False">
+            <StackPanel>
+              <Rectangle Height="0.5"
+                         Fill="{DynamicResource CupertinoSeparatorBrush}" />
+              <ContentPresenter x:Name="PART_ContentPresenter"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                Margin="21,0,0,0" />
+            </StackPanel>
+          </Panel>
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:expanded /template/ Panel#ContentHost">
+      <Setter Property="IsVisible" Value="True" />
+      <Style.Animations>
+        <Animation Duration="0:0:0.25" Easing="QuadraticEaseOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="TranslateTransform.Y" Value="-8" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="^:expanded /template/ Path#Chevron">
+      <Setter Property="RenderTransform" Value="rotate(90deg)" />
+    </Style>
+
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoExpanderToggle" TargetType="ToggleButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="MinHeight" Value="52" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent" MinHeight="{TemplateBinding MinHeight}">
+          <Border x:Name="Row" Background="Transparent">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="0:0:0.25" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+          <ContentPresenter Content="{TemplateBinding Content}"
+                            VerticalContentAlignment="Center"
+                            HorizontalContentAlignment="Stretch" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pressed /template/ Border#Row">
+      <Setter Property="Background" Value="{DynamicResource CupertinoRowPressedBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type Expander}" TargetType="Expander"
+                BasedOn="{StaticResource CupertinoExpander}" />
+
+</ResourceDictionary>

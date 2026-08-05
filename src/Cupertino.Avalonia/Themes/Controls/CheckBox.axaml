@@ -1,0 +1,178 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <ControlTheme x:Key="CupertinoCheckBox" TargetType="CheckBox">
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="MinHeight" Value="28" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="22,*" Background="Transparent">
+          <Panel Grid.Column="0" Width="22" Height="22" VerticalAlignment="Center">
+            <Ellipse x:Name="Ring"
+                     Stroke="{DynamicResource CupertinoTertiaryLabelBrush}"
+                     StrokeThickness="1.6" />
+            <Ellipse x:Name="Fill"
+                     Fill="{DynamicResource CupertinoAccentBrush}"
+                     Opacity="0">
+              <Ellipse.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                </Transitions>
+              </Ellipse.Transitions>
+            </Ellipse>
+            <Path x:Name="Check"
+                  Data="{StaticResource CupertinoCheckmarkGeometry}"
+                  Stroke="White" StrokeThickness="2" StrokeLineCap="Round"
+                  Width="16" Height="16" Stretch="None"
+                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                  Opacity="0">
+              <Path.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                </Transitions>
+              </Path.Transitions>
+            </Path>
+            <Border x:Name="Dash"
+                    Height="2" Width="10" CornerRadius="1"
+                    Background="White"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                    IsVisible="False" />
+            <Border x:Name="FocusRing"
+                    CornerRadius="11" Margin="-3"
+                    BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                    BorderThickness="2"
+                    IsVisible="False" />
+          </Panel>
+          <ContentPresenter Grid.Column="1"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:checked /template/ Ellipse#Fill">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:checked /template/ Path#Check">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:checked /template/ Ellipse#Ring">
+      <Setter Property="Stroke" Value="Transparent" />
+    </Style>
+
+    <Style Selector="^:indeterminate /template/ Ellipse#Fill">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:indeterminate /template/ Border#Dash">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:indeterminate /template/ Ellipse#Ring">
+      <Setter Property="Stroke" Value="Transparent" />
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Ellipse#Ring">
+      <Setter Property="Stroke" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="Opacity" Value="0.7" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoRadioButton" TargetType="RadioButton">
+    <Setter Property="Transitions">
+      <Transitions>
+        <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+      </Transitions>
+    </Setter>
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="MinHeight" Value="28" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid ColumnDefinitions="22,*" Background="Transparent">
+          <Panel Grid.Column="0" Width="22" Height="22" VerticalAlignment="Center">
+            <Ellipse x:Name="Ring"
+                     Stroke="{DynamicResource CupertinoTertiaryLabelBrush}"
+                     StrokeThickness="1.6" />
+            <Ellipse x:Name="Fill"
+                     Fill="{DynamicResource CupertinoAccentBrush}"
+                     Opacity="0">
+              <Ellipse.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                </Transitions>
+              </Ellipse.Transitions>
+            </Ellipse>
+            <Ellipse x:Name="Dot"
+                     Fill="White" Width="8" Height="8"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Opacity="0">
+              <Ellipse.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                </Transitions>
+              </Ellipse.Transitions>
+            </Ellipse>
+            <Border x:Name="FocusRing"
+                    CornerRadius="11" Margin="-3"
+                    BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                    BorderThickness="2"
+                    IsVisible="False" />
+          </Panel>
+          <ContentPresenter Grid.Column="1"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center" />
+        </Grid>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:checked /template/ Ellipse#Fill">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:checked /template/ Ellipse#Dot">
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:checked /template/ Ellipse#Ring">
+      <Setter Property="Stroke" Value="Transparent" />
+    </Style>
+    <Style Selector="^:pointerover /template/ Ellipse#Ring">
+      <Setter Property="Stroke" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^:pressed">
+      <Setter Property="Opacity" Value="0.7" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.5" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type CheckBox}" TargetType="CheckBox"
+                BasedOn="{StaticResource CupertinoCheckBox}" />
+
+  <ControlTheme x:Key="{x:Type RadioButton}" TargetType="RadioButton"
+                BasedOn="{StaticResource CupertinoRadioButton}" />
+
+</ResourceDictionary>

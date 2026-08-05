@@ -1,0 +1,47 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:Cupertino.Controls">
+
+  <ControlTheme x:Key="{x:Type c:ToolbarSpacer}" TargetType="c:ToolbarSpacer">
+    <Setter Property="IsHitTestVisible" Value="False" />
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoToolbarButton" TargetType="Button">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Width" Value="44" />
+    <Setter Property="Height" Value="40" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:pressed">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.35" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type c:CupertinoToolbar}" TargetType="c:CupertinoToolbar">
+    <Setter Property="ClipToBounds" Value="False" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
+    <Setter Property="VerticalAlignment" Value="Bottom" />
+    <Setter Property="Margin" Value="35,0,35,32" />
+    <Setter Property="Height" Value="40" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Grid x:Name="PART_Groups" ClipToBounds="False" />
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>
