@@ -55,17 +55,19 @@ There is an iOS head at `samples/Cupertino.Gallery.iOS`.
 
 #### Design language
 
-<table>
+<table width="100%">
   <tr>
-    <td align="center" width="25%"><a href="images/liquid-glass.png"><img src="images/liquid-glass.png" alt="Liquid Glass" width="200"></a><br><sub>Liquid Glass</sub></td>
-    <td align="center" width="25%"><a href="images/colors.png"><img src="images/colors.png" alt="Colours" width="200"></a><br><sub>Colours</sub></td>
-    <td align="center" width="25%"><a href="images/typography.png"><img src="images/typography.png" alt="Typography" width="200"></a><br><sub>Typography</sub></td>
-    <td align="center" width="25%"><a href="images/icons.png"><img src="images/icons.png" alt="Icons" width="200"></a><br><sub>Icons</sub></td>
+    <td align="center" width="33%"><a href="images/liquid-glass.png"><img src="images/liquid-glass.png" alt="Liquid Glass" width="100%"></a><br><sub>Liquid Glass</sub></td>
+    <td align="center" width="33%"><a href="images/colors.png"><img src="images/colors.png" alt="Colours" width="100%"></a><br><sub>Colours</sub></td>
+    <td align="center" width="33%"><a href="images/typography.png"><img src="images/typography.png" alt="Typography" width="100%"></a><br><sub>Typography</sub></td>
   </tr>
   <tr>
-    <td align="center" width="25%"><a href="images/photos.png"><img src="images/photos.png" alt="Photos" width="200"></a><br><sub>Photos</sub></td>
-    <td align="center" width="25%"><a href="images/lock-screen.png"><img src="images/lock-screen.png" alt="Lock screen" width="200"></a><br><sub>Lock screen</sub></td>
-    <td align="center" width="25%"><a href="images/side-by-side.png"><img src="images/side-by-side.png" alt="Light and dark themes side by side" width="200"></a><br><sub>Light and dark themes</sub></td>
+    <td align="center" colspan="3"><a href="images/icons.png"><img src="images/icons.png" alt="Icons" width="100%"></a><br><sub>Icons</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="33%"><a href="images/photos.png"><img src="images/photos.png" alt="Photos" width="100%"></a><br><sub>Photos</sub></td>
+    <td align="center" width="33%"><a href="images/lock-screen.png"><img src="images/lock-screen.png" alt="Lock screen" width="100%"></a><br><sub>Lock screen</sub></td>
+    <td align="center" width="33%"><a href="images/side-by-side.png"><img src="images/side-by-side.png" alt="Light and dark themes side by side" width="100%"></a><br><sub>Light and dark themes</sub></td>
   </tr>
 </table>
 
