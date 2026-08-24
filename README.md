@@ -60,7 +60,8 @@ Add `CupertinoTheme` after your base theme.
 dotnet run --project samples/Cupertino.Gallery.Desktop
 ```
 
-There is an iOS head at `samples/Cupertino.Gallery.iOS`.
+Mobile heads are available at `samples/Cupertino.Gallery.iOS` and
+`samples/Cupertino.Gallery.Android`.
 
 ### Screenshots
 
