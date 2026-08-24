@@ -29,7 +29,9 @@ tests/Cupertino.Avalonia.RenderTests/TestResults/
 
 # NuGet Packages
 *.nupkg
+*.snupkg
 **/packages/*
+artifacts/
 
 # Visual Studio profiler
 *.psess

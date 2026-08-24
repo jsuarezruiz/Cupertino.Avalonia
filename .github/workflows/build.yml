@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+env:
+  BUILD_CONFIGURATION: Release
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_NOLOGO: "true"
+
 jobs:
   portability:
     strategy:
@@ -22,9 +27,9 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - name: Behavior tests
-        run: dotnet test tests/Cupertino.Avalonia.Tests/Cupertino.Avalonia.Tests.csproj --configuration Release
+        run: dotnet test tests/Cupertino.Avalonia.Tests/Cupertino.Avalonia.Tests.csproj --configuration "$BUILD_CONFIGURATION"
       - name: Render tests
-        run: dotnet test tests/Cupertino.Avalonia.RenderTests/Cupertino.Avalonia.RenderTests.csproj --configuration Release
+        run: dotnet test tests/Cupertino.Avalonia.RenderTests/Cupertino.Avalonia.RenderTests.csproj --configuration "$BUILD_CONFIGURATION"
 
       - name: Upload render differences
         if: failure()
@@ -47,18 +52,22 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --no-restore --configuration "$BUILD_CONFIGURATION"
 
       - name: Test
-        run: dotnet test --no-build --configuration Release --verbosity minimal
+        run: dotnet test --no-build --configuration "$BUILD_CONFIGURATION" --verbosity minimal
 
-      - name: Pack
-        run: dotnet pack src/Cupertino.Avalonia/Cupertino.Avalonia.csproj --no-build --configuration Release --output artifacts
+      - name: Pack NuGet package
+        run: ./build/pack-nuget.sh "0.0.0-ci.${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" artifacts/packages
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload NuGet packages
+        uses: actions/upload-artifact@v4
         with:
-          name: nupkg
-          path: artifacts/*.nupkg
+          name: nuget-packages
+          path: |
+            artifacts/packages/*.nupkg
+            artifacts/packages/*.snupkg
+          if-no-files-found: error
 
   ios:
     runs-on: macos-latest
@@ -81,4 +90,4 @@ jobs:
           fi
 
       - name: Build iOS gallery
-        run: dotnet build samples/Cupertino.Gallery.iOS/Cupertino.Gallery.iOS.csproj --configuration Release --runtime "$IOS_RUNTIME" --verbosity minimal
+        run: dotnet build samples/Cupertino.Gallery.iOS/Cupertino.Gallery.iOS.csproj --configuration "$BUILD_CONFIGURATION" --runtime "$IOS_RUNTIME" --verbosity minimal

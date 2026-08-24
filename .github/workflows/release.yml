@@ -2,37 +2,166 @@ name: release
 
 on:
   push:
-    tags: ['v*']
+    tags:
+      - "v*"
 
 permissions:
-  contents: read
+  actions: read
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  BUILD_CONFIGURATION: Release
+  DOTNET_CLI_TELEMETRY_OPTOUT: "true"
+  DOTNET_NOLOGO: "true"
 
 jobs:
   publish:
+    name: Publish NuGet package and GitHub release
     runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
+    timeout-minutes: 30
 
-      - uses: actions/setup-dotnet@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate release tag
+        shell: bash
+        run: |
+          if [[ ! "$GITHUB_REF_NAME" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z][0-9A-Za-z-]*(\.[0-9A-Za-z][0-9A-Za-z-]*)*)?$ ]]; then
+            echo "Release tags must use vMAJOR.MINOR.PATCH or vMAJOR.MINOR.PATCH-PRERELEASE, for example v1.0.0 or v0.1.0-preview.1." >&2
+            exit 1
+          fi
+
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "Release tags must point to a commit on main." >&2
+            exit 1
+          fi
+
+          package_version="${GITHUB_REF_NAME#v}"
+          if ! grep -Fq "## [$package_version]" CHANGELOG.md; then
+            echo "CHANGELOG.md must contain a ## [$package_version] release section." >&2
+            exit 1
+          fi
+
+          echo "PACKAGE_VERSION=$package_version" >> "$GITHUB_ENV"
+          if [[ "$package_version" == *-* ]]; then
+            echo "IS_PRERELEASE=true" >> "$GITHUB_ENV"
+          else
+            echo "IS_PRERELEASE=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Verify main build passed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          build_result=$(gh run list \
+            --workflow build.yml \
+            --commit "$GITHUB_SHA" \
+            --event push \
+            --limit 1 \
+            --json status,conclusion \
+            --jq '.[0] | "\(.status):\(.conclusion)"')
+
+          if [[ "$build_result" != "completed:success" ]]; then
+            echo "The build workflow for $GITHUB_SHA has not completed successfully (result: ${build_result:-not found})." >&2
+            exit 1
+          fi
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
 
-      - name: Set package version
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration "$BUILD_CONFIGURATION" --no-restore --warnaserror -p:Version="$PACKAGE_VERSION"
+
+      - name: Test
+        run: dotnet test --configuration "$BUILD_CONFIGURATION" --no-build --verbosity minimal -p:Version="$PACKAGE_VERSION"
+
+      - name: Pack NuGet package
+        run: ./build/pack-nuget.sh "$PACKAGE_VERSION" artifacts/packages
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages-${{ github.ref_name }}
+          path: |
+            artifacts/packages/*.nupkg
+            artifacts/packages/*.snupkg
+          if-no-files-found: error
+
+      - name: Prepare GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          package_version="${GITHUB_REF_NAME#v}"
-          test -n "$package_version"
-          echo "PACKAGE_VERSION=$package_version" >> "$GITHUB_ENV"
+          if release_is_draft=$(gh release view "$GITHUB_REF_NAME" --json isDraft --jq .isDraft 2>/dev/null); then
+            if [[ "$release_is_draft" != "true" ]]; then
+              echo "GitHub Release $GITHUB_REF_NAME is already published." >&2
+              exit 1
+            fi
 
-      - name: Build and test
-        run: |
-          dotnet build --configuration Release -p:Version="$PACKAGE_VERSION"
-          dotnet test --no-build --configuration Release --verbosity minimal -p:Version="$PACKAGE_VERSION"
+            gh release upload "$GITHUB_REF_NAME" \
+              artifacts/packages/*.nupkg \
+              artifacts/packages/*.snupkg \
+              --clobber
+          elif [[ "$IS_PRERELEASE" == "true" ]]; then
+            gh release create "$GITHUB_REF_NAME" \
+              artifacts/packages/*.nupkg \
+              artifacts/packages/*.snupkg \
+              --draft \
+              --prerelease \
+              --latest=false \
+              --verify-tag \
+              --generate-notes \
+              --fail-on-no-commits \
+              --title "Cupertino Avalonia $GITHUB_REF_NAME"
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              artifacts/packages/*.nupkg \
+              artifacts/packages/*.snupkg \
+              --draft \
+              --verify-tag \
+              --generate-notes \
+              --fail-on-no-commits \
+              --title "Cupertino Avalonia $GITHUB_REF_NAME"
+          fi
 
-      - name: Pack
-        run: dotnet pack src/Cupertino.Avalonia/Cupertino.Avalonia.csproj --no-build --configuration Release --output artifacts -p:Version="$PACKAGE_VERSION"
-
-      - name: Push to NuGet
+      - name: Publish package to NuGet.org
         env:
           NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: dotnet nuget push "artifacts/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+        shell: bash
+        run: |
+          if [[ -z "$NUGET_API_KEY" ]]; then
+            echo "The NUGET_API_KEY repository secret is not configured." >&2
+            exit 1
+          fi
+
+          for package in artifacts/packages/*.nupkg; do
+            dotnet nuget push "$package" \
+              --api-key "$NUGET_API_KEY" \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          done
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if [[ "$IS_PRERELEASE" == "true" ]]; then
+            gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease --latest=false
+          else
+            gh release edit "$GITHUB_REF_NAME" --draft=false --prerelease=false --latest
+          fi

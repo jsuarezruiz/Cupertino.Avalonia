@@ -30,3 +30,4 @@ See the [gallery and screenshots](https://github.com/jsuarezruiz/Cupertino.Avalo
 
 - [Source](https://github.com/jsuarezruiz/Cupertino.Avalonia)
 - [FAQ](https://github.com/jsuarezruiz/Cupertino.Avalonia/blob/main/FAQ.md)
+- [Release notes](https://github.com/jsuarezruiz/Cupertino.Avalonia/releases)

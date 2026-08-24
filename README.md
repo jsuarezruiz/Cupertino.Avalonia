@@ -182,10 +182,18 @@ There is an iOS head at `samples/Cupertino.Gallery.iOS`.
 ## Documentation
 
 * [FAQ](FAQ.md)
+* [Changelog](CHANGELOG.md)
+* [Release process](RELEASING.md)
+
+To build the NuGet and symbol packages locally, run:
+
+```bash
+ALLOW_DIRTY=1 ./build/pack-nuget.sh 0.1.0-preview.1
+```
 
 ## Requirements
 
-.NET 10 and Avalonia 12.1.1. Desktop, iOS, Android and Browser targets all render the themes; the glass material needs a GPU surface and degrades to a flat material where one is not available or where Reduce Transparency is on.
+.NET 8 or later and Avalonia 12.1.1. Desktop, iOS, Android and Browser targets all render the themes; the glass material needs a GPU surface and degrades to a flat material where one is not available or where Reduce Transparency is on.
 
 ## Licence
 
