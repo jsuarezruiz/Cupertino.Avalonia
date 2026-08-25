@@ -10,11 +10,13 @@ namespace Cupertino.Controls;
 public class CupertinoIcon : Control
 {
     private readonly record struct Spec(string Key, double Box, bool Filled, double Stroke = 0,
-                                        string? FillOverlayKey = null);
+                                        string? FillOverlayKey = null,
+                                        double OffsetX = 0, double OffsetY = 0);
 
     private static readonly Dictionary<string, Spec> Specs = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["magnifyingglass"] = new("CupertinoSearchGeometry", 22, false, 2.3),
+        ["magnifyingglass"] = new("CupertinoSearchGeometry", 22, false, 2.3,
+                                   OffsetX: 2.5, OffsetY: 2.5),
         ["xmark"] = new("CupertinoXMarkGeometry", 16, false, 2),
         ["checkmark"] = new("CupertinoCheckmarkGeometry", 16, false, 2),
         ["chevron.left"] = new("CupertinoChevronLeftGeometry", 16, false, 2),
@@ -117,7 +119,10 @@ public class CupertinoIcon : Control
             || Foreground is not { } brush)
             return;
 
-        using (context.PushTransform(Matrix.CreateScale(Size / spec.Box, Size / spec.Box)))
+        var scale = Size / spec.Box;
+        var transform = Matrix.CreateScale(scale, scale).Append(
+            Matrix.CreateTranslation(spec.OffsetX * scale, spec.OffsetY * scale));
+        using (context.PushTransform(transform))
         {
             if (spec.Filled)
                 context.DrawGeometry(brush, null, geometry);

@@ -58,15 +58,20 @@
                   CornerRadius="16" Height="32" Width="94"
                   ClipToBounds="True"
                   VerticalAlignment="Center">
-            <Grid ColumnDefinitions="*,0.5,*">
+            <Grid ColumnDefinitions="*,*">
               <RepeatButton x:Name="PART_DecreaseButton"
                             Theme="{StaticResource CupertinoStepperButton}"
                             Content="&#x2212;" FontSize="26" />
-              <Rectangle x:Name="Divider" Grid.Column="1"
-                         Fill="{DynamicResource CupertinoSeparatorBrush}" Margin="0,6" />
-              <RepeatButton Grid.Column="2" x:Name="PART_IncreaseButton"
+              <RepeatButton Grid.Column="1" x:Name="PART_IncreaseButton"
                             Theme="{StaticResource CupertinoStepperButton}"
                             Content="+" FontSize="25" />
+              <!-- UIStepper overlays a 1x24pt separator on the 47pt boundary;
+                   it does not consume width from either button segment. -->
+              <Rectangle x:Name="Divider" Grid.ColumnSpan="2"
+                         Width="1" Height="24"
+                         HorizontalAlignment="Center" VerticalAlignment="Center"
+                         IsHitTestVisible="False" Opacity="0.84"
+                         Fill="{DynamicResource CupertinoSeparatorBrush}" />
             </Grid>
           </Border>
         </StackPanel>
@@ -96,6 +101,7 @@
                    PlaceholderText="{TemplateBinding PlaceholderText}"
                    IsReadOnly="{TemplateBinding IsReadOnly}"
                    MinWidth="70"
+                   Margin="0,0,8,0"
                    VerticalAlignment="Center" />
         </ButtonSpinner>
       </ControlTemplate>

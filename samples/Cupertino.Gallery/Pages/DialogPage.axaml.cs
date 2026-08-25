@@ -4,9 +4,16 @@ using Cupertino.Controls;
 
 namespace Cupertino.Gallery.Pages;
 
-public partial class DialogPage : UserControl
+public partial class DialogPage : UserControl, IGalleryCaptureState
 {
     public DialogPage() => InitializeComponent();
+
+    public void ApplyGalleryCaptureState() =>
+        _ = Dialog.ShowAsync(this,
+            "Delete Photo?",
+            "This photo will be deleted from all your devices.",
+            new DialogAction("Cancel", DialogActionRole.Cancel),
+            new DialogAction("Delete", DialogActionRole.Destructive));
 
     private void Report(DialogAction? chosen) =>
         this.FindControl<TextBlock>("Result")!.Text = chosen?.Title ?? "dismissed";

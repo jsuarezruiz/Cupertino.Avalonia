@@ -3,8 +3,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -18,6 +20,14 @@ public static class TabBarInteraction
 {
     private const double DragThreshold = 3;
     private const double SnapMilliseconds = 320;
+    private const double BottomLensOverflow = 3;
+    private const double TwoItemLensOverflow = 4;
+    private const double BottomItemWidth = 86;
+    private const double TwoItemWidth = 51;
+    private const double BottomBarMargins = 42;
+    private const double BottomBarInsets = 14;
+    private const double BottomAccessoryWidth = 74;
+    private const string TwoItemClass = "cupertino-two-item";
 
     public static readonly AttachedProperty<bool> IsEnabledProperty =
         AvaloniaProperty.RegisterAttached<TemplatedControl, bool>("IsEnabled", typeof(TabBarInteraction));
@@ -77,6 +87,7 @@ public static class TabBarInteraction
         private readonly ItemsPresenter _presenter;
         private readonly DispatcherTimer _settle;
         private readonly DispatcherTimer _travel;
+        private readonly Dictionary<Control, IDisposable?> _itemWidthOverrides = new();
         private TopLevel? _releaseRoot;
         private EventHandler<PointerReleasedEventArgs>? _releaseHandler;
 
@@ -112,16 +123,69 @@ public static class TabBarInteraction
             owner.AddHandler(InputElement.PointerCaptureLostEvent, OnCaptureLost,
                              RoutingStrategies.Bubble, handledEventsToo: true);
             owner.DetachedFromVisualTree += OnDetached;
+            owner.PropertyChanged += OnOwnerPropertyChanged;
 
             if (owner is SelectingItemsControl sic)
             {
                 _lastIndex = Math.Max(0, sic.SelectedIndex);
                 sic.SelectionChanged += OnSelectionChanged;
             }
+            if (owner is ItemsControl itemsControl)
+                itemsControl.ContainerPrepared += OnContainerPrepared;
+
+            UpdateBottomGeometry();
 
             // Sample the backdrop after layout.
             if (!_segmented)
                 ScheduleBackdropSample();
+        }
+
+        private bool IsTwoItemBar =>
+            !_segmented && _owner is ItemsControl { ItemCount: 2 };
+
+        private void UpdateBottomGeometry()
+        {
+            var compact = IsTwoItemBar;
+            _owner.Classes.Set(TwoItemClass, compact);
+
+            foreach (var item in _itemWidthOverrides.Keys.Except(Items).ToArray())
+            {
+                _itemWidthOverrides[item]?.Dispose();
+                _itemWidthOverrides.Remove(item);
+            }
+
+            var width = compact ? TwoItemWidth : BottomItemWidth;
+            if (!_segmented && _owner is ItemsControl { ItemCount: > 0 } itemsControl
+                && _owner.Bounds.Width > 0)
+            {
+                var available = _owner.Bounds.Width - BottomBarMargins - BottomBarInsets;
+                if (Tabs.GetAccessory(_owner) is not null)
+                    available -= BottomAccessoryWidth;
+                width = Math.Min(width, Math.Max(0, available / itemsControl.ItemCount));
+            }
+
+            foreach (var item in Items)
+            {
+                item.Classes.Set(TwoItemClass, compact);
+                if (_itemWidthOverrides.Remove(item, out var previous))
+                    previous?.Dispose();
+                if (!_segmented)
+                    _itemWidthOverrides[item] = item.SetValue(
+                        Layoutable.MaxWidthProperty, width, BindingPriority.Style);
+            }
+        }
+
+        private void OnOwnerPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property == ItemsControl.ItemCountProperty
+                || e.Property == Visual.BoundsProperty
+                || e.Property == Tabs.AccessoryProperty)
+                UpdateBottomGeometry();
+        }
+
+        private void OnContainerPrepared(object? sender, ContainerPreparedEventArgs e)
+        {
+            UpdateBottomGeometry();
         }
 
         private IReadOnlyList<Control> Items
@@ -158,6 +222,16 @@ public static class TabBarInteraction
             return new Rect(index * w, 0, w, _presenter.Bounds.Height);
         }
 
+        private Rect IndicatorBoundsOf(Control item)
+        {
+            var cell = BoundsOf(item);
+            var overflow = IsTwoItemBar ? TwoItemLensOverflow : BottomLensOverflow;
+            return _segmented || cell.Width <= 0
+                ? cell
+                : new Rect(cell.X - overflow, cell.Y,
+                           cell.Width + overflow * 2, cell.Height);
+        }
+
         private int SelectedIndex =>
             _owner is SelectingItemsControl s ? Math.Max(0, s.SelectedIndex) : 0;
 
@@ -179,7 +253,7 @@ public static class TabBarInteraction
                 return default;
             index = Math.Clamp(index, 0, ic.ItemCount - 1);
             return ic.ContainerFromIndex(index) is Control { IsVisible: true } c
-                ? BoundsOf(c)
+                ? IndicatorBoundsOf(c)
                 : default;
         }
 
@@ -315,8 +389,8 @@ public static class TabBarInteraction
             var items = Items;
             if (items.Count == 0)
                 return;
-            _endMin = BoundsOf(items[0]).X - 3;
-            _endMax = BoundsOf(items[^1]).Right + 3;
+            _endMin = IndicatorBoundsOf(items[0]).X - 3;
+            _endMax = IndicatorBoundsOf(items[^1]).Right + 3;
         }
 
         private double CapStretch(double stretch, double centre, double width)
@@ -453,7 +527,7 @@ public static class TabBarInteraction
                     var b = BoundsOf(item);
                     if (_pressPoint.X >= b.X && _pressPoint.X <= b.Right)
                     {
-                        target = b;
+                        target = IndicatorBoundsOf(item);
                         break;
                     }
                 }
@@ -632,7 +706,7 @@ public static class TabBarInteraction
             if (_owner is SelectingItemsControl { SelectedIndex: >= 0 } sic
                 && _owner is ItemsControl ic
                 && ic.ContainerFromIndex(sic.SelectedIndex) is Control c)
-                return BoundsOf(c);
+                return IndicatorBoundsOf(c);
             return default;
         }
 
@@ -708,8 +782,8 @@ public static class TabBarInteraction
             if (items.Count == 0)
                 return;
 
-            var first = BoundsOf(items[0]);
-            var last = BoundsOf(items[^1]);
+            var first = IndicatorBoundsOf(items[0]);
+            var last = IndicatorBoundsOf(items[^1]);
 
             var x = Math.Clamp(p.X - _grabOffset, first.X, last.X);
 
@@ -869,8 +943,14 @@ public static class TabBarInteraction
             _owner.RemoveHandler(InputElement.PointerReleasedEvent, OnReleased);
             _owner.RemoveHandler(InputElement.PointerCaptureLostEvent, OnCaptureLost);
             _owner.DetachedFromVisualTree -= OnDetached;
+            _owner.PropertyChanged -= OnOwnerPropertyChanged;
             if (_owner is SelectingItemsControl sic)
                 sic.SelectionChanged -= OnSelectionChanged;
+            if (_owner is ItemsControl itemsControl)
+                itemsControl.ContainerPrepared -= OnContainerPrepared;
+            foreach (var widthOverride in _itemWidthOverrides.Values)
+                widthOverride?.Dispose();
+            _itemWidthOverrides.Clear();
         }
     }
 }

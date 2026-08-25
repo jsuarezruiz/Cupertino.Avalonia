@@ -12,7 +12,7 @@
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Pick a date" />
           <WrapPanel Grid.Column="1" Classes="specimens">
-            <CalendarDatePicker PlaceholderText="Select date" />
+            <CalendarDatePicker x:Name="CapturePicker" PlaceholderText="Select date" />
           </WrapPanel>
         </Grid>
       </cupertino:Section>

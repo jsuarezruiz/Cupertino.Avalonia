@@ -9,8 +9,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Grid Background="Transparent" MinHeight="24" ClipToBounds="False">
-          <Border Background="{TemplateBinding Foreground}"
-                  Height="5.7" CornerRadius="2.85"
+          <Border x:Name="Rail"
+                  Background="{TemplateBinding Foreground}"
+                  Height="5.7" CornerRadius="{TemplateBinding CornerRadius}"
                   VerticalAlignment="Center" />
         </Grid>
       </ControlTemplate>
@@ -23,8 +24,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Grid Background="Transparent" MinWidth="24" ClipToBounds="False">
-          <Border Background="{TemplateBinding Foreground}"
-                  Width="5.7" CornerRadius="2.85"
+          <Border x:Name="Rail"
+                  Background="{TemplateBinding Foreground}"
+                  Width="5.7" CornerRadius="{TemplateBinding CornerRadius}"
                   HorizontalAlignment="Center" />
         </Grid>
       </ControlTemplate>
@@ -265,11 +267,13 @@
               <Track.DecreaseButton>
                 <RepeatButton Name="PART_DecreaseButton"
                               Theme="{StaticResource CupertinoSliderRailHorizontal}"
+                              CornerRadius="2.85,0,0,2.85"
                               Foreground="{TemplateBinding Foreground}" />
               </Track.DecreaseButton>
               <Track.IncreaseButton>
                 <RepeatButton Name="PART_IncreaseButton"
                               Theme="{StaticResource CupertinoSliderRailHorizontal}"
+                              CornerRadius="0,2.85,2.85,0"
                               Foreground="{TemplateBinding Background}" />
               </Track.IncreaseButton>
               <Thumb Name="thumb" Theme="{StaticResource CupertinoSliderThumb}"
@@ -307,11 +311,13 @@
               <Track.DecreaseButton>
                 <RepeatButton Name="PART_DecreaseButton"
                               Theme="{StaticResource CupertinoSliderRailVertical}"
+                              CornerRadius="0,0,2.85,2.85"
                               Foreground="{TemplateBinding Foreground}" />
               </Track.DecreaseButton>
               <Track.IncreaseButton>
                 <RepeatButton Name="PART_IncreaseButton"
                               Theme="{StaticResource CupertinoSliderRailVertical}"
+                              CornerRadius="2.85,2.85,0,0"
                               Foreground="{TemplateBinding Background}" />
               </Track.IncreaseButton>
               <Thumb Name="thumb" Theme="{StaticResource CupertinoSliderThumbVertical}"

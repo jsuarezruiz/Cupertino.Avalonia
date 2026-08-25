@@ -112,7 +112,9 @@ public partial class ShellView : UserControl
                 void OpenOnce(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
                 {
                     nav.Loaded -= OpenOnce;
-                    nav.Push(wanted.Title, wanted.Build());
+                    var content = wanted.Build();
+                    GalleryCaptureState.Attach(content);
+                    nav.Push(wanted.Title, content);
                 }
                 nav.Loaded += OpenOnce;
             }

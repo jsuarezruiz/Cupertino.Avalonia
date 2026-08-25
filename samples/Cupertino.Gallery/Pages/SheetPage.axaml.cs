@@ -5,12 +5,15 @@ using Cupertino.Controls;
 
 namespace Cupertino.Gallery.Pages;
 
-public partial class SheetPage : UserControl
+public partial class SheetPage : UserControl, IGalleryCaptureState
 {
     public SheetPage()
     {
         InitializeComponent();
     }
+
+    public void ApplyGalleryCaptureState() =>
+        _ = CupertinoSheet.ShowAsync(this, SheetBody("Medium and large"));
 
     private static StackPanel SheetBody(string title) => new()
     {

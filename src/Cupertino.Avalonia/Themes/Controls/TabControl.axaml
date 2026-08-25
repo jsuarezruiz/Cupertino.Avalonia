@@ -22,7 +22,9 @@
   </ControlTheme>
 
   <ControlTheme x:Key="CupertinoBottomRestingLens" TargetType="controls:GlassSurface">
-    <Setter Property="Margin" Value="0,4.5" />
+    <!-- Native keeps the selected lens ~4pt inside the bar while three-tab
+         centres sit 86pt apart: a 92pt lens overlaps its cell by 3pt per side. -->
+    <Setter Property="Margin" Value="-3,4.5" />
     <Setter Property="CornerRadius" Value="26.5" />
     <Setter Property="BlurRadius" Value="4" />
     <Setter Property="GlassThickness" Value="5" />
@@ -170,21 +172,24 @@
 
   <ControlTheme x:Key="CupertinoBottomTabItem" TargetType="TabItem">
     <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize10}" />
     <Setter Property="LetterSpacing" Value="0.25" />
+    <!-- iOS 26.2: three visible tabs are centred 86pt apart. -->
+    <Setter Property="Width" Value="86" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Background="Transparent">
+        <Panel Background="Transparent" ClipToBounds="False">
           <!-- Use visibility to avoid sampling a half-faded lens. -->
           <controls:GlassSurface x:Name="Lens"
                                  IsVisible="False"
                                  Theme="{StaticResource CupertinoBottomRestingLens}" />
           <Border x:Name="Hover"
                   CornerRadius="26.5"
-                  Margin="4.5"
+                  Margin="-3,4.5"
                   Opacity="0"
                   Background="{DynamicResource CupertinoTabPillBrush}">
             <Border.Transitions>
@@ -205,13 +210,25 @@
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center" />
           <controls:CupertinoBadge
+              Classes="tab-badge"
               IsVisible="{Binding (controls:Tabs.BadgeValue), RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"
               Value="{Binding (controls:Tabs.BadgeValue), RelativeSource={RelativeSource TemplatedParent}, TargetNullValue=-1}"
-              HorizontalAlignment="Center" VerticalAlignment="Center"
-              RenderTransform="translate(15px,-15px)" />
+              HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Panel>
       </ControlTemplate>
     </Setter>
+
+    <!-- iOS compacts a two-destination bar to 118pt: 8 + (2 x 51) + 8.
+         The 59pt lens overlaps its item cell by 4pt on each side. -->
+    <Style Selector="^.cupertino-two-item">
+      <Setter Property="Width" Value="51" />
+    </Style>
+    <Style Selector="^.cupertino-two-item /template/ controls|GlassSurface#Lens">
+      <Setter Property="Margin" Value="-4,4.5" />
+    </Style>
+    <Style Selector="^.cupertino-two-item /template/ Border#Hover">
+      <Setter Property="Margin" Value="-4,4.5" />
+    </Style>
 
     <Style Selector="^:selected">
       <Setter Property="Foreground" Value="{DynamicResource CupertinoTabAccentBrush}" />
@@ -317,14 +334,18 @@
                               Margin="{TemplateBinding Padding}"
                               Content="{TemplateBinding SelectedContent}"
                               ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
-            <!-- Keep the capsule responsive when an accessory is present. -->
-            <Grid ColumnDefinitions="*,Auto" MaxWidth="560"
-                  HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
+            <!-- Size to the native item group. At three tabs this is
+                 7 + (3 x 86) + 7 = 272pt, centred in the 402pt host. -->
+            <Grid ColumnDefinitions="Auto,Auto" MaxWidth="560"
+                  HorizontalAlignment="Center" VerticalAlignment="Bottom"
                   Margin="21,0,21,26">
               <controls:GlassSurface x:Name="PART_BarCapsule"
                                      Theme="{StaticResource CupertinoBottomBarSurface}">
                 <Panel>
-                  <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+                  <ItemsPresenter Name="PART_ItemsPresenter"
+                                  ClipToBounds="False"
+                                  Margin="7,0"
+                                  ItemsPanel="{TemplateBinding ItemsPanel}" />
                   <!-- The moving lens must render above the items. -->
                   <Canvas ClipToBounds="False">
                     <controls:GlassSurface x:Name="PART_Indicator"
@@ -345,6 +366,10 @@
           </Panel>
         </ControlTemplate>
       </Setter>
+    </Style>
+
+    <Style Selector="^.bottom.cupertino-two-item /template/ ItemsPresenter#PART_ItemsPresenter">
+      <Setter Property="Margin" Value="8,0" />
     </Style>
 
     <Style Selector="^.bottom.has-accessory /template/ controls|GlassSurface#AccessoryHost">
@@ -415,20 +440,22 @@
 
   <ControlTheme x:Key="CupertinoBottomStripItem" TargetType="TabStripItem">
     <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize10}" />
     <Setter Property="LetterSpacing" Value="0.25" />
+    <Setter Property="Width" Value="86" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Background="Transparent">
+        <Panel Background="Transparent" ClipToBounds="False">
           <controls:GlassSurface x:Name="Lens"
                                  IsVisible="False"
                                  Theme="{StaticResource CupertinoBottomRestingLens}" />
           <Border x:Name="Hover"
                   CornerRadius="26.5"
-                  Margin="4.5"
+                  Margin="-3,4.5"
                   Opacity="0"
                   Background="{DynamicResource CupertinoTabPillBrush}">
             <Border.Transitions>
@@ -449,13 +476,23 @@
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center" />
           <controls:CupertinoBadge
+              Classes="tab-badge"
               IsVisible="{Binding (controls:Tabs.BadgeValue), RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"
               Value="{Binding (controls:Tabs.BadgeValue), RelativeSource={RelativeSource TemplatedParent}, TargetNullValue=-1}"
-              HorizontalAlignment="Center" VerticalAlignment="Center"
-              RenderTransform="translate(15px,-15px)" />
+              HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Panel>
       </ControlTemplate>
     </Setter>
+
+    <Style Selector="^.cupertino-two-item">
+      <Setter Property="Width" Value="51" />
+    </Style>
+    <Style Selector="^.cupertino-two-item /template/ controls|GlassSurface#Lens">
+      <Setter Property="Margin" Value="-4,4.5" />
+    </Style>
+    <Style Selector="^.cupertino-two-item /template/ Border#Hover">
+      <Setter Property="Margin" Value="-4,4.5" />
+    </Style>
 
     <Style Selector="^:selected">
       <Setter Property="Foreground" Value="{DynamicResource CupertinoTabAccentBrush}" />
@@ -536,12 +573,15 @@
       <Setter Property="ItemContainerTheme" Value="{StaticResource CupertinoBottomStripItem}" />
       <Setter Property="Template">
         <ControlTemplate>
-          <Grid ColumnDefinitions="*,Auto" MaxWidth="560"
-                HorizontalAlignment="Stretch" Margin="21,0">
+          <Grid ColumnDefinitions="Auto,Auto" MaxWidth="560"
+                HorizontalAlignment="Center" Margin="21,0">
             <controls:GlassSurface x:Name="PART_BarCapsule"
                                    Theme="{StaticResource CupertinoBottomBarSurface}">
               <Panel>
-                <ItemsPresenter Name="PART_ItemsPresenter" ItemsPanel="{TemplateBinding ItemsPanel}" />
+                <ItemsPresenter Name="PART_ItemsPresenter"
+                                ClipToBounds="False"
+                                Margin="7,0"
+                                ItemsPanel="{TemplateBinding ItemsPanel}" />
                 <Canvas ClipToBounds="False">
                   <controls:GlassSurface x:Name="PART_Indicator"
                                          IsVisible="False"
@@ -560,6 +600,10 @@
           </Grid>
         </ControlTemplate>
       </Setter>
+    </Style>
+
+    <Style Selector="^.bottom.cupertino-two-item /template/ ItemsPresenter#PART_ItemsPresenter">
+      <Setter Property="Margin" Value="8,0" />
     </Style>
 
     <Style Selector="^.bottom.has-accessory /template/ controls|GlassSurface#AccessoryHost">

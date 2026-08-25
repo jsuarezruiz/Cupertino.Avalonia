@@ -34,6 +34,23 @@
         </ControlTemplate>
       </Setter>
     </Style>
+
+    <!-- UITabBar anchors badges to the symbol rather than the whole tab cell.
+         Counts ride a wider icon corner; an empty badge uses the native 18pt dot. -->
+    <Style Selector="^.tab-badge">
+      <Setter Property="RenderTransform" Value="translate(21px,-15px)" />
+    </Style>
+    <Style Selector="^.tab-badge:dot">
+      <Setter Property="MinWidth" Value="18" />
+      <Setter Property="Height" Value="18" />
+      <Setter Property="RenderTransform" Value="translate(17px,-15px)" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}" CornerRadius="9"
+                  Width="18" Height="18" />
+        </ControlTemplate>
+      </Setter>
+    </Style>
   </ControlTheme>
 
 </ResourceDictionary>

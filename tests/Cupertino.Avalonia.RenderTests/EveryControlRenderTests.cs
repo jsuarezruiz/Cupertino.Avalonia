@@ -29,7 +29,7 @@ public class EveryControlRenderTests
         ["SearchTextBox"] = () => new TextBox { Classes = { "search" }, Text = "Search", Width = 200 },
         ["MaskedTextBox"] = () => new MaskedTextBox { Mask = "(000) 000-0000", Width = 200 },
         ["AutoCompleteBox"] = () => new AutoCompleteBox { Text = "Auto", Width = 200 },
-        ["NumericUpDown"] = () => new NumericUpDown { Value = 3, Width = 160 },
+        ["NumericUpDown"] = () => new NumericUpDown { Value = 3 },
         ["CheckBox"] = () => new CheckBox { Content = "Check", IsChecked = true },
         ["RadioButton"] = () => new RadioButton { Content = "Radio", IsChecked = true },
         ["ComboBox"] = () => new ComboBox { ItemsSource = new[] { "One", "Two" }, SelectedIndex = 0, Width = 160 },

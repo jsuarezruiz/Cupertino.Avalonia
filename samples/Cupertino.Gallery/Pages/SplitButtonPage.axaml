@@ -13,7 +13,7 @@
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Split" />
           <WrapPanel Grid.Column="1" Classes="specimens">
-            <SplitButton Content="Share">
+            <SplitButton x:Name="CaptureSplit" Content="Share">
               <SplitButton.Flyout>
                 <MenuFlyout>
                   <MenuItem Header="Copy Link" />

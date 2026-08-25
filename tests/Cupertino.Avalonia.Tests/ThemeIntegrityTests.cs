@@ -222,6 +222,141 @@ public class ThemeIntegrityTests
     }
 
     [AvaloniaFact]
+    public void Three_item_bottom_bar_matches_ios_26_geometry()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        window.Width = 402;
+        var tabs = new TabControl { Classes = { "bottom" }, SelectedIndex = 0 };
+        var inbox = new TabItem { Header = "Inbox", Content = new Border() };
+        var news = new TabItem { Header = "New", Content = new Border() };
+        var settings = new TabItem { Header = "Settings", Content = new Border() };
+        Tabs.SetBadgeValue(inbox, 3);
+        Tabs.SetBadgeValue(news, -1);
+        tabs.Items.Add(inbox);
+        tabs.Items.Add(news);
+        tabs.Items.Add(settings);
+        window.Content = tabs;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+
+        var bar = tabs.GetVisualDescendants().OfType<GlassSurface>()
+                      .Single(surface => surface.Name == "PART_BarCapsule");
+        var items = tabs.GetVisualDescendants().OfType<TabItem>()
+                        .OrderBy(item => item.TranslatePoint(default, bar)!.Value.X)
+                        .ToArray();
+
+        Assert.InRange(bar.Bounds.Width, 271.5, 272.5);
+        Assert.All(items, item => Assert.InRange(item.Bounds.Width, 85.5, 86.5));
+        var centres = items.Select(item =>
+            item.TranslatePoint(new Point(item.Bounds.Width / 2, 0), bar)!.Value.X).ToArray();
+        Assert.InRange(centres[0], 49.5, 50.5);
+        Assert.InRange(centres[1], 135.5, 136.5);
+        Assert.InRange(centres[2], 221.5, 222.5);
+
+        var lens = inbox.GetVisualDescendants().OfType<GlassSurface>()
+                        .Single(surface => surface.Name == "Lens");
+        Assert.InRange(lens.Bounds.Width, 91.5, 92.5);
+        var lensLeft = lens.TranslatePoint(default, bar)!.Value.X;
+        Assert.InRange(lensLeft, 3.5, 4.5);
+
+        var count = inbox.GetVisualDescendants().OfType<CupertinoBadge>().Single();
+        var dot = news.GetVisualDescendants().OfType<CupertinoBadge>().Single();
+        Assert.InRange(count.Bounds.Height, 17.5, 18.5);
+        Assert.InRange(dot.Bounds.Width, 17.5, 18.5);
+        Assert.InRange(dot.Bounds.Height, 17.5, 18.5);
+    }
+
+    [AvaloniaFact]
+    public void Two_item_bottom_bar_compacts_like_ios_26()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        var strip = new TabStrip
+        {
+            Classes = { "bottom" },
+            Width = 160,
+            SelectedIndex = 0,
+        };
+        strip.Items.Add(new TabStripItem { Content = "Home" });
+        strip.Items.Add(new TabStripItem { Content = "Settings" });
+        window.Content = strip;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+
+        var bar = strip.GetVisualDescendants().OfType<GlassSurface>()
+                       .Single(surface => surface.Name == "PART_BarCapsule");
+        var items = strip.GetVisualDescendants().OfType<TabStripItem>()
+                         .OrderBy(item => item.TranslatePoint(default, bar)!.Value.X)
+                         .ToArray();
+
+        Assert.Contains("cupertino-two-item", strip.Classes);
+        Assert.InRange(bar.Bounds.Width, 117.5, 118.5);
+        Assert.All(items, item => Assert.InRange(item.Bounds.Width, 50.5, 51.5));
+        var centres = items.Select(item =>
+            item.TranslatePoint(new Point(item.Bounds.Width / 2, 0), bar)!.Value.X).ToArray();
+        Assert.InRange(centres[0], 33.0, 34.0);
+        Assert.InRange(centres[1], 84.0, 85.0);
+
+        var lens = items[0].GetVisualDescendants().OfType<GlassSurface>()
+                           .Single(surface => surface.Name == "Lens");
+        Assert.InRange(lens.Bounds.Width, 58.5, 59.5);
+        var lensLeft = lens.TranslatePoint(default, bar)!.Value.X;
+        Assert.InRange(lensLeft, 3.5, 4.5);
+    }
+
+    [AvaloniaTheory]
+    [InlineData(4, 375)]
+    [InlineData(5, 375)]
+    [InlineData(5, 402)]
+    public void Bottom_tab_bar_fits_common_phone_widths(int itemCount, double width)
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        window.Width = width;
+        var tabs = new TabControl { Classes = { "bottom" } };
+        for (var i = 0; i < itemCount; i++)
+            tabs.Items.Add(new TabItem { Header = $"Tab {i + 1}", Content = new Border() });
+        window.Content = tabs;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+
+        var bar = tabs.GetVisualDescendants().OfType<GlassSurface>()
+                      .Single(surface => surface.Name == "PART_BarCapsule");
+        var left = bar.TranslatePoint(default, tabs)!.Value.X;
+
+        Assert.True(left >= 0, $"bar starts outside the {width}px host at {left:F1}");
+        Assert.True(left + bar.Bounds.Width <= width + 0.1,
+            $"bar ends at {left + bar.Bounds.Width:F1} in a {width}px host");
+    }
+
+    [AvaloniaFact]
+    public void Five_item_bottom_strip_fits_a_phone_width()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        window.Width = 375;
+        var strip = new TabStrip { Classes = { "bottom" } };
+        for (var i = 0; i < 5; i++)
+            strip.Items.Add(new TabStripItem { Content = $"Tab {i + 1}" });
+        window.Content = strip;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+
+        var bar = strip.GetVisualDescendants().OfType<GlassSurface>()
+                       .Single(surface => surface.Name == "PART_BarCapsule");
+        var left = bar.TranslatePoint(default, strip)!.Value.X;
+
+        Assert.True(left >= 0, $"bar starts outside the host at {left:F1}");
+        Assert.True(left + bar.Bounds.Width <= 375.1,
+            $"bar ends at {left + bar.Bounds.Width:F1} in a 375px host");
+    }
+
+    [AvaloniaFact]
     public void Disabling_tab_bar_interaction_disposes_an_active_drag()
     {
         var window = NewWindow(ThemeVariant.Light);
@@ -341,6 +476,80 @@ public class ThemeIntegrityTests
         window.MouseUp(new Point(start.X + 24, start.Y + 14), MouseButton.Left);
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
         Assert.Equal(0, strip.SelectedIndex);
+    }
+
+    [AvaloniaFact]
+    public void Stepper_only_keeps_the_native_capsule_and_divider_geometry()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        var stepper = new NumericUpDown
+        {
+            Classes = { "stepper" },
+            Width = 94,
+            Value = 3,
+        };
+        window.Content = stepper;
+        window.Show();
+        window.UpdateLayout();
+
+        var capsule = stepper.GetVisualDescendants().OfType<Border>()
+                             .Single(border => border.Name == "Capsule");
+        var divider = stepper.GetVisualDescendants()
+                             .OfType<global::Avalonia.Controls.Shapes.Rectangle>()
+                             .Single(rectangle => rectangle.Name == "Divider");
+        var field = stepper.GetVisualDescendants().OfType<TextBox>()
+                           .Single(textBox => textBox.Name == "PART_TextBox");
+
+        Assert.InRange(capsule.Bounds.Width, 93.5, 94.5);
+        Assert.InRange(capsule.Bounds.Height, 31.5, 32.5);
+        Assert.InRange(divider.Bounds.Width, 0.9, 1.1);
+        Assert.InRange(divider.Bounds.Height, 23.5, 24.5);
+        Assert.False(field.IsVisible);
+        var capsuleLeft = capsule.TranslatePoint(default, stepper)!.Value.X;
+        Assert.InRange(capsuleLeft, -0.1, 0.1);
+        Assert.InRange(capsuleLeft + capsule.Bounds.Width, 93.9, 94.1);
+    }
+
+    [AvaloniaFact]
+    public void Numeric_field_keeps_the_native_eight_point_stepper_gap()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        var numeric = new NumericUpDown { Value = 3 };
+        window.Content = numeric;
+        window.Show();
+        window.UpdateLayout();
+
+        var field = numeric.GetVisualDescendants().OfType<TextBox>()
+                           .Single(textBox => textBox.Name == "PART_TextBox");
+        var capsule = numeric.GetVisualDescendants().OfType<Border>()
+                             .Single(border => border.Name == "Capsule");
+        var fieldLeft = field.TranslatePoint(default, numeric)!.Value.X;
+        var capsuleLeft = capsule.TranslatePoint(default, numeric)!.Value.X;
+        var gap = capsuleLeft - (fieldLeft + field.Bounds.Width);
+
+        Assert.InRange(gap, 7.9, 8.1);
+    }
+
+    [AvaloniaFact]
+    public void Slider_rails_are_flat_where_they_meet_the_thumb()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        var slider = new Slider { Width = 240, Value = 50 };
+        window.Content = slider;
+        window.Show();
+        window.UpdateLayout();
+
+        var decrease = slider.GetVisualDescendants().OfType<RepeatButton>()
+                             .Single(button => button.Name == "PART_DecreaseButton");
+        var increase = slider.GetVisualDescendants().OfType<RepeatButton>()
+                             .Single(button => button.Name == "PART_IncreaseButton");
+        var filledRail = decrease.GetVisualDescendants().OfType<Border>()
+                                 .Single(border => border.Name == "Rail");
+        var remainderRail = increase.GetVisualDescendants().OfType<Border>()
+                                    .Single(border => border.Name == "Rail");
+
+        Assert.Equal(new CornerRadius(2.85, 0, 0, 2.85), filledRail.CornerRadius);
+        Assert.Equal(new CornerRadius(0, 2.85, 2.85, 0), remainderRail.CornerRadius);
     }
 
     [AvaloniaFact]

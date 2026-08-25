@@ -13,7 +13,7 @@
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Drop-down" />
           <WrapPanel Grid.Column="1" Classes="specimens">
-            <DropDownButton Content="Sort">
+            <DropDownButton x:Name="CaptureDropDown" Content="Sort">
               <DropDownButton.Flyout>
                 <MenuFlyout>
                   <MenuItem Header="Name" />

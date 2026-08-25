@@ -12,7 +12,8 @@
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Picker" />
-            <ComboBox Grid.Column="1" SelectedIndex="1" HorizontalAlignment="Right">
+            <ComboBox x:Name="CapturePicker" Grid.Column="1" SelectedIndex="1"
+                      HorizontalAlignment="Right">
               <ComboBoxItem Content="Small" />
               <ComboBoxItem Content="Medium" />
               <ComboBoxItem Content="Large" />

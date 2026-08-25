@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -21,6 +22,12 @@ public class CupertinoSwipeView : ContentControl
     public static readonly StyledProperty<object?> TrailingActionsProperty =
         AvaloniaProperty.Register<CupertinoSwipeView, object?>(nameof(TrailingActions));
 
+    public static readonly StyledProperty<SwipeViewState> SwipeStateProperty =
+        AvaloniaProperty.Register<CupertinoSwipeView, SwipeViewState>(
+            nameof(SwipeState),
+            SwipeViewState.Closed,
+            defaultBindingMode: BindingMode.TwoWay);
+
     public object? LeadingActions
     {
         get => GetValue(LeadingActionsProperty);
@@ -31,6 +38,15 @@ public class CupertinoSwipeView : ContentControl
     {
         get => GetValue(TrailingActionsProperty);
         set => SetValue(TrailingActionsProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets which edge's actions are visible at rest.
+    /// </summary>
+    public SwipeViewState SwipeState
+    {
+        get => GetValue(SwipeStateProperty);
+        set => SetValue(SwipeStateProperty, value);
     }
 
     private const double DragThreshold = 3;
@@ -72,16 +88,15 @@ public class CupertinoSwipeView : ContentControl
         if (_content is not null)
             _content.RenderTransform = _shift;
         UpdateDirectionHosts();
-        ApplyPosition(_openAt);
-        SetRevealed(_openAt);
+        ApplySwipeState(SwipeState);
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
-        _settle.Stop();
         _pressed = false;
         _dragging = false;
+        _settle.Stop();
         ApplyPosition(0);
         _openAt = 0;
         SetRevealed(0);
@@ -89,15 +104,56 @@ public class CupertinoSwipeView : ContentControl
             s_open = null;
     }
 
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        ApplySwipeState(SwipeState);
+    }
+
     /// <summary>
     /// Closes the revealed actions.
     /// </summary>
-    public void Close()
+    public void Close() => SetSwipeState(SwipeViewState.Closed);
+
+    private void SetSwipeState(SwipeViewState state)
     {
-        if (s_open == this)
-            s_open = null;
-        _openAt = 0;
-        StartSettle(0);
+        if (SwipeState == state)
+            ApplySwipeState(state);
+        else
+            SetCurrentValue(SwipeStateProperty, state);
+    }
+
+    private void ApplySwipeState(SwipeViewState state)
+    {
+        if (state == SwipeViewState.Closed)
+        {
+            if (s_open == this)
+                s_open = null;
+            _openAt = 0;
+            StartSettle(0);
+            return;
+        }
+
+        OpenActions(leading: state == SwipeViewState.LeadingVisible);
+    }
+
+    private void OpenActions(bool leading)
+    {
+        if (leading ? LeadingActions is null : TrailingActions is null)
+        {
+            if (s_open == this)
+                s_open = null;
+            _openAt = 0;
+            StartSettle(0);
+            return;
+        }
+
+        if (s_open != this)
+            s_open?.Close();
+        s_open = this;
+        ResetNaturalWidths();
+        _openAt = leading ? LeadingWidth : -TrailingWidth;
+        StartSettle(_openAt);
     }
 
     private static double NaturalWidth(ContentPresenter? host, ref double cachedWidth, double height)
@@ -146,6 +202,10 @@ public class CupertinoSwipeView : ContentControl
             UpdateDirectionHosts();
             ApplyPosition(_position);
         }
+        else if (change.Property == SwipeStateProperty)
+        {
+            ApplySwipeState(change.GetNewValue<SwipeViewState>());
+        }
         else if (change.Property == LeadingActionsProperty || change.Property == TrailingActionsProperty)
         {
             ResetNaturalWidths();
@@ -153,7 +213,7 @@ public class CupertinoSwipeView : ContentControl
             Dispatcher.UIThread.Post(() =>
             {
                 ResetNaturalWidths();
-                SetRevealed(_position);
+                ApplySwipeState(SwipeState);
             }, DispatcherPriority.Loaded);
         }
     }
@@ -261,10 +321,10 @@ public class CupertinoSwipeView : ContentControl
         }
 
         var reach = x > 0 ? LeadingWidth : TrailingWidth;
-        _openAt = Math.Abs(x) > reach * 0.5 ? Math.Sign(x) * reach : 0;
-        if (_openAt == 0 && s_open == this)
-            s_open = null;
-        StartSettle(_openAt);
+        var state = Math.Abs(x) > reach * 0.5
+            ? (x > 0 ? SwipeViewState.LeadingVisible : SwipeViewState.TrailingVisible)
+            : SwipeViewState.Closed;
+        SetSwipeState(state);
     }
 
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
@@ -275,9 +335,7 @@ public class CupertinoSwipeView : ContentControl
 
         _pressed = false;
         _dragging = false;
-        if (_openAt == 0 && s_open == this)
-            s_open = null;
-        StartSettle(_openAt);
+        SetSwipeState(SwipeState);
     }
 
     private static Button? FindOutermostButton(ContentPresenter? host, bool trailing)

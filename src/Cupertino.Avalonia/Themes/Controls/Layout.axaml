@@ -7,62 +7,313 @@
     <Setter Property="PaneBackground" Value="{DynamicResource CupertinoGroupedBackgroundBrush}" />
     <Setter Property="OpenPaneLength" Value="300" />
     <Setter Property="CompactPaneLength" Value="52" />
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Panel>
-          <ContentPresenter Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}" />
 
-          <!-- Disable the dismiss layer while the pane is closed. -->
-          <Border x:Name="Scrim"
-                  Background="#33000000"
-                  Opacity="0"
-                  IsHitTestVisible="False">
-            <Border.Transitions>
-              <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
-              </Transitions>
-            </Border.Transitions>
-          </Border>
-
-          <Panel x:Name="PART_PaneRoot"
-                 Width="{TemplateBinding OpenPaneLength}"
-                 HorizontalAlignment="Left"
-                 ClipToBounds="True"
-                 RenderTransformOrigin="0%,0%">
-            <Panel.Transitions>
-              <Transitions>
-                <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3">
-                  <TransformOperationsTransition.Easing>
-                    <anim:CriticallyDampedEasing OmegaDuration="8.4" />
-                  </TransformOperationsTransition.Easing>
-                </TransformOperationsTransition>
-              </Transitions>
-            </Panel.Transitions>
-            <Border Background="{TemplateBinding PaneBackground}" />
-            <Rectangle Width="0.5" HorizontalAlignment="Right"
-                       Fill="{DynamicResource CupertinoSeparatorBrush}" />
-            <ContentPresenter x:Name="PART_PanePresenter"
-                              Content="{TemplateBinding Pane}"
-                              ContentTemplate="{TemplateBinding PaneTemplate}" />
-          </Panel>
-        </Panel>
-      </ControlTemplate>
-    </Setter>
-
-    <Style Selector="^ /template/ Panel#PART_PaneRoot">
-      <Setter Property="RenderTransform" Value="translateX(-300px)" />
+    <Style Selector="^:left">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Grid Background="{TemplateBinding Background}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.PaneColumnGridLength}" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Panel x:Name="PART_PaneRoot"
+                   Background="{TemplateBinding PaneBackground}"
+                   HorizontalAlignment="Left"
+                   ClipToBounds="True"
+                   ZIndex="1">
+              <Rectangle x:Name="PaneDivider" Width="0.5" HorizontalAlignment="Right"
+                         Fill="{DynamicResource CupertinoSeparatorBrush}" />
+              <ContentPresenter x:Name="PART_PanePresenter"
+                                Content="{TemplateBinding Pane}"
+                                ContentTemplate="{TemplateBinding PaneTemplate}" />
+            </Panel>
+            <Panel x:Name="ContentRoot" Grid.Column="1">
+              <ContentPresenter x:Name="PART_ContentPresenter"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+              <Border x:Name="Scrim" Background="#33000000"
+                      Opacity="0" IsHitTestVisible="False">
+                <Border.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+                  </Transitions>
+                </Border.Transitions>
+              </Border>
+            </Panel>
+          </Grid>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:overlay /template/ Panel#PART_PaneRoot">
+        <Setter Property="Grid.Column" Value="0" />
+        <Setter Property="Grid.ColumnSpan" Value="2" />
+      </Style>
+      <Style Selector="^:overlay /template/ Panel#ContentRoot">
+        <Setter Property="Grid.Column" Value="1" />
+        <Setter Property="Grid.ColumnSpan" Value="2" />
+      </Style>
+      <Style Selector="^:compactoverlay /template/ Panel#PART_PaneRoot">
+        <Setter Property="Grid.Column" Value="0" />
+        <Setter Property="Grid.ColumnSpan" Value="2" />
+      </Style>
     </Style>
-    <Style Selector="^:open /template/ Panel#PART_PaneRoot">
-      <Setter Property="RenderTransform" Value="translateX(0px)" />
+
+    <Style Selector="^:right">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Grid Background="{TemplateBinding Background}">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.PaneColumnGridLength}" />
+            </Grid.ColumnDefinitions>
+            <Panel x:Name="PART_PaneRoot" Grid.Column="1"
+                   Background="{TemplateBinding PaneBackground}"
+                   HorizontalAlignment="Right"
+                   ClipToBounds="True"
+                   ZIndex="1">
+              <Rectangle x:Name="PaneDivider" Width="0.5" HorizontalAlignment="Left"
+                         Fill="{DynamicResource CupertinoSeparatorBrush}" />
+              <ContentPresenter x:Name="PART_PanePresenter"
+                                Content="{TemplateBinding Pane}"
+                                ContentTemplate="{TemplateBinding PaneTemplate}" />
+            </Panel>
+            <Panel x:Name="ContentRoot">
+              <ContentPresenter x:Name="PART_ContentPresenter"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+              <Border x:Name="Scrim" Background="#33000000"
+                      Opacity="0" IsHitTestVisible="False">
+                <Border.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+                  </Transitions>
+                </Border.Transitions>
+              </Border>
+            </Panel>
+          </Grid>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:overlay /template/ Panel#PART_PaneRoot">
+        <Setter Property="Grid.Column" Value="1" />
+        <Setter Property="Grid.ColumnSpan" Value="2" />
+      </Style>
+      <Style Selector="^:overlay /template/ Panel#ContentRoot">
+        <Setter Property="Grid.Column" Value="0" />
+        <Setter Property="Grid.ColumnSpan" Value="2" />
+      </Style>
+      <Style Selector="^:compactoverlay /template/ Panel#PART_PaneRoot">
+        <Setter Property="Grid.Column" Value="1" />
+        <Setter Property="Grid.ColumnSpan" Value="2" />
+      </Style>
     </Style>
-    <Style Selector="^:open /template/ Border#Scrim">
+
+    <Style Selector="^:top">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Grid Background="{TemplateBinding Background}">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.PaneRowGridLength}" />
+              <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Panel x:Name="PART_PaneRoot"
+                   Background="{TemplateBinding PaneBackground}"
+                   VerticalAlignment="Top"
+                   ClipToBounds="True"
+                   ZIndex="1">
+              <Rectangle x:Name="PaneDivider" Height="0.5" VerticalAlignment="Bottom"
+                         Fill="{DynamicResource CupertinoSeparatorBrush}" />
+              <ContentPresenter x:Name="PART_PanePresenter"
+                                Content="{TemplateBinding Pane}"
+                                ContentTemplate="{TemplateBinding PaneTemplate}" />
+            </Panel>
+            <Panel x:Name="ContentRoot" Grid.Row="1">
+              <ContentPresenter x:Name="PART_ContentPresenter"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+              <Border x:Name="Scrim" Background="#33000000"
+                      Opacity="0" IsHitTestVisible="False">
+                <Border.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+                  </Transitions>
+                </Border.Transitions>
+              </Border>
+            </Panel>
+          </Grid>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:overlay /template/ Panel#PART_PaneRoot">
+        <Setter Property="Grid.Row" Value="0" />
+        <Setter Property="Grid.RowSpan" Value="2" />
+      </Style>
+      <Style Selector="^:overlay /template/ Panel#ContentRoot">
+        <Setter Property="Grid.Row" Value="1" />
+        <Setter Property="Grid.RowSpan" Value="2" />
+      </Style>
+      <Style Selector="^:compactoverlay /template/ Panel#PART_PaneRoot">
+        <Setter Property="Grid.Row" Value="0" />
+        <Setter Property="Grid.RowSpan" Value="2" />
+      </Style>
+    </Style>
+
+    <Style Selector="^:bottom">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Grid Background="{TemplateBinding Background}">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="*" />
+              <RowDefinition Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.PaneRowGridLength}" />
+            </Grid.RowDefinitions>
+            <Panel x:Name="PART_PaneRoot" Grid.Row="1"
+                   Background="{TemplateBinding PaneBackground}"
+                   VerticalAlignment="Bottom"
+                   ClipToBounds="True"
+                   ZIndex="1">
+              <Rectangle x:Name="PaneDivider" Height="0.5" VerticalAlignment="Top"
+                         Fill="{DynamicResource CupertinoSeparatorBrush}" />
+              <ContentPresenter x:Name="PART_PanePresenter"
+                                Content="{TemplateBinding Pane}"
+                                ContentTemplate="{TemplateBinding PaneTemplate}" />
+            </Panel>
+            <Panel x:Name="ContentRoot">
+              <ContentPresenter x:Name="PART_ContentPresenter"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+              <Border x:Name="Scrim" Background="#33000000"
+                      Opacity="0" IsHitTestVisible="False">
+                <Border.Transitions>
+                  <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+                  </Transitions>
+                </Border.Transitions>
+              </Border>
+            </Panel>
+          </Grid>
+        </ControlTemplate>
+      </Setter>
+      <Style Selector="^:overlay /template/ Panel#PART_PaneRoot">
+        <Setter Property="Grid.Row" Value="1" />
+        <Setter Property="Grid.RowSpan" Value="2" />
+      </Style>
+      <Style Selector="^:overlay /template/ Panel#ContentRoot">
+        <Setter Property="Grid.Row" Value="0" />
+        <Setter Property="Grid.RowSpan" Value="2" />
+      </Style>
+      <Style Selector="^:compactoverlay /template/ Panel#PART_PaneRoot">
+        <Setter Property="Grid.Row" Value="1" />
+        <Setter Property="Grid.RowSpan" Value="2" />
+      </Style>
+    </Style>
+
+    <Style Selector="^:left:open /template/ Panel#PART_PaneRoot">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Width" Duration="0:0:0.3">
+            <DoubleTransition.Easing>
+              <anim:CriticallyDampedEasing OmegaDuration="8.4" />
+            </DoubleTransition.Easing>
+          </DoubleTransition>
+        </Transitions>
+      </Setter>
+      <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenPaneLength}" />
+    </Style>
+    <Style Selector="^:right:open /template/ Panel#PART_PaneRoot">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Width" Duration="0:0:0.3">
+            <DoubleTransition.Easing>
+              <anim:CriticallyDampedEasing OmegaDuration="8.4" />
+            </DoubleTransition.Easing>
+          </DoubleTransition>
+        </Transitions>
+      </Setter>
+      <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenPaneLength}" />
+    </Style>
+    <Style Selector="^:left:closed /template/ Panel#PART_PaneRoot">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Width" Duration="0:0:0.3">
+            <DoubleTransition.Easing>
+              <anim:CriticallyDampedEasing OmegaDuration="8.4" />
+            </DoubleTransition.Easing>
+          </DoubleTransition>
+        </Transitions>
+      </Setter>
+      <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.ClosedPaneWidth}" />
+    </Style>
+    <Style Selector="^:right:closed /template/ Panel#PART_PaneRoot">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Width" Duration="0:0:0.3">
+            <DoubleTransition.Easing>
+              <anim:CriticallyDampedEasing OmegaDuration="8.4" />
+            </DoubleTransition.Easing>
+          </DoubleTransition>
+        </Transitions>
+      </Setter>
+      <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.ClosedPaneWidth}" />
+    </Style>
+    <Style Selector="^:top:open /template/ Panel#PART_PaneRoot">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Height" Duration="0:0:0.3">
+            <DoubleTransition.Easing>
+              <anim:CriticallyDampedEasing OmegaDuration="8.4" />
+            </DoubleTransition.Easing>
+          </DoubleTransition>
+        </Transitions>
+      </Setter>
+      <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenPaneLength}" />
+    </Style>
+    <Style Selector="^:bottom:open /template/ Panel#PART_PaneRoot">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Height" Duration="0:0:0.3">
+            <DoubleTransition.Easing>
+              <anim:CriticallyDampedEasing OmegaDuration="8.4" />
+            </DoubleTransition.Easing>
+          </DoubleTransition>
+        </Transitions>
+      </Setter>
+      <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=OpenPaneLength}" />
+    </Style>
+    <Style Selector="^:top:closed /template/ Panel#PART_PaneRoot">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Height" Duration="0:0:0.3">
+            <DoubleTransition.Easing>
+              <anim:CriticallyDampedEasing OmegaDuration="8.4" />
+            </DoubleTransition.Easing>
+          </DoubleTransition>
+        </Transitions>
+      </Setter>
+      <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.ClosedPaneHeight}" />
+    </Style>
+    <Style Selector="^:bottom:closed /template/ Panel#PART_PaneRoot">
+      <Setter Property="Transitions">
+        <Transitions>
+          <DoubleTransition Property="Height" Duration="0:0:0.3">
+            <DoubleTransition.Easing>
+              <anim:CriticallyDampedEasing OmegaDuration="8.4" />
+            </DoubleTransition.Easing>
+          </DoubleTransition>
+        </Transitions>
+      </Setter>
+      <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=TemplateSettings.ClosedPaneHeight}" />
+    </Style>
+    <Style Selector="^:overlay:closed /template/ Rectangle#PaneDivider">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="^:inline:closed /template/ Rectangle#PaneDivider">
+      <Setter Property="IsVisible" Value="False" />
+    </Style>
+
+    <Style Selector="^:overlay:open /template/ Border#Scrim">
       <Setter Property="Opacity" Value="1" />
       <Setter Property="IsHitTestVisible" Value="True" />
     </Style>
-
-    <Style Selector="^[DisplayMode=Inline] /template/ Panel#PART_PaneRoot">
-      <Setter Property="RenderTransform" Value="translateX(0px)" />
+    <Style Selector="^:compactoverlay:open /template/ Border#Scrim">
+      <Setter Property="Opacity" Value="1" />
+      <Setter Property="IsHitTestVisible" Value="True" />
     </Style>
   </ControlTheme>
 
@@ -97,7 +348,7 @@
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type Carousel}" TargetType="Carousel">
-    <Setter Property="(controls:CarouselGestures.IsEnabled)" Value="True" />
+    <Setter Property="IsSwipeEnabled" Value="True" />
     <Setter Property="PageTransition">
       <CrossFade Duration="0:0:0.25" />
     </Setter>

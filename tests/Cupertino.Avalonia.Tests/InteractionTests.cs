@@ -27,6 +27,65 @@ public class InteractionTests
         return window;
     }
 
+    [AvaloniaTheory]
+    [InlineData(SplitViewPanePlacement.Left)]
+    [InlineData(SplitViewPanePlacement.Right)]
+    [InlineData(SplitViewPanePlacement.Top)]
+    [InlineData(SplitViewPanePlacement.Bottom)]
+    public void Closed_overlay_split_view_hides_the_pane(SplitViewPanePlacement placement)
+    {
+        var splitView = new SplitView
+        {
+            Width = 300,
+            Height = 200,
+            DisplayMode = SplitViewDisplayMode.Overlay,
+            PanePlacement = placement,
+            OpenPaneLength = 100,
+            Pane = new Border(),
+            Content = new Border(),
+        };
+        var window = ShowHosting(splitView);
+
+        var pane = splitView.GetVisualDescendants().OfType<Panel>()
+            .Single(control => control.Name == "PART_PaneRoot");
+        var content = splitView.GetVisualDescendants().OfType<Panel>()
+            .Single(control => control.Name == "ContentRoot");
+
+        if (placement is SplitViewPanePlacement.Left or SplitViewPanePlacement.Right)
+            Assert.Equal(0, pane.Bounds.Width);
+        else
+            Assert.Equal(0, pane.Bounds.Height);
+
+        Assert.Equal(splitView.Bounds.Size, content.Bounds.Size);
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Open_inline_split_view_allocates_space_for_the_pane()
+    {
+        var splitView = new SplitView
+        {
+            Width = 300,
+            Height = 200,
+            DisplayMode = SplitViewDisplayMode.Inline,
+            IsPaneOpen = true,
+            OpenPaneLength = 100,
+            Pane = new Border(),
+            Content = new Border(),
+        };
+        var window = ShowHosting(splitView);
+
+        var pane = splitView.GetVisualDescendants().OfType<Panel>()
+            .Single(control => control.Name == "PART_PaneRoot");
+        var content = splitView.GetVisualDescendants().OfType<Panel>()
+            .Single(control => control.Name == "ContentRoot");
+
+        Assert.Equal(100, pane.Bounds.Width);
+        Assert.Equal(100, content.Bounds.X);
+        Assert.Equal(200, content.Bounds.Width);
+        window.Close();
+    }
+
     [AvaloniaFact]
     public void Stepper_buttons_change_the_value()
     {

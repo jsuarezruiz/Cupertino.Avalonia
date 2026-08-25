@@ -2,7 +2,7 @@ using Avalonia.Controls;
 
 namespace Cupertino.Gallery.Pages;
 
-public partial class AutoCompleteBoxPage : UserControl
+public partial class AutoCompleteBoxPage : UserControl, IGalleryCaptureState
 {
     private static readonly string[] FruitNames =
     {
@@ -16,5 +16,12 @@ public partial class AutoCompleteBoxPage : UserControl
         this.FindControl<AutoCompleteBox>("Fruits")!.ItemsSource = FruitNames;
         this.FindControl<AutoCompleteBox>("FruitsContains")!.ItemsSource = FruitNames;
         this.FindControl<AutoCompleteBox>("FruitsMin")!.ItemsSource = FruitNames;
+    }
+
+    public void ApplyGalleryCaptureState()
+    {
+        var fruits = this.FindControl<AutoCompleteBox>("Fruits")!;
+        fruits.Text = "Ap";
+        fruits.IsDropDownOpen = true;
     }
 }

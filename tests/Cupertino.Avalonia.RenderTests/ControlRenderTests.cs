@@ -87,6 +87,39 @@ public class ToolbarRenderTests
         Assert.All(capsules, c => Assert.Equal(40, c.Height));
         Assert.Equal(new global::Avalonia.Thickness(35, 0, 35, 32), toolbar.Margin);
     }
+
+    [AvaloniaFact]
+    public void Search_icon_ink_is_centered_in_its_box()
+    {
+        var icon = new CupertinoIcon
+        {
+            Glyph = "magnifyingglass",
+            Size = 20,
+            HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center,
+            VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+        };
+        var luma = Probe.Render("search-icon-centered", icon, 40, 40, Colors.White);
+
+        var minX = 40;
+        var maxX = -1;
+        var minY = 40;
+        var maxY = -1;
+        for (var y = 0; y < 40; y++)
+        for (var x = 0; x < 40; x++)
+        {
+            if (luma[x, y] >= 64)
+                continue;
+            minX = System.Math.Min(minX, x);
+            maxX = System.Math.Max(maxX, x);
+            minY = System.Math.Min(minY, y);
+            maxY = System.Math.Max(maxY, y);
+        }
+
+        Assert.True(maxX >= minX && maxY >= minY, "search icon rendered no dark ink");
+        // A centered odd-pixel ink extent rasterizes around either side of 19.5.
+        Assert.InRange((minX + maxX) / 2.0, 19.0, 20.0);
+        Assert.InRange((minY + maxY) / 2.0, 19.0, 20.0);
+    }
 }
 
 public class FieldRenderTests
