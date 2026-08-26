@@ -5,7 +5,7 @@
     <item name="android:windowBackground">@null</item>
     <item name="android:windowNoTitle">true</item>
     <item name="android:windowSplashScreenBackground">@color/splash_background</item>
-    <item name="android:windowSplashScreenAnimatedIcon">@drawable/icon</item>
+    <item name="android:windowSplashScreenAnimatedIcon">@mipmap/appicon</item>
     <item name="android:windowSplashScreenAnimationDuration">500</item>
     <item name="postSplashScreenTheme">@style/CupertinoTheme.Main</item>
   </style>

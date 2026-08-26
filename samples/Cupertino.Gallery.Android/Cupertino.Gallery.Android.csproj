@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <AndroidResource Include="../Cupertino.Gallery/Assets/AppIcon.png">
-      <Link>Resources\drawable\icon.png</Link>
+      <Link>Resources\mipmap-xxxhdpi\appicon.png</Link>
     </AndroidResource>
   </ItemGroup>
 
