@@ -15,6 +15,7 @@ internal static class VersionInfo
         var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
             .InformationalVersion ?? "unknown";
         var suffix = version.IndexOf('+');
-        return suffix > 0 ? version[..suffix] : version;
+        version = suffix > 0 ? version[..suffix] : version;
+        return version.EndsWith("-local", StringComparison.Ordinal) ? "local" : version;
     }
 }

@@ -87,6 +87,16 @@ public partial class ShellView : UserControl
     {
         InitializeComponent();
 
+        AttachedToVisualTree += (_, _) =>
+        {
+            if (TopLevel.GetTopLevel(this) is not { } top || top.InsetsManager is not { } insets)
+                return;
+            insets.DisplayEdgeToEdgePreference = true;
+            TopLevel.SetAutoSafeAreaPadding(top, false);
+            Padding = insets.SafeAreaPadding;
+            insets.SafeAreaChanged += (_, e) => Padding = e.SafeAreaPadding;
+        };
+
         var nav = this.FindControl<CupertinoNavigationPage>("Nav")!;
 
         var entries = _entries;

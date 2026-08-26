@@ -7,7 +7,6 @@
     <OutputType>Exe</OutputType>
     <SupportedOSPlatformVersion>16.0</SupportedOSPlatformVersion>
     <ApplicationId>net.avaloniaui.cupertino.gallery</ApplicationId>
-    <ApplicationTitle>Cupertino Gallery</ApplicationTitle>
     <RootNamespace>Cupertino.Gallery</RootNamespace>
     <NoWarn>$(NoWarn);CA1711</NoWarn>
     <!-- Allow the installed Xcode version. -->

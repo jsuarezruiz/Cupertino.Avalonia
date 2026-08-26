@@ -1,0 +1,16 @@
+<Project>
+  <Import Project="../Directory.Build.props" />
+
+  <PropertyGroup>
+    <VersionPrefix>0.0.0</VersionPrefix>
+    <VersionSuffix>local</VersionSuffix>
+    <ApplicationTitle>Cupertino Gallery</ApplicationTitle>
+    <AssemblyTitle>Cupertino Gallery</AssemblyTitle>
+    <Product>Cupertino.Avalonia Gallery</Product>
+    <Authors>Javier Suárez Ruiz</Authors>
+    <Company>Javier Suárez Ruiz</Company>
+    <Description>Interactive control gallery for the Cupertino.Avalonia iOS 26 design system.</Description>
+    <Copyright>Copyright © 2026 Javier Suárez Ruiz</Copyright>
+    <NeutralLanguage>en</NeutralLanguage>
+  </PropertyGroup>
+</Project>

@@ -22,7 +22,8 @@ public static class Program
             return IntPtr.Zero;
 
         var framework = Path.Combine(
-            Foundation.NSBundle.MainBundle.PrivateFrameworksPath!,
+            Foundation.NSBundle.MainBundle.BundlePath,
+            "Frameworks",
             "libSkiaSharp.framework",
             "libSkiaSharp");
         return NativeLibrary.Load(framework, assembly, searchPath);
