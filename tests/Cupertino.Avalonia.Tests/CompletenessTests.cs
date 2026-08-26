@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -252,6 +253,37 @@ public class AccessibilityAndDirectionTests
 
 public class PickerCompletenessTests
 {
+    [AvaloniaTheory]
+    [InlineData("Light")]
+    [InlineData("Dark")]
+    public void Time_picker_wheels_use_the_theme_foreground(string themeName)
+    {
+        var variant = themeName == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+        var time = new CupertinoTimePicker
+        {
+            DisplayMode = CupertinoPickerDisplayMode.Inline,
+            SelectedTime = new TimeSpan(10, 30, 0),
+        };
+        var window = new Window
+        {
+            Width = 400,
+            Height = 300,
+            RequestedThemeVariant = variant,
+            Content = time,
+        };
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.True(window.TryFindResource("CupertinoLabelBrush", variant, out var resource));
+        var expected = Assert.IsAssignableFrom<ISolidColorBrush>(resource).Color;
+        var wheels = time.GetVisualDescendants().OfType<CupertinoWheel>().ToList();
+
+        Assert.True(wheels.Count >= 2);
+        Assert.All(wheels, wheel =>
+            Assert.Equal(expected, Assert.IsAssignableFrom<ISolidColorBrush>(wheel.Foreground).Color));
+    }
+
     [AvaloniaFact]
     public void Date_and_time_constraints_coerce_external_values()
     {
@@ -301,6 +333,61 @@ public class PickerCompletenessTests
         var wheels = picker.GetVisualDescendants().OfType<CupertinoWheel>().ToList();
         Assert.Contains(wheels, wheel => wheel.Items?.Count == 24);
         Assert.Contains(wheels, wheel => wheel.Items?.SequenceEqual(new[] { "00", "59" }) == true);
+    }
+
+    [AvaloniaFact]
+    public async Task Popover_animation_preserves_content_and_reverses_before_closing()
+    {
+        var reduceMotion = CupertinoAccessibility.ReduceMotion;
+        var anchor = new Button { Width = 120, Height = 34 };
+        var window = new Window { Width = 400, Height = 600, Content = anchor };
+        window.Show();
+        window.UpdateLayout();
+
+        try
+        {
+            CupertinoAccessibility.ReduceMotion = false;
+            CupertinoPopover.Show(anchor, new Border { Width = 330, Height = 300 }, 30, null);
+
+            var overlay = OverlayLayer.GetOverlayLayer(anchor)!;
+            var host = Assert.IsAssignableFrom<Panel>(overlay.Children[^1]);
+            var panel = Assert.IsType<Grid>(host.Children[^1]);
+            var glass = Assert.IsType<GlassSurface>(panel.Children[0]);
+            var content = Assert.IsType<Border>(panel.Children[1]);
+            var transform = glass.RenderTransform!.Value;
+
+            Assert.Equal(transform.M11, transform.M22, 3);
+            Assert.Equal(0.5, transform.M11, 3);
+            Assert.Null(content.RenderTransform);
+            Assert.Equal(0, content.Opacity);
+            Assert.Equal(1, host.Opacity);
+            Assert.Equal(1, anchor.Opacity);
+
+            await Task.Delay(350);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.True(glass.RenderTransform!.Value.IsIdentity);
+            Assert.Equal(1, content.Opacity);
+
+            CupertinoPopover.Close(anchor);
+
+            Assert.True(CupertinoPopover.IsOpen(anchor));
+            Assert.Same(panel, host.Children[^1]);
+            Assert.Equal(1, anchor.Opacity);
+
+            await Task.Delay(300);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.False(CupertinoPopover.IsOpen(anchor));
+            Assert.DoesNotContain(host, overlay.Children);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            CupertinoPopover.Close(anchor);
+            CupertinoAccessibility.ReduceMotion = reduceMotion;
+            window.Close();
+        }
     }
 }
 

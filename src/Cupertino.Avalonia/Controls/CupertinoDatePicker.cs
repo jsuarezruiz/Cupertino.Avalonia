@@ -42,7 +42,8 @@ public class CupertinoDatePicker : TemplatedControl
         AvaloniaProperty.Register<CupertinoDatePicker, DateTimeOffset?>(nameof(MaximumDate));
 
     public static readonly StyledProperty<DayOfWeek> FirstDayOfWeekProperty =
-        AvaloniaProperty.Register<CupertinoDatePicker, DayOfWeek>(nameof(FirstDayOfWeek), DayOfWeek.Monday);
+        AvaloniaProperty.Register<CupertinoDatePicker, DayOfWeek>(nameof(FirstDayOfWeek),
+            CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
 
     public DateTimeOffset? SelectedDate { get => GetValue(SelectedDateProperty); set => SetValue(SelectedDateProperty, value); }
     public string? DateFormat { get => GetValue(DateFormatProperty); set => SetValue(DateFormatProperty, value); }

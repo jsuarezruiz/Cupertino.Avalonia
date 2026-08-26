@@ -339,18 +339,17 @@ public class GlassSurface : Decorator
                 }
 
                 var now = DateTime.UtcNow;
-                foreach (var surface in _surfaces)
+                var repaint = _surfaces.Any(surface => surface.IsEffectivelyVisible
+                    && (surface.IsLive || now < surface._pulseUntil));
+                if (repaint)
                 {
-                    if (surface.IsEffectivelyVisible
-                        && (surface.IsLive || now < surface._pulseUntil))
+                    _top.InvalidateVisual();
+                    foreach (var surface in _surfaces)
                     {
-                        surface.InvalidateVisual();
+                        if (surface.IsEffectivelyVisible
+                            && (surface.IsLive || now < surface._pulseUntil))
+                            surface.InvalidateVisual();
                     }
-                }
-
-                if (_surfaces.Any(surface => surface.IsEffectivelyVisible
-                    && (surface.IsLive || now < surface._pulseUntil)))
-                {
                     RequestFrame();
                 }
             });

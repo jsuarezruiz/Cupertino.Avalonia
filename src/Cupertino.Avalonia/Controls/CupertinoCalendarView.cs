@@ -6,6 +6,7 @@ using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 namespace Cupertino.Controls;
 
@@ -37,7 +38,8 @@ public class CupertinoMonthGrid : Control
         AvaloniaProperty.Register<CupertinoMonthGrid, IBrush>(nameof(WeekdayBrush), Brushes.Gray);
 
     public static readonly StyledProperty<DayOfWeek> FirstDayOfWeekProperty =
-        AvaloniaProperty.Register<CupertinoMonthGrid, DayOfWeek>(nameof(FirstDayOfWeek), DayOfWeek.Monday);
+        AvaloniaProperty.Register<CupertinoMonthGrid, DayOfWeek>(nameof(FirstDayOfWeek),
+            CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
 
     public static readonly StyledProperty<DateTimeOffset?> MinimumDateProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, DateTimeOffset?>(nameof(MinimumDate));
@@ -57,14 +59,23 @@ public class CupertinoMonthGrid : Control
     public DateTimeOffset? MaximumDate { get => GetValue(MaximumDateProperty); set => SetValue(MaximumDateProperty, value); }
 
     // Scale all geometry from the square cell size.
-    private const double DiscRatio = 1.0;
+    private const double DiscRatio = 0.9;
     private const double DayFontRatio = 0.48;
     private const double WeekdayFontRatio = 0.30;
     // Weekday-band height relative to a day cell.
     private const double WeekdayRowRatio = 0.314;
+    private const double SelectionPopMs = 180;
+    private const double MonthSlideMs = 300;
 
     private double Cell => Bounds.Width / 7;
     private double WeekdayRowHeight => Cell * WeekdayRowRatio;
+
+    private DateTime? _poppingSelection;
+    private DateTime _popStart;
+    private DateTime? _slideFromMonth;
+    private int _slideDirection;
+    private DateTime _slideStart;
+    private DispatcherTimer? _animTimer;
 
     static CupertinoMonthGrid()
     {
@@ -80,6 +91,62 @@ public class CupertinoMonthGrid : Control
     /// Raised when a day is tapped.
     /// </summary>
     public event EventHandler<DateTime>? DayPicked;
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (CupertinoAccessibility.ReduceMotion)
+            return;
+
+        if (change.Property == SelectedDateProperty &&
+            change.NewValue is DateTimeOffset selected)
+        {
+            _poppingSelection = selected.Date;
+            _popStart = DateTime.UtcNow;
+            StartAnimTimer();
+        }
+        else if (change.Property == DisplayMonthProperty &&
+                 change.OldValue is DateTime oldMonth &&
+                 change.NewValue is DateTime newMonth &&
+                 (oldMonth.Year, oldMonth.Month) != (newMonth.Year, newMonth.Month))
+        {
+            _slideFromMonth = new DateTime(oldMonth.Year, oldMonth.Month, 1);
+            _slideDirection = newMonth > oldMonth ? 1 : -1;
+            _slideStart = DateTime.UtcNow;
+            StartAnimTimer();
+        }
+    }
+
+    private void StartAnimTimer()
+    {
+        _animTimer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(16),
+                                           DispatcherPriority.Render, OnAnimTick);
+        _animTimer.Start();
+    }
+
+    private void OnAnimTick(object? sender, EventArgs e)
+    {
+        var now = DateTime.UtcNow;
+        var popDone = _poppingSelection is null ||
+                      (now - _popStart).TotalMilliseconds >= SelectionPopMs;
+        var slideDone = _slideFromMonth is null ||
+                        (now - _slideStart).TotalMilliseconds >= MonthSlideMs;
+        if (popDone)
+            _poppingSelection = null;
+        if (slideDone)
+            _slideFromMonth = null;
+        if (popDone && slideDone)
+            _animTimer?.Stop();
+        InvalidateVisual();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        _animTimer?.Stop();
+        _poppingSelection = null;
+        _slideFromMonth = null;
+    }
 
     private int ColumnOf(DateTime date) => ((int)date.DayOfWeek - (int)FirstDayOfWeek + 7) % 7;
 
@@ -119,7 +186,33 @@ public class CupertinoMonthGrid : Control
                                            weekdayRow / 2 - ft.Height / 2));
         }
 
-        var first = new DateTime(DisplayMonth.Year, DisplayMonth.Month, 1);
+        var current = new DateTime(DisplayMonth.Year, DisplayMonth.Month, 1);
+        if (_slideFromMonth is { } fromMonth)
+        {
+            var t = Math.Clamp(
+                (DateTime.UtcNow - _slideStart).TotalMilliseconds / MonthSlideMs, 0, 1);
+            var eased = 1 - Math.Pow(1 - t, 3);
+            var width = Bounds.Width;
+            var dayArea = new Rect(0, weekdayRow, width,
+                                   Math.Max(0, Bounds.Height - weekdayRow));
+            using (context.PushClip(dayArea))
+            {
+                DrawMonth(context, fromMonth, -_slideDirection * width * eased,
+                          cell, weekdayRow, culture, typeface, bold);
+                DrawMonth(context, current, _slideDirection * width * (1 - eased),
+                          cell, weekdayRow, culture, typeface, bold);
+            }
+        }
+        else
+        {
+            DrawMonth(context, current, 0, cell, weekdayRow, culture, typeface, bold);
+        }
+    }
+
+    private void DrawMonth(DrawingContext context, DateTime first, double xOffset,
+                           double cell, double weekdayRow, CultureInfo culture,
+                           Typeface typeface, Typeface bold)
+    {
         var days = DateTime.DaysInMonth(first.Year, first.Month);
         var today = DateTime.Today;
         var selected = SelectedDate?.Date;
@@ -128,7 +221,7 @@ public class CupertinoMonthGrid : Control
         {
             var date = new DateTime(first.Year, first.Month, d);
             var index = ColumnOf(first) + d - 1;
-            var cx = colPitch * (index % 7 + 0.5);
+            var cx = xOffset + cell * (index % 7 + 0.5);
             var cy = weekdayRow + cell * (index / 7 + 0.5);
 
             var isSelected = selected == date;
@@ -137,6 +230,12 @@ public class CupertinoMonthGrid : Control
             if (isSelected)
             {
                 var r = cell * DiscRatio / 2;
+                if (_poppingSelection == date)
+                {
+                    var t = Math.Clamp(
+                        (DateTime.UtcNow - _popStart).TotalMilliseconds / SelectionPopMs, 0, 1);
+                    r *= 0.5 + 0.5 * (1 - (1 - t) * (1 - t));
+                }
                 context.DrawEllipse(SelectionBrush, null, new Point(cx, cy), r, r);
             }
 
@@ -264,7 +363,8 @@ public class CupertinoCalendarView : TemplatedControl
         AvaloniaProperty.Register<CupertinoCalendarView, DateTimeOffset?>(nameof(MaximumDate));
 
     public static readonly StyledProperty<DayOfWeek> FirstDayOfWeekProperty =
-        AvaloniaProperty.Register<CupertinoCalendarView, DayOfWeek>(nameof(FirstDayOfWeek), DayOfWeek.Monday);
+        AvaloniaProperty.Register<CupertinoCalendarView, DayOfWeek>(nameof(FirstDayOfWeek),
+            CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
 
     public int MinYear { get => GetValue(MinYearProperty); set => SetValue(MinYearProperty, value); }
     public int MaxYear { get => GetValue(MaxYearProperty); set => SetValue(MaxYearProperty, value); }

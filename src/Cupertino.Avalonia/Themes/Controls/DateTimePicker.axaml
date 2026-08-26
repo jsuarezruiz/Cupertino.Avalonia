@@ -98,13 +98,19 @@
                       StrokeThickness="2.2" StrokeLineCap="Round" StrokeJoin="Round"
                       Width="16" Height="16" Stretch="None"
                       VerticalAlignment="Center"
-                      RenderTransformOrigin="50%,50%" />
+                      RenderTransformOrigin="50%,50%" RenderTransform="rotate(0deg)">
+                  <Path.Transitions>
+                    <Transitions>
+                      <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="SineEaseOut" />
+                    </Transitions>
+                  </Path.Transitions>
+                </Path>
               </StackPanel>
             </Button>
             <Button Grid.Column="1" x:Name="PART_PreviousButton"
                     Theme="{StaticResource CupertinoCalendarChevron}">
               <Path Data="{StaticResource CupertinoChevronLeftGeometry}"
-                    Stroke="{DynamicResource CupertinoAccentBrush}"
+                    Stroke="{DynamicResource CupertinoLabelBrush}"
                     StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
                     Width="16" Height="16" Stretch="None"
                     RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
@@ -112,7 +118,7 @@
             <Button Grid.Column="2" x:Name="PART_NextButton"
                     Theme="{StaticResource CupertinoCalendarChevron}">
               <Path Data="{StaticResource CupertinoChevronRightGeometry}"
-                    Stroke="{DynamicResource CupertinoAccentBrush}"
+                    Stroke="{DynamicResource CupertinoLabelBrush}"
                     StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
                     Width="16" Height="16" Stretch="None"
                     RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
@@ -151,6 +157,9 @@
 
     <Style Selector="^:monthpicker /template/ Path#TitleChevron">
       <Setter Property="RenderTransform" Value="rotate(90deg)" />
+    </Style>
+    <Style Selector="^:monthpicker /template/ TextBlock#PART_Title">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
     </Style>
     <Style Selector="^:monthpicker /template/ c|CupertinoMonthGrid#PART_Grid">
       <Setter Property="IsVisible" Value="False" />

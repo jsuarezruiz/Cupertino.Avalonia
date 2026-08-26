@@ -20,14 +20,16 @@
     <Setter Property="CornerRadius" Value="8" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Background="{TemplateBinding Background}"
-                CornerRadius="{TemplateBinding CornerRadius}"
-                Padding="{TemplateBinding Padding}"
-                BoxShadow="0 4 14 0 #26000000">
-          <ContentPresenter Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            TextBlock.TextWrapping="Wrap" />
-        </Border>
+        <Panel Margin="14,10,14,18">
+          <Border Background="{TemplateBinding Background}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  Padding="{TemplateBinding Padding}"
+                  BoxShadow="0 4 14 0 #26000000">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              TextBlock.TextWrapping="Wrap" />
+          </Border>
+        </Panel>
       </ControlTemplate>
     </Setter>
   </ControlTheme>
@@ -48,21 +50,22 @@
                  IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
                  IsLightDismissEnabled="True"
                  ShouldUseOverlayLayer="True"
+                 controls:CupertinoFlyoutTransition.IsEnabled="True"
                  Placement="BottomEdgeAlignedLeft">
-            <Panel Classes="cupertino-popover" Margin="18,6,18,18">
-              <controls:GlassSurface CornerRadius="12"
-                                     BlurRadius="28" Saturation="1.8"
-                                     GlassThickness="0.35" RefractionStrength="0.10"
-                                     ChromaticAberration="0" DepthEffect="0.25"
-                                     IsAdaptive="True"
-                                     ShadowOpacity="0.20" ShadowBlur="30" ShadowOffset="10"
-                                     MinWidth="180">
-                <Border CornerRadius="12" ClipToBounds="True">
+            <Panel Classes="cupertino-popover source-transition" Margin="18,6,18,18">
+              <Grid MinWidth="180">
+                <controls:GlassSurface Classes="source-transition-material" CornerRadius="12"
+                                       BlurRadius="28" Saturation="1.8"
+                                       GlassThickness="0.35" RefractionStrength="0.10"
+                                       ChromaticAberration="0" DepthEffect="0.25"
+                                       IsAdaptive="True"
+                                       ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+                <Border Classes="source-transition-content" CornerRadius="12" ClipToBounds="True">
                   <ItemsPresenter Name="PART_ItemsPresenter"
                                   ItemsPanel="{TemplateBinding ItemsPanel}"
                                   Margin="0,6" />
                 </Border>
-              </controls:GlassSurface>
+              </Grid>
             </Panel>
           </Popup>
         </Panel>
@@ -227,20 +230,20 @@
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Classes="cupertino-popover" Margin="18,10,18,18">
-          <controls:GlassSurface CornerRadius="14"
-                                 BlurRadius="28" Saturation="1.8"
-                                 GlassThickness="0.35" RefractionStrength="0.10"
-                                 ChromaticAberration="0" DepthEffect="0.25"
-                                 IsAdaptive="True"
-                                 ShadowOpacity="0.20" ShadowBlur="30" ShadowOffset="10"
-                                 MinWidth="220">
-            <Border CornerRadius="14" ClipToBounds="True">
+        <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
+          <Grid MinWidth="220">
+            <controls:GlassSurface Classes="source-transition-material" CornerRadius="14"
+                                     BlurRadius="28" Saturation="1.8"
+                                     GlassThickness="0.35" RefractionStrength="0.10"
+                                     ChromaticAberration="0" DepthEffect="0.25"
+                                     IsAdaptive="True"
+                                     ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+            <Border Classes="source-transition-content" CornerRadius="14" ClipToBounds="True">
               <ItemsPresenter Name="PART_ItemsPresenter"
                               ItemsPanel="{TemplateBinding ItemsPanel}"
                               Margin="0,6" />
             </Border>
-          </controls:GlassSurface>
+          </Grid>
         </Panel>
       </ControlTemplate>
     </Setter>
@@ -252,14 +255,15 @@
     <Setter Property="MaxWidth" Value="456" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Classes="cupertino-popover" Margin="18,10,18,18">
-          <controls:GlassSurface CornerRadius="14"
-                                 BlurRadius="28" Saturation="1.8"
-                                 GlassThickness="0.35" RefractionStrength="0.10"
-                                 ChromaticAberration="0" DepthEffect="0.25"
-                                 IsAdaptive="True"
-                                 ShadowOpacity="0.20" ShadowBlur="30" ShadowOffset="10">
-            <Border CornerRadius="14" ClipToBounds="True">
+        <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
+          <Grid>
+            <controls:GlassSurface Classes="source-transition-material" CornerRadius="14"
+                                     BlurRadius="28" Saturation="1.8"
+                                     GlassThickness="0.35" RefractionStrength="0.10"
+                                     ChromaticAberration="0" DepthEffect="0.25"
+                                     IsAdaptive="True"
+                                     ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+            <Border Classes="source-transition-content" CornerRadius="14" ClipToBounds="True">
               <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
                 <ContentPresenter Content="{TemplateBinding Content}"
@@ -267,7 +271,7 @@
                                   Padding="{TemplateBinding Padding}" />
               </ScrollViewer>
             </Border>
-          </controls:GlassSurface>
+          </Grid>
         </Panel>
       </ControlTemplate>
     </Setter>

@@ -38,6 +38,7 @@ public class CupertinoTheme : Styles
 
     public CupertinoTheme(IServiceProvider? sp = null)
     {
+        CupertinoFlyoutTransition.Initialize();
         AvaloniaXamlLoader.Load(sp, this);
         Resources["CupertinoFontFamily"] = ResolveSystemFont();
         ApplyTextScale();

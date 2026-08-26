@@ -14,7 +14,7 @@
       <ControlTemplate>
         <Panel Background="Transparent">
           <Ellipse x:Name="Disc" Width="34.6" Height="34.6"
-                   Fill="{DynamicResource CupertinoAccentSubtleBrush}"
+                   Fill="{DynamicResource CupertinoAccentBrush}"
                    IsVisible="False" />
           <ContentPresenter x:Name="Content"
                             Content="{TemplateBinding Content}"
@@ -40,7 +40,7 @@
       <Setter Property="IsVisible" Value="True" />
     </Style>
     <Style Selector="^:selected">
-      <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelOnGlassBrush}" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
@@ -48,10 +48,13 @@
       <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
-
+    <Style Selector="^:today:selected">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelOnGlassBrush}" />
+    </Style>
     <Style Selector="^:inactive">
-      <Setter Property="Foreground" Value="{DynamicResource CupertinoTertiaryLabelBrush}" />
+      <Setter Property="Foreground" Value="Transparent" />
       <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="IsHitTestVisible" Value="False" />
     </Style>
 
     <Style Selector="^:pointerover /template/ Ellipse#Disc">
@@ -158,36 +161,39 @@
     </Setter>
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid RowDefinitions="Auto,*" Margin="8,6,8,10">
-          <Grid ColumnDefinitions="*,Auto,Auto" Margin="8,2,0,4">
-            <Button x:Name="PART_HeaderButton" Grid.Column="0"
-                    Theme="{StaticResource CupertinoCalendarHeaderButton}"
-                    HorizontalAlignment="Left" />
-            <Button x:Name="PART_PreviousButton" Grid.Column="1"
-                    Theme="{StaticResource CupertinoCalendarPagingButton}">
-              <Path Data="{StaticResource CupertinoChevronLeftGeometry}"
-                    Stroke="{DynamicResource CupertinoAccentBrush}"
-                    StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
-                    Width="16" Height="16" Stretch="None"
-                    RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
-            </Button>
-            <Button x:Name="PART_NextButton" Grid.Column="2"
-                    Theme="{StaticResource CupertinoCalendarPagingButton}">
-              <Path Data="{StaticResource CupertinoChevronRightGeometry}"
-                    Stroke="{DynamicResource CupertinoAccentBrush}"
-                    StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
-                    Width="16" Height="16" Stretch="None"
-                    RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
-            </Button>
-          </Grid>
+        <Border Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+          <Grid RowDefinitions="Auto,*" Margin="8,6,8,10">
+            <Grid ColumnDefinitions="*,Auto,Auto" Margin="8,2,0,12">
+              <Button x:Name="PART_HeaderButton" Grid.Column="0"
+                      Theme="{StaticResource CupertinoCalendarHeaderButton}"
+                      HorizontalAlignment="Left" />
+              <Button x:Name="PART_PreviousButton" Grid.Column="1"
+                      Theme="{StaticResource CupertinoCalendarPagingButton}">
+                <Path Data="{StaticResource CupertinoChevronLeftGeometry}"
+                      Stroke="{DynamicResource CupertinoAccentBrush}"
+                      StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
+                      Width="16" Height="16" Stretch="None"
+                      RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
+              </Button>
+              <Button x:Name="PART_NextButton" Grid.Column="2"
+                      Theme="{StaticResource CupertinoCalendarPagingButton}">
+                <Path Data="{StaticResource CupertinoChevronRightGeometry}"
+                      Stroke="{DynamicResource CupertinoAccentBrush}"
+                      StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
+                      Width="16" Height="16" Stretch="None"
+                      RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
+              </Button>
+            </Grid>
 
-          <Grid x:Name="PART_MonthView" Grid.Row="1" IsVisible="False"
-                ColumnDefinitions="*,*,*,*,*,*,*"
-                RowDefinitions="Auto,*,*,*,*,*,*" />
-          <Grid x:Name="PART_YearView" Grid.Row="1" IsVisible="False"
-                ColumnDefinitions="*,*,*,*"
-                RowDefinitions="*,*,*" />
-        </Grid>
+            <Grid x:Name="PART_MonthView" Grid.Row="1" IsVisible="False"
+                  ColumnDefinitions="*,*,*,*,*,*,*"
+                  RowDefinitions="Auto,*,*,*,*,*,*" />
+            <Grid x:Name="PART_YearView" Grid.Row="1" IsVisible="False"
+                  ColumnDefinitions="*,*,*,*"
+                  RowDefinitions="*,*,*" />
+          </Grid>
+        </Border>
       </ControlTemplate>
     </Setter>
   </ControlTheme>
@@ -199,10 +205,9 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel x:Name="PART_Root">
-          <Border Background="{TemplateBinding Background}"
-                  CornerRadius="{TemplateBinding CornerRadius}">
-            <CalendarItem x:Name="PART_CalendarItem" />
-          </Border>
+          <CalendarItem x:Name="PART_CalendarItem"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="{TemplateBinding CornerRadius}" />
         </Panel>
       </ControlTemplate>
     </Setter>

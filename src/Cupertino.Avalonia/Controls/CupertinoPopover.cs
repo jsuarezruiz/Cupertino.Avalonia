@@ -1,11 +1,9 @@
 using Avalonia;
-using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Reactive;
-using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 namespace Cupertino.Controls;
@@ -17,7 +15,7 @@ public static class CupertinoPopover
 {
     private const double AnchorGap = 8;
 
-    private const double EdgeMargin = 8;
+    private const double EdgeMargin = 24;
 
     private sealed class Session
     {
@@ -25,8 +23,9 @@ public static class CupertinoPopover
         public Panel Host = null!;
         public Control Dismisser = null!;
         public Control Panel = null!;
-        public Avalonia.Media.Transformation.TransformOperations CollapsedTransform =
-            Avalonia.Media.Transformation.TransformOperations.Parse("scale(0.35,0.12)");
+        public Control ContentHost = null!;
+        public Rect TargetBounds;
+        public CupertinoFlyoutTransition.TransitionSession? Motion;
         public IDisposable? SizeSubscription;
         public EventHandler<VisualTreeAttachmentEventArgs>? AnchorDetachedHandler;
         public Action? OnClosed;
@@ -56,30 +55,42 @@ public static class CupertinoPopover
         var glass = new GlassSurface
         {
             CornerRadius = new CornerRadius(cornerRadius),
-            BlurRadius = 28,
+            BlurRadius = 36,
             Saturation = 1.8,
             GlassThickness = 0.35,
             RefractionStrength = 0.10,
             ChromaticAberration = 0,
             DepthEffect = 0.25,
-            ShadowOpacity = 0.20,
-            ShadowBlur = 30,
-            ShadowOffset = 10,
+            ShadowOpacity = 0.14,
+            ShadowBlur = 18,
+            ShadowOffset = 6,
             IsAdaptive = true,
+        };
+        glass.Bind(GlassSurface.TintProperty,
+            glass.GetResourceObservable("CupertinoPopoverTint"));
+
+        var contentHost = new Border
+        {
             Child = content,
+            CornerRadius = new CornerRadius(cornerRadius),
+            ClipToBounds = true,
         };
 
-        var panel = new Border
+        var panel = new Grid
         {
-            Child = glass,
             ClipToBounds = false,
-            Opacity = 0,
         };
+        panel.Children.Add(glass);
+        panel.Children.Add(contentHost);
 
         // Use an invisible light-dismiss layer.
         var dismisser = new Border { Background = Brushes.Transparent };
 
-        var host = new Panel { ClipToBounds = false };
+        var host = new Panel
+        {
+            ClipToBounds = false,
+            Opacity = 0,
+        };
         host.Children.Add(dismisser);
         host.Children.Add(panel);
 
@@ -89,6 +100,7 @@ public static class CupertinoPopover
             Host = host,
             Dismisser = dismisser,
             Panel = panel,
+            ContentHost = contentHost,
             OnClosed = onClosed,
         };
         Open[anchor] = session;
@@ -114,48 +126,12 @@ public static class CupertinoPopover
         host.Height = layer.Bounds.Height;
         layer.UpdateLayout();
         Position(anchor, session, layer.Bounds);
-        panel.RenderTransform = session.CollapsedTransform;
+        layer.UpdateLayout();
 
-        // Attach transitions after initial placement.
-        if (CupertinoAccessibility.ReduceMotion)
-        {
-            panel.Opacity = 1;
-            panel.RenderTransform = Avalonia.Media.Transformation.TransformOperations.Parse("scale(1)");
-            return;
-        }
-
-        DispatcherTimer.RunOnce(() =>
-        {
-            if (session.Closing
-                || !Open.TryGetValue(anchor, out var current)
-                || !ReferenceEquals(current, session))
-                return;
-
-            // Morph from the anchor while resampling the backdrop.
-            panel.Transitions =
-            [
-                new DoubleTransition
-                {
-                    Property = Visual.OpacityProperty,
-                    Duration = TimeSpan.FromMilliseconds(180),
-                    Easing = new Cupertino.Animation.CriticallyDampedEasing
-                    {
-                        OmegaDuration = 10,
-                    },
-                },
-                new TransformOperationsTransition
-                {
-                    Property = Visual.RenderTransformProperty,
-                    Duration = TimeSpan.FromMilliseconds(280),
-                    Easing = new Cupertino.Animation.CriticallyDampedEasing
-                    {
-                        OmegaDuration = 8.4,
-                    },
-                },
-            ];
-            panel.Opacity = 1;
-            panel.RenderTransform = Avalonia.Media.Transformation.TransformOperations.Parse("scale(1)");
-        }, TimeSpan.FromMilliseconds(16));
+        session.Motion = CupertinoFlyoutTransition.CreateSession(
+            anchor, panel, glass, contentHost, session.TargetBounds,
+            () => FinishClose(anchor, session));
+        host.Opacity = 1;
     }
 
     // Keep the popover inside the window.
@@ -199,18 +175,7 @@ public static class CupertinoPopover
         panel.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
         panel.Margin = new Thickness(x, y, 0, 0);
 
-        // Scale from the anchor without moving its attachment point.
-        var anchorX = p.X + anchor.Bounds.Width / 2;
-        var anchorY = p.Y + anchor.Bounds.Height / 2;
-        panel.RenderTransformOrigin = new RelativePoint(
-            (anchorX - x) / size.Width,
-            (anchorY - y) / size.Height,
-            RelativeUnit.Relative);
-
-        var scaleX = Math.Clamp(anchor.Bounds.Width / size.Width, 0.05, 0.95);
-        var scaleY = Math.Clamp(anchor.Bounds.Height / size.Height, 0.05, 0.95);
-        session.CollapsedTransform = Avalonia.Media.Transformation.TransformOperations.Parse(
-            FormattableString.Invariant($"scale({scaleX},{scaleY})"));
+        session.TargetBounds = new Rect(x, y, size.Width, size.Height);
     }
 
     /// <summary>
@@ -242,25 +207,10 @@ public static class CupertinoPopover
             return;
         }
 
-        session.Panel.Transitions =
-        [
-            new DoubleTransition
-            {
-                Property = Visual.OpacityProperty,
-                Duration = TimeSpan.FromMilliseconds(130),
-                Easing = new Avalonia.Animation.Easings.QuadraticEaseIn(),
-            },
-            new TransformOperationsTransition
-            {
-                Property = Visual.RenderTransformProperty,
-                Duration = TimeSpan.FromMilliseconds(160),
-                Easing = new Avalonia.Animation.Easings.QuadraticEaseIn(),
-            },
-        ];
-        session.Panel.Opacity = 0;
-        session.Panel.RenderTransform = session.CollapsedTransform;
-
-        DispatcherTimer.RunOnce(() => FinishClose(anchor, session), TimeSpan.FromMilliseconds(170));
+        if (session.Motion is { } motion)
+            motion.Close();
+        else
+            FinishClose(anchor, session);
     }
 
     private static void FinishClose(Control anchor, Session session)
@@ -268,6 +218,8 @@ public static class CupertinoPopover
         if (session.Closed)
             return;
         session.Closed = true;
+        var motion = session.Motion;
+        session.Motion = null;
         session.SizeSubscription?.Dispose();
         session.SizeSubscription = null;
         if (session.AnchorDetachedHandler is { } handler)
@@ -276,6 +228,7 @@ public static class CupertinoPopover
             session.AnchorDetachedHandler = null;
         }
         session.Layer.Children.Remove(session.Host);
+        motion?.Dispose();
         if (Open.TryGetValue(anchor, out var current) && ReferenceEquals(current, session))
             Open.Remove(anchor);
 

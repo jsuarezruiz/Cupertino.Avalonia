@@ -8,17 +8,17 @@
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
           <Color x:Key="CupertinoSystemGreen">#FF34C759</Color>
-          <Color x:Key="CupertinoSystemBlue">#FF0088FF</Color>
+          <Color x:Key="CupertinoSystemBlue">#FF007AFF</Color>
           <Color x:Key="CupertinoSwitchTrackOffTint">#FFC3C3C5</Color>
           <Color x:Key="CupertinoSwitchTrackOnTint">#FF34C759</Color>
           <SolidColorBrush x:Key="CupertinoLabelBrush" Color="#FF000000" />
           <SolidColorBrush x:Key="CupertinoKnobBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoKnobPressedBrush" Color="#C9FFFFFF" />
-          <SolidColorBrush x:Key="CupertinoFocusRingBrush" Color="#990088FF" />
-          <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FF0088FF" />
+          <SolidColorBrush x:Key="CupertinoFocusRingBrush" Color="#99007AFF" />
+          <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FF007AFF" />
           <SolidColorBrush x:Key="CupertinoSliderRemainderBrush" Color="#2B505050" />
           <Color x:Key="CupertinoGlassButtonTint">#8CF2F2F5</Color>
-          <Color x:Key="CupertinoProminentTint">#FF0088FE</Color>
+          <Color x:Key="CupertinoProminentTint">#FF007AFF</Color>
           <Color x:Key="CupertinoProminentPressedTint">#FF4BB7FF</Color>
           <SolidColorBrush x:Key="CupertinoProminentForegroundBrush" Color="#FF84FFFF" />
           <SolidColorBrush x:Key="CupertinoBorderedFillBrush" Color="#8CA2A2A2" />
@@ -42,14 +42,14 @@
           <SolidColorBrush x:Key="CupertinoSegmentTrackBrush" Color="#1F787880" />
           <SolidColorBrush x:Key="CupertinoPickerFieldBrush" Color="#1E767680" />
           <SolidColorBrush x:Key="CupertinoPickerHighlightBrush" Color="#14767680" />
-          <SolidColorBrush x:Key="CupertinoAccentSubtleBrush" Color="#1F0088FF" />
+          <SolidColorBrush x:Key="CupertinoAccentSubtleBrush" Color="#1F007AFF" />
           <SolidColorBrush x:Key="CupertinoSegmentSelectedBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoTabPillBrush" Color="#8AFFFFFF" />
           <Color x:Key="CupertinoTabPillTint">#0AFFFFFF</Color>
           <Color x:Key="CupertinoTabBarTint">#B8FFFFFF</Color>
           <Color x:Key="CupertinoTabLensTint">#12000000</Color>
           <Color x:Key="CupertinoSegmentLensTint">#17FFFFFF</Color>
-          <SolidColorBrush x:Key="CupertinoTabAccentBrush" Color="#FF0053DB" />
+          <SolidColorBrush x:Key="CupertinoTabAccentBrush" Color="#FF007AFF" />
           <SolidColorBrush x:Key="CupertinoLabelOnGlassBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoTabPillBorderBrush" Color="#40FFFFFF" />
           <SolidColorBrush x:Key="CupertinoFieldBorderBrush" Color="#FFCCCCCC" />
@@ -62,7 +62,7 @@
           <SolidColorBrush x:Key="CupertinoMenuPanelBrush" Color="#F5F7F7FA" />
           <SolidColorBrush x:Key="CupertinoMenuRowHoverBrush" Color="#0D000000" />
           <SolidColorBrush x:Key="CupertinoMenuRowPressedBrush" Color="#1F000000" />
-          <SolidColorBrush x:Key="CupertinoSelectionBrush" Color="#4D0088FF" />
+          <SolidColorBrush x:Key="CupertinoSelectionBrush" Color="#4D007AFF" />
           <SolidColorBrush x:Key="CupertinoFieldBorderHoverBrush" Color="#FFA9A9AE" />
           <SolidColorBrush x:Key="CupertinoReadOnlyFieldBrush" Color="#FFF2F2F7" />
           <SolidColorBrush x:Key="CupertinoDangerBrush" Color="#FFFF3B30" />
@@ -75,12 +75,13 @@
           <SolidColorBrush x:Key="CupertinoSystemMintBrush" Color="#FF00C7BE" />
           <SolidColorBrush x:Key="CupertinoSystemTealBrush" Color="#FF30B0C7" />
           <SolidColorBrush x:Key="CupertinoSystemCyanBrush" Color="#FF32ADE6" />
-          <SolidColorBrush x:Key="CupertinoSystemBlueBrush" Color="#FF0088FF" />
+          <SolidColorBrush x:Key="CupertinoSystemBlueBrush" Color="#FF007AFF" />
           <SolidColorBrush x:Key="CupertinoSystemIndigoBrush" Color="#FF5856D6" />
           <SolidColorBrush x:Key="CupertinoSystemPurpleBrush" Color="#FFAF52DE" />
           <SolidColorBrush x:Key="CupertinoSystemPinkBrush" Color="#FFFF2D55" />
           <SolidColorBrush x:Key="CupertinoSystemBrownBrush" Color="#FFA2845E" />
           <Color x:Key="CupertinoThickMaterialTint">#C9FAFAFC</Color>
+          <Color x:Key="CupertinoPopoverTint">#C2FAFAFC</Color>
           <SolidColorBrush x:Key="CupertinoDialogActionBrush" Color="#26787880" />
           <SolidColorBrush x:Key="CupertinoDialogActionHoverBrush" Color="#3D787880" />
           <SolidColorBrush x:Key="CupertinoDialogActionPressedBrush" Color="#59787880" />
@@ -160,6 +161,7 @@
           <SolidColorBrush x:Key="CupertinoSystemPinkBrush" Color="#FFFF375F" />
           <SolidColorBrush x:Key="CupertinoSystemBrownBrush" Color="#FFAC8E68" />
           <Color x:Key="CupertinoThickMaterialTint">#D11C1C1E</Color>
+          <Color x:Key="CupertinoPopoverTint">#C22C2C2E</Color>
           <SolidColorBrush x:Key="CupertinoDialogActionBrush" Color="#3DFFFFFF" />
           <SolidColorBrush x:Key="CupertinoDialogActionHoverBrush" Color="#52FFFFFF" />
           <SolidColorBrush x:Key="CupertinoDialogActionPressedBrush" Color="#70FFFFFF" />
@@ -223,7 +225,7 @@
     <Setter Property="Background" Value="{DynamicResource CupertinoSystemRedBrush}" />
   </Style>
 
-  <Style Selector="Panel.cupertino-popover">
+  <Style Selector="Panel.cupertino-popover:not(.source-transition)">
     <Setter Property="RenderTransformOrigin" Value="50%,0%" />
     <Style.Animations>
       <Animation Duration="0:0:0.18" Easing="QuadraticEaseOut">

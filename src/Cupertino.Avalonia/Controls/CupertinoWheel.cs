@@ -72,7 +72,8 @@ public class CupertinoWheel : Control
     private double _velocity;
     private DateTime _lastMove;
     private DispatcherTimer? _timer;
-    private double _settleFrom, _settleTo, _settleT;
+    private double _settleTo;
+    private double _springVel;
     private bool _settling;
     private int _lastTickRow = int.MinValue;
     private bool _isAttached;
@@ -259,17 +260,9 @@ public class CupertinoWheel : Control
                 _ => (bounds.Width - ft.Width) / 2,
             };
 
-            double opacity;
-            if (Math.Abs(index - _offset) < 0.5)
-            {
-                opacity = 1.0;
-            }
-            else
-            {
-                var deg = Math.Abs(theta) * 180 / Math.PI;
-                var t = Math.Clamp((deg - 40.0) / 50.0, 0, 1);
-                opacity = 0.35 * (1 - 0.75 * t);
-            }
+            // Continuous fade by row distance, matching UIPickerView.
+            var distance = Math.Abs(index - _offset);
+            var opacity = 1.0 / (1.0 + 0.85 * Math.Pow(distance, 1.3));
 
             using (context.PushOpacity(opacity))
             using (context.PushTransform(
@@ -335,6 +328,7 @@ public class CupertinoWheel : Control
         _pressY = _lastY;
         _travelled = 0;
         _lastMove = DateTime.UtcNow;
+        e.PreventGestureRecognition();
         e.Pointer.Capture(this);
         _capturedPointer = e.Pointer;
         e.Handled = true;
@@ -411,8 +405,8 @@ public class CupertinoWheel : Control
         if ((DateTime.UtcNow - _lastMove).TotalMilliseconds > 80)
             _velocity = 0;
 
-        var projected = _offset + _velocity * 0.18;
-        SettleTo(Math.Round(Clamp(projected)));
+        var projected = _offset + _velocity * 0.25;
+        SettleTo(Math.Round(Clamp(projected)), _velocity);
         e.Handled = true;
     }
 
@@ -441,7 +435,9 @@ public class CupertinoWheel : Control
         e.Handled = true;
     }
 
-    private void SettleTo(double target)
+    private void SettleTo(double target) => SettleTo(target, 0);
+
+    private void SettleTo(double target, double velocity)
     {
         // Skip visual travel when motion is reduced.
         if (CupertinoAccessibility.ReduceMotion)
@@ -454,9 +450,8 @@ public class CupertinoWheel : Control
             return;
         }
 
-        _settleFrom = _offset;
         _settleTo = target;
-        _settleT = 0;
+        _springVel = velocity;
         // Set before CommitIndex to preserve the animation offset.
         _settling = true;
 
@@ -482,22 +477,21 @@ public class CupertinoWheel : Control
 
     private void OnSettleTick(object? sender, EventArgs e)
     {
-        // Settle without overshoot.
-        _settleT += 16 / 340.0;
-        var progress = Math.Min(_settleT, 1.0);
-        const double omegaD = 7.0;
-        var norm = 1 - (1 + omegaD) * Math.Exp(-omegaD);
-        var x = omegaD * progress;
-        var eased = (1 - (1 + x) * Math.Exp(-x)) / norm;
-
-        _offset = _settleFrom + (_settleTo - _settleFrom) * eased;
+        // Critically damped spring carrying the release velocity.
+        const double dt = 0.016;
+        const double omega = 10.0;
+        var d = _offset - _settleTo;
+        var accel = -omega * omega * d - 2 * omega * _springVel;
+        _springVel += accel * dt;
+        _offset += _springVel * dt;
         Tick();
         InvalidateVisual();
 
-        if (progress >= 1.0)
+        if (Math.Abs(_offset - _settleTo) < 0.005 && Math.Abs(_springVel) < 0.02)
         {
             _timer?.Stop();
             _offset = _settleTo;
+            _springVel = 0;
             _settling = false;
 
             CommitIndex(_offset);

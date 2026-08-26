@@ -27,10 +27,10 @@
             <cupertino:CupertinoDateTimePicker x:Name="DemoDateTime" Grid.Column="1"
                                               HorizontalAlignment="Right" />
           </Grid>
-          <Grid Classes="case" ColumnDefinitions="Auto,*">
+          <Grid Classes="case" RowDefinitions="Auto,Auto" RowSpacing="8">
             <TextBlock Classes="case" Text="Inline bounded" />
-            <cupertino:CupertinoDatePicker x:Name="DemoInlineDate" Grid.Column="1"
-                                           DisplayMode="Inline" HorizontalAlignment="Right" />
+            <cupertino:CupertinoDatePicker x:Name="DemoInlineDate" Grid.Row="1"
+                                           DisplayMode="Inline" HorizontalAlignment="Center" />
           </Grid>
         </StackPanel>
       </cupertino:Section>

@@ -150,7 +150,8 @@ public class CupertinoTimePicker : TemplatedControl
         foreach (var w in new[] { _hours, _minutes, _period })
         {
             w.SelectionSettled += OnWheelSettled;
-            w.Bind(ForegroundProperty, this.GetResourceObservable("CupertinoLabelBrush"));
+            w.Bind(CupertinoWheel.ForegroundProperty,
+                   this.GetResourceObservable("CupertinoLabelBrush"));
         }
 
         PushToWheels();

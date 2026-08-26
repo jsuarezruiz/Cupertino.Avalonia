@@ -8,6 +8,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 using Cupertino.Controls;
@@ -1309,6 +1310,127 @@ public class ButtonInteractionTests
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
 
         Assert.True(split.Flyout!.IsOpen, "the chevron half must open the flyout");
+    }
+
+    [AvaloniaFact]
+    public async Task Flyout_reveal_reaches_its_visible_state()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = false;
+        var flyout = new Flyout { Content = new TextBlock { Text = "Details" } };
+        var button = new Button
+        {
+            Width = 120,
+            Height = 44,
+            Content = "Open",
+            Flyout = flyout,
+        };
+        var window = new Window { Width = 400, Height = 500, Content = button };
+
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            flyout.ShowAt(button);
+            window.UpdateLayout();
+
+            var presenter = Assert.IsType<FlyoutPresenter>(flyout.Popup.Child);
+            var panel = presenter.GetVisualDescendants().OfType<Panel>()
+                .First(control => control.Classes.Contains("cupertino-popover"));
+            var glass = panel.GetVisualDescendants().OfType<GlassSurface>().Single();
+            var content = panel.GetVisualDescendants().OfType<Border>()
+                .First(control => control.Classes.Contains("source-transition-content"));
+            var openingTransform = Assert.IsType<TransformOperations>(glass.RenderTransform);
+
+            Assert.False(openingTransform.IsIdentity);
+            Assert.Equal(0.5, openingTransform.Value.M11, 3);
+            Assert.Equal(0.5, openingTransform.Value.M22, 3);
+            Assert.Equal(Matrix.Identity, panel.RenderTransform?.Value);
+            Assert.Equal(1, button.Opacity);
+            Assert.True(flyout.Popup.ShouldUseOverlayLayer);
+
+            await Task.Delay(350);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(1, glass.Opacity);
+            Assert.Equal(1, content.Opacity);
+            Assert.Null(panel.Clip);
+            Assert.True(Assert.IsType<TransformOperations>(glass.RenderTransform).IsIdentity);
+            Assert.Equal(1, button.Opacity);
+            Assert.True(button.IsVisible);
+            Assert.True(button.IsHitTestVisible);
+
+            flyout.Hide();
+            Assert.True(flyout.IsOpen);
+            Assert.Equal(1, button.Opacity);
+            await Task.Delay(300);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Assert.False(flyout.IsOpen);
+            Assert.Equal(1, button.Opacity);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            flyout.Hide();
+            CupertinoAccessibility.ReduceMotion = old;
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task ColorPicker_uses_the_shared_flyout_transition()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = false;
+        var picker = new ColorPicker();
+        var window = new Window { Width = 400, Height = 600, Content = picker };
+
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            var button = picker.GetVisualDescendants().OfType<Button>().Single();
+            var flyout = Assert.IsType<Flyout>(button.Flyout);
+            flyout.ShowAt(button);
+            window.UpdateLayout();
+
+            var presenter = Assert.IsType<FlyoutPresenter>(flyout.Popup.Child);
+            var panel = presenter.GetVisualDescendants().OfType<Panel>()
+                .First(control => control.Classes.Contains("cupertino-popover"));
+            var material = panel.GetVisualDescendants().OfType<Border>()
+                .First(control => control.Classes.Contains("source-transition-material"));
+            var content = panel.GetVisualDescendants().OfType<Border>()
+                .First(control => control.Classes.Contains("source-transition-content"));
+
+            Assert.NotSame(material, content);
+            Assert.False(Assert.IsType<TransformOperations>(material.RenderTransform).IsIdentity);
+            Assert.Equal(0, content.Opacity);
+
+            await Task.Delay(350);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.True(Assert.IsType<TransformOperations>(material.RenderTransform).IsIdentity);
+            Assert.Equal(1, content.Opacity);
+            Assert.Null(panel.Clip);
+            Assert.Equal(1, button.Opacity);
+            Assert.True(button.IsVisible);
+            Assert.True(button.IsHitTestVisible);
+
+            flyout.Hide();
+            Assert.True(flyout.IsOpen);
+            Assert.Equal(1, button.Opacity);
+            await Task.Delay(300);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Assert.False(flyout.IsOpen);
+            Assert.Equal(1, button.Opacity);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            picker.GetVisualDescendants().OfType<Button>().FirstOrDefault()?.Flyout?.Hide();
+            CupertinoAccessibility.ReduceMotion = old;
+            window.Close();
+        }
     }
 }
 

@@ -288,12 +288,20 @@
     <Setter Property="Padding" Value="0" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border Background="{TemplateBinding Background}"
-                CornerRadius="{TemplateBinding CornerRadius}"
-                BoxShadow="0 8 40 0 #30000000" Margin="12">
-          <ContentPresenter Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}" />
-        </Border>
+        <Panel Classes="cupertino-popover source-transition" Margin="12">
+          <Grid>
+            <Border Classes="source-transition-material"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    BoxShadow="0 6 18 0 #24000000" />
+            <Border Classes="source-transition-content"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    ClipToBounds="True">
+              <ContentPresenter Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+            </Border>
+          </Grid>
+        </Panel>
       </ControlTemplate>
     </Setter>
   </ControlTheme>
