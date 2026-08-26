@@ -139,6 +139,94 @@ public class ThemeIntegrityTests
         }
     }
 
+    [AvaloniaTheory]
+    [InlineData("Light")]
+    [InlineData("Dark")]
+    public void ToggleSwitch_shows_only_the_active_state_content(string variantName)
+    {
+        var variant = variantName == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+        var window = NewWindow(variant);
+        var toggle = new ToggleSwitch
+        {
+            OnContent = "On",
+            OffContent = "Off",
+            IsChecked = false,
+        };
+        window.Content = toggle;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        var on = toggle.GetVisualDescendants().OfType<ContentPresenter>()
+            .Single(presenter => presenter.Name == "PART_OnContentPresenter");
+        var off = toggle.GetVisualDescendants().OfType<ContentPresenter>()
+            .Single(presenter => presenter.Name == "PART_OffContentPresenter");
+
+        Assert.False(on.IsVisible);
+        Assert.True(off.IsVisible);
+
+        toggle.IsChecked = true;
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.True(on.IsVisible);
+        Assert.False(off.IsVisible);
+
+        toggle.IsEnabled = false;
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.True(on.IsVisible);
+        Assert.False(off.IsVisible);
+        Assert.Equal(0.5, toggle.Opacity);
+    }
+
+    [AvaloniaTheory]
+    [InlineData("Light")]
+    [InlineData("Dark")]
+    public void ComboBox_shows_placeholder_until_an_item_is_selected(string variantName)
+    {
+        var variant = variantName == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+        var window = NewWindow(variant);
+        var comboBox = new ComboBox
+        {
+            PlaceholderText = "Choose a size",
+            ItemsSource = new[] { "Small", "Medium", "Large" },
+        };
+        window.Content = comboBox;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        var placeholder = comboBox.GetVisualDescendants().OfType<TextBlock>()
+            .Single(text => text.Name == "Placeholder");
+        var content = comboBox.GetVisualDescendants().OfType<ContentControl>()
+            .Single(control => control.Name == "ContentPresenter");
+
+        Assert.True(placeholder.IsVisible);
+        Assert.False(content.IsVisible);
+
+        comboBox.SelectedIndex = 1;
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.False(placeholder.IsVisible);
+        Assert.True(content.IsVisible);
+        Assert.Equal("Medium", content.Content);
+    }
+
+    [AvaloniaFact]
+    public void Label_hides_the_access_key_marker()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        var label = new Label { Content = "_Name" };
+        window.Content = label;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        var presenter = label.GetVisualDescendants().OfType<ContentPresenter>().Single();
+
+        Assert.True(presenter.RecognizesAccessKey);
+    }
+
     [AvaloniaFact]
     public void Search_field_uses_custom_caret_and_reserves_clear_target()
     {

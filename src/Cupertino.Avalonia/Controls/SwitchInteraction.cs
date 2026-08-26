@@ -32,6 +32,7 @@ public static class SwitchInteraction
     // Both state fills are flat. The shared knob supplies the held glass.
     private const double HoverMix = 0.06;
     private const string ReleasingClass = "cupertino-switch-releasing";
+    private const string StateContentClass = "cupertino-switch-state-content";
     private static readonly TimeSpan PressTravelDuration = TimeSpan.FromMilliseconds(334);
     private static readonly TimeSpan ReleaseTravelDuration = TimeSpan.FromMilliseconds(334);
     private static readonly TimeSpan PressScaleDuration = TimeSpan.FromMilliseconds(110);
@@ -43,6 +44,8 @@ public static class SwitchInteraction
         IsEnabledProperty.Changed.AddClassHandler<ToggleSwitch>((sw, e) => OnIsEnabledChanged(sw, e.GetNewValue<bool>()));
         OnTintProperty.Changed.AddClassHandler<ToggleSwitch>((sw, _) => Refresh(sw));
         OffTintProperty.Changed.AddClassHandler<ToggleSwitch>((sw, _) => Refresh(sw));
+        ToggleSwitch.OnContentProperty.Changed.AddClassHandler<ToggleSwitch>((sw, _) => RefreshStateContent(sw));
+        ToggleSwitch.OffContentProperty.Changed.AddClassHandler<ToggleSwitch>((sw, _) => RefreshStateContent(sw));
     }
 
     public static void SetIsEnabled(ToggleSwitch element, bool value) => element.SetValue(IsEnabledProperty, value);
@@ -59,6 +62,7 @@ public static class SwitchInteraction
 
     private static void OnIsEnabledChanged(ToggleSwitch sw, bool enabled)
     {
+        RefreshStateContent(sw);
         sw.GetValue(StateProperty)?.Dispose();
         sw.SetValue(StateProperty, null);
         sw.TemplateApplied -= OnTemplateApplied;
@@ -73,6 +77,10 @@ public static class SwitchInteraction
             sw.PointerExited += OnPointerExited;
         }
     }
+
+    private static void RefreshStateContent(ToggleSwitch sw) =>
+        sw.Classes.Set(StateContentClass,
+            sw.IsSet(ToggleSwitch.OnContentProperty) || sw.IsSet(ToggleSwitch.OffContentProperty));
 
     private static void OnPointerEntered(object? sender, Avalonia.Input.PointerEventArgs e)
     {

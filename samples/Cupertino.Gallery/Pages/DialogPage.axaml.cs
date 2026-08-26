@@ -20,8 +20,10 @@ public partial class DialogPage : UserControl, IGalleryCaptureState
 
     private async void OnInfo(object? sender, RoutedEventArgs e) =>
         Report(await Dialog.ShowAsync(this,
-            "Backup Complete",
-            "Your library is safely backed up."));
+            "Open in “Maps”?",
+            "The link will open in another app.",
+            new DialogAction("Cancel", DialogActionRole.Cancel),
+            new DialogAction("Open", DialogActionRole.Preferred)));
 
     private async void OnAlert(object? sender, RoutedEventArgs e) =>
         Report(await Dialog.ShowAsync(this,

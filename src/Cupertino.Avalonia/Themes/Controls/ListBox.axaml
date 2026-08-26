@@ -52,7 +52,7 @@
       <Setter Property="Background" Value="{DynamicResource CupertinoRowPressedBrush}" />
     </Style>
     <Style Selector="^:selected /template/ Border#RowBackground">
-      <Setter Property="Background" Value="{DynamicResource CupertinoAccentSubtleBrush}" />
+      <Setter Property="Background" Value="{DynamicResource CupertinoRowPressedBrush}" />
     </Style>
     <Style Selector="^:nth-child(1) /template/ Border#RowBackground">
       <Setter Property="CornerRadius" Value="10,10,0,0" />

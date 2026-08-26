@@ -72,11 +72,19 @@
                   BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
                   BorderThickness="2" IsVisible="False" />
           <Grid ColumnDefinitions="*,Auto" Background="Transparent">
+            <TextBlock x:Name="Placeholder"
+                       Text="{TemplateBinding PlaceholderText}"
+                       Foreground="{DynamicResource CupertinoPlaceholderBrush}"
+                       TextTrimming="CharacterEllipsis"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       IsVisible="{TemplateBinding SelectionBoxItem, Converter={x:Static ObjectConverters.IsNull}}" />
             <ContentControl x:Name="ContentPresenter"
                             Content="{TemplateBinding SelectionBoxItem}"
                             ContentTemplate="{TemplateBinding ItemTemplate}"
                             HorizontalAlignment="Right"
-                            VerticalAlignment="Center" />
+                            VerticalAlignment="Center"
+                            IsVisible="{TemplateBinding SelectionBoxItem, Converter={x:Static ObjectConverters.IsNotNull}}" />
             <Path Grid.Column="1"
                   Data="{StaticResource CupertinoChevronUpDownGeometry}"
                   Stroke="{TemplateBinding Foreground}"

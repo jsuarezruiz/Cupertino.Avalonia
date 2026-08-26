@@ -16,6 +16,11 @@
                 BorderBrush="{DynamicResource CupertinoSeparatorBrush}"
                 BorderThickness="0,0,0,0.5"
                 Padding="{TemplateBinding Padding}">
+          <Border.Transitions>
+            <Transitions>
+              <BrushTransition Property="Background" Duration="0:0:0.2" />
+            </Transitions>
+          </Border.Transitions>
           <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="44">
             <ContentPresenter Content="{TemplateBinding Leading}"
                               Margin="0,0,12,0"

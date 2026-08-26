@@ -39,6 +39,7 @@ public enum DialogActionRole
     Default,
     Cancel,
     Destructive,
+    Preferred,
 }
 
 /// <summary>
@@ -59,6 +60,8 @@ public class DialogAction
     public bool IsDestructive => Role == DialogActionRole.Destructive;
 
     public bool IsCancel => Role == DialogActionRole.Cancel;
+
+    public bool IsPreferred => Role == DialogActionRole.Preferred;
 }
 
 internal sealed class ActionCommand : System.Windows.Input.ICommand
@@ -258,6 +261,8 @@ public class Dialog : ContentControl
 
             var buttons = this.GetVisualDescendants().OfType<Button>().ToList();
             var preferred = buttons.FirstOrDefault(button =>
+                                button.DataContext is DialogAction { Role: DialogActionRole.Preferred })
+                            ?? buttons.FirstOrDefault(button =>
                                 button.DataContext is DialogAction { Role: DialogActionRole.Default })
                             ?? buttons.FirstOrDefault(button =>
                                 button.DataContext is DialogAction { Role: DialogActionRole.Cancel })

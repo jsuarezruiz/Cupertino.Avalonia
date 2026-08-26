@@ -18,11 +18,14 @@
               </Transitions>
             </Border.Transitions>
           </Border>
-          <Grid ColumnDefinitions="*,Auto,Auto" Margin="{TemplateBinding Padding}">
-            <ContentPresenter Content="{TemplateBinding Header}"
+          <Grid ColumnDefinitions="Auto,*,Auto" Margin="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Icon}"
+                              IsVisible="{TemplateBinding Icon, Converter={x:Static ObjectConverters.IsNotNull}}"
+                              Width="26" Margin="0,0,10,0"
+                              HorizontalContentAlignment="Center"
                               VerticalAlignment="Center" />
             <ContentPresenter Grid.Column="1"
-                              Content="{TemplateBinding Icon}"
+                              Content="{TemplateBinding Header}"
                               VerticalAlignment="Center" />
             <Path x:Name="SubChevron" Grid.Column="2"
                   Data="{StaticResource CupertinoChevronRightGeometry}"

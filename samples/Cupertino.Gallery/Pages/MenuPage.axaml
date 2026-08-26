@@ -52,7 +52,7 @@
             <MenuItem Header="Actions">
               <MenuItem Header="Go home">
                 <MenuItem.Icon>
-                  <Path Classes="menuicon" Data="{StaticResource CupertinoHouseGeometry}" />
+                  <cupertino:CupertinoIcon Glyph="house" Size="26" StrokeThickness="1.8" />
                 </MenuItem.Icon>
               </MenuItem>
               <MenuItem Header="Search…">

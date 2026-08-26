@@ -27,7 +27,7 @@
     </Setter>
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid ColumnDefinitions="*,Auto" Background="Transparent" ClipToBounds="False">
+        <Grid ColumnDefinitions="*,Auto,Auto" Background="Transparent" ClipToBounds="False">
 
           <ContentPresenter Grid.Column="0"
                             VerticalAlignment="Center"
@@ -53,13 +53,6 @@
             <Border x:Name="Track"
                     Width="63" Height="28" CornerRadius="14"
                     Background="{DynamicResource CupertinoSwitchTrackOffTint}" />
-
-            <ContentPresenter x:Name="PART_OnContentPresenter" IsVisible="False"
-                              Content="{TemplateBinding OnContent}"
-                              ContentTemplate="{TemplateBinding OnContentTemplate}" />
-            <ContentPresenter x:Name="PART_OffContentPresenter" IsVisible="False"
-                              Content="{TemplateBinding OffContent}"
-                              ContentTemplate="{TemplateBinding OffContentTemplate}" />
 
             <Canvas x:Name="PART_SwitchKnob"
                     Width="22" Height="24"
@@ -138,12 +131,39 @@
             </Canvas>
 
           </Grid>
+
+          <ContentPresenter x:Name="PART_OnContentPresenter"
+                            Grid.Column="2"
+                            Margin="12,0,0,0"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding OnContent}"
+                            ContentTemplate="{TemplateBinding OnContentTemplate}"
+                            IsVisible="False" />
+          <ContentPresenter x:Name="PART_OffContentPresenter"
+                            Grid.Column="2"
+                            Margin="12,0,0,0"
+                            VerticalAlignment="Center"
+                            Content="{TemplateBinding OffContent}"
+                            ContentTemplate="{TemplateBinding OffContentTemplate}"
+                            IsVisible="False" />
         </Grid>
       </ControlTemplate>
     </Setter>
 
     <Style Selector="^:checked /template/ Border#Track">
       <Setter Property="Background" Value="{DynamicResource CupertinoSwitchTrackOnTint}" />
+    </Style>
+    <Style Selector="^.cupertino-switch-state-content:checked /template/ ContentPresenter#PART_OnContentPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^.cupertino-switch-state-content:unchecked /template/ ContentPresenter#PART_OffContentPresenter">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^ /template/ ContentPresenter#PART_OnContentPresenter:empty">
+      <Setter Property="Margin" Value="0" />
+    </Style>
+    <Style Selector="^ /template/ ContentPresenter#PART_OffContentPresenter:empty">
+      <Setter Property="Margin" Value="0" />
     </Style>
 
     <Style Selector="^:pressed /template/ Grid#PART_MovingKnobs">

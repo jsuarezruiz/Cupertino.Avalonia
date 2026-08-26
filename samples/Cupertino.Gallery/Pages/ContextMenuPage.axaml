@@ -10,12 +10,6 @@
       <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
     </Style>
-    <Style Selector="Path.menuicon">
-      <Setter Property="Width" Value="16" />
-      <Setter Property="Height" Value="16" />
-      <Setter Property="Stretch" Value="Uniform" />
-      <Setter Property="Fill" Value="{DynamicResource CupertinoLabelBrush}" />
-    </Style>
   </UserControl.Styles>
 
   <ScrollViewer>
@@ -52,7 +46,7 @@
                 <ContextMenu>
                   <MenuItem Header="Home">
                     <MenuItem.Icon>
-                      <Path Classes="menuicon" Data="{StaticResource CupertinoHouseGeometry}" />
+                      <cupertino:CupertinoIcon Glyph="house" Size="26" StrokeThickness="1.8" />
                     </MenuItem.Icon>
                   </MenuItem>
                   <MenuItem Header="Search…">

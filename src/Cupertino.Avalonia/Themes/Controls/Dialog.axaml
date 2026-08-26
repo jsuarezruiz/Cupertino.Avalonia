@@ -58,6 +58,21 @@
     <Style Selector="^.cancel">
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
+    <Style Selector="^.preferred">
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelOnGlassBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="^.preferred /template/ Border#Fill">
+      <Setter Property="Background" Value="{DynamicResource CupertinoAccentBrush}" />
+    </Style>
+    <Style Selector="^.preferred:pointerover /template/ Border#Fill">
+      <Setter Property="Background" Value="{DynamicResource CupertinoAccentBrush}" />
+      <Setter Property="Opacity" Value="0.9" />
+    </Style>
+    <Style Selector="^.preferred:pressed /template/ Border#Fill">
+      <Setter Property="Background" Value="{DynamicResource CupertinoAccentBrush}" />
+      <Setter Property="Opacity" Value="0.75" />
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type controls:Dialog}" TargetType="controls:Dialog">
@@ -106,6 +121,7 @@
                           Margin="4,0"
                           Classes.destructive="{Binding IsDestructive}"
                           Classes.cancel="{Binding IsCancel}"
+                          Classes.preferred="{Binding IsPreferred}"
                           Command="{Binding $parent[controls:Dialog].InvokeActionCommand}"
                           CommandParameter="{Binding}" />
                 </DataTemplate>
