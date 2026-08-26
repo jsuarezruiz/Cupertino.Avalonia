@@ -21,8 +21,16 @@ public class CupertinoActivityIndicator : Control
         AvaloniaProperty.Register<CupertinoActivityIndicator, IBrush>(
             nameof(Foreground), Brushes.Gray);
 
+    /// <summary>
+    /// Fraction of spokes shown while arming; 1 spins normally.
+    /// </summary>
+    public static readonly StyledProperty<double> SweepFractionProperty =
+        AvaloniaProperty.Register<CupertinoActivityIndicator, double>(
+            nameof(SweepFraction), 1.0, coerce: (_, v) => Math.Clamp(v, 0, 1));
+
     public bool IsActive { get => GetValue(IsActiveProperty); set => SetValue(IsActiveProperty, value); }
     public IBrush Foreground { get => GetValue(ForegroundProperty); set => SetValue(ForegroundProperty, value); }
+    public double SweepFraction { get => GetValue(SweepFractionProperty); set => SetValue(SweepFractionProperty, value); }
 
     private const int Spokes = 8;
     private const double InnerRatio = 0.31;
@@ -39,7 +47,8 @@ public class CupertinoActivityIndicator : Control
 
     static CupertinoActivityIndicator()
     {
-        AffectsRender<CupertinoActivityIndicator>(ForegroundProperty, IsActiveProperty);
+        AffectsRender<CupertinoActivityIndicator>(ForegroundProperty, IsActiveProperty,
+                                                  SweepFractionProperty);
     }
 
     protected override Size MeasureOverride(Size availableSize)
@@ -122,12 +131,18 @@ public class CupertinoActivityIndicator : Control
         var colour = Foreground is ISolidColorBrush s ? s.Color : Colors.Gray;
         EnsurePens(colour, thickness);
 
+        // While arming, spokes materialise clockwise from the top without spinning.
+        var arming = SweepFraction < 1;
+        var visible = arming ? (int)Math.Ceiling(Spokes * SweepFraction) : Spokes;
+
         for (var i = 0; i < Spokes; i++)
         {
-            var index = ((_step - i) % Spokes + Spokes) % Spokes;
+            var index = arming ? i : ((_step - i) % Spokes + Spokes) % Spokes;
+            if (arming && i >= visible)
+                continue;
             var angle = -Math.PI / 2 + 2 * Math.PI * index / Spokes;
 
-            var pen = _pens![i];
+            var pen = arming ? _pens![Spokes - 1] : _pens![i];
 
             var dx = Math.Cos(angle);
             var dy = Math.Sin(angle);

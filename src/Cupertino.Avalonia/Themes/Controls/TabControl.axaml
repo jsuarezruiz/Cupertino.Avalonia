@@ -22,8 +22,6 @@
   </ControlTheme>
 
   <ControlTheme x:Key="CupertinoBottomRestingLens" TargetType="controls:GlassSurface">
-    <!-- Native keeps the selected lens ~4pt inside the bar while three-tab
-         centres sit 86pt apart: a 92pt lens overlaps its cell by 3pt per side. -->
     <Setter Property="Margin" Value="-3,4.5" />
     <Setter Property="CornerRadius" Value="26.5" />
     <Setter Property="BlurRadius" Value="4" />
@@ -176,7 +174,6 @@
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize10}" />
     <Setter Property="LetterSpacing" Value="0.25" />
-    <!-- iOS 26.2: three visible tabs are centred 86pt apart. -->
     <Setter Property="Width" Value="86" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -189,7 +186,7 @@
                                  Theme="{StaticResource CupertinoBottomRestingLens}" />
           <Border x:Name="Hover"
                   CornerRadius="26.5"
-                  Margin="-3,4.5"
+                  Margin="7,4.5"
                   Opacity="0"
                   Background="{DynamicResource CupertinoTabPillBrush}">
             <Border.Transitions>
@@ -218,8 +215,6 @@
       </ControlTemplate>
     </Setter>
 
-    <!-- iOS compacts a two-destination bar to 118pt: 8 + (2 x 51) + 8.
-         The 59pt lens overlaps its item cell by 4pt on each side. -->
     <Style Selector="^.cupertino-two-item">
       <Setter Property="Width" Value="51" />
     </Style>
@@ -227,7 +222,7 @@
       <Setter Property="Margin" Value="-4,4.5" />
     </Style>
     <Style Selector="^.cupertino-two-item /template/ Border#Hover">
-      <Setter Property="Margin" Value="-4,4.5" />
+      <Setter Property="Margin" Value="8,4.5" />
     </Style>
 
     <Style Selector="^:selected">
@@ -334,8 +329,6 @@
                               Margin="{TemplateBinding Padding}"
                               Content="{TemplateBinding SelectedContent}"
                               ContentTemplate="{TemplateBinding SelectedContentTemplate}" />
-            <!-- Size to the native item group. At three tabs this is
-                 7 + (3 x 86) + 7 = 272pt, centred in the 402pt host. -->
             <Grid ColumnDefinitions="Auto,Auto" MaxWidth="560"
                   HorizontalAlignment="Center" VerticalAlignment="Bottom"
                   Margin="21,0,21,26">
@@ -455,7 +448,7 @@
                                  Theme="{StaticResource CupertinoBottomRestingLens}" />
           <Border x:Name="Hover"
                   CornerRadius="26.5"
-                  Margin="-3,4.5"
+                  Margin="7,4.5"
                   Opacity="0"
                   Background="{DynamicResource CupertinoTabPillBrush}">
             <Border.Transitions>
@@ -491,7 +484,7 @@
       <Setter Property="Margin" Value="-4,4.5" />
     </Style>
     <Style Selector="^.cupertino-two-item /template/ Border#Hover">
-      <Setter Property="Margin" Value="-4,4.5" />
+      <Setter Property="Margin" Value="8,4.5" />
     </Style>
 
     <Style Selector="^:selected">

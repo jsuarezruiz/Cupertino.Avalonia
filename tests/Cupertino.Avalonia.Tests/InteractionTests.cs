@@ -28,62 +28,62 @@ public class InteractionTests
     }
 
     [AvaloniaTheory]
-    [InlineData(SplitViewPanePlacement.Left)]
-    [InlineData(SplitViewPanePlacement.Right)]
-    [InlineData(SplitViewPanePlacement.Top)]
-    [InlineData(SplitViewPanePlacement.Bottom)]
-    public void Closed_overlay_split_view_hides_the_pane(SplitViewPanePlacement placement)
+    [InlineData(SplitViewDisplayMode.Overlay, false, 0, 0)]
+    [InlineData(SplitViewDisplayMode.Overlay, true, 100, 0)]
+    [InlineData(SplitViewDisplayMode.CompactOverlay, false, 40, 40)]
+    [InlineData(SplitViewDisplayMode.CompactOverlay, true, 100, 40)]
+    [InlineData(SplitViewDisplayMode.Inline, false, 0, 0)]
+    [InlineData(SplitViewDisplayMode.Inline, true, 100, 100)]
+    [InlineData(SplitViewDisplayMode.CompactInline, false, 40, 40)]
+    [InlineData(SplitViewDisplayMode.CompactInline, true, 100, 100)]
+    public void Split_view_uses_template_settings_for_each_mode_and_placement(
+        SplitViewDisplayMode displayMode, bool isPaneOpen, double paneLength, double contentInset)
     {
-        var splitView = new SplitView
+        foreach (var placement in Enum.GetValues<SplitViewPanePlacement>())
         {
-            Width = 300,
-            Height = 200,
-            DisplayMode = SplitViewDisplayMode.Overlay,
-            PanePlacement = placement,
-            OpenPaneLength = 100,
-            Pane = new Border(),
-            Content = new Border(),
-        };
-        var window = ShowHosting(splitView);
+            var splitView = new SplitView
+            {
+                Width = 300,
+                Height = 200,
+                DisplayMode = displayMode,
+                PanePlacement = placement,
+                IsPaneOpen = isPaneOpen,
+                OpenPaneLength = 100,
+                CompactPaneLength = 40,
+                Pane = new Border(),
+                Content = new Border(),
+            };
+            var window = ShowHosting(splitView);
 
-        var pane = splitView.GetVisualDescendants().OfType<Panel>()
-            .Single(control => control.Name == "PART_PaneRoot");
-        var content = splitView.GetVisualDescendants().OfType<Panel>()
-            .Single(control => control.Name == "ContentRoot");
+            var pane = splitView.GetVisualDescendants().OfType<Panel>()
+                .Single(control => control.Name == "PART_PaneRoot");
+            var content = splitView.GetVisualDescendants().OfType<Panel>()
+                .Single(control => control.Name == "ContentRoot");
+            var scrim = splitView.GetVisualDescendants().OfType<Border>()
+                .Single(control => control.Name == "Scrim");
+            pane.Transitions = null;
+            splitView.IsPaneOpen = !isPaneOpen;
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            splitView.IsPaneOpen = isPaneOpen;
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            var horizontal = placement is SplitViewPanePlacement.Left or SplitViewPanePlacement.Right;
+            var extent = horizontal ? 300 : 200;
+            var paneExtent = horizontal ? pane.Bounds.Width : pane.Bounds.Height;
+            var contentExtent = horizontal ? content.Bounds.Width : content.Bounds.Height;
+            var contentOffset = horizontal ? content.Bounds.X : content.Bounds.Y;
+            var expectedOffset = placement is SplitViewPanePlacement.Left or SplitViewPanePlacement.Top
+                ? contentInset
+                : 0;
+            var isOverlayOpen = isPaneOpen
+                && displayMode is SplitViewDisplayMode.Overlay or SplitViewDisplayMode.CompactOverlay;
 
-        if (placement is SplitViewPanePlacement.Left or SplitViewPanePlacement.Right)
-            Assert.Equal(0, pane.Bounds.Width);
-        else
-            Assert.Equal(0, pane.Bounds.Height);
-
-        Assert.Equal(splitView.Bounds.Size, content.Bounds.Size);
-        window.Close();
-    }
-
-    [AvaloniaFact]
-    public void Open_inline_split_view_allocates_space_for_the_pane()
-    {
-        var splitView = new SplitView
-        {
-            Width = 300,
-            Height = 200,
-            DisplayMode = SplitViewDisplayMode.Inline,
-            IsPaneOpen = true,
-            OpenPaneLength = 100,
-            Pane = new Border(),
-            Content = new Border(),
-        };
-        var window = ShowHosting(splitView);
-
-        var pane = splitView.GetVisualDescendants().OfType<Panel>()
-            .Single(control => control.Name == "PART_PaneRoot");
-        var content = splitView.GetVisualDescendants().OfType<Panel>()
-            .Single(control => control.Name == "ContentRoot");
-
-        Assert.Equal(100, pane.Bounds.Width);
-        Assert.Equal(100, content.Bounds.X);
-        Assert.Equal(200, content.Bounds.Width);
-        window.Close();
+            Assert.Equal(paneLength, paneExtent, 3);
+            Assert.Equal(extent - contentInset, contentExtent, 3);
+            Assert.Equal(expectedOffset, contentOffset, 3);
+            Assert.Equal(isOverlayOpen, scrim.IsHitTestVisible);
+            window.Close();
+        }
     }
 
     [AvaloniaFact]

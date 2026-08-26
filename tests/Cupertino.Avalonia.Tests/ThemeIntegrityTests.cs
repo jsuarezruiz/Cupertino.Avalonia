@@ -1,10 +1,12 @@
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Input.GestureRecognizers;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
@@ -268,6 +270,63 @@ public class ThemeIntegrityTests
         Assert.InRange(dot.Bounds.Height, 17.5, 18.5);
     }
 
+    [AvaloniaTheory]
+    [InlineData(false, 2)]
+    [InlineData(false, 3)]
+    [InlineData(true, 2)]
+    [InlineData(true, 3)]
+    public void Adjacent_bottom_bar_surfaces_do_not_overlap(bool useStrip, int itemCount)
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        window.Width = 402;
+        Control owner;
+        Control selected;
+        Control adjacent;
+
+        if (useStrip)
+        {
+            var strip = new TabStrip { Classes = { "bottom" }, SelectedIndex = 0 };
+            var items = Enumerable.Range(0, itemCount)
+                .Select(index => new TabStripItem { Content = $"Item {index}" })
+                .ToArray();
+            foreach (var item in items)
+                strip.Items.Add(item);
+            owner = strip;
+            selected = items[0];
+            adjacent = items[1];
+        }
+        else
+        {
+            var tabs = new TabControl { Classes = { "bottom" }, SelectedIndex = 0 };
+            var items = Enumerable.Range(0, itemCount)
+                .Select(index => new TabItem { Header = $"Item {index}", Content = new Border() })
+                .ToArray();
+            foreach (var item in items)
+                tabs.Items.Add(item);
+            owner = tabs;
+            selected = items[0];
+            adjacent = items[1];
+        }
+
+        window.Content = owner;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+
+        var bar = owner.GetVisualDescendants().OfType<GlassSurface>()
+            .Single(surface => surface.Name == "PART_BarCapsule");
+        var lens = selected.GetVisualDescendants().OfType<GlassSurface>()
+            .Single(surface => surface.Name == "Lens");
+        var hover = adjacent.GetVisualDescendants().OfType<Border>()
+            .Single(border => border.Name == "Hover");
+        var lensRight = lens.TranslatePoint(default, bar)!.Value.X + lens.Bounds.Width;
+        var hoverLeft = hover.TranslatePoint(default, bar)!.Value.X;
+
+        Assert.True(hoverLeft - lensRight >= 4,
+            $"Selected lens ends at {lensRight:F1}, hover starts at {hoverLeft:F1}.");
+    }
+
     [AvaloniaFact]
     public void Two_item_bottom_bar_compacts_like_ios_26()
     {
@@ -305,6 +364,67 @@ public class ThemeIntegrityTests
         Assert.InRange(lens.Bounds.Width, 58.5, 59.5);
         var lensLeft = lens.TranslatePoint(default, bar)!.Value.X;
         Assert.InRange(lensLeft, 3.5, 4.5);
+    }
+
+    [AvaloniaFact]
+    public void Two_item_bottom_bar_fits_narrow_widths()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        var strip = new TabStrip
+        {
+            Classes = { "bottom" },
+            Width = 150,
+            SelectedIndex = 0,
+        };
+        strip.Items.Add(new TabStripItem { Content = "Home" });
+        strip.Items.Add(new TabStripItem { Content = "Settings" });
+        window.Content = strip;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+
+        var bar = strip.GetVisualDescendants().OfType<GlassSurface>()
+            .Single(surface => surface.Name == "PART_BarCapsule");
+        var origin = bar.TranslatePoint(default, strip)!.Value.X;
+
+        Assert.True(origin >= 21);
+        Assert.True(origin + bar.Bounds.Width <= strip.Bounds.Width - 21);
+        Assert.All(strip.GetVisualDescendants().OfType<TabStripItem>(),
+            item => Assert.InRange(item.Bounds.Width, 45.5, 46.5));
+    }
+
+    [AvaloniaFact]
+    public void Bottom_bar_geometry_tracks_visible_items()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        var strip = new TabStrip
+        {
+            Classes = { "bottom" },
+            Width = 300,
+            SelectedIndex = 0,
+        };
+        var hidden = new TabStripItem { Content = "Hidden", IsVisible = false };
+        strip.Items.Add(new TabStripItem { Content = "Home" });
+        strip.Items.Add(new TabStripItem { Content = "Settings" });
+        strip.Items.Add(hidden);
+        window.Content = strip;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+
+        Assert.Contains("cupertino-two-item", strip.Classes);
+        Assert.All(strip.GetVisualDescendants().OfType<TabStripItem>().Where(item => item.IsVisible),
+            item => Assert.InRange(item.Bounds.Width, 50.5, 51.5));
+
+        hidden.IsVisible = true;
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+
+        Assert.DoesNotContain("cupertino-two-item", strip.Classes);
+        Assert.All(strip.GetVisualDescendants().OfType<TabStripItem>(),
+            item => Assert.InRange(item.Bounds.Width, 81, 83));
     }
 
     [AvaloniaTheory]
@@ -653,6 +773,81 @@ public class ThemeIntegrityTests
         foreach (var icon in panel.Children)
             Assert.True(icon.Bounds.Width > 0 && icon.Bounds.Height > 0,
                 $"icon '{(icon as CupertinoIcon)?.Glyph}' laid out empty");
+    }
+
+    [AvaloniaFact]
+    public void Carousel_native_swipe_recognizer_accepts_mouse_drag()
+    {
+        var carousel = new Carousel
+        {
+            Items =
+            {
+                new Border { Background = Brushes.Red },
+                new Border { Background = Brushes.Blue },
+            },
+        };
+        var window = NewWindow(ThemeVariant.Light);
+        window.Content = carousel;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        var panel = Assert.IsType<VirtualizingCarouselPanel>(carousel.ItemsPanelRoot);
+        var recognizer = Assert.Single(
+            panel.GestureRecognizers.OfType<SwipeGestureRecognizer>());
+        Assert.True(recognizer.IsMouseEnabled);
+
+        window.MouseDown(new Point(300, 200), MouseButton.Left);
+        window.MouseMove(new Point(250, 200));
+        window.MouseMove(new Point(200, 200));
+        window.MouseMove(new Point(150, 200));
+        window.MouseMove(new Point(100, 200));
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.True(carousel.IsSwiping);
+        window.MouseUp(new Point(100, 200), MouseButton.Left);
+    }
+
+    [AvaloniaFact]
+    public void Transitioning_content_control_runs_its_page_transition()
+    {
+        var transition = new RecordingPageTransition();
+        var control = new TransitioningContentControl
+        {
+            Content = "First",
+            PageTransition = transition,
+        };
+        var window = NewWindow(ThemeVariant.Light);
+        window.Content = control;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        control.Content = "Second";
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(1, transition.CallCount);
+        Assert.NotNull(transition.From);
+        Assert.NotNull(transition.To);
+        Assert.NotSame(transition.From, transition.To);
+    }
+
+    private sealed class RecordingPageTransition : IPageTransition
+    {
+        public int CallCount { get; private set; }
+
+        public Visual? From { get; private set; }
+
+        public Visual? To { get; private set; }
+
+        public Task Start(Visual? from, Visual? to, bool forward, CancellationToken cancellationToken)
+        {
+            CallCount++;
+            From = from;
+            To = to;
+            return Task.CompletedTask;
+        }
     }
 
     private static Window NewWindow(ThemeVariant variant) =>

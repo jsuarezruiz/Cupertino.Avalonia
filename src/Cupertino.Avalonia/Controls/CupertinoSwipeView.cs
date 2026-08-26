@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
-using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -22,12 +21,6 @@ public class CupertinoSwipeView : ContentControl
     public static readonly StyledProperty<object?> TrailingActionsProperty =
         AvaloniaProperty.Register<CupertinoSwipeView, object?>(nameof(TrailingActions));
 
-    public static readonly StyledProperty<SwipeViewState> SwipeStateProperty =
-        AvaloniaProperty.Register<CupertinoSwipeView, SwipeViewState>(
-            nameof(SwipeState),
-            SwipeViewState.Closed,
-            defaultBindingMode: BindingMode.TwoWay);
-
     public object? LeadingActions
     {
         get => GetValue(LeadingActionsProperty);
@@ -40,18 +33,10 @@ public class CupertinoSwipeView : ContentControl
         set => SetValue(TrailingActionsProperty, value);
     }
 
-    /// <summary>
-    /// Gets or sets which edge's actions are visible at rest.
-    /// </summary>
-    public SwipeViewState SwipeState
-    {
-        get => GetValue(SwipeStateProperty);
-        set => SetValue(SwipeStateProperty, value);
-    }
-
     private const double DragThreshold = 3;
-    private const double CommitFraction = 0.6;
-    private const double SettleRate = 14;
+    private const double CommitFraction = 0.9;
+    private const double ReleaseProjectionSeconds = 0.2;
+    private const double SettleOmega = 14;
 
     private ContentPresenter? _content;
     private ContentPresenter? _leading;
@@ -66,6 +51,10 @@ public class CupertinoSwipeView : ContentControl
     private double _rawPosition;
     private double _openAt;
     private double _target;
+    private double _settleVelocity;
+    private double _dragVelocity;
+    private double _lastDragX;
+    private DateTime _lastDragMove;
     private double _leadingNaturalWidth = double.NaN;
     private double _trailingNaturalWidth = double.NaN;
 
@@ -88,7 +77,15 @@ public class CupertinoSwipeView : ContentControl
         if (_content is not null)
             _content.RenderTransform = _shift;
         UpdateDirectionHosts();
-        ApplySwipeState(SwipeState);
+        if (_openAt == 0)
+        {
+            ApplyPosition(0);
+            SetRevealed(0);
+        }
+        else
+        {
+            OpenActions(leading: _openAt > 0);
+        }
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -104,38 +101,26 @@ public class CupertinoSwipeView : ContentControl
             s_open = null;
     }
 
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnAttachedToVisualTree(e);
-        ApplySwipeState(SwipeState);
-    }
-
     /// <summary>
     /// Closes the revealed actions.
     /// </summary>
-    public void Close() => SetSwipeState(SwipeViewState.Closed);
-
-    private void SetSwipeState(SwipeViewState state)
+    public void Close()
     {
-        if (SwipeState == state)
-            ApplySwipeState(state);
-        else
-            SetCurrentValue(SwipeStateProperty, state);
+        if (s_open == this)
+            s_open = null;
+        _openAt = 0;
+        StartSettle(0);
     }
 
-    private void ApplySwipeState(SwipeViewState state)
-    {
-        if (state == SwipeViewState.Closed)
-        {
-            if (s_open == this)
-                s_open = null;
-            _openAt = 0;
-            StartSettle(0);
-            return;
-        }
+    /// <summary>
+    /// Reveals the leading actions.
+    /// </summary>
+    public void OpenLeadingActions() => OpenActions(leading: true);
 
-        OpenActions(leading: state == SwipeViewState.LeadingVisible);
-    }
+    /// <summary>
+    /// Reveals the trailing actions.
+    /// </summary>
+    public void OpenTrailingActions() => OpenActions(leading: false);
 
     private void OpenActions(bool leading)
     {
@@ -163,10 +148,21 @@ public class CupertinoSwipeView : ContentControl
         if (host is null)
             return cachedWidth = 74;
 
-        // Measure without the temporary reveal width.
+        // Measure without the temporary reveal width; hidden hosts measure as zero.
+        var wasVisible = host.IsVisible;
+        if (!wasVisible)
+            host.IsVisible = true;
         host.ClearValue(WidthProperty);
+        host.ApplyTemplate();
+        var child = host.Child;
+        child?.InvalidateMeasure();
+        host.InvalidateMeasure();
         host.Measure(new Size(double.PositiveInfinity, Math.Max(1, height)));
-        return cachedWidth = Math.Max(74, host.DesiredSize.Width);
+        var width = Math.Max(74, Math.Max(
+            host.DesiredSize.Width, child?.DesiredSize.Width ?? 0));
+        if (!wasVisible)
+            host.IsVisible = false;
+        return cachedWidth = width;
     }
 
     private double LeadingWidth => NaturalWidth(_leading, ref _leadingNaturalWidth, Bounds.Height);
@@ -202,10 +198,6 @@ public class CupertinoSwipeView : ContentControl
             UpdateDirectionHosts();
             ApplyPosition(_position);
         }
-        else if (change.Property == SwipeStateProperty)
-        {
-            ApplySwipeState(change.GetNewValue<SwipeViewState>());
-        }
         else if (change.Property == LeadingActionsProperty || change.Property == TrailingActionsProperty)
         {
             ResetNaturalWidths();
@@ -213,7 +205,10 @@ public class CupertinoSwipeView : ContentControl
             Dispatcher.UIThread.Post(() =>
             {
                 ResetNaturalWidths();
-                ApplySwipeState(SwipeState);
+                if (_openAt == 0)
+                    SetRevealed(_position);
+                else
+                    OpenActions(leading: _openAt > 0);
             }, DispatcherPriority.Loaded);
         }
     }
@@ -233,8 +228,8 @@ public class CupertinoSwipeView : ContentControl
             _leading.IsVisible = x > 0.5;
             if (x > 0.5)
             {
-                _leading.Width = Math.Max(LeadingWidth, x);
-                _leading.Background = FindOutermostButton(_leading, trailing: false)?.Background;
+                _leading.Width = LeadingWidth;
+                SetRevealHint(_leading, x / Math.Max(1, LeadingWidth), trailing: false);
             }
             else
             {
@@ -246,14 +241,30 @@ public class CupertinoSwipeView : ContentControl
             _trailing.IsVisible = x < -0.5;
             if (x < -0.5)
             {
-                _trailing.Width = Math.Max(TrailingWidth, -x);
-                _trailing.Background = FindOutermostButton(_trailing, trailing: true)?.Background;
+                _trailing.Width = TrailingWidth;
+                SetRevealHint(_trailing, -x / Math.Max(1, TrailingWidth), trailing: true);
             }
             else
             {
                 _trailing.ClearValue(WidthProperty);
             }
         }
+    }
+
+    // Actions materialise while the reveal grows, as UIKit's do.
+    private static void SetRevealHint(ContentPresenter host, double t, bool trailing)
+    {
+        if (CupertinoAccessibility.ReduceMotion || t >= 1)
+        {
+            host.Opacity = 1;
+            host.RenderTransform = null;
+            return;
+        }
+        t = Math.Clamp(t, 0, 1);
+        host.Opacity = Math.Pow(t, 0.7);
+        host.RenderTransformOrigin = new RelativePoint(trailing ? 1 : 0, 0.5, RelativeUnit.Relative);
+        var scale = 0.8 + 0.2 * t;
+        host.RenderTransform = new ScaleTransform(scale, scale);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -263,6 +274,9 @@ public class CupertinoSwipeView : ContentControl
         _dragging = false;
         _press = e.GetPosition(this);
         _rawPosition = _openAt;
+        _dragVelocity = 0;
+        _lastDragX = _position;
+        _lastDragMove = DateTime.UtcNow;
         _settle.Stop();
     }
 
@@ -282,6 +296,7 @@ public class CupertinoSwipeView : ContentControl
             if (s_open != this)
                 s_open?.Close();
             s_open = this;
+            e.PreventGestureRecognition();
             e.Pointer.Capture(this);
         }
 
@@ -294,9 +309,19 @@ public class CupertinoSwipeView : ContentControl
         if (Math.Abs(x) > reach)
             x = Math.Sign(x) * (reach + (Math.Abs(x) - reach) * 0.55);
 
+        var now = DateTime.UtcNow;
+        var dt = (now - _lastDragMove).TotalSeconds;
+        if (dt > 0.001)
+            _dragVelocity = _dragVelocity * 0.7 + (x - _lastDragX) / dt * 0.3;
+        _lastDragX = x;
+        _lastDragMove = now;
+
         ApplyPosition(x);
         SetRevealed(x);
     }
+
+    private bool IsCommit() =>
+        Math.Abs(_rawPosition) > Bounds.Width * CommitFraction;
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
@@ -311,20 +336,28 @@ public class CupertinoSwipeView : ContentControl
         e.Pointer.Capture(null);
 
         var x = _position;
-        if (Math.Abs(_rawPosition) > Bounds.Width * CommitFraction)
+        if (IsCommit())
         {
             var host = x < 0 ? _trailing : _leading;
             if (FindOutermostButton(host, trailing: x < 0) is { } button)
+            {
+                CupertinoHaptics.Play(HapticFeedback.ImpactMedium);
                 button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Close();
+            }
+            if (s_open == this)
+                s_open = null;
+            _openAt = 0;
+            StartSettle(0, _dragVelocity);
             return;
         }
 
-        var reach = x > 0 ? LeadingWidth : TrailingWidth;
-        var state = Math.Abs(x) > reach * 0.5
-            ? (x > 0 ? SwipeViewState.LeadingVisible : SwipeViewState.TrailingVisible)
-            : SwipeViewState.Closed;
-        SetSwipeState(state);
+        var side = Math.Sign(x);
+        var reach = side > 0 ? LeadingWidth : TrailingWidth;
+        var projectedReveal = (x + _dragVelocity * ReleaseProjectionSeconds) * side;
+        _openAt = projectedReveal > reach * 0.5 ? side * reach : 0;
+        if (_openAt == 0 && s_open == this)
+            s_open = null;
+        StartSettle(_openAt, _dragVelocity);
     }
 
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
@@ -335,7 +368,9 @@ public class CupertinoSwipeView : ContentControl
 
         _pressed = false;
         _dragging = false;
-        SetSwipeState(SwipeState);
+        if (_openAt == 0 && s_open == this)
+            s_open = null;
+        StartSettle(_openAt);
     }
 
     private static Button? FindOutermostButton(ContentPresenter? host, bool trailing)
@@ -355,26 +390,65 @@ public class CupertinoSwipeView : ContentControl
         return null;
     }
 
-    private void StartSettle(double target)
+    private void StartSettle(double target) => StartSettle(target, 0);
+
+    private void StartSettle(double target, double velocity)
     {
+        _target = target;
+        var distance = target - _position;
+        _settleVelocity = velocity * distance > 0
+            ? Math.Sign(distance) * Math.Min(Math.Abs(velocity), SettleOmega * Math.Abs(distance))
+            : 0;
+        if (CupertinoAccessibility.ReduceMotion)
+        {
+            ApplyPosition(target);
+            SetRevealed(target);
+        }
+        else
+        {
+            _settle.Start();
+        }
+        // First measures can run while the host is hidden; re-check once laid out.
+        if (target != 0)
+            Dispatcher.UIThread.Post(ResyncOpenReach, DispatcherPriority.Loaded);
+    }
+
+    private void ResyncOpenReach()
+    {
+        if (_openAt == 0 || _dragging)
+            return;
+        var leading = _openAt > 0;
+        ResetNaturalWidths();
+        var reach = leading ? LeadingWidth : TrailingWidth;
+        var target = leading ? reach : -reach;
+        if (Math.Abs(target - _openAt) < 0.5)
+            return;
+        _openAt = target;
         _target = target;
         if (CupertinoAccessibility.ReduceMotion)
         {
             ApplyPosition(target);
             SetRevealed(target);
-            return;
         }
-        _settle.Start();
+        else
+        {
+            _settle.Start();
+        }
     }
 
     private void OnSettleTick(object? sender, EventArgs e)
     {
-        var next = _position + (_target - _position) * (1 - Math.Exp(-SettleRate * 0.016));
-        ApplyPosition(next);
-        if (Math.Abs(_position - _target) < 0.5)
+        // Critically damped spring carrying the release velocity.
+        const double dt = 0.016;
+        var d = _position - _target;
+        var accel = -SettleOmega * SettleOmega * d - 2 * SettleOmega * _settleVelocity;
+        _settleVelocity += accel * dt;
+        ApplyPosition(_position + _settleVelocity * dt);
+        if (Math.Abs(_position - _target) < 0.5 && Math.Abs(_settleVelocity) < 4)
         {
             ApplyPosition(_target);
             _settle.Stop();
+            _settleVelocity = 0;
         }
         SetRevealed(_position);
     }

@@ -12,7 +12,8 @@ public partial class TransitioningContentPage : UserControl
         "Motion uses Cupertino timing.",
     ];
 
-    private int _line;
+    private int _defaultLine;
+    private int _customizedLine;
 
     public TransitioningContentPage()
     {
@@ -21,10 +22,16 @@ public partial class TransitioningContentPage : UserControl
             this.FindControl<TransitioningContentControl>(name)!.Content = Lines[0];
     }
 
-    private void OnSwap(object? sender, RoutedEventArgs e)
+    private void OnDefaultSwap(object? sender, RoutedEventArgs e)
     {
-        _line = (_line + 1) % Lines.Length;
-        foreach (var name in (string[])["Stage", "Fade", "Slide"])
-            this.FindControl<TransitioningContentControl>(name)!.Content = Lines[_line];
+        _defaultLine = (_defaultLine + 1) % Lines.Length;
+        this.FindControl<TransitioningContentControl>("Stage")!.Content = Lines[_defaultLine];
+    }
+
+    private void OnCustomizedSwap(object? sender, RoutedEventArgs e)
+    {
+        _customizedLine = (_customizedLine + 1) % Lines.Length;
+        foreach (var name in (string[])["Fade", "Slide"])
+            this.FindControl<TransitioningContentControl>(name)!.Content = Lines[_customizedLine];
     }
 }

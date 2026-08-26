@@ -43,9 +43,10 @@ public static class CupertinoSheet
         private const double Tau = 100;
         private const double ScrimOpacity = 0.20;
         private const double FloatInset = 8;
-        private const double LargeTop = 10;
+        private const double LargeTopGap = 10;
         private const double MediumTopFraction = 0.475;
         private const double DismissVelocity = 900;
+        private const double DragSlop = 6;
 
         private readonly OverlayLayer _layer;
         private readonly TopLevel _host;
@@ -68,6 +69,7 @@ public static class CupertinoSheet
         private double _velocity;   // pt per tick during drags
         private bool _tornDown;
         private IPointer? _activePointer;
+        private Point? _pendingPress;
 
         public Task Completion => _done.Task;
 
@@ -122,6 +124,8 @@ public static class CupertinoSheet
         }
 
         private double HostHeight => _hostSize.Height;
+        private double LargeTop =>
+            (_host.InsetsManager?.SafeAreaPadding.Top ?? 0) + LargeTopGap;
         private double MediumTop => HostHeight * MediumTopFraction;
         private double MediumTopGeometry => HostHeight * MediumTopFraction;
 
@@ -208,24 +212,44 @@ public static class CupertinoSheet
 
         private void OnSheetPressed(object? sender, PointerPressedEventArgs e)
         {
-            // Only the grabber starts a sheet drag.
             var p = e.GetPosition(_presenter);
-            if (p.Y > 48)
+            if (p.Y <= 48)
+            {
+                // The grabber drags immediately.
+                BeginDrag(e);
+                e.Handled = true;
                 return;
+            }
+            // Anywhere else waits for a vertical movement.
+            _pendingPress = e.GetPosition(_root);
+            _activePointer = e.Pointer;
+        }
+
+        private void BeginDrag(PointerEventArgs e)
+        {
             _dragging = true;
+            _pendingPress = null;
             _grabDy = e.GetPosition(_root).Y - _y;
             _lastY = _y;
             _velocity = 0;
             _timer.Stop();
+            e.PreventGestureRecognition();
             e.Pointer.Capture(_presenter);
             _activePointer = e.Pointer;
-            e.Handled = true;
         }
 
         private void OnSheetMoved(object? sender, PointerEventArgs e)
         {
             if (!_dragging)
-                return;
+            {
+                if (_pendingPress is not { } press)
+                    return;
+                var q = e.GetPosition(_root);
+                var dy = q.Y - press.Y;
+                if (Math.Abs(dy) < DragSlop || Math.Abs(dy) < Math.Abs(q.X - press.X))
+                    return;
+                BeginDrag(e);
+            }
             var y = e.GetPosition(_root).Y - _grabDy;
             // Add resistance above the tallest detent.
             if (y < LargeTop)
@@ -237,6 +261,7 @@ public static class CupertinoSheet
 
         private void OnSheetReleased(object? sender, PointerReleasedEventArgs e)
         {
+            _pendingPress = null;
             if (!_dragging)
                 return;
             _dragging = false;

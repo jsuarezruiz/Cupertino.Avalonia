@@ -9,8 +9,7 @@ public partial class SwipeViewPage : UserControl, IGalleryCaptureState
     public SwipeViewPage() => InitializeComponent();
 
     public void ApplyGalleryCaptureState() =>
-        this.FindControl<CupertinoSwipeView>("RichRow")!.SwipeState =
-            SwipeViewState.LeadingVisible;
+        this.FindControl<CupertinoSwipeView>("RichRow")!.OpenLeadingActions();
 
     private void OnAction(object? sender, RoutedEventArgs e)
     {

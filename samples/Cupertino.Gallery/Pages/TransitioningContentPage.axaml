@@ -16,7 +16,7 @@
                                          VerticalContentAlignment="Center" />
           </Grid>
           <Grid Classes="case">
-            <Button Content="Swap content" Click="OnSwap" />
+            <Button Content="Swap content" Click="OnDefaultSwap" />
           </Grid>
         </StackPanel>
       </cupertino:Section>
@@ -46,7 +46,7 @@
             </Border>
           </Grid>
           <Grid Classes="case">
-            <Button Content="Swap content" Click="OnSwap" />
+            <Button Content="Swap content" Click="OnCustomizedSwap" />
           </Grid>
         </StackPanel>
       </cupertino:Section>

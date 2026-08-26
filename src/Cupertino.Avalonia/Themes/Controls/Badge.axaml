@@ -35,8 +35,6 @@
       </Setter>
     </Style>
 
-    <!-- UITabBar anchors badges to the symbol rather than the whole tab cell.
-         Counts ride a wider icon corner; an empty badge uses the native 18pt dot. -->
     <Style Selector="^.tab-badge">
       <Setter Property="RenderTransform" Value="translate(21px,-15px)" />
     </Style>

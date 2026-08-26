@@ -26,6 +26,7 @@ public static class TabBarInteraction
     private const double TwoItemWidth = 51;
     private const double BottomBarMargins = 42;
     private const double BottomBarInsets = 14;
+    private const double TwoItemBarInsets = 16;
     private const double BottomAccessoryWidth = 74;
     private const string TwoItemClass = "cupertino-two-item";
 
@@ -87,13 +88,15 @@ public static class TabBarInteraction
         private readonly ItemsPresenter _presenter;
         private readonly DispatcherTimer _settle;
         private readonly DispatcherTimer _travel;
-        private readonly Dictionary<Control, IDisposable?> _itemWidthOverrides = new();
+        private readonly Dictionary<Control, (double Width, IDisposable? Subscription)> _itemWidthOverrides = new();
+        private readonly HashSet<Control> _observedItems = new();
         private TopLevel? _releaseRoot;
         private EventHandler<PointerReleasedEventArgs>? _releaseHandler;
 
         private bool _pressed;
         private bool _pressOnPill;
         private bool _dragging;
+        private bool _twoItemBar;
         private Point _pressPoint;
         private Point _pressRootPoint;
         private Point _dragRootPoint;
@@ -123,56 +126,98 @@ public static class TabBarInteraction
             owner.AddHandler(InputElement.PointerCaptureLostEvent, OnCaptureLost,
                              RoutingStrategies.Bubble, handledEventsToo: true);
             owner.DetachedFromVisualTree += OnDetached;
-            owner.PropertyChanged += OnOwnerPropertyChanged;
 
             if (owner is SelectingItemsControl sic)
             {
                 _lastIndex = Math.Max(0, sic.SelectedIndex);
                 sic.SelectionChanged += OnSelectionChanged;
             }
-            if (owner is ItemsControl itemsControl)
-                itemsControl.ContainerPrepared += OnContainerPrepared;
 
-            UpdateBottomGeometry();
+            if (!_segmented)
+            {
+                owner.PropertyChanged += OnOwnerPropertyChanged;
+                if (owner is ItemsControl itemsControl)
+                    itemsControl.ContainerPrepared += OnContainerPrepared;
+                UpdateBottomGeometry();
+            }
 
             // Sample the backdrop after layout.
             if (!_segmented)
                 ScheduleBackdropSample();
         }
 
-        private bool IsTwoItemBar =>
-            !_segmented && _owner is ItemsControl { ItemCount: 2 };
-
         private void UpdateBottomGeometry()
         {
-            var compact = IsTwoItemBar;
+            var containers = GetItems(visibleOnly: false);
+            UpdateItemObservers(containers);
+            var items = new List<Control>(containers.Count);
+            foreach (var item in containers)
+                if (item.IsVisible)
+                    items.Add(item);
+            var compact = _twoItemBar = items.Count == 2;
             _owner.Classes.Set(TwoItemClass, compact);
 
-            foreach (var item in _itemWidthOverrides.Keys.Except(Items).ToArray())
+            List<Control>? staleItems = null;
+            foreach (var item in _itemWidthOverrides.Keys)
             {
-                _itemWidthOverrides[item]?.Dispose();
-                _itemWidthOverrides.Remove(item);
+                if (!items.Contains(item))
+                {
+                    staleItems ??= new List<Control>();
+                    staleItems.Add(item);
+                }
             }
+            if (staleItems is not null)
+                foreach (var item in staleItems)
+                {
+                    _itemWidthOverrides[item].Subscription?.Dispose();
+                    _itemWidthOverrides.Remove(item);
+                }
 
             var width = compact ? TwoItemWidth : BottomItemWidth;
-            if (!_segmented && _owner is ItemsControl { ItemCount: > 0 } itemsControl
-                && _owner.Bounds.Width > 0)
+            if (items.Count > 0 && _owner.Bounds.Width > 0)
             {
-                var available = _owner.Bounds.Width - BottomBarMargins - BottomBarInsets;
+                var insets = compact ? TwoItemBarInsets : BottomBarInsets;
+                var available = _owner.Bounds.Width - BottomBarMargins - insets;
                 if (Tabs.GetAccessory(_owner) is not null)
                     available -= BottomAccessoryWidth;
-                width = Math.Min(width, Math.Max(0, available / itemsControl.ItemCount));
+                width = Math.Min(width, Math.Max(0, available / items.Count));
             }
 
-            foreach (var item in Items)
+            foreach (var item in containers)
+                item.Classes.Set(TwoItemClass, compact && item.IsVisible);
+
+            foreach (var item in items)
             {
-                item.Classes.Set(TwoItemClass, compact);
-                if (_itemWidthOverrides.Remove(item, out var previous))
-                    previous?.Dispose();
-                if (!_segmented)
-                    _itemWidthOverrides[item] = item.SetValue(
-                        Layoutable.MaxWidthProperty, width, BindingPriority.Style);
+                if (_itemWidthOverrides.TryGetValue(item, out var current) && current.Width == width)
+                    continue;
+                if (_itemWidthOverrides.Remove(item, out current))
+                    current.Subscription?.Dispose();
+                _itemWidthOverrides[item] = (width, item.SetValue(
+                    Layoutable.MaxWidthProperty, width, BindingPriority.Style));
             }
+        }
+
+        private void UpdateItemObservers(List<Control> items)
+        {
+            _observedItems.RemoveWhere(item =>
+            {
+                if (items.Contains(item))
+                    return false;
+                item.PropertyChanged -= OnItemPropertyChanged;
+                return true;
+            });
+
+            foreach (var item in items)
+            {
+                if (_observedItems.Add(item))
+                    item.PropertyChanged += OnItemPropertyChanged;
+            }
+        }
+
+        private void OnItemPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+        {
+            if (e.Property == Visual.IsVisibleProperty)
+                UpdateBottomGeometry();
         }
 
         private void OnOwnerPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
@@ -188,20 +233,21 @@ public static class TabBarInteraction
             UpdateBottomGeometry();
         }
 
-        private IReadOnlyList<Control> Items
+        private List<Control> GetItems(bool visibleOnly)
         {
-            get
+            var list = new List<Control>();
+            if (_owner is ItemsControl ic)
             {
-                var list = new List<Control>();
-                if (_owner is ItemsControl ic)
-                {
-                    for (var i = 0; i < ic.ItemCount; i++)
-                        if (ic.ContainerFromIndex(i) is Control { IsVisible: true } c)
-                            list.Add(c);
-                }
-                return list;
+                for (var i = 0; i < ic.ItemCount; i++)
+                    if (ic.ContainerFromIndex(i) is Control c && (!visibleOnly || c.IsVisible))
+                        list.Add(c);
             }
+            return list;
         }
+
+        private List<Control> Items => GetItems(visibleOnly: true);
+
+        private bool IsTwoItemBar => _twoItemBar;
 
         private Rect BoundsOf(Control item)
         {
@@ -943,13 +989,17 @@ public static class TabBarInteraction
             _owner.RemoveHandler(InputElement.PointerReleasedEvent, OnReleased);
             _owner.RemoveHandler(InputElement.PointerCaptureLostEvent, OnCaptureLost);
             _owner.DetachedFromVisualTree -= OnDetached;
-            _owner.PropertyChanged -= OnOwnerPropertyChanged;
+            if (!_segmented)
+                _owner.PropertyChanged -= OnOwnerPropertyChanged;
             if (_owner is SelectingItemsControl sic)
                 sic.SelectionChanged -= OnSelectionChanged;
-            if (_owner is ItemsControl itemsControl)
+            if (!_segmented && _owner is ItemsControl itemsControl)
                 itemsControl.ContainerPrepared -= OnContainerPrepared;
+            foreach (var item in _observedItems)
+                item.PropertyChanged -= OnItemPropertyChanged;
+            _observedItems.Clear();
             foreach (var widthOverride in _itemWidthOverrides.Values)
-                widthOverride?.Dispose();
+                widthOverride.Subscription?.Dispose();
             _itemWidthOverrides.Clear();
         }
     }

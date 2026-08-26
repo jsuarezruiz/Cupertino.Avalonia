@@ -166,6 +166,7 @@ public static class RefreshInteraction
             effective = Math.Min(effective, BandHeight * 1.6);
             _band.Y = -BandHeight + Math.Min(effective, BandHeight);
             _hold.Y = effective;
+            UpdateSweep();
         }
 
         private void OnPullReleased(object? sender, Avalonia.Input.PointerReleasedEventArgs e) =>
@@ -321,6 +322,30 @@ public static class RefreshInteraction
                 _hold.Y = _holdTarget;
                 _timer.Stop();
             }
+            UpdateSweep();
+        }
+
+        private void UpdateSweep()
+        {
+            if (_visualizer is not { } visualizer)
+                return;
+            CupertinoActivityIndicator? spinner = null;
+            foreach (var descendant in Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(visualizer))
+            {
+                if (descendant is CupertinoActivityIndicator found)
+                {
+                    spinner = found;
+                    break;
+                }
+            }
+            if (spinner is null)
+                return;
+
+            spinner.SweepFraction =
+                visualizer.GetValue(RefreshVisualizer.RefreshVisualizerStateProperty)
+                    is RefreshVisualizerState.Pending or RefreshVisualizerState.Refreshing
+                ? 1
+                : Math.Clamp((_band.Y + BandHeight) / BandHeight, 0, 1);
         }
     }
 
