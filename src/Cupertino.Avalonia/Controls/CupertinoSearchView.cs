@@ -10,7 +10,7 @@ using Avalonia.VisualTree;
 
 namespace Cupertino.Controls;
 
-public enum CupertinoSearchPresentation
+public enum CupertinoSearchDisplayMode
 {
     Inline,
     Collapsible,
@@ -24,52 +24,52 @@ public enum CupertinoSearchPresentation
 [TemplatePart("PART_CancelButton", typeof(Button))]
 [TemplatePart("PART_Scopes", typeof(TabStrip))]
 [TemplatePart("PART_Results", typeof(ListBox))]
-[PseudoClasses(":active", ":collapsible", ":scopes", ":empty")]
-public class CupertinoSearchController : TemplatedControl
+[PseudoClasses(":expanded", ":collapsible", ":scopes", ":empty")]
+public class CupertinoSearchView : TemplatedControl
 {
     public static readonly StyledProperty<IEnumerable?> ItemsSourceProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, IEnumerable?>(nameof(ItemsSource));
+        AvaloniaProperty.Register<CupertinoSearchView, IEnumerable?>(nameof(ItemsSource));
 
-    public static readonly StyledProperty<string?> QueryProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, string?>(
-            nameof(Query), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+    public static readonly StyledProperty<string?> TextProperty =
+        AvaloniaProperty.Register<CupertinoSearchView, string?>(
+            nameof(Text), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
     public static readonly StyledProperty<IList<string>?> ScopesProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, IList<string>?>(nameof(Scopes));
+        AvaloniaProperty.Register<CupertinoSearchView, IList<string>?>(nameof(Scopes));
 
     public static readonly StyledProperty<int> SelectedScopeIndexProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, int>(
+        AvaloniaProperty.Register<CupertinoSearchView, int>(
             nameof(SelectedScopeIndex), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
     public static readonly StyledProperty<object?> SelectedItemProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, object?>(
+        AvaloniaProperty.Register<CupertinoSearchView, object?>(
             nameof(SelectedItem), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
-    public static readonly StyledProperty<bool> IsActiveProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, bool>(
-            nameof(IsActive), true, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+    public static readonly StyledProperty<bool> IsExpandedProperty =
+        AvaloniaProperty.Register<CupertinoSearchView, bool>(
+            nameof(IsExpanded), true, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
-    public static readonly StyledProperty<CupertinoSearchPresentation> PresentationProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, CupertinoSearchPresentation>(nameof(Presentation));
+    public static readonly StyledProperty<CupertinoSearchDisplayMode> DisplayModeProperty =
+        AvaloniaProperty.Register<CupertinoSearchView, CupertinoSearchDisplayMode>(nameof(DisplayMode));
 
     public static readonly StyledProperty<IDataTemplate?> ItemTemplateProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, IDataTemplate?>(nameof(ItemTemplate));
+        AvaloniaProperty.Register<CupertinoSearchView, IDataTemplate?>(nameof(ItemTemplate));
 
     public static readonly StyledProperty<object?> EmptyContentProperty =
-        AvaloniaProperty.Register<CupertinoSearchController, object?>(nameof(EmptyContent), "No Results");
+        AvaloniaProperty.Register<CupertinoSearchView, object?>(nameof(EmptyContent), "No Results");
 
     private IReadOnlyList<object> _filteredItems = Array.Empty<object>();
-    public static readonly DirectProperty<CupertinoSearchController, IReadOnlyList<object>> FilteredItemsProperty =
-        AvaloniaProperty.RegisterDirect<CupertinoSearchController, IReadOnlyList<object>>(
+    public static readonly DirectProperty<CupertinoSearchView, IReadOnlyList<object>> FilteredItemsProperty =
+        AvaloniaProperty.RegisterDirect<CupertinoSearchView, IReadOnlyList<object>>(
             nameof(FilteredItems), o => o.FilteredItems);
 
     public IEnumerable? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
-    public string? Query { get => GetValue(QueryProperty); set => SetValue(QueryProperty, value); }
+    public string? Text { get => GetValue(TextProperty); set => SetValue(TextProperty, value); }
     public IList<string>? Scopes { get => GetValue(ScopesProperty); set => SetValue(ScopesProperty, value); }
     public int SelectedScopeIndex { get => GetValue(SelectedScopeIndexProperty); set => SetValue(SelectedScopeIndexProperty, value); }
     public object? SelectedItem { get => GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
-    public bool IsActive { get => GetValue(IsActiveProperty); set => SetValue(IsActiveProperty, value); }
-    public CupertinoSearchPresentation Presentation { get => GetValue(PresentationProperty); set => SetValue(PresentationProperty, value); }
+    public bool IsExpanded { get => GetValue(IsExpandedProperty); set => SetValue(IsExpandedProperty, value); }
+    public CupertinoSearchDisplayMode DisplayMode { get => GetValue(DisplayModeProperty); set => SetValue(DisplayModeProperty, value); }
     public IDataTemplate? ItemTemplate { get => GetValue(ItemTemplateProperty); set => SetValue(ItemTemplateProperty, value); }
     public object? EmptyContent { get => GetValue(EmptyContentProperty); set => SetValue(EmptyContentProperty, value); }
     public IReadOnlyList<object> FilteredItems => _filteredItems;
@@ -118,7 +118,7 @@ public class CupertinoSearchController : TemplatedControl
     private bool _syncing;
     private int _scopeSynchronizationGeneration;
 
-    public CupertinoSearchController()
+    public CupertinoSearchView()
     {
         UpdatePseudoClasses();
     }
@@ -141,13 +141,13 @@ public class CupertinoSearchController : TemplatedControl
         _results = e.NameScope.Find<ListBox>("PART_Results");
 
         if (e.NameScope.Find<Button>("PART_CompactButton") is { } compact)
-            compact.Click += (_, _) => SetActive(true);
+            compact.Click += (_, _) => SetExpanded(true);
         if (e.NameScope.Find<Button>("PART_CancelButton") is { } cancel)
             cancel.Click += (_, _) => Cancel();
 
         if (_field is not null)
         {
-            _field.Text = Query;
+            _field.Text = Text;
             _field.TextChanged += OnFieldTextChanged;
             _field.KeyDown += OnFieldKeyDown;
         }
@@ -186,10 +186,10 @@ public class CupertinoSearchController : TemplatedControl
         base.OnDetachedFromVisualTree(e);
     }
 
-    private void SetActive(bool active)
+    private void SetExpanded(bool expanded)
     {
-        SetCurrentValue(IsActiveProperty, active);
-        if (active)
+        SetCurrentValue(IsExpandedProperty, expanded);
+        if (expanded)
             FocusField();
     }
 
@@ -197,16 +197,16 @@ public class CupertinoSearchController : TemplatedControl
 
     public void Cancel()
     {
-        SetCurrentValue(QueryProperty, string.Empty);
-        if (Presentation == CupertinoSearchPresentation.Collapsible)
-            SetCurrentValue(IsActiveProperty, false);
+        SetCurrentValue(TextProperty, string.Empty);
+        if (DisplayMode == CupertinoSearchDisplayMode.Collapsible)
+            SetCurrentValue(IsExpandedProperty, false);
     }
 
     private void OnFieldTextChanged(object? sender, TextChangedEventArgs e)
     {
         if (_syncing)
             return;
-        SetCurrentValue(QueryProperty, _field?.Text);
+        SetCurrentValue(TextProperty, _field?.Text);
     }
 
     private void OnFieldKeyDown(object? sender, KeyEventArgs e)
@@ -238,7 +238,7 @@ public class CupertinoSearchController : TemplatedControl
             ConnectSource();
             ApplyFilter();
         }
-        else if (change.Property == QueryProperty || change.Property == SelectedScopeIndexProperty)
+        else if (change.Property == TextProperty || change.Property == SelectedScopeIndexProperty)
         {
             if (change.Property == SelectedScopeIndexProperty)
             {
@@ -252,8 +252,8 @@ public class CupertinoSearchController : TemplatedControl
             _syncing = true;
             try
             {
-                if (_field is not null && _field.Text != Query)
-                    _field.Text = Query;
+                if (_field is not null && _field.Text != Text)
+                    _field.Text = Text;
                 var scopeIndex = Scopes is { Count: > 0 } ? SelectedScopeIndex : -1;
                 if (_scopeStrip is not null && _scopeStrip.SelectedIndex != scopeIndex)
                     _scopeStrip.SelectedIndex = scopeIndex;
@@ -269,10 +269,10 @@ public class CupertinoSearchController : TemplatedControl
                 _scopeStrip.ItemsSource = Scopes;
             SynchronizeScopes();
         }
-        else if (change.Property == IsActiveProperty || change.Property == PresentationProperty)
+        else if (change.Property == IsExpandedProperty || change.Property == DisplayModeProperty)
         {
             UpdatePseudoClasses();
-            if (IsActive)
+            if (IsExpanded)
                 FocusField();
         }
         else if (change.Property == ItemTemplateProperty && _results is not null)
@@ -356,7 +356,7 @@ public class CupertinoSearchController : TemplatedControl
     {
         var oldItems = _filteredItems;
         var filteredItems = new List<object>();
-        var query = (Query ?? string.Empty).Trim();
+        var query = (Text ?? string.Empty).Trim();
         if (ItemsSource is not null)
         {
             foreach (var value in ItemsSource)
@@ -385,8 +385,8 @@ public class CupertinoSearchController : TemplatedControl
 
     private void UpdatePseudoClasses()
     {
-        PseudoClasses.Set(":active", IsActive);
-        PseudoClasses.Set(":collapsible", Presentation == CupertinoSearchPresentation.Collapsible);
+        PseudoClasses.Set(":expanded", IsExpanded);
+        PseudoClasses.Set(":collapsible", DisplayMode == CupertinoSearchDisplayMode.Collapsible);
         PseudoClasses.Set(":scopes", Scopes is { Count: > 0 });
     }
 }

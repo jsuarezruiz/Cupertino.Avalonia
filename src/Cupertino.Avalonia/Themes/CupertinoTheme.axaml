@@ -199,7 +199,7 @@
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ColorPicker.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ListRows.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/PageControl.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/SearchController.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/SearchView.axaml" />
       </ResourceDictionary.MergedDictionaries>
 
     </ResourceDictionary>

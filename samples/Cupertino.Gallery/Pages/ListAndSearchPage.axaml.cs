@@ -8,7 +8,7 @@ public partial class ListAndSearchPage : UserControl
     public ListAndSearchPage()
     {
         InitializeComponent();
-        var search = this.FindControl<CupertinoSearchController>("SearchDemo")!;
+        var search = this.FindControl<CupertinoSearchView>("SearchDemo")!;
         search.Scopes = ["All", "People", "Files"];
         search.ItemsSource = new[]
         {

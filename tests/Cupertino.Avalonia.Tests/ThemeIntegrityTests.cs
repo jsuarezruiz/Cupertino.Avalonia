@@ -110,7 +110,7 @@ public class ThemeIntegrityTests
             new CupertinoListCell { Title = "Cell", AccessoryKind = CupertinoListAccessory.Disclosure },
             new CupertinoFormRow { Label = "Name", Content = new TextBox() },
             new CupertinoPageControl { NumberOfPages = 3 },
-            new CupertinoSearchController { ItemsSource = new[] { "a", "b" } },
+            new CupertinoSearchView { ItemsSource = new[] { "a", "b" } },
             new CupertinoDateTimePicker { SelectedDateTime = DateTimeOffset.Now },
             new CupertinoSheetPresenter { Content = new TextBlock { Text = "sheet" }, Width = 200, Height = 120 },
             new CupertinoToolbar { Width = 300 },

@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
-  <ControlTheme x:Key="{x:Type controls:CupertinoSearchController}" TargetType="controls:CupertinoSearchController">
+  <ControlTheme x:Key="{x:Type controls:CupertinoSearchView}" TargetType="controls:CupertinoSearchView">
     <Setter Property="HorizontalAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate>
@@ -11,8 +11,10 @@
                                    GlassThickness="0" BlurRadius="18" Saturation="1"
                                    RefractionStrength="0" ChromaticAberration="0"
                                    DepthEffect="0" LightIntensity="0" FresnelStrength="0"
+                                   ShadowOpacity="0"
+                                   controls:CupertinoSearchFieldShadow.IsAdornerEnabled="True"
                                    Tint="{DynamicResource CupertinoBarButtonTint}">
-            <Grid ColumnDefinitions="40,*,Auto">
+            <Grid ColumnDefinitions="44,*,Auto">
               <Path Data="{DynamicResource CupertinoSearchGeometry}" Width="18" Height="18"
                     Stretch="Uniform" Stroke="{DynamicResource CupertinoSecondaryLabelBrush}"
                     StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -29,6 +31,7 @@
             </Grid>
           </controls:GlassSurface>
           <TabStrip Name="PART_Scopes" Grid.Row="1" IsVisible="False"
+                    Classes="segmented" Margin="0,8,0,0"
                     HorizontalAlignment="Stretch" />
           <Grid Grid.Row="2">
             <ListBox Name="PART_Results" Background="Transparent" />
@@ -39,7 +42,7 @@
         </Grid>
       </ControlTemplate>
     </Setter>
-    <Style Selector="^ /template/ controls|GlassSurface#PART_SearchSurface">
+    <Style Selector="^:collapsible /template/ controls|GlassSurface#PART_SearchSurface">
       <Setter Property="Transitions">
         <Transitions><DoubleTransition Property="MaxWidth" Duration="0:0:0.28" /></Transitions>
       </Setter>
@@ -50,15 +53,16 @@
     </Style>
     <Style Selector="^:collapsible /template/ TextBox#PART_Field"><Setter Property="Opacity" Value="0" /></Style>
     <Style Selector="^:collapsible /template/ ListBox#PART_Results"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:active /template/ controls|GlassSurface#PART_SearchSurface">
-      <Setter Property="MaxWidth" Value="1000" />
+    <Style Selector="^:expanded /template/ controls|GlassSurface#PART_SearchSurface">
+      <Setter Property="MaxWidth"
+              Value="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}" />
       <Setter Property="HorizontalAlignment" Value="Stretch" />
     </Style>
-    <Style Selector="^:active /template/ TextBox#PART_Field"><Setter Property="Opacity" Value="1" /></Style>
-    <Style Selector="^:active /template/ Button#PART_CompactButton"><Setter Property="IsVisible" Value="False" /></Style>
-    <Style Selector="^:active /template/ Button#PART_CancelButton"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:active /template/ ListBox#PART_Results"><Setter Property="IsVisible" Value="True" /></Style>
-    <Style Selector="^:active:scopes /template/ TabStrip#PART_Scopes"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:expanded /template/ TextBox#PART_Field"><Setter Property="Opacity" Value="1" /></Style>
+    <Style Selector="^:expanded /template/ Button#PART_CompactButton"><Setter Property="IsVisible" Value="False" /></Style>
+    <Style Selector="^:expanded /template/ Button#PART_CancelButton"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:expanded /template/ ListBox#PART_Results"><Setter Property="IsVisible" Value="True" /></Style>
+    <Style Selector="^:expanded:scopes /template/ TabStrip#PART_Scopes"><Setter Property="IsVisible" Value="True" /></Style>
     <Style Selector="^:empty /template/ ContentPresenter#PART_Empty"><Setter Property="IsVisible" Value="True" /></Style>
   </ControlTheme>
 </ResourceDictionary>

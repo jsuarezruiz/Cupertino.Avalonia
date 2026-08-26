@@ -15,10 +15,10 @@ namespace Cupertino.Controls;
 public sealed class CupertinoSearchFieldShadow : Control
 {
     public static readonly AttachedProperty<bool> IsAdornerEnabledProperty =
-        AvaloniaProperty.RegisterAttached<CupertinoSearchFieldShadow, TextBox, bool>("IsAdornerEnabled");
+        AvaloniaProperty.RegisterAttached<CupertinoSearchFieldShadow, Control, bool>("IsAdornerEnabled");
 
     private static readonly AttachedProperty<CupertinoSearchFieldShadow?> AdornerProperty =
-        AvaloniaProperty.RegisterAttached<CupertinoSearchFieldShadow, TextBox, CupertinoSearchFieldShadow?>("Adorner");
+        AvaloniaProperty.RegisterAttached<CupertinoSearchFieldShadow, Control, CupertinoSearchFieldShadow?>("Adorner");
 
     public static readonly StyledProperty<CornerRadius> CornerRadiusProperty =
         AvaloniaProperty.Register<CupertinoSearchFieldShadow, CornerRadius>(
@@ -44,7 +44,7 @@ public sealed class CupertinoSearchFieldShadow : Control
             ShadowSigmaProperty,
             ShadowOffsetProperty);
 
-        IsAdornerEnabledProperty.Changed.AddClassHandler<TextBox>((field, change) =>
+        IsAdornerEnabledProperty.Changed.AddClassHandler<Control>((field, change) =>
         {
             var adorner = field.GetValue(AdornerProperty);
             if (change.GetNewValue<bool>())
@@ -65,9 +65,9 @@ public sealed class CupertinoSearchFieldShadow : Control
         });
     }
 
-    public static bool GetIsAdornerEnabled(TextBox field) => field.GetValue(IsAdornerEnabledProperty);
+    public static bool GetIsAdornerEnabled(Control field) => field.GetValue(IsAdornerEnabledProperty);
 
-    public static void SetIsAdornerEnabled(TextBox field, bool value) =>
+    public static void SetIsAdornerEnabled(Control field, bool value) =>
         field.SetValue(IsAdornerEnabledProperty, value);
 
     public CornerRadius CornerRadius

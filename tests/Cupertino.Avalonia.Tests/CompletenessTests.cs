@@ -15,12 +15,12 @@ namespace Cupertino.Avalonia.Tests;
 public class NewPrimitiveTests
 {
     [AvaloniaFact]
-    public void Search_controller_filters_and_respects_scopes()
+    public void Search_view_filters_and_respects_scopes()
     {
-        var search = new CupertinoSearchController
+        var search = new CupertinoSearchView
         {
             ItemsSource = new[] { "Ada", "Alan", "Grace", "Design notes" },
-            Query = "a",
+            Text = "a",
             Scopes = new[] { "All", "People" },
             SelectedScopeIndex = 1,
         };
@@ -31,17 +31,17 @@ public class NewPrimitiveTests
 
         Assert.Equal(new[] { "Ada", "Alan", "Grace" }, search.FilteredItems.Cast<string>());
 
-        search.Query = "zz";
+        search.Text = "zz";
         Assert.Empty(search.FilteredItems);
         search.Cancel();
-        Assert.Equal(string.Empty, search.Query);
+        Assert.Equal(string.Empty, search.Text);
     }
 
     [AvaloniaFact]
-    public void Search_controller_observes_scope_mutations_and_clamps_selection()
+    public void Search_view_observes_scope_mutations_and_clamps_selection()
     {
         var scopes = new ObservableCollection<string> { "All", "People" };
-        var search = new CupertinoSearchController
+        var search = new CupertinoSearchView
         {
             ItemsSource = new[] { "Ada", "Design notes" },
             Scopes = scopes,
@@ -61,13 +61,13 @@ public class NewPrimitiveTests
     }
 
     [AvaloniaFact]
-    public void Search_controller_uses_text_selector()
+    public void Search_view_uses_text_selector()
     {
         var items = new[] { new SearchItem("Ada"), new SearchItem("Grace") };
-        var search = new CupertinoSearchController
+        var search = new CupertinoSearchView
         {
             ItemsSource = items,
-            Query = "ada",
+            Text = "ada",
             SearchTextSelector = item => ((SearchItem)item).Name,
         };
 
@@ -225,7 +225,7 @@ public class AccessibilityAndDirectionTests
                     new CupertinoListCell { Title = "Title", Subtitle = "Secondary", AccessoryKind = CupertinoListAccessory.Disclosure },
                     new CupertinoFormRow { Label = "Name", Content = new TextBox { Text = "Value" } },
                     new CupertinoPageControl { NumberOfPages = 4, CurrentPage = 1 },
-                    new CupertinoSearchController { ItemsSource = new[] { "One", "Two" }, Query = "o" },
+                    new CupertinoSearchView { ItemsSource = new[] { "One", "Two" }, Text = "o" },
                     new CupertinoDateTimePicker { SelectedDateTime = DateTimeOffset.Now },
                 },
             };

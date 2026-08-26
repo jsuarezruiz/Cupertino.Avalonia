@@ -48,7 +48,7 @@ Add `CupertinoTheme` after your base theme.
 
 **Themed Avalonia controls.** Buttons in every role and size, switches, sliders, text fields including search and masked variants, checkboxes and radios, pickers for date and time, lists, trees, tabs, menus, flyouts, dialogs, progress, refresh and expanders.
 
-**Controls iOS has that Avalonia does not.** `CupertinoSheet` with detents, `CupertinoSwipeView` for row actions, `CupertinoBadge`, `CupertinoToolbar`, `CupertinoNavigationPage` with the interactive back gesture and restorable routes, reusable `CupertinoListCell` and `CupertinoFormRow`, `CupertinoSearchController`, `CupertinoPageControl`, inline and compact date, time, duration and paired date-time pickers, `CupertinoCalendarView`, `CupertinoIcon` and the Liquid Glass surface itself.
+**Controls iOS has that Avalonia does not.** `CupertinoSheet` with detents, `CupertinoSwipeView` for row actions, `CupertinoBadge`, `CupertinoToolbar`, `CupertinoNavigationPage` with the interactive back gesture and restorable routes, reusable `CupertinoListCell` and `CupertinoFormRow`, `CupertinoSearchView`, `CupertinoPageControl`, inline and compact date, time, duration and paired date-time pickers, `CupertinoCalendarView`, `CupertinoIcon` and the Liquid Glass surface itself.
 
 **The design language.** Dynamic Type scaling, inherited RTL layout, the colour system in both light and dark variants, motion curves, and `GlassSurface`, a shader based material that samples and refracts what passes beneath it.
 

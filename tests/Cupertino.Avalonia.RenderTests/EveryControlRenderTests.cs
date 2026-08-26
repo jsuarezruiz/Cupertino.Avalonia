@@ -124,10 +124,10 @@ public class EveryControlRenderTests
             NumberOfPages = 5,
             CurrentPage = 2,
         },
-        ["SearchController"] = () => new CupertinoSearchController
+        ["SearchView"] = () => new CupertinoSearchView
         {
             ItemsSource = new[] { "Ada", "Grace" },
-            Query = "a",
+            Text = "a",
             Width = 320,
         },
         ["DateTimePicker"] = () => new CupertinoDateTimePicker

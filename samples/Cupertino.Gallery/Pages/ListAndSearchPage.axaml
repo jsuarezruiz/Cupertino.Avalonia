@@ -39,8 +39,8 @@
 
       <cupertino:Section Header="SEARCH"
                          Footer="The compact search button expands into a query field, optional scopes, and a filtered result list.">
-        <cupertino:CupertinoSearchController x:Name="SearchDemo" Margin="16,12"
-                                             Presentation="Collapsible" IsActive="False" />
+        <cupertino:CupertinoSearchView x:Name="SearchDemo" Margin="24"
+                                      DisplayMode="Collapsible" IsExpanded="False" />
       </cupertino:Section>
 
       <cupertino:Section Header="PAGE CONTROL"

@@ -1391,7 +1391,7 @@ public class ThemeCoverageTests
         [typeof(Calendar)], [typeof(TreeView)], [typeof(Menu)], [typeof(Label)],
         [typeof(CupertinoDatePicker)], [typeof(CupertinoTimePicker)],
         [typeof(CupertinoDateTimePicker)], [typeof(CupertinoListCell)],
-        [typeof(CupertinoFormRow)], [typeof(CupertinoSearchController)],
+        [typeof(CupertinoFormRow)], [typeof(CupertinoSearchView)],
         [typeof(CupertinoNavigationBar)], [typeof(CupertinoCalendarView)],
         [typeof(DatePicker)], [typeof(TimePicker)], [typeof(AutoCompleteBox)],
         [typeof(ToolTip)], [typeof(SplitView)], [typeof(GridSplitter)],
