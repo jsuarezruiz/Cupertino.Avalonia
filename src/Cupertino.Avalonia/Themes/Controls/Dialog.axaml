@@ -123,7 +123,15 @@
                           Classes.cancel="{Binding IsCancel}"
                           Classes.preferred="{Binding IsPreferred}"
                           Command="{Binding $parent[controls:Dialog].InvokeActionCommand}"
-                          CommandParameter="{Binding}" />
+                          CommandParameter="{Binding}">
+                    <Button.ContentTemplate>
+                      <DataTemplate>
+                        <TextBlock Text="{Binding}"
+                                   LineHeight="22"
+                                   TextAlignment="Center" />
+                      </DataTemplate>
+                    </Button.ContentTemplate>
+                  </Button>
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>

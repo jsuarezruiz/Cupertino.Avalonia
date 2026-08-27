@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Cupertino.Controls;
 
 namespace Cupertino.Gallery;
@@ -32,6 +35,10 @@ public partial class RootPage : UserControl
         DataContext = this;
         InitializeComponent();
         Refill(string.Empty);
+        this.FindControl<CupertinoDatePicker>("HighlightDate")!.SelectedDate =
+            DateTimeOffset.Now;
+        this.FindControl<CupertinoTimePicker>("HighlightTime")!.SelectedTime =
+            DateTimeOffset.Now.TimeOfDay;
 
         this.FindControl<TextBlock>("HeroVersion")!.Text =
             "Version " + VersionInfo.Library;
@@ -75,6 +82,7 @@ public partial class RootPage : UserControl
         StyleEntries.AddRange(matches.Where(x => x.Category == "Styles")
                                      .OrderBy(x => x.Title, StringComparer.CurrentCultureIgnoreCase));
 
+        this.FindControl<Section>("HighlightsSection")!.IsVisible = query.Length == 0;
         this.FindControl<Section>("ControlsSection")!.IsVisible = ControlEntries.Count > 0;
         this.FindControl<Section>("CupertinoSection")!.IsVisible = CupertinoEntries.Count > 0;
         this.FindControl<Section>("PresentationSection")!.IsVisible = PresentationEntries.Count > 0;
@@ -84,6 +92,35 @@ public partial class RootPage : UserControl
 
     private void OnFilterChanged(object? sender, TextChangedEventArgs e) =>
         Refill(this.FindControl<TextBox>("Filter")?.Text?.Trim() ?? string.Empty);
+
+    private async void OnHighlightDialog(object? sender, RoutedEventArgs e) =>
+        await Dialog.ShowAsync(this,
+            "Built for iOS",
+            "Dialogs use the same typography, spacing, material and action roles as the rest of the theme.",
+            new DialogAction("Not now", DialogActionRole.Cancel),
+            new DialogAction("Continue", DialogActionRole.Preferred));
+
+    private async void OnHighlightSheet(object? sender, RoutedEventArgs e) =>
+        await CupertinoSheet.ShowAsync(this, new StackPanel
+        {
+            Spacing = 8,
+            Children =
+            {
+                new TextBlock
+                {
+                    Text = "A native-feeling sheet",
+                    FontWeight = FontWeight.SemiBold,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 4, 0, 0),
+                },
+                new TextBlock
+                {
+                    Text = "Drag the grabber or tap outside to dismiss.",
+                    TextAlignment = TextAlignment.Center,
+                    Opacity = 0.55,
+                },
+            },
+        });
 
     private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {

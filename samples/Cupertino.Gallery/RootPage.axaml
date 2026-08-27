@@ -5,6 +5,19 @@
              x:Class="Cupertino.Gallery.RootPage"
              x:DataType="local:RootPage">
 
+  <UserControl.Styles>
+    <Style Selector="TextBlock.highlight-title">
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    </Style>
+    <Style Selector="TextBlock.highlight-body">
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
+    </Style>
+  </UserControl.Styles>
+
   <UserControl.Resources>
     <DataTemplate x:Key="EntryTemplate" x:DataType="local:CatalogEntry">
       <Grid ColumnDefinitions="29,*,Auto" Height="52">
@@ -85,6 +98,53 @@
         <TextBox x:Name="Filter" Classes="search" Margin="16,10"
                  PlaceholderText="Search"
                  TextChanged="OnFilterChanged" />
+      </cupertino:Section>
+
+      <cupertino:Section x:Name="HighlightsSection" Header="HIGHLIGHTS">
+        <StackPanel>
+          <StackPanel Margin="16,10" Spacing="10">
+            <StackPanel Spacing="2">
+              <TextBlock Classes="highlight-title" Text="Native input" />
+              <TextBlock Classes="highlight-body"
+                         Text="Avalonia controls with the iOS feel." />
+            </StackPanel>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+              <Slider Width="170" Minimum="0" Maximum="100" Value="64"
+                      HorizontalAlignment="Left" />
+              <ToggleSwitch Grid.Column="1" IsChecked="True" />
+            </Grid>
+          </StackPanel>
+
+          <Rectangle Classes="hair" />
+
+          <StackPanel Margin="16,10" Spacing="10">
+            <StackPanel Spacing="2">
+              <TextBlock Classes="highlight-title" Text="Pickers" />
+              <TextBlock Classes="highlight-body"
+                         Text="Compact date and time fields open a calendar and wheel." />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="4"
+                        HorizontalAlignment="Right">
+              <cupertino:CupertinoDatePicker x:Name="HighlightDate" />
+              <cupertino:CupertinoTimePicker x:Name="HighlightTime" />
+            </StackPanel>
+          </StackPanel>
+
+          <Rectangle Classes="hair" />
+
+          <Grid Height="64" ColumnDefinitions="*,Auto" Margin="16,0">
+            <StackPanel Spacing="2" VerticalAlignment="Center">
+              <TextBlock Classes="highlight-title" Text="Presentation" />
+              <TextBlock Classes="highlight-body"
+                         Text="Real overlay surfaces." />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                        VerticalAlignment="Center">
+              <Button Classes="small" Content="Dialog" Click="OnHighlightDialog" />
+              <Button Classes="small prominent" Content="Sheet" Click="OnHighlightSheet" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
       </cupertino:Section>
 
       <cupertino:Section x:Name="ControlsSection" Header="CONTROLS"
