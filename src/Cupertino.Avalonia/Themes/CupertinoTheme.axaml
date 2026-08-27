@@ -60,6 +60,8 @@
           <SolidColorBrush x:Key="CupertinoSearchCaretBrush" Color="#FF426BF2" />
           <SolidColorBrush x:Key="CupertinoProgressTrackBrush" Color="#FFE4E4E5" />
           <SolidColorBrush x:Key="CupertinoMenuPanelBrush" Color="#F5F7F7FA" />
+          <SolidColorBrush x:Key="CupertinoContextMenuScrimBrush" Color="#30000015" />
+          <Color x:Key="CupertinoContextMenuTint">#D1F9F9FF</Color>
           <SolidColorBrush x:Key="CupertinoMenuRowHoverBrush" Color="#0D000000" />
           <SolidColorBrush x:Key="CupertinoMenuRowPressedBrush" Color="#1F000000" />
           <SolidColorBrush x:Key="CupertinoSelectionBrush" Color="#4D007AFF" />
@@ -140,6 +142,8 @@
           <SolidColorBrush x:Key="CupertinoSearchCaretBrush" Color="#FF0A84FF" />
           <SolidColorBrush x:Key="CupertinoProgressTrackBrush" Color="#FF3A3A3C" />
           <SolidColorBrush x:Key="CupertinoMenuPanelBrush" Color="#F52C2C2E" />
+          <SolidColorBrush x:Key="CupertinoContextMenuScrimBrush" Color="#1A302858" />
+          <Color x:Key="CupertinoContextMenuTint">#C21C1C1E</Color>
           <SolidColorBrush x:Key="CupertinoMenuRowHoverBrush" Color="#14FFFFFF" />
           <SolidColorBrush x:Key="CupertinoMenuRowPressedBrush" Color="#26FFFFFF" />
           <SolidColorBrush x:Key="CupertinoSelectionBrush" Color="#4D0A84FF" />

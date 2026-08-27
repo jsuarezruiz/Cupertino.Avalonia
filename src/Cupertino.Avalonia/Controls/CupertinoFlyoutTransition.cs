@@ -419,11 +419,14 @@ public static class CupertinoFlyoutTransition
 
     private sealed class ContextMenuState(ContextMenu owner)
     {
+        private static WeakReference<ContextMenuState>? s_active;
+
         private TransitionSession? _session;
         private double _preparedOpacity;
         private bool _prepared;
         private bool _completing;
         private Control? _watchedAnchor;
+        private Popup? _popup;
         private Border? _scrim;
         private OverlayLayer? _scrimLayer;
 
@@ -439,9 +442,15 @@ public static class CupertinoFlyoutTransition
 
         public void Opened(object? sender, Avalonia.Interactivity.RoutedEventArgs args)
         {
+            if (s_active?.TryGetTarget(out var active) == true
+                && !ReferenceEquals(active, this))
+                active.CompleteClose();
+            s_active = new WeakReference<ContextMenuState>(this);
+
             _session?.Dispose();
             if (owner.Parent is Popup popup && popup.PlacementTarget is { } anchor)
             {
+                _popup = popup;
                 _session = CreateSession(anchor, owner, popup.Placement, CompleteClose);
                 _watchedAnchor = anchor;
                 anchor.DetachedFromVisualTree += OnAnchorDetached;
@@ -463,11 +472,15 @@ public static class CupertinoFlyoutTransition
 
         public void Closed(object? sender, Avalonia.Interactivity.RoutedEventArgs args)
         {
+            if (s_active?.TryGetTarget(out var active) == true
+                && ReferenceEquals(active, this))
+                s_active = null;
             UnwatchAnchor();
             RemoveScrim();
             RestorePreparedOpacity();
             _session?.Dispose();
             _session = null;
+            _popup = null;
             _completing = false;
         }
 
@@ -489,12 +502,13 @@ public static class CupertinoFlyoutTransition
 
             var scrim = new Border
             {
-                Background = new SolidColorBrush(Color.FromArgb(0x26, 0, 0, 0)),
                 Opacity = 0,
                 IsHitTestVisible = false,
                 Width = layer.Bounds.Width,
                 Height = layer.Bounds.Height,
             };
+            scrim.Bind(Border.BackgroundProperty,
+                scrim.GetResourceObservable("CupertinoContextMenuScrimBrush"));
             if (!CupertinoAccessibility.ReduceMotion)
                 scrim.Transitions =
                 [
@@ -525,7 +539,10 @@ public static class CupertinoFlyoutTransition
         private void CompleteClose()
         {
             _completing = true;
-            owner.Close();
+            if (_popup is { } popup)
+                popup.Close();
+            else
+                owner.Close();
             _completing = false;
         }
 
@@ -547,7 +564,8 @@ public static class CupertinoFlyoutTransition
         public void Opened(object? sender, EventArgs args)
         {
             _session?.Dispose();
-            if (owner.PlacementTarget is { } anchor && owner.Child is { } presenter)
+            var anchor = owner.PlacementTarget ?? owner.TemplatedParent as Control;
+            if (anchor is not null && owner.Child is { } presenter)
             {
                 _session = CreateSession(anchor, presenter, owner.Placement, owner.Close);
                 _watchedAnchor = anchor;

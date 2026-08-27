@@ -166,6 +166,66 @@ public class InteractionTests
         var separator = menu.GetVisualDescendants().OfType<Separator>().Single();
         Assert.True(separator.Bounds.Height <= 1.0,
             $"separator height: {separator.Bounds.Height}");
+        var material = menu.GetVisualDescendants().OfType<GlassSurface>().Single();
+        Assert.Equal(new CornerRadius(26), material.CornerRadius);
+        Assert.Equal(Color.FromArgb(0xD1, 0xF9, 0xF9, 0xFF), material.Tint);
+
+        window.RequestedThemeVariant = ThemeVariant.Dark;
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        Assert.Equal(Color.FromArgb(0xC2, 0x1C, 0x1C, 0x1E), material.Tint);
+    }
+
+    [AvaloniaFact]
+    public async Task Opening_a_context_menu_closes_the_previous_menu_and_scrim()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = false;
+        var firstMenu = new ContextMenu { ItemsSource = new[] { "First" } };
+        var secondMenu = new ContextMenu { ItemsSource = new[] { "Second" } };
+        var firstHost = new Border { Width = 200, Height = 60, ContextMenu = firstMenu };
+        var secondHost = new Border { Width = 200, Height = 60, ContextMenu = secondMenu };
+        var window = ShowHosting(new StackPanel { Children = { firstHost, secondHost } });
+
+        try
+        {
+            firstMenu.Open(firstHost);
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Assert.True(firstMenu.IsOpen);
+
+            firstMenu.Close();
+            Assert.True(firstMenu.IsOpen);
+            secondMenu.Open(secondHost);
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            await Task.Delay(50);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.False(firstMenu.IsOpen);
+            Assert.True(secondMenu.IsOpen);
+            var layer = Assert.IsType<OverlayLayer>(OverlayLayer.GetOverlayLayer(secondHost));
+            Assert.Single(layer.Children.OfType<Border>(),
+                control => control.Background is SolidColorBrush brush
+                           && brush.Color == Color.FromArgb(0x30, 0, 0, 0x15));
+
+            secondMenu.Close();
+            Assert.True(secondMenu.IsOpen);
+            await Task.Delay(300);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.False(secondMenu.IsOpen);
+            Assert.DoesNotContain(layer.Children.OfType<Border>(),
+                control => control.Background is SolidColorBrush brush
+                           && brush.Color == Color.FromArgb(0x30, 0, 0, 0x15));
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            firstMenu.Close();
+            secondMenu.Close();
+            CupertinoAccessibility.ReduceMotion = old;
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -1428,6 +1488,49 @@ public class ButtonInteractionTests
         {
             CupertinoAccessibility.ReduceMotion = true;
             picker.GetVisualDescendants().OfType<Button>().FirstOrDefault()?.Flyout?.Hide();
+            CupertinoAccessibility.ReduceMotion = old;
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task Calendar_date_picker_uses_the_shared_flyout_transition()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = false;
+        var picker = new CalendarDatePicker { Width = 160 };
+        var window = new Window { Width = 400, Height = 600, Content = picker };
+
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            var button = picker.GetVisualDescendants().OfType<Button>()
+                .Single(control => control.Name == "PART_Button");
+            button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+
+            var popup = picker.GetVisualDescendants().OfType<Popup>().Single();
+            Assert.True(popup.IsOpen);
+            var panel = Assert.IsType<Panel>(popup.Child);
+            var material = panel.GetVisualDescendants().OfType<GlassSurface>().Single();
+            var content = panel.GetVisualDescendants().OfType<Border>()
+                .Single(control => control.Classes.Contains("source-transition-content"));
+
+            Assert.False(Assert.IsType<TransformOperations>(material.RenderTransform).IsIdentity);
+            Assert.InRange(content.Opacity, 0, 0.99);
+
+            await Task.Delay(350);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.True(Assert.IsType<TransformOperations>(material.RenderTransform).IsIdentity);
+            Assert.Equal(1, content.Opacity);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            picker.GetVisualDescendants().OfType<Popup>().FirstOrDefault()?.Close();
             CupertinoAccessibility.ReduceMotion = old;
             window.Close();
         }
