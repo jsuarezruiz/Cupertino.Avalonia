@@ -1,0 +1,6 @@
+- name: Guides
+  href: docs/
+- name: API reference
+  href: api/
+- name: GitHub
+  href: https://github.com/jsuarezruiz/Cupertino.Avalonia

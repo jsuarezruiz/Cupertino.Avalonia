@@ -1,0 +1,61 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dotnet/docfx/main/schemas/docfx.schema.json",
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src",
+          "files": [
+            "Cupertino.Avalonia/Cupertino.Avalonia.csproj"
+          ]
+        }
+      ],
+      "dest": "api",
+      "properties": {
+        "Configuration": "Release"
+      }
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "exclude": [
+          "_site/**"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      },
+      {
+        "src": "../samples/Cupertino.Gallery/Assets",
+        "files": [
+          "AppIcon.png"
+        ],
+        "dest": "assets"
+      }
+    ],
+    "output": "_site",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "Cupertino.Avalonia",
+      "_appTitle": "Cupertino.Avalonia documentation",
+      "_appFaviconPath": "assets/AppIcon.png",
+      "_enableSearch": true,
+      "_disableContribution": false,
+      "_gitContribute": {
+        "repo": "https://github.com/jsuarezruiz/Cupertino.Avalonia",
+        "branch": "main"
+      }
+    }
+  }
+}

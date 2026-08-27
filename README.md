@@ -182,6 +182,12 @@ Mobile heads are available at `samples/Cupertino.Gallery.iOS` and
 
 ## Documentation
 
+The full documentation includes setup guides, design-system concepts, control examples and generated API reference:
+
+**[Read the Cupertino.Avalonia documentation](https://jsuarezruiz.github.io/Cupertino.Avalonia/)**
+
+The source lives in [`docs`](docs/) and is built with DocFX.
+
 * [FAQ](FAQ.md)
 * [Changelog](CHANGELOG.md)
 * [Release process](RELEASING.md)
