@@ -104,7 +104,7 @@
         <StackPanel>
           <StackPanel Margin="16,10" Spacing="10">
             <StackPanel Spacing="2">
-              <TextBlock Classes="highlight-title" Text="Native input" />
+              <TextBlock Classes="highlight-title" Text="Input controls" />
               <TextBlock Classes="highlight-body"
                          Text="Avalonia controls with the iOS feel." />
             </StackPanel>
@@ -148,7 +148,7 @@
       </cupertino:Section>
 
       <cupertino:Section x:Name="ControlsSection" Header="CONTROLS"
-                         Footer="Every control, with its main cases. Tap one to open it.">
+                         Footer="Open a control to explore its common uses, appearance options, and states.">
         <ListBox x:Name="Catalog"
                  ItemsSource="{Binding ControlEntries}"
                  ItemTemplate="{StaticResource EntryTemplate}"
@@ -164,7 +164,7 @@
       </cupertino:Section>
 
       <cupertino:Section x:Name="CupertinoSection" Header="CUPERTINO CONTROLS"
-                         Footer="Controls this library adds: iOS experiences with no stock Avalonia counterpart.">
+                         Footer="Explore the additional controls provided by this library, including navigation, pickers, and toolbars.">
         <ListBox x:Name="CupertinoCatalog"
                  ItemsSource="{Binding CupertinoEntries}"
                  ItemTemplate="{StaticResource EntryTemplate}"
@@ -179,7 +179,7 @@
       </cupertino:Section>
 
       <cupertino:Section x:Name="PresentationSection" Header="PRESENTATION"
-                         Footer="Overlays that present over the app: alerts, sheets, popovers and banners.">
+                         Footer="Try alerts, flyouts, and notification banners that appear over the current page.">
         <ListBox x:Name="PresentationCatalog"
                  ItemsSource="{Binding PresentationEntries}"
                  ItemTemplate="{StaticResource EntryTemplate}"
@@ -194,7 +194,7 @@
       </cupertino:Section>
 
       <cupertino:Section x:Name="ShowcasesSection" Header="SHOWCASES"
-                         Footer="Whole screens composed from the shipped controls, glass over live content.">
+                         Footer="Explore complete screens built with the library's controls and glass backgrounds.">
         <ListBox x:Name="ShowcasesCatalog"
                  ItemsSource="{Binding ShowcaseEntries}"
                  ItemTemplate="{StaticResource EntryTemplate}"
@@ -209,7 +209,7 @@
       </cupertino:Section>
 
       <cupertino:Section x:Name="StylesSection" Header="STYLES"
-                         Footer="The design system behind the controls: type ramp, palette and the material.">
+                         Footer="Browse the text styles, icons, colours, and glass effects used by the controls.">
         <ListBox x:Name="StylesCatalog"
                  ItemsSource="{Binding StyleEntries}"
                  ItemTemplate="{StaticResource EntryTemplate}"

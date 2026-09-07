@@ -30,6 +30,6 @@ if (Navigation.CanGoBack)
 
 Use stable route strings when saving navigation state. Subscribe to `Navigating` to cancel a transition, and to `NavigationCompleted` when work must occur after the animation finishes.
 
-The stack mirrors directional chrome and gestures for RTL layouts. Do not manually reverse the push direction.
+Navigation buttons and gestures follow right-to-left layouts automatically. Keep the same push and pop calls in both directions.
 
 See <xref:Cupertino.Controls.CupertinoNavigationPage> for state restoration and route APIs.

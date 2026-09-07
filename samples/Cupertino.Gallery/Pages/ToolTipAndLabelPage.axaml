@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="TOOLTIP"
-                         Footer="iOS has none; the tip follows the menu material, as macOS does. Hover to see it.">
+                         Footer="Hover over the button to show a short explanation of its action.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Hover" />
@@ -21,7 +21,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="The tip is arbitrary content, and ToolTip.Placement picks the edge it appears on.">
+                         Footer="A tooltip can contain more than text. Use ToolTip.Placement to choose where it appears relative to its control.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Rich tip" />
@@ -50,7 +50,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="LABEL"
-                         Footer="A Label is a plain 17pt caption that passes focus to its target; disable it with the field it names.">
+                         Footer="A Label names a field and can move focus to its Target. Disable the label along with the field when the input is unavailable.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="For a field" />

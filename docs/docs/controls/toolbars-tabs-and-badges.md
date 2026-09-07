@@ -16,7 +16,7 @@ ms.date: 2026-08-27
 
 ## Toolbars
 
-Toolbars contain actions, not destinations. Consecutive items share one glass capsule; `ToolbarSpacer` breaks groups and distributes remaining width.
+Use toolbars for actions. Consecutive items share one glass capsule; `ToolbarSpacer` separates groups and fills the space between them.
 
 ```xml
 <cupertino:CupertinoToolbar>
@@ -35,12 +35,12 @@ Toolbars contain actions, not destinations. Consecutive items share one glass ca
 
 ## Tabs
 
-Tabs represent peer destinations. Use the themed `TabControl` or `TabStrip`, and set attached tab metadata through `Tabs` when an item needs an icon or badge.
+Use the themed `TabControl` or `TabStrip` for navigation between sections. Set the attached properties in `Tabs` to add an icon or badge.
 
-Do not force equal-width tabs into a compact bar. The bar sizes to its content, while the selected lens retains its own native-like width.
+Compact tab bars size themselves to their content. Let the theme size the tabs and selection indicator.
 
 ## Badges
 
-`CupertinoBadge` accepts an integer `Value`. Positive values render a count capped at `99+`; a negative value renders the dot form. `Tabs.BadgeValue` places the same badge anatomy on a tab icon.
+Set `CupertinoBadge.Value` to a count. Values above 99 display `99+`; negative values display a dot. Use `Tabs.BadgeValue` to add a badge to a tab icon.
 
-Keep badge text supplementary. The associated control still needs an accessible label that explains the destination or action.
+Give the associated control an accessible label that explains its destination or action, even when it has a badge.

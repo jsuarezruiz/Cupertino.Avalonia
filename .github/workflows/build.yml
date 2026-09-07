@@ -27,9 +27,9 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - name: Behavior tests
-        run: dotnet test tests/Cupertino.Avalonia.Tests/Cupertino.Avalonia.Tests.csproj --configuration "$BUILD_CONFIGURATION"
+        run: dotnet test tests/Cupertino.Avalonia.Tests/Cupertino.Avalonia.Tests.csproj --configuration "${{ env.BUILD_CONFIGURATION }}"
       - name: Render tests
-        run: dotnet test tests/Cupertino.Avalonia.RenderTests/Cupertino.Avalonia.RenderTests.csproj --configuration "$BUILD_CONFIGURATION"
+        run: dotnet test tests/Cupertino.Avalonia.RenderTests/Cupertino.Avalonia.RenderTests.csproj --configuration "${{ env.BUILD_CONFIGURATION }}"
 
       - name: Upload render differences
         if: failure()
@@ -52,10 +52,20 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --no-restore --configuration "$BUILD_CONFIGURATION"
+        run: dotnet build --no-restore --configuration "${{ env.BUILD_CONFIGURATION }}"
 
       - name: Test
-        run: dotnet test --no-build --configuration "$BUILD_CONFIGURATION" --verbosity minimal
+        run: dotnet test --no-build --configuration "${{ env.BUILD_CONFIGURATION }}" --verbosity minimal
+
+      - name: Glass repaint tests with region tracking
+        env:
+          CUPERTINO_TEST_DIRTY_RECTS: regions
+        run: dotnet test tests/Cupertino.Avalonia.RenderTests/Cupertino.Avalonia.RenderTests.csproj --no-build --configuration "${{ env.BUILD_CONFIGURATION }}" --filter FullyQualifiedName~GlassRepaintTests
+
+      - name: Glass repaint tests with native region tracking
+        env:
+          CUPERTINO_TEST_DIRTY_RECTS: native-regions
+        run: dotnet test tests/Cupertino.Avalonia.RenderTests/Cupertino.Avalonia.RenderTests.csproj --no-build --configuration "${{ env.BUILD_CONFIGURATION }}" --filter FullyQualifiedName~GlassRepaintTests
 
       - name: Pack NuGet package
         run: ./build/pack-nuget.sh "0.0.0-ci.${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" artifacts/packages
@@ -90,7 +100,7 @@ jobs:
           fi
 
       - name: Build iOS gallery
-        run: dotnet build samples/Cupertino.Gallery.iOS/Cupertino.Gallery.iOS.csproj --configuration "$BUILD_CONFIGURATION" --runtime "$IOS_RUNTIME" --verbosity minimal
+        run: dotnet build samples/Cupertino.Gallery.iOS/Cupertino.Gallery.iOS.csproj --configuration "${{ env.BUILD_CONFIGURATION }}" --runtime "$IOS_RUNTIME" --verbosity minimal
 
   android:
     runs-on: ubuntu-latest
@@ -106,4 +116,4 @@ jobs:
         run: dotnet workload install android
 
       - name: Build Android gallery
-        run: dotnet build samples/Cupertino.Gallery.Android/Cupertino.Gallery.Android.csproj --configuration "$BUILD_CONFIGURATION" --verbosity minimal
+        run: dotnet build samples/Cupertino.Gallery.Android/Cupertino.Gallery.Android.csproj --configuration "${{ env.BUILD_CONFIGURATION }}" --verbosity minimal

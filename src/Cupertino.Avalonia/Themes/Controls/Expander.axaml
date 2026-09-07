@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation">
 
   <ControlTheme x:Key="CupertinoExpander" TargetType="Expander">
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
@@ -28,7 +29,7 @@
                   <Path.Transitions>
                     <Transitions>
                       <TransformOperationsTransition Property="RenderTransform"
-                                                     Duration="0:0:0.25" />
+                                                     Duration="{motion:MotionDuration 250}" />
                     </Transitions>
                   </Path.Transitions>
                 </Path>
@@ -53,7 +54,7 @@
     <Style Selector="^:expanded /template/ Panel#ContentHost">
       <Setter Property="IsVisible" Value="True" />
       <Style.Animations>
-        <Animation Duration="0:0:0.25" Easing="QuadraticEaseOut">
+        <Animation Duration="{motion:MotionDuration 250}" Easing="QuadraticEaseOut">
           <KeyFrame Cue="0%">
             <Setter Property="Opacity" Value="0" />
             <Setter Property="TranslateTransform.Y" Value="-8" />
@@ -86,7 +87,7 @@
           <Border x:Name="Row" Background="Transparent">
             <Border.Transitions>
               <Transitions>
-                <BrushTransition Property="Background" Duration="0:0:0.25" />
+                <BrushTransition Property="Background" Duration="{motion:MotionDuration 250}" />
               </Transitions>
             </Border.Transitions>
           </Border>

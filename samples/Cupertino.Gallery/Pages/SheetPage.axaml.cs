@@ -29,7 +29,7 @@ public partial class SheetPage : UserControl, IGalleryCaptureState
             },
             new TextBlock
             {
-                Text = "Drag the top to move between detents.\nFlick down or tap outside to dismiss.",
+                Text = "Drag the handle to change the height.\nSwipe down or tap outside to dismiss.",
                 TextAlignment = Avalonia.Media.TextAlignment.Center,
                 Opacity = 0.55,
             },

@@ -14,7 +14,7 @@ The gallery groups controls by the job they do. Each control page shows the comm
 
 ## Themed Avalonia controls
 
-Use the standard Avalonia control when its semantics already match the problem. `CupertinoTheme` supplies the iOS presentation without changing the control API.
+Use a standard Avalonia control when it provides the behavior you need. `CupertinoTheme` supplies the iOS styling.
 
 | Area | Examples |
 | --- | --- |
@@ -27,7 +27,7 @@ Use the standard Avalonia control when its semantics already match the problem. 
 
 ## Cupertino-specific controls
 
-Use these when iOS provides an interaction or composition that Avalonia does not expose directly.
+These controls add features such as draggable sheets, swipe actions and grouped form rows.
 
 | Control | Use it for |
 | --- | --- |
@@ -41,8 +41,8 @@ Use these when iOS provides an interaction or composition that Avalonia does not
 | `CupertinoToolbar` | Bottom action groups separated by flexible spacers |
 | `CupertinoBadge` | Counts and dot indicators |
 | `CupertinoListCell`, `CupertinoFormRow`, `Section` | iOS list and form composition |
-| `CupertinoSearchView` | Search field plus results composition |
+| `CupertinoSearchView` | Search field with filtered results |
 | `CupertinoPageControl` | Page-position dots |
 | `CupertinoIcon` | Original vector icons authored to iOS metrics |
 
-For the complete property and event surface, use the [API reference](xref:Cupertino.Controls).
+See the [API reference](xref:Cupertino.Controls) for properties, methods and events.

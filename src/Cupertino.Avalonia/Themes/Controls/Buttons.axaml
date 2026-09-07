@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="using:Cupertino.Controls">
 
   <ControlTheme x:Key="CupertinoRepeatButton" TargetType="RepeatButton">
@@ -17,8 +18,8 @@
     <Setter Property="RenderTransform" Value="scale(1.0)" />
     <Setter Property="Transitions">
       <Transitions>
-        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.13" Easing="SineEaseOut" />
-        <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+        <TransformOperationsTransition Property="RenderTransform" Duration="{motion:MotionDuration 130}" Easing="SineEaseOut" />
+        <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
       </Transitions>
     </Setter>
 
@@ -48,7 +49,7 @@
                   Opacity="0">
             <Border.Transitions>
               <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
               </Transitions>
             </Border.Transitions>
           </Border>
@@ -85,8 +86,8 @@
     <Setter Property="RenderTransform" Value="scale(1.0)" />
     <Setter Property="Transitions">
       <Transitions>
-        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.13" Easing="SineEaseOut" />
-        <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+        <TransformOperationsTransition Property="RenderTransform" Duration="{motion:MotionDuration 130}" Easing="SineEaseOut" />
+        <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
       </Transitions>
     </Setter>
     <Setter Property="Template">
@@ -161,7 +162,7 @@
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Transitions">
       <Transitions>
-        <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+        <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 120}" />
       </Transitions>
     </Setter>
     <Setter Property="Template">
@@ -231,7 +232,7 @@
                   Opacity="0">
             <Border.Transitions>
               <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
               </Transitions>
             </Border.Transitions>
           </Border>
@@ -251,7 +252,7 @@
           <Border x:Name="Fill" Background="Transparent">
             <Border.Transitions>
               <Transitions>
-                <BrushTransition Property="Background" Duration="0:0:0.18" />
+                <BrushTransition Property="Background" Duration="{motion:MotionDuration 180}" />
               </Transitions>
             </Border.Transitions>
           </Border>

@@ -4,8 +4,14 @@ using Avalonia.Input.GestureRecognizers;
 
 namespace Cupertino.Controls;
 
+/// <summary>
+/// Adds pointer-drag interaction to a Carousel through attached properties.
+/// </summary>
 public static class CarouselInteraction
 {
+    /// <summary>
+    /// Identifies the <see cref="GetIsMouseEnabled"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsMouseEnabledProperty =
         AvaloniaProperty.RegisterAttached<Carousel, bool>("IsMouseEnabled", typeof(CarouselInteraction));
 
@@ -26,9 +32,11 @@ public static class CarouselInteraction
         });
     }
 
+    /// <inheritdoc cref="IsMouseEnabledProperty"/>
     public static bool GetIsMouseEnabled(Carousel carousel) =>
         carousel.GetValue(IsMouseEnabledProperty);
 
+    /// <inheritdoc cref="IsMouseEnabledProperty"/>
     public static void SetIsMouseEnabled(Carousel carousel, bool value) =>
         carousel.SetValue(IsMouseEnabledProperty, value);
 

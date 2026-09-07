@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:c="using:Cupertino.Controls">
 
   <!-- Overlay-hosted pickers can sample the application backdrop. -->
@@ -101,7 +102,7 @@
                       RenderTransformOrigin="50%,50%" RenderTransform="rotate(0deg)">
                   <Path.Transitions>
                     <Transitions>
-                      <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2" Easing="SineEaseOut" />
+                      <TransformOperationsTransition Property="RenderTransform" Duration="{motion:MotionDuration 200}" Easing="SineEaseOut" />
                     </Transitions>
                   </Path.Transitions>
                 </Path>
@@ -184,11 +185,7 @@
           <Button x:Name="PART_FlyoutButton"
                   Theme="{StaticResource CupertinoPickerFieldButton}"
                   Content="{TemplateBinding DisplayText}" />
-          <c:CupertinoCalendarView x:Name="PART_InlineCalendar" IsVisible="False"
-                                   SelectedDate="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                                   MinimumDate="{TemplateBinding MinimumDate}"
-                                   MaximumDate="{TemplateBinding MaximumDate}"
-                                   FirstDayOfWeek="{TemplateBinding FirstDayOfWeek}" />
+          <c:CupertinoCalendarView x:Name="PART_InlineCalendar" IsVisible="False" />
         </Grid>
       </ControlTemplate>
     </Setter>

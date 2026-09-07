@@ -7,12 +7,23 @@ using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
+using System.Linq;
 
 namespace Cupertino.Controls;
 
+/// <summary>
+/// The supported resting positions for a sheet.
+/// </summary>
 public enum SheetDetents
 {
+    /// <summary>
+    /// A single expanded resting position.
+    /// </summary>
     Large,
+    /// <summary>
+    /// Medium and expanded resting positions.
+    /// </summary>
     MediumAndLarge,
 }
 
@@ -28,6 +39,9 @@ public sealed class CupertinoSheetPresenter : ContentControl
 /// </summary>
 public static class CupertinoSheet
 {
+    /// <summary>
+    /// Shows a modal draggable sheet in the anchor’s overlay and completes when it closes or detaches. Focus cycles inside the sheet; Escape dismisses it and restores the previous focus.
+    /// </summary>
     public static Task ShowAsync(Visual anchor, object content,
         SheetDetents detents = SheetDetents.MediumAndLarge)
     {
@@ -54,6 +68,7 @@ public static class CupertinoSheet
         private readonly Panel _root;
         private readonly Border _scrim;
         private readonly CupertinoSheetPresenter _presenter;
+        private readonly IInputElement? _previousFocus;
         private readonly TranslateTransform _translate = new();
         private readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromMilliseconds(16) };
         private readonly TaskCompletionSource _done = new(
@@ -77,12 +92,14 @@ public static class CupertinoSheet
         {
             _layer = layer;
             _host = host;
+            _previousFocus = host.FocusManager?.GetFocusedElement();
             _detents = detents;
             _hostSize = host.ClientSize;
 
             _presenter = new CupertinoSheetPresenter
             {
                 Content = content,
+                Focusable = true,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Top,
                 Margin = new Thickness(FloatInset, 0, FloatInset, 0),
@@ -94,7 +111,17 @@ public static class CupertinoSheet
                 Opacity = 0,
             };
             _root = new Panel { Children = { _scrim, _presenter } };
+            KeyboardNavigation.SetTabNavigation(_presenter, KeyboardNavigationMode.Cycle);
+            _presenter.KeyDown += OnKeyDown;
             _layer.Children.Add(_root);
+            _presenter.Focus();
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_tornDown || !_presenter.IsKeyboardFocusWithin)
+                    return;
+                _presenter.GetVisualDescendants().OfType<InputElement>()
+                    .FirstOrDefault(control => control.Focusable && control.IsEffectivelyEnabled && control.IsEffectivelyVisible)?.Focus();
+            }, DispatcherPriority.Loaded);
             ResizeRoot();
 
             _presenter.Height = Math.Max(0, HostHeight - MediumTopGeometry - FloatInset);
@@ -198,7 +225,8 @@ public static class CupertinoSheet
 
         private void OnTick(object? sender, EventArgs e)
         {
-            SetY(_y + (_target - _y) * (1 - Math.Exp(-16.0 / Tau)));
+            SetY(CupertinoAccessibility.ReduceMotion ? _target :
+                _y + (_target - _y) * (1 - Math.Exp(-16.0 / Tau)));
             if (Math.Abs(_y - _target) < 0.5)
             {
                 SetY(_target);
@@ -209,6 +237,14 @@ public static class CupertinoSheet
         }
 
         private void OnScrimPressed(object? sender, PointerPressedEventArgs e) => Dismiss();
+
+        private void OnKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Escape)
+                return;
+            Dismiss();
+            e.Handled = true;
+        }
 
         private void OnSheetPressed(object? sender, PointerPressedEventArgs e)
         {
@@ -330,6 +366,7 @@ public static class CupertinoSheet
             if (_tornDown)
                 return;
             _tornDown = true;
+            var restoreFocus = _presenter.IsKeyboardFocusWithin;
             _timer.Stop();
             _timer.Tick -= OnTick;
             _scrim.PointerPressed -= OnScrimPressed;
@@ -339,7 +376,11 @@ public static class CupertinoSheet
             _presenter.RemoveHandler(InputElement.PointerCaptureLostEvent, OnSheetCaptureLost);
             _root.DetachedFromVisualTree -= OnRootDetached;
             _host.PropertyChanged -= OnHostPropertyChanged;
+            _presenter.KeyDown -= OnKeyDown;
             _layer.Children.Remove(_root);
+            _presenter.Content = null;
+            if (restoreFocus && _previousFocus is Visual visual && TopLevel.GetTopLevel(visual) == _host)
+                _previousFocus.Focus();
             _done.TrySetResult();
         }
 

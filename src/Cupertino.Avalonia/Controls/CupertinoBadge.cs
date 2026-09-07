@@ -10,9 +10,15 @@ namespace Cupertino.Controls;
 /// </summary>
 public class CupertinoBadge : TemplatedControl
 {
+    /// <summary>
+    /// Identifies the <see cref="Value"/> property.
+    /// </summary>
     public static readonly StyledProperty<int> ValueProperty =
         AvaloniaProperty.Register<CupertinoBadge, int>(nameof(Value), -1);
 
+    /// <summary>
+    /// Identifies the <see cref="Text"/> property.
+    /// </summary>
     public static readonly DirectProperty<CupertinoBadge, string> TextProperty =
         AvaloniaProperty.RegisterDirect<CupertinoBadge, string>(nameof(Text), b => b.Text);
 
@@ -36,11 +42,15 @@ public class CupertinoBadge : TemplatedControl
         private set => SetAndRaise(TextProperty, ref _text, value);
     }
 
+    /// <summary>
+    /// Creates a CupertinoBadge with its default settings.
+    /// </summary>
     public CupertinoBadge()
     {
         UpdateFromValue(Value);
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);

@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation">
 
   <ControlTheme x:Key="CupertinoListBoxItem" TargetType="ListBoxItem">
     <Setter Property="FocusAdorner" Value="{x:Null}" />
@@ -16,7 +17,7 @@
           <Border x:Name="RowBackground" Background="{TemplateBinding Background}">
             <Border.Transitions>
               <Transitions>
-                <BrushTransition Property="Background" Duration="0:0:0.18" />
+                <BrushTransition Property="Background" Duration="{motion:MotionDuration 180}" />
               </Transitions>
             </Border.Transitions>
           </Border>

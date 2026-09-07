@@ -11,40 +11,91 @@ namespace Cupertino.Controls;
 /// </summary>
 public class CupertinoPageControl : Control
 {
+    /// <summary>
+    /// Identifies the <see cref="NumberOfPages"/> property.
+    /// </summary>
     public static readonly StyledProperty<int> NumberOfPagesProperty =
         AvaloniaProperty.Register<CupertinoPageControl, int>(nameof(NumberOfPages), 1);
 
+    /// <summary>
+    /// Identifies the <see cref="CurrentPage"/> property.
+    /// </summary>
     public static readonly StyledProperty<int> CurrentPageProperty =
         AvaloniaProperty.Register<CupertinoPageControl, int>(
             nameof(CurrentPage), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
+    /// <summary>
+    /// Identifies the <see cref="HidesForSinglePage"/> property.
+    /// </summary>
     public static readonly StyledProperty<bool> HidesForSinglePageProperty =
         AvaloniaProperty.Register<CupertinoPageControl, bool>(nameof(HidesForSinglePage), true);
 
+    /// <summary>
+    /// Identifies the <see cref="AllowsContinuousInteraction"/> property.
+    /// </summary>
     public static readonly StyledProperty<bool> AllowsContinuousInteractionProperty =
         AvaloniaProperty.Register<CupertinoPageControl, bool>(nameof(AllowsContinuousInteraction), true);
 
+    /// <summary>
+    /// Identifies the <see cref="DotSize"/> property.
+    /// </summary>
     public static readonly StyledProperty<double> DotSizeProperty =
         AvaloniaProperty.Register<CupertinoPageControl, double>(nameof(DotSize), 7);
 
+    /// <summary>
+    /// Identifies the <see cref="DotSpacing"/> property.
+    /// </summary>
     public static readonly StyledProperty<double> DotSpacingProperty =
         AvaloniaProperty.Register<CupertinoPageControl, double>(nameof(DotSpacing), 9);
 
+    /// <summary>
+    /// Identifies the <see cref="ActiveBrush"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush> ActiveBrushProperty =
         AvaloniaProperty.Register<CupertinoPageControl, IBrush>(nameof(ActiveBrush), Brushes.Black);
 
+    /// <summary>
+    /// Identifies the <see cref="InactiveBrush"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush> InactiveBrushProperty =
         AvaloniaProperty.Register<CupertinoPageControl, IBrush>(nameof(InactiveBrush), Brushes.Gray);
 
+    /// <summary>
+    /// The page count, normalized to a nonnegative value. Updating it also clamps CurrentPage.
+    /// </summary>
     public int NumberOfPages { get => GetValue(NumberOfPagesProperty); set => SetValue(NumberOfPagesProperty, value); }
+    /// <summary>
+    /// The zero-based selected page, clamped to the available page range.
+    /// </summary>
     public int CurrentPage { get => GetValue(CurrentPageProperty); set => SetValue(CurrentPageProperty, value); }
+    /// <summary>
+    /// Hides the indicator when there is no more than one page.
+    /// </summary>
     public bool HidesForSinglePage { get => GetValue(HidesForSinglePageProperty); set => SetValue(HidesForSinglePageProperty, value); }
+    /// <summary>
+    /// Updates the selected page continuously while dragging across the dots.
+    /// </summary>
     public bool AllowsContinuousInteraction { get => GetValue(AllowsContinuousInteractionProperty); set => SetValue(AllowsContinuousInteractionProperty, value); }
+    /// <summary>
+    /// The dot diameter in logical pixels.
+    /// </summary>
     public double DotSize { get => GetValue(DotSizeProperty); set => SetValue(DotSizeProperty, value); }
+    /// <summary>
+    /// The gap between adjacent dots in logical pixels.
+    /// </summary>
     public double DotSpacing { get => GetValue(DotSpacingProperty); set => SetValue(DotSpacingProperty, value); }
+    /// <summary>
+    /// The brush for the selected page dot.
+    /// </summary>
     public IBrush ActiveBrush { get => GetValue(ActiveBrushProperty); set => SetValue(ActiveBrushProperty, value); }
+    /// <summary>
+    /// The brush for the unselected page dots.
+    /// </summary>
     public IBrush InactiveBrush { get => GetValue(InactiveBrushProperty); set => SetValue(InactiveBrushProperty, value); }
 
+    /// <summary>
+    /// Raised when the selected page changes, including changes caused by page-count coercion.
+    /// </summary>
     public event EventHandler? CurrentPageChanged;
 
     private bool _tracking;
@@ -59,6 +110,7 @@ public class CupertinoPageControl : Control
         FocusableProperty.OverrideDefaultValue<CupertinoPageControl>(true);
     }
 
+    /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize)
     {
         var count = Math.Max(0, NumberOfPages);
@@ -68,6 +120,7 @@ public class CupertinoPageControl : Control
         return new Size(Math.Min(width, availableSize.Width), Math.Min(Math.Max(20, DotSize), availableSize.Height));
     }
 
+    /// <inheritdoc/>
     public override void Render(DrawingContext context)
     {
         var count = Math.Max(0, NumberOfPages);
@@ -85,6 +138,7 @@ public class CupertinoPageControl : Control
         }
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -129,6 +183,7 @@ public class CupertinoPageControl : Control
         SetCurrentValue(CurrentPageProperty, logical);
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
@@ -140,6 +195,7 @@ public class CupertinoPageControl : Control
         e.Handled = true;
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
@@ -147,6 +203,7 @@ public class CupertinoPageControl : Control
             SelectAt(e.GetPosition(this));
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
@@ -159,12 +216,14 @@ public class CupertinoPageControl : Control
         e.Handled = true;
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
         base.OnPointerCaptureLost(e);
         _tracking = false;
     }
 
+    /// <inheritdoc/>
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);

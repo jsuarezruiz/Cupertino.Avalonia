@@ -9,12 +9,12 @@
       <TextBlock Text="Controls" FontSize="34" FontWeight="Bold"
                  Foreground="{DynamicResource CupertinoLabelBrush}"
                  Margin="20,0,20,2" />
-      <TextBlock Text="Every control, with its main cases."
+      <TextBlock Text="Explore common controls and try their different states."
                  FontSize="15" Margin="20,0,20,22"
                  Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
 
       <cupertino:Section Header="BUTTON"
-                         Footer="Default renders on live glass. Style classes: prominent, bordered, plain, small, large.">
+                         Footer="Compare button appearances and sizes. Use prominent for a main action, bordered for a subtle background, or plain for a text-only appearance.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Glass" />
@@ -52,7 +52,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="TOGGLESWITCH"
-                         Footer="63×28pt track, 37×24pt capsule knob. Drag the knob: the track colour follows it.">
+                         Footer="Select the switch or drag its handle to turn it on or off. The track colour changes with its state.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="States" />
@@ -73,7 +73,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="SLIDER"
-                         Footer="5.7pt rail, 37×24pt thumb, the same capsule the switch uses.">
+                         Footer="Drag the slider to adjust its value. The coloured part of the track shows the current position within the range.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Value" />
@@ -94,7 +94,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="TEXTBOX"
-                         Footer="Classes: plain for list rows, search for a search field, glass to render on live glass.">
+                         Footer="Try entering text, searching, and selecting read-only text. The disabled field cannot be edited.">
         <StackPanel Margin="16,12" Spacing="10">
           <TextBox PlaceholderText="Bordered field" />
           <TextBox Text="Typed value" />
@@ -106,7 +106,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CHECKBOX &amp; RADIOBUTTON"
-                         Footer="iOS has no standalone checkbox; these follow the Reminders idiom: a filled circle with a checkmark.">
+                         Footer="Use checkboxes for independent options and radio buttons for a single choice within a group.">
         <StackPanel Margin="16,12" Spacing="10">
           <CheckBox Content="Checked" IsChecked="True" />
           <CheckBox Content="Unchecked" />
@@ -120,7 +120,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="COMBOBOX"
-                         Footer="ComboBox renders as the iOS menu button: accent label plus a chevron.up.chevron.down, with a thick-material dropdown.">
+                         Footer="Open the menu to choose an item. The selected item appears in the button beside the menu arrows.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Picker" />
@@ -154,7 +154,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUPERTINONAVIGATIONBAR"
-                         Footer="Large title collapsing to an inline one over 68pt of scroll. CollapseProgress is settable, so both ends are shown here without a scroller; bind Scroller to drive it from real content.">
+                         Footer="Compare the large title with its compact appearance. Connect Scroller to a ScrollViewer to collapse the title as content scrolls; CollapseProgress lets you preview each state.">
         <StackPanel Spacing="10" Margin="0,8,0,12">
           <Border Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
                   CornerRadius="10" ClipToBounds="True" Height="168">
@@ -183,7 +183,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="REPEATBUTTON, TOGGLEBUTTON, SPLITBUTTON, DROPDOWNBUTTON, HYPERLINKBUTTON"
-                         Footer="RepeatButton, ToggleButton, SplitButton, DropDownButton and HyperlinkButton all take the capsule, so reaching for one does not drop Fluent styling into the app.">
+                         Footer="Compare buttons for repeated actions, on/off options, menus, and links. Each uses an appearance that fits the Cupertino theme.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Repeat" />
@@ -251,14 +251,14 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CALENDAR"
-                         Footer="Avalonia's Calendar with Cupertino styling, accent selection and subdued adjacent months.">
+                         Footer="Browse months and select a date. The selected day uses the accent colour, while days from adjacent months appear dimmed.">
         <Panel Margin="8,8">
           <Calendar x:Name="DemoCalendar" HorizontalAlignment="Center" />
         </Panel>
       </cupertino:Section>
 
       <cupertino:Section Header="EXPANDER"
-                         Footer="Expander renders as an iOS disclosure group: a 52pt row whose chevron turns down, with the revealed rows indented 21pt.">
+                         Footer="Select the header to show or hide the rows beneath it. The arrow turns to indicate whether the group is open.">
         <StackPanel>
           <Expander Header="Wi-Fi Networks" Margin="16,0">
             <StackPanel>
@@ -284,7 +284,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUPERTINODATEPICKER &amp; CUPERTINOTIMEPICKER"
-                         Footer="Compact fields are capsules in iOS 26. Tapping a date opens a calendar; tapping a time opens the wheel, which spins, flings and settles, and a tap on any visible row scrolls it into the selection.">
+                         Footer="Open a date field to choose from a calendar, or a time field to scroll the time wheels. Select a visible wheel row to move it into place.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Date" />
@@ -328,7 +328,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="NUMERICUPDOWN &amp; CONTEXTMENU"
-                         Footer="NumericUpDown renders the iOS stepper; add Classes=&quot;stepper&quot; to drop the text field. Right-click the row below for the menu.">
+                         Footer="Adjust a number with the minus and plus buttons. Use the stepper class to hide the text field. Right-click the sample row to open its context menu.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="With value" />
@@ -364,7 +364,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="PROGRESSBAR"
-                         Footer="4pt capsule over a system-fill track.">
+                         Footer="Use a filled bar when progress is known, or a spinner when the remaining work is unknown.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Determinate" />
@@ -379,7 +379,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="TABCONTROL &amp; TABSTRIP"
-                         Footer="TabControl Classes=&quot;segmented&quot; when segments own pages; TabStrip when they do not.">
+                         Footer="Use a segmented TabControl to switch between pages. A TabStrip provides tab selection for content managed by your app.">
         <StackPanel Margin="16,14" Spacing="12">
           <TabControl Classes="segmented" SelectedIndex="1">
             <TabItem Header="Years" />
@@ -394,7 +394,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="LISTBOX"
-                         Footer="A plain ListBox inside a Section; add Classes=&quot;icons&quot; when rows carry a 29pt tile.">
+                         Footer="Choose an item from a list inside a Section. Add the icons class when rows include an icon beside the label.">
         <ListBox SelectionMode="Single" SelectedIndex="0">
           <ListBoxItem Content="First row" />
           <ListBoxItem Content="Second row" />
@@ -403,7 +403,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="DIALOG"
-                         Footer="Hosted in the window's overlay layer, so the glass samples the app behind it.">
+                         Footer="Open an alert or action sheet to try different ways of presenting a choice over the current page.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Alert" />

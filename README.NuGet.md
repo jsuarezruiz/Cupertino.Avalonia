@@ -24,7 +24,9 @@ Add `CupertinoTheme` after your base theme.
 </Application>
 ```
 
-See the [gallery and screenshots](https://github.com/jsuarezruiz/Cupertino.Avalonia#gallery) for the complete control catalogue.
+Your app supplies system accessibility preferences through `CupertinoAccessibility`. See the [accessibility guide](https://jsuarezruiz.github.io/Cupertino.Avalonia/docs/fundamentals/accessibility-and-platforms.html) for setup.
+
+See the [gallery and screenshots](https://github.com/jsuarezruiz/Cupertino.Avalonia#the-gallery) for the complete control catalogue.
 
 ## Links
 

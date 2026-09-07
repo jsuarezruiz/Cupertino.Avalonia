@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <ControlTheme x:Key="{x:Type controls:CupertinoListCell}" TargetType="controls:CupertinoListCell">
@@ -18,7 +19,7 @@
                 Padding="{TemplateBinding Padding}">
           <Border.Transitions>
             <Transitions>
-              <BrushTransition Property="Background" Duration="0:0:0.2" />
+              <BrushTransition Property="Background" Duration="{motion:MotionDuration 200}" />
             </Transitions>
           </Border.Transitions>
           <Grid ColumnDefinitions="Auto,*,Auto,Auto" MinHeight="44">

@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <!-- Part names are required by RefreshContainer. -->
@@ -29,7 +30,7 @@
                                                Opacity="0">
             <controls:CupertinoActivityIndicator.Transitions>
               <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 150}" />
               </Transitions>
             </controls:CupertinoActivityIndicator.Transitions>
           </controls:CupertinoActivityIndicator>

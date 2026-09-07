@@ -13,6 +13,9 @@ using Avalonia.VisualTree;
 
 namespace Cupertino.Controls;
 
+/// <summary>
+/// Attaches the Cupertino opening and closing motion to supported flyout presenters.
+/// </summary>
 public static class CupertinoFlyoutTransition
 {
     private sealed class PropertyOwner : AvaloniaObject
@@ -32,6 +35,9 @@ public static class CupertinoFlyoutTransition
         Color = Colors.Transparent,
     });
 
+    /// <summary>
+    /// Identifies the <see cref="GetIsEnabled"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsEnabledProperty =
         AvaloniaProperty.RegisterAttached<PropertyOwner, AvaloniaObject, bool>("IsEnabled");
 
@@ -48,8 +54,10 @@ public static class CupertinoFlyoutTransition
             new AnonymousObserver<AvaloniaPropertyChangedEventArgs<bool>>(OnIsEnabledChanged));
     }
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static bool GetIsEnabled(AvaloniaObject control) => control.GetValue(IsEnabledProperty);
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static void SetIsEnabled(AvaloniaObject control, bool value) =>
         control.SetValue(IsEnabledProperty, value);
 

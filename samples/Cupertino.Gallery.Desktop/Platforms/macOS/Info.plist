@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plist version="1.0">
+  <dict>
+    <key>CFBundleDisplayName</key>
+    <string>Cupertino Gallery</string>
+    <key>CFBundleExecutable</key>
+    <string>$(AssemblyName)</string>
+    <key>CFBundleGetInfoString</key>
+    <string>Interactive control gallery for the Cupertino.Avalonia iOS 26 design system.</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIdentifier</key>
+    <string>net.avaloniaui.cupertino.gallery</string>
+    <key>CFBundleName</key>
+    <string>Cupertino Gallery</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>$(Version)</string>
+    <key>CFBundleVersion</key>
+    <string>$(Version)</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>12.0</string>
+    <key>NSHighResolutionCapable</key>
+    <true />
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 Javier Suárez Ruiz</string>
+  </dict>
+</plist>

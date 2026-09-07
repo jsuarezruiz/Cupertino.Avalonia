@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="TabStrip is the bar without pages: the same segmented capsule, selection only.">
+                         Footer="A TabStrip lets users select a tab. Your app decides what to show when the selection changes.">
         <StackPanel Margin="16,14">
           <TabStrip Classes="segmented" SelectedIndex="0">
             <TabStripItem Content="Years" />
@@ -19,7 +19,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="Bring your own content: the strip drives whatever the app pairs it with, here a TransitioningContentControl cross-fades on selection.">
+                         Footer="Connect the selected tab to your own content. Here, changing tabs fades between two text views.">
         <StackPanel>
           <Grid Classes="case">
             <TabStrip x:Name="ModeStrip" Classes="segmented" SelectedIndex="0"
@@ -36,7 +36,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="BOTTOM STRIP"
-                         Footer="Classes=&quot;bottom&quot; on a TabStrip is the floating glass bar alone, with the same lens, gestures and detached accessory as the TabControl one, with no page host.">
+                         Footer="Use the bottom class for a floating glass tab strip. It supports the same selection gestures and separate circular tab as the bottom TabControl.">
         <Grid Classes="case">
           <Border CornerRadius="10" ClipToBounds="True" Height="300">
             <Panel>

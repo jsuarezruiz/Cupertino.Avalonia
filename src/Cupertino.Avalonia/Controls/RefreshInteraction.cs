@@ -17,6 +17,9 @@ public static class RefreshInteraction
     private const double BandHeight = 60;
     private const double SettleRate = 14;
 
+    /// <summary>
+    /// Identifies the <see cref="GetIsEnabled"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsEnabledProperty =
         AvaloniaProperty.RegisterAttached<TemplatedControl, bool>("IsEnabled", typeof(RefreshInteraction));
 
@@ -35,9 +38,11 @@ public static class RefreshInteraction
         });
     }
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static void SetIsEnabled(TemplatedControl element, bool value) =>
         element.SetValue(IsEnabledProperty, value);
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static bool GetIsEnabled(TemplatedControl element) =>
         element.GetValue(IsEnabledProperty);
 

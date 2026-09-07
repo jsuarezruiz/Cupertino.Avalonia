@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation">
 
   <!-- Spin buttons must remain inside ButtonSpinner's template. -->
 
@@ -13,7 +14,7 @@
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Transitions">
       <Transitions>
-        <BrushTransition Property="Foreground" Duration="0:0:0.1" />
+        <BrushTransition Property="Foreground" Duration="{motion:MotionDuration 100}" />
       </Transitions>
     </Setter>
     <Setter Property="Template">
@@ -22,7 +23,7 @@
           <Border x:Name="Fill" Background="Transparent">
             <Border.Transitions>
               <Transitions>
-                <BrushTransition Property="Background" Duration="0:0:0.18" />
+                <BrushTransition Property="Background" Duration="{motion:MotionDuration 180}" />
               </Transitions>
             </Border.Transitions>
           </Border>

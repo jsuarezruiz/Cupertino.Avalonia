@@ -12,9 +12,15 @@ namespace Cupertino.Themes;
 /// </summary>
 public class CupertinoTheme : Styles
 {
+    /// <summary>
+    /// Identifies the <see cref="Accent"/> property.
+    /// </summary>
     public static readonly StyledProperty<Color?> AccentProperty =
         AvaloniaProperty.Register<CupertinoTheme, Color?>(nameof(Accent));
 
+    /// <summary>
+    /// Overrides the theme accent family. Setting null restores the light and dark palette defaults.
+    /// </summary>
     public Color? Accent
     {
         get => GetValue(AccentProperty);
@@ -31,11 +37,14 @@ public class CupertinoTheme : Styles
         ("CupertinoProminentTint", 0xFF, 0xFF, true),
     ];
 
-    private static readonly Color LightBlue = Color.FromRgb(0x00, 0x88, 0xFF);
+    private static readonly Color LightBlue = Color.FromRgb(0x00, 0x7A, 0xFF);
     private static readonly Color DarkBlue = Color.FromRgb(0x0A, 0x84, 0xFF);
 
-    private static readonly Color LightTabBlue = Color.FromRgb(0x00, 0x53, 0xDB);
+    private static readonly Color LightTabBlue = Color.FromRgb(0x00, 0x7A, 0xFF);
 
+    /// <summary>
+    /// Creates a CupertinoTheme with its default settings.
+    /// </summary>
     public CupertinoTheme(IServiceProvider? sp = null)
     {
         CupertinoFlyoutTransition.Initialize();
@@ -94,6 +103,7 @@ public class CupertinoTheme : Styles
         return FontFamily.Default;
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);

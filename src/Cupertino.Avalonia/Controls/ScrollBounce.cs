@@ -17,6 +17,9 @@ public sealed class ScrollBounce
     {
     }
 
+    /// <summary>
+    /// Identifies the <see cref="GetIsEnabled"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsEnabledProperty =
         AvaloniaProperty.RegisterAttached<ScrollBounce, ScrollViewer, bool>("IsEnabled");
 
@@ -29,7 +32,9 @@ public sealed class ScrollBounce
     private const int IdleMs = 90;
     private const double DecayRate = 12;
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static bool GetIsEnabled(ScrollViewer viewer) => viewer.GetValue(IsEnabledProperty);
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static void SetIsEnabled(ScrollViewer viewer, bool value) => viewer.SetValue(IsEnabledProperty, value);
 
     static ScrollBounce()

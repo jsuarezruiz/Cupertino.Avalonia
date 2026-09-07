@@ -32,7 +32,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="CLEAR GLASS"
-                         Footer="The lens: blur, refraction, a chromatic edge and a specular rim, sampling the content behind it live.">
+                         Footer="The glass blurs and bends the content behind it, with highlights around its edges.">
         <Panel Height="170" Margin="16,14">
           <Border CornerRadius="18" ClipToBounds="True">
             <Border>
@@ -58,7 +58,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="THICK MATERIAL"
-                         Footer="The alert's material: flat and vibrant. Saturation is boosted, not reduced, so the panel keeps the backdrop's chroma while staying legible.">
+                         Footer="This denser background keeps the colours behind it visible while making text easier to read. It is used for surfaces such as alerts.">
         <Panel Height="170" Margin="16,14">
           <Border CornerRadius="18" ClipToBounds="True">
             <Border>
@@ -86,7 +86,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="PLAYGROUND"
-                         Footer="The material's dials, live. These are the same GlassSurface properties every control's surface tunes.">
+                         Footer="Move the sliders to see how blur, colour, highlights, and distortion change the glass above.">
         <StackPanel>
           <Panel Height="190" Margin="16,14">
             <Border CornerRadius="18" ClipToBounds="True">
@@ -109,7 +109,7 @@
                     </RadialGradientBrush>
                   </Ellipse.Fill>
                 </Ellipse>
-                <TextBlock Text="backdrop" FontSize="13" Foreground="#66FFFFFF"
+                <TextBlock Text="Background" FontSize="13" Foreground="#66FFFFFF"
                            HorizontalAlignment="Right" VerticalAlignment="Bottom"
                            Margin="0,0,12,8" />
               </Panel>
@@ -141,12 +141,12 @@
             <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #ThicknessDial.Value, StringFormat='{}{0:0.0}'}" />
           </Grid>
           <Grid Classes="case" ColumnDefinitions="96,*,44">
-            <TextBlock Classes="case" Text="Refraction" />
+            <TextBlock Classes="case" Text="Distortion" />
             <Slider x:Name="RefractionDial" Grid.Column="1" Maximum="30" Value="18" VerticalAlignment="Center" />
             <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #RefractionDial.Value, StringFormat='{}{0:0.0}'}" />
           </Grid>
           <Grid Classes="case" ColumnDefinitions="96,*,44">
-            <TextBlock Classes="case" Text="Aberration" />
+            <TextBlock Classes="case" Text="Colour fringe" />
             <Slider x:Name="AberrationDial" Grid.Column="1" Maximum="2" Value="0.5" VerticalAlignment="Center" />
             <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #AberrationDial.Value, StringFormat='{}{0:0.00}'}" />
           </Grid>
@@ -156,12 +156,12 @@
             <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #SaturationDial.Value, StringFormat='{}{0:0.0}'}" />
           </Grid>
           <Grid Classes="case" ColumnDefinitions="96,*,44">
-            <TextBlock Classes="case" Text="Specular" />
+            <TextBlock Classes="case" Text="Highlight" />
             <Slider x:Name="LightDial" Grid.Column="1" Maximum="2" Value="0.9" VerticalAlignment="Center" />
             <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #LightDial.Value, StringFormat='{}{0:0.0}'}" />
           </Grid>
           <Grid Classes="case" ColumnDefinitions="96,*,44">
-            <TextBlock Classes="case" Text="Fresnel" />
+            <TextBlock Classes="case" Text="Edge glow" />
             <Slider x:Name="FresnelDial" Grid.Column="1" Maximum="3" Value="1.2" VerticalAlignment="Center" />
             <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #FresnelDial.Value, StringFormat='{}{0:0.0}'}" />
           </Grid>
@@ -171,7 +171,7 @@
             <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #DepthDial.Value, StringFormat='{}{0:0.00}'}" />
           </Grid>
           <Grid Classes="case" ColumnDefinitions="96,*,44">
-            <TextBlock Classes="case" Text="Magnify" />
+            <TextBlock Classes="case" Text="Zoom" />
             <Slider x:Name="MagnifyDial" Grid.Column="1" Minimum="1" Maximum="1.4" Value="1" VerticalAlignment="Center" />
             <TextBlock Grid.Column="2" Classes="dialvalue" Text="{Binding #MagnifyDial.Value, StringFormat='{}{0:0.00}'}" />
           </Grid>

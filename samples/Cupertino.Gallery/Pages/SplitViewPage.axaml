@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="OVERLAY"
-                         Footer="Overlay slides the pane in over a dismissing scrim. The sidebar idiom belongs to iPad and Mac.">
+                         Footer="In Overlay mode, the pane opens over the content. Select the dimmed background to close it.">
         <StackPanel>
         <Grid Classes="case">
           <ToggleButton x:Name="PaneToggle" Content="Toggle pane"
@@ -34,7 +34,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="INLINE"
-                         Footer="Inline gives the pane its own column and the content yields instead of being covered.">
+                         Footer="In Inline mode, the pane has its own space beside the content. Opening it reduces the space available to the main view.">
         <StackPanel>
         <Grid Classes="case">
           <ToggleButton Content="Toggle pane"

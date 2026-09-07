@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="A determinate bar is a 4pt accent capsule over a system-fill track.">
+                         Footer="Use a progress bar when you know how much work is complete. The filled portion shows the value within its range.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Value 25" />
@@ -28,7 +28,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="Foreground retints the capsule; the track keeps the system fill.">
+                         Footer="Set Foreground to change the progress colour. The background track continues to follow the theme.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Purple" />
@@ -43,7 +43,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="INDETERMINATE"
-                         Footer="IsIndeterminate swaps the capsule for the iOS eight-spoke spinner.">
+                         Footer="Set IsIndeterminate to show a spinner when the amount of remaining work is unknown.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Spinner" />
@@ -53,7 +53,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="ACTIVITY INDICATOR"
-                         Footer="CupertinoActivityIndicator is the spinner on its own: 20pt by default, sized by Width, and hidden entirely when IsActive is false.">
+                         Footer="Use CupertinoActivityIndicator for a standalone spinner. Set Width and Height to change its size, or turn off IsActive to hide it. Try the switch below.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Regular" />
@@ -78,7 +78,7 @@
           </Grid>
           <Rectangle Classes="hair" />
           <Grid Classes="case" ColumnDefinitions="Auto,*">
-            <TextBlock Classes="case" Text="Hides stopped" />
+            <TextBlock Classes="case" Text="Active" />
             <WrapPanel Grid.Column="1" Classes="specimens">
               <cupertino:CupertinoActivityIndicator IsActive="{Binding #SpinSwitch.IsChecked}"
                                                     VerticalAlignment="Center" />

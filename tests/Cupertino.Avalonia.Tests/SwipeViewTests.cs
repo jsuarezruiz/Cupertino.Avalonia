@@ -12,9 +12,17 @@ using Xunit;
 
 namespace Cupertino.Avalonia.Tests;
 
-public class SwipeViewTests
+public sealed class SwipeViewTests : IDisposable
 {
-    private static (Window Window, CupertinoSwipeView Swipe, Button Delete) Show()
+    private readonly List<Window> _windows = new();
+
+    public void Dispose()
+    {
+        foreach (var window in _windows)
+            window.Close();
+    }
+
+    private (Window Window, CupertinoSwipeView Swipe, Button Delete) Show()
     {
         var delete = new Button { Content = "Delete", Classes = { "swipe", "swipe-destructive" } };
         var swipe = new CupertinoSwipeView
@@ -24,6 +32,7 @@ public class SwipeViewTests
             Content = new TextBlock { Text = "row" },
         };
         var window = new Window { Width = 320, Height = 200, Content = new StackPanel { Children = { swipe } } };
+        _windows.Add(window);
         window.Show();
         window.UpdateLayout();
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
@@ -56,7 +65,9 @@ public class SwipeViewTests
         try
         {
             var (window, swipe, _) = Show();
-            Drag(window, 250, 230);
+            // A short, slow drag should close; an immediate synthetic drag can
+            // legitimately meet the velocity threshold for opening as a flick.
+            Drag(window, 250, 230, moveDelayMilliseconds: 20);
             var content = swipe.GetVisualDescendants().OfType<ContentPresenter>()
                 .Single(p => p.Name == "PART_Content");
             var shift = Assert.IsType<TranslateTransform>(content.RenderTransform);

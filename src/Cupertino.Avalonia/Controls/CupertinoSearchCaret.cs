@@ -12,12 +12,21 @@ namespace Cupertino.Controls;
 /// </summary>
 public sealed class CupertinoSearchCaret : Control
 {
+    /// <summary>
+    /// Identifies the <see cref="Brush"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush?> BrushProperty =
         AvaloniaProperty.Register<CupertinoSearchCaret, IBrush?>(nameof(Brush));
 
+    /// <summary>
+    /// Identifies the <see cref="CaretWidth"/> property.
+    /// </summary>
     public static readonly StyledProperty<double> CaretWidthProperty =
         AvaloniaProperty.Register<CupertinoSearchCaret, double>(nameof(CaretWidth), 2);
 
+    /// <summary>
+    /// Identifies the <see cref="CaretHeight"/> property.
+    /// </summary>
     public static readonly StyledProperty<double> CaretHeightProperty =
         AvaloniaProperty.Register<CupertinoSearchCaret, double>(nameof(CaretHeight), 23);
 
@@ -27,6 +36,9 @@ public sealed class CupertinoSearchCaret : Control
     private bool _blinkOn;
     private bool _invalidateQueued;
 
+    /// <summary>
+    /// Creates a CupertinoSearchCaret with its default settings.
+    /// </summary>
     public CupertinoSearchCaret()
     {
         _blinkTimer = new DispatcherTimer(
@@ -48,24 +60,34 @@ public sealed class CupertinoSearchCaret : Control
         ];
     }
 
+    /// <summary>
+    /// The brush used to draw the custom caret.
+    /// </summary>
     public IBrush? Brush
     {
         get => GetValue(BrushProperty);
         set => SetValue(BrushProperty, value);
     }
 
+    /// <summary>
+    /// The caret width in logical pixels.
+    /// </summary>
     public double CaretWidth
     {
         get => GetValue(CaretWidthProperty);
         set => SetValue(CaretWidthProperty, value);
     }
 
+    /// <summary>
+    /// The caret height in logical pixels.
+    /// </summary>
     public double CaretHeight
     {
         get => GetValue(CaretHeightProperty);
         set => SetValue(CaretHeightProperty, value);
     }
 
+    /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -84,6 +106,7 @@ public sealed class CupertinoSearchCaret : Control
         UpdateBlinking();
     }
 
+    /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _blinkTimer.Stop();
@@ -101,6 +124,7 @@ public sealed class CupertinoSearchCaret : Control
         base.OnDetachedFromVisualTree(e);
     }
 
+    /// <inheritdoc/>
     public override void Render(DrawingContext context)
     {
         base.Render(context);

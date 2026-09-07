@@ -13,10 +13,22 @@ namespace Cupertino.Controls;
 /// </summary>
 public static class SliderInteraction
 {
+    /// <summary>
+    /// The CSS class applied while the slider thumb is being manipulated.
+    /// </summary>
     public const string ActiveClass = "cupertino-active";
+    /// <summary>
+    /// The CSS class applied when the slider value equals its minimum.
+    /// </summary>
     public const string AtMinimumClass = "cupertino-at-minimum";
+    /// <summary>
+    /// The CSS class applied when the slider value equals its maximum.
+    /// </summary>
     public const string AtMaximumClass = "cupertino-at-maximum";
 
+    /// <summary>
+    /// Identifies the <see cref="GetIsEnabled"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsEnabledProperty =
         AvaloniaProperty.RegisterAttached<Slider, bool>("IsEnabled", typeof(SliderInteraction));
 
@@ -82,13 +94,21 @@ public static class SliderInteraction
         });
     }
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static void SetIsEnabled(Slider element, bool value) => element.SetValue(IsEnabledProperty, value);
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static bool GetIsEnabled(Slider element) => element.GetValue(IsEnabledProperty);
+    /// <inheritdoc cref="RailClipProperty"/>
     public static void SetRailClip(Thumb element, Geometry? value) => element.SetValue(RailClipProperty, value);
+    /// <inheritdoc cref="RailClipProperty"/>
     public static Geometry? GetRailClip(Thumb element) => element.GetValue(RailClipProperty);
+    /// <inheritdoc cref="RimTopBrushProperty"/>
     public static void SetRimTopBrush(Thumb element, IBrush? value) => element.SetValue(RimTopBrushProperty, value);
+    /// <inheritdoc cref="RimTopBrushProperty"/>
     public static IBrush? GetRimTopBrush(Thumb element) => element.GetValue(RimTopBrushProperty);
+    /// <inheritdoc cref="RimBottomBrushProperty"/>
     public static void SetRimBottomBrush(Thumb element, IBrush? value) => element.SetValue(RimBottomBrushProperty, value);
+    /// <inheritdoc cref="RimBottomBrushProperty"/>
     public static IBrush? GetRimBottomBrush(Thumb element) => element.GetValue(RimBottomBrushProperty);
 
     private static void OnTemplateApplied(object? sender, TemplateAppliedEventArgs e)

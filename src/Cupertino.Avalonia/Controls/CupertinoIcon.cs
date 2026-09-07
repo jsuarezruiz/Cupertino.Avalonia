@@ -76,12 +76,21 @@ public class CupertinoIcon : Control
     /// </summary>
     public static IReadOnlyCollection<string> Glyphs => Specs.Keys;
 
+    /// <summary>
+    /// Identifies the <see cref="Glyph"/> property.
+    /// </summary>
     public static readonly StyledProperty<string?> GlyphProperty =
         AvaloniaProperty.Register<CupertinoIcon, string?>(nameof(Glyph));
 
+    /// <summary>
+    /// Identifies the <see cref="Size"/> property.
+    /// </summary>
     public static readonly StyledProperty<double> SizeProperty =
         AvaloniaProperty.Register<CupertinoIcon, double>(nameof(Size), 24);
 
+    /// <summary>
+    /// Identifies the <see cref="Foreground"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush?> ForegroundProperty =
         AvaloniaProperty.Register<CupertinoIcon, IBrush?>(nameof(Foreground));
 
@@ -92,9 +101,21 @@ public class CupertinoIcon : Control
         AvaloniaProperty.Register<CupertinoIcon, double>(nameof(StrokeThickness), double.NaN);
 
 
+    /// <summary>
+    /// The named icon to render from the built-in glyph catalogue.
+    /// </summary>
     public string? Glyph { get => GetValue(GlyphProperty); set => SetValue(GlyphProperty, value); }
+    /// <summary>
+    /// The requested square icon size in logical pixels.
+    /// </summary>
     public double Size { get => GetValue(SizeProperty); set => SetValue(SizeProperty, value); }
+    /// <summary>
+    /// The brush used to draw the text or indicator.
+    /// </summary>
     public IBrush? Foreground { get => GetValue(ForegroundProperty); set => SetValue(ForegroundProperty, value); }
+    /// <summary>
+    /// The icon stroke width in logical pixels.
+    /// </summary>
     public double StrokeThickness { get => GetValue(StrokeThicknessProperty); set => SetValue(StrokeThicknessProperty, value); }
 
     static CupertinoIcon()
@@ -103,6 +124,9 @@ public class CupertinoIcon : Control
         AffectsMeasure<CupertinoIcon>(SizeProperty);
     }
 
+    /// <summary>
+    /// Creates a CupertinoIcon with its default settings.
+    /// </summary>
     public CupertinoIcon()
     {
         // Use the label colour unless locally overridden.
@@ -110,8 +134,10 @@ public class CupertinoIcon : Control
                   Avalonia.Data.BindingPriority.Style);
     }
 
+    /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize) => new(Size, Size);
 
+    /// <inheritdoc/>
     public override void Render(DrawingContext context)
     {
         if (Glyph is null || !Specs.TryGetValue(Glyph, out var spec)

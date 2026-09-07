@@ -3,13 +3,24 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.Media;
 
 namespace Cupertino.Controls;
 
+/// <summary>
+/// Chooses between selecting a time of day and a countdown duration.
+/// </summary>
 public enum CupertinoTimePickerMode
 {
+    /// <summary>
+    /// Selects a time of day.
+    /// </summary>
     Time,
+    /// <summary>
+    /// Selects a duration from zero through MaximumDuration.
+    /// </summary>
     CountdownDuration,
 }
 
@@ -23,6 +34,9 @@ public class CupertinoTimePicker : TemplatedControl
     private static readonly TimeSpan LargestCountdownDuration =
         TimeSpan.FromHours(23) + TimeSpan.FromMinutes(59);
 
+    /// <summary>
+    /// Identifies the <see cref="SelectedTime"/> property.
+    /// </summary>
     public static readonly StyledProperty<TimeSpan?> SelectedTimeProperty =
         AvaloniaProperty.Register<CupertinoTimePicker, TimeSpan?>(
             nameof(SelectedTime), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
@@ -39,18 +53,33 @@ public class CupertinoTimePicker : TemplatedControl
     public static readonly StyledProperty<int> MinuteIncrementProperty =
         AvaloniaProperty.Register<CupertinoTimePicker, int>(nameof(MinuteIncrement), 1);
 
+    /// <summary>
+    /// Identifies the <see cref="IsDropDownOpen"/> property.
+    /// </summary>
     public static readonly StyledProperty<bool> IsDropDownOpenProperty =
         AvaloniaProperty.Register<CupertinoTimePicker, bool>(nameof(IsDropDownOpen));
 
+    /// <summary>
+    /// Identifies the <see cref="DisplayMode"/> property.
+    /// </summary>
     public static readonly StyledProperty<CupertinoPickerDisplayMode> DisplayModeProperty =
         AvaloniaProperty.Register<CupertinoTimePicker, CupertinoPickerDisplayMode>(nameof(DisplayMode));
 
+    /// <summary>
+    /// Identifies the <see cref="Mode"/> property.
+    /// </summary>
     public static readonly StyledProperty<CupertinoTimePickerMode> ModeProperty =
         AvaloniaProperty.Register<CupertinoTimePicker, CupertinoTimePickerMode>(nameof(Mode));
 
+    /// <summary>
+    /// Identifies the <see cref="MinimumTime"/> property.
+    /// </summary>
     public static readonly StyledProperty<TimeSpan?> MinimumTimeProperty =
         AvaloniaProperty.Register<CupertinoTimePicker, TimeSpan?>(nameof(MinimumTime));
 
+    /// <summary>
+    /// Identifies the <see cref="MaximumTime"/> property.
+    /// </summary>
     public static readonly StyledProperty<TimeSpan?> MaximumTimeProperty =
         AvaloniaProperty.Register<CupertinoTimePicker, TimeSpan?>(nameof(MaximumTime));
 
@@ -61,16 +90,44 @@ public class CupertinoTimePicker : TemplatedControl
         AvaloniaProperty.Register<CupertinoTimePicker, TimeSpan>(
             nameof(MaximumDuration), TimeSpan.FromHours(23) + TimeSpan.FromMinutes(59));
 
+    /// <summary>
+    /// The selected time or countdown duration, or null. Values are normalized to the active mode, minute interval, and bounds.
+    /// </summary>
     public TimeSpan? SelectedTime { get => GetValue(SelectedTimeProperty); set => SetValue(SelectedTimeProperty, value); }
+    /// <summary>
+    /// Use 12HourClock or 24HourClock; null follows the current culture.
+    /// </summary>
     public string? ClockIdentifier { get => GetValue(ClockIdentifierProperty); set => SetValue(ClockIdentifierProperty, value); }
+    /// <summary>
+    /// The minute-wheel interval, clamped to 1–59. Selections are normalized to the nearest permitted minute.
+    /// </summary>
     public int MinuteIncrement { get => GetValue(MinuteIncrementProperty); set => SetValue(MinuteIncrementProperty, value); }
+    /// <summary>
+    /// The requested popover state. A true value set before attachment opens once the template and overlay are available.
+    /// </summary>
     public bool IsDropDownOpen { get => GetValue(IsDropDownOpenProperty); set => SetValue(IsDropDownOpenProperty, value); }
+    /// <summary>
+    /// Chooses an inline editor or a compact field with a popover.
+    /// </summary>
     public CupertinoPickerDisplayMode DisplayMode { get => GetValue(DisplayModeProperty); set => SetValue(DisplayModeProperty, value); }
+    /// <summary>
+    /// Chooses a time of day or a countdown duration.
+    /// </summary>
     public CupertinoTimePickerMode Mode { get => GetValue(ModeProperty); set => SetValue(ModeProperty, value); }
+    /// <summary>
+    /// The inclusive lower time-of-day bound; ignored in countdown mode.
+    /// </summary>
     public TimeSpan? MinimumTime { get => GetValue(MinimumTimeProperty); set => SetValue(MinimumTimeProperty, value); }
+    /// <summary>
+    /// The inclusive upper time-of-day bound; ignored in countdown mode.
+    /// </summary>
     public TimeSpan? MaximumTime { get => GetValue(MaximumTimeProperty); set => SetValue(MaximumTimeProperty, value); }
+    /// <inheritdoc cref="MaximumDurationProperty"/>
     public TimeSpan MaximumDuration { get => GetValue(MaximumDurationProperty); set => SetValue(MaximumDurationProperty, value); }
 
+    /// <summary>
+    /// Whether the effective time mode and clock format use an AM/PM wheel.
+    /// </summary>
     public bool Is12Hour => Mode == CupertinoTimePickerMode.Time && (ClockIdentifier is { } id
         ? id == "12HourClock"
         : CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern.Contains('h', StringComparison.Ordinal));
@@ -85,40 +142,96 @@ public class CupertinoTimePicker : TemplatedControl
                                              CultureInfo.CurrentCulture)
         : "Select";
 
+    /// <summary>
+    /// Identifies the <see cref="DisplayText"/> property.
+    /// </summary>
     public static readonly DirectProperty<CupertinoTimePicker, string> DisplayTextProperty =
         AvaloniaProperty.RegisterDirect<CupertinoTimePicker, string>(
             nameof(DisplayText), o => o.DisplayText);
 
     private CupertinoWheel? _hours, _minutes, _period;
     private Button? _field;
+    private int _popoverVersion;
+    private ContentControl? _popoverBody;
     private ContentControl? _inlineHost;
     private bool _syncing;
 
+    /// <summary>
+    /// Raised after the selected time changes and has been normalized to the current constraints.
+    /// </summary>
     public event EventHandler? SelectedTimeChanged;
 
+    /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
+        ResetPopover();
+        if (_field is not null)
+            _field.Click -= OnFieldClick;
         base.OnApplyTemplate(e);
 
         _field = e.NameScope.Find<Button>("PART_FlyoutButton");
         if (_field is not null)
-            _field.Click += (_, _) => SetCurrentValue(IsDropDownOpenProperty, !IsDropDownOpen);
+            _field.Click += OnFieldClick;
         _inlineHost = e.NameScope.Find<ContentControl>("PART_InlineHost");
         UpdateModePresentation();
+        QueueOpen();
+    }
+
+    private void OnFieldClick(object? sender, RoutedEventArgs e) =>
+        SetCurrentValue(IsDropDownOpenProperty, !IsDropDownOpen);
+
+    /// <inheritdoc/>
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        QueueOpen();
+    }
+
+    /// <inheritdoc/>
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        ResetPopover();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void QueueOpen() => Dispatcher.UIThread.Post(() =>
+    {
+        if (IsDropDownOpen && DisplayMode == CupertinoPickerDisplayMode.Compact)
+            ShowPopover();
+    }, DispatcherPriority.Loaded);
+
+    private void ResetPopover()
+    {
+        ++_popoverVersion;
+        if (_field is not null)
+            CupertinoPopover.CloseImmediately(_field);
+        _popoverBody = null;
     }
 
     private void ShowPopover()
     {
-        if (_field is null)
+        if (_field is null || TopLevel.GetTopLevel(_field) is null ||
+            DisplayMode != CupertinoPickerDisplayMode.Compact)
             return;
-
-        var body = BuildWheelBody();
-        CupertinoPopover.Show(_field, body, 30,
-                              () => SetCurrentValue(IsDropDownOpenProperty, false));
+        if (_popoverBody is not null && CupertinoPopover.IsOpen(_field) && !CupertinoPopover.IsClosing(_field))
+            return;
+        ResetPopover();
+        var version = _popoverVersion;
+        _popoverBody = new ContentControl { Content = BuildWheelBody() };
+        CupertinoPopover.Show(_field, _popoverBody, 30, () =>
+        {
+            if (version != _popoverVersion)
+                return;
+            _popoverBody = null;
+            SetCurrentValue(IsDropDownOpenProperty, false);
+        });
     }
 
     private Panel BuildWheelBody()
     {
+        foreach (var wheel in new[] { _hours, _minutes, _period })
+            if (wheel is not null)
+                wheel.SelectionSettled -= OnWheelSettled;
         var culture = CultureInfo.CurrentCulture;
         var step = EffectiveMinuteIncrement;
         var durationHours = (int)Math.Floor(EffectiveMaximumDuration.TotalHours);
@@ -232,6 +345,7 @@ public class CupertinoTimePicker : TemplatedControl
         SetCurrentValue(SelectedTimeProperty, new TimeSpan(hour, minute, 0));
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -254,7 +368,8 @@ public class CupertinoTimePicker : TemplatedControl
             PseudoClasses.Set(":dropdownopen", IsDropDownOpen);
             if (IsDropDownOpen)
                 ShowPopover();
-            else if (_field is not null) CupertinoPopover.Close(_field);
+            else if (_field is not null)
+                CupertinoPopover.Close(_field);
         }
         else if (change.Property == DisplayModeProperty || change.Property == ModeProperty ||
                  change.Property == ClockIdentifierProperty || change.Property == MinuteIncrementProperty ||
@@ -295,8 +410,17 @@ public class CupertinoTimePicker : TemplatedControl
             if (_inlineHost is not null)
                 _inlineHost.Content = BuildWheelBody();
         }
-        else if (_inlineHost is not null)
-            _inlineHost.Content = null;
+        else
+        {
+            if (_inlineHost is not null)
+                _inlineHost.Content = null;
+            if (_popoverBody is not null)
+            {
+                _popoverBody.Content = BuildWheelBody();
+                if (_field is not null)
+                    CupertinoPopover.Reposition(_field);
+            }
+        }
     }
 
     private TimeSpan? CoerceTime(TimeSpan? value)

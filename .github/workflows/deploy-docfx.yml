@@ -34,10 +34,10 @@ jobs:
             10.0.x
 
       - name: Install DocFX
-        run: dotnet tool install --global docfx
+        run: dotnet tool install --global docfx --version 2.78.4
 
       - name: Build documentation
-        run: docfx docs/docfx.json
+        run: docfx docs/docfx.json --warningsAsErrors
 
       - name: Disable Jekyll processing
         run: touch docs/_site/.nojekyll

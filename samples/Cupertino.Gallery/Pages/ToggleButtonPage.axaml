@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="iOS has no sunken button, so a checked ToggleButton takes the prominent accent fill rather than shading.">
+                         Footer="A toggle button stays selected until you select it again. The accent background indicates that it is on.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Toggle" />
@@ -21,7 +21,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="Any content fits the capsule: styled glyphs make formatting toggles, and a composed panel makes a labelled one.">
+                         Footer="Use icons for familiar formatting actions, or combine an icon and label to explain the option.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Formatting" />
@@ -53,7 +53,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="IsThreeState adds an indeterminate stop that dims the capsule to 60%; disabled washes to 40% whichever state it holds.">
+                         Footer="Set IsThreeState to add an indeterminate state. Disabled buttons keep their current state and cannot be activated.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Three-state" />

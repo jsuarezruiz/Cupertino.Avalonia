@@ -5,6 +5,9 @@ namespace Cupertino.Controls;
 /// <summary>
 /// One snapshot of the operating system's accessibility preferences.
 /// </summary>
+/// <param name="ReduceTransparency">Use flat opaque glass fills.</param>
+/// <param name="ReduceMotion">Skip decorative transitions.</param>
+/// <param name="TextScaleFactor">Scale typography tokens; values are clamped to 0.8–2.35 when applied.</param>
 public readonly record struct CupertinoAccessibilitySettings(
     bool ReduceTransparency,
     bool ReduceMotion,
@@ -83,7 +86,7 @@ public static class CupertinoAccessibility
     }
 
     /// <summary>
-    /// Gets or sets the platform accessibility provider.
+    /// Gets or sets the host-supplied platform accessibility provider. No provider is installed automatically. Replacing it removes the old event subscription; the host owns disposal of native observers.
     /// </summary>
     public static ICupertinoAccessibilityProvider? Provider
     {

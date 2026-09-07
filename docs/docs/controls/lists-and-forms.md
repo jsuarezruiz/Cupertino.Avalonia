@@ -6,7 +6,7 @@ ms.date: 2026-08-27
 
 # Lists and forms
 
-`Section`, `CupertinoListCell`, and `CupertinoFormRow` provide reusable iOS list anatomy while keeping content and bindings flexible.
+Use `Section` to group content, `CupertinoListCell` for list rows, and `CupertinoFormRow` for labelled inputs.
 
 <img src="../../images/list-and-search.png"
      alt="Grouped lists and search results"
@@ -38,4 +38,4 @@ For editable forms, keep the label, control, help text, required state, and vali
 </cupertino:CupertinoFormRow>
 ```
 
-Use a real `ListBox` when selection, virtualization, or keyboard navigation is required. The Cupertino theme already gives it the matching row presentation.
+Use `ListBox` when you need selection, virtualization or keyboard navigation. The theme gives it matching row styles.

@@ -1,6 +1,6 @@
 # Releasing Cupertino.Avalonia
 
-Releases are created from version tags on `main`. The tag is the source of truth for the NuGet and assembly version; unversioned local builds identify themselves as `0.0.0-local`.
+Create releases from version tags on `main`. The tag sets the NuGet package and assembly version. Local builds without a version use `0.0.0-local`.
 
 ## One-time setup
 
@@ -21,7 +21,11 @@ git push origin v0.1.0-preview.1
 
 Tags must use `vMAJOR.MINOR.PATCH` or `vMAJOR.MINOR.PATCH-PRERELEASE`. Preview tags create GitHub prereleases; stable tags create normal releases and are marked as the latest release.
 
-The release workflow validates the tag and changelog, verifies that the tagged commit's `build` workflow passed, builds and tests the solution again with the release version, creates NuGet and symbol packages, and prepares a draft GitHub Release. It publishes to NuGet.org before publishing the GitHub Release. A rerun reuses an existing draft and safely skips a package version already present on NuGet.org.
+The release workflow checks the tag, changelog and successful CI build, then rebuilds and tests the solution with the release version. It creates NuGet and symbol packages, prepares a draft GitHub Release, and publishes to NuGet.org before publishing the release.
+
+Rerun a failed release from the same tag and commit. The workflow reuses the draft and skips package versions already on NuGet.org. Published NuGet versions cannot be replaced, even if unlisted; code changes need a new version and tag.
+
+You can replace assets in a GitHub draft. Published assets cannot be replaced when release immutability is enabled. See the [NuGet publishing rules](https://learn.microsoft.com/en-us/nuget/api/package-publish-resource) and [GitHub release rules](https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository).
 
 ## Build packages without releasing
 

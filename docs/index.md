@@ -6,7 +6,7 @@ ms.date: 2026-08-27
 
 # Build Avalonia apps with an iOS feel
 
-**Cupertino.Avalonia** is an iOS 26 design system for Avalonia. It themes the standard Avalonia controls and adds the navigation, presentation, picker, list, and Liquid Glass primitives that iOS applications need.
+**Cupertino.Avalonia** brings an iOS 26 appearance to Avalonia apps. It styles standard controls and adds navigation, sheets, pickers, grouped lists and Liquid Glass.
 
 <img src="images/cupertino-avalonia-banner.png"
      alt="Cupertino.Avalonia gallery"
@@ -29,4 +29,4 @@ ms.date: 2026-08-27
 | Design language | Dynamic colors, typography, motion, RTL behavior, accessibility adaptations, and Liquid Glass |
 | Platforms | Desktop, iOS, Android, and Browser |
 
-The [gallery project](https://github.com/jsuarezruiz/Cupertino.Avalonia/tree/main/samples/Cupertino.Gallery) is the executable companion to these docs. Each page shows live states and practical source code.
+Run the [gallery](docs/gallery.md) to try the controls and view the source for each example.

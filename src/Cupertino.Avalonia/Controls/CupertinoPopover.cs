@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Reactive;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 namespace Cupertino.Controls;
@@ -28,6 +29,9 @@ public static class CupertinoPopover
         public CupertinoFlyoutTransition.TransitionSession? Motion;
         public IDisposable? SizeSubscription;
         public EventHandler<VisualTreeAttachmentEventArgs>? AnchorDetachedHandler;
+        public EventHandler<KeyEventArgs>? KeyDownHandler;
+        public IInputElement? PreviousFocus;
+        public TopLevel Root = null!;
         public Action? OnClosed;
         public bool Closing;
         public bool Closed;
@@ -41,7 +45,7 @@ public static class CupertinoPopover
     public static bool IsOpen(Control anchor) => Open.ContainsKey(anchor);
 
     /// <summary>
-    /// Shows content beside an anchor.
+    /// Shows content beside an anchor, moves keyboard focus into it, and supports Escape dismissal.
     /// </summary>
     public static void Show(Control anchor, Control content, double cornerRadius, Action? onClosed)
     {
@@ -49,7 +53,7 @@ public static class CupertinoPopover
             return;
 
         var layer = OverlayLayer.GetOverlayLayer(anchor);
-        if (layer is null)
+        if (layer is null || TopLevel.GetTopLevel(anchor) is not { } root)
             return;
 
         var glass = new GlassSurface
@@ -90,6 +94,7 @@ public static class CupertinoPopover
         {
             ClipToBounds = false,
             Opacity = 0,
+            Focusable = true,
         };
         host.Children.Add(dismisser);
         host.Children.Add(panel);
@@ -102,8 +107,21 @@ public static class CupertinoPopover
             Panel = panel,
             ContentHost = contentHost,
             OnClosed = onClosed,
+            PreviousFocus = root.FocusManager?.GetFocusedElement(),
+            Root = root,
         };
         Open[anchor] = session;
+
+        KeyboardNavigation.SetTabNavigation(host, KeyboardNavigationMode.Cycle);
+        session.KeyDownHandler = (_, e) =>
+        {
+            if (e.Key == Key.Escape)
+            {
+                Close(anchor);
+                e.Handled = true;
+            }
+        };
+        host.KeyDown += session.KeyDownHandler;
 
         session.AnchorDetachedHandler = (_, _) => CloseCore(anchor, session, animate: false);
         anchor.DetachedFromVisualTree += session.AnchorDetachedHandler;
@@ -132,6 +150,14 @@ public static class CupertinoPopover
             anchor, panel, glass, contentHost, session.TargetBounds,
             () => FinishClose(anchor, session));
         host.Opacity = 1;
+        host.Focus();
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (session.Closed || session.Closing || !host.IsKeyboardFocusWithin)
+                return;
+            content.GetSelfAndVisualDescendants().OfType<InputElement>()
+                .FirstOrDefault(control => control.Focusable && control.IsEffectivelyEnabled && control.IsEffectivelyVisible)?.Focus();
+        }, DispatcherPriority.Loaded);
     }
 
     // Keep the popover inside the window.
@@ -189,6 +215,21 @@ public static class CupertinoPopover
         CloseCore(anchor, session, animate: true);
     }
 
+    internal static bool IsClosing(Control anchor) =>
+        Open.TryGetValue(anchor, out var session) && session.Closing;
+
+    internal static void CloseImmediately(Control anchor)
+    {
+        if (Open.TryGetValue(anchor, out var session))
+            CloseCore(anchor, session, animate: false);
+    }
+
+    internal static void Reposition(Control anchor)
+    {
+        if (Open.TryGetValue(anchor, out var session))
+            Position(anchor, session, session.Layer.Bounds);
+    }
+
     private static void CloseCore(Control anchor, Session session, bool animate)
     {
         if (session.Closed)
@@ -218,6 +259,7 @@ public static class CupertinoPopover
         if (session.Closed)
             return;
         session.Closed = true;
+        var restoreFocus = session.Host.IsKeyboardFocusWithin;
         var motion = session.Motion;
         session.Motion = null;
         session.SizeSubscription?.Dispose();
@@ -227,10 +269,23 @@ public static class CupertinoPopover
             anchor.DetachedFromVisualTree -= handler;
             session.AnchorDetachedHandler = null;
         }
+        if (session.KeyDownHandler is { } keyHandler)
+        {
+            session.Host.KeyDown -= keyHandler;
+            session.KeyDownHandler = null;
+        }
         session.Layer.Children.Remove(session.Host);
+        if (session.ContentHost is Border contentHost)
+            contentHost.Child = null;
         motion?.Dispose();
         if (Open.TryGetValue(anchor, out var current) && ReferenceEquals(current, session))
             Open.Remove(anchor);
+
+        if (restoreFocus && session.PreviousFocus is Control previous
+            && previous.IsEffectivelyVisible && previous.IsEffectivelyEnabled
+            && TopLevel.GetTopLevel(previous) == session.Root)
+            previous.Focus();
+        session.PreviousFocus = null;
 
         var onClosed = session.OnClosed;
         session.OnClosed = null;

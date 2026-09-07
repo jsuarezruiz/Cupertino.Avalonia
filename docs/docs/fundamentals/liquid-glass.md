@@ -28,7 +28,7 @@ ms.date: 2026-08-27
                           DepthEffect="0.28"
                           Saturation="1.3"
                           LightIntensity="0.9"
-                          FresnelStrength="1.2">
+                          FresnelStrength="1">
     <TextBlock HorizontalAlignment="Center"
                VerticalAlignment="Center"
                Text="Liquid Glass" />
@@ -40,11 +40,11 @@ ms.date: 2026-08-27
 
 | Property | Effect |
 | --- | --- |
-| `BlurRadius` | Frost blur sigma in logical pixels |
+| `BlurRadius` | Amount of background blur, in logical pixels |
 | `GlassThickness` | Width of the refracting edge band |
 | `RefractionStrength` | Backdrop displacement at the edge |
 | `ChromaticAberration` | Color separation in the refraction band |
-| `DepthEffect` | Convex lens contribution |
+| `DepthEffect` | Strength of the curved lens effect |
 | `Saturation` | Backdrop saturation multiplier |
 | `Tint` | Material tint; alpha controls its strength |
 | `LightIntensity` and `LightAngle` | Directional highlight |
@@ -52,8 +52,20 @@ ms.date: 2026-08-27
 | `Magnification` | Convex magnification; `1` is flat |
 | `IsAdaptive` | Adapts the material to backdrop luminance |
 
-Start from the values used by an existing themed control and tune only the properties needed for the intended material. Strong refraction and chromatic aberration are best reserved for compact lenses; large reading surfaces should use a thick, calmer material.
+Start with an existing control's settings and adjust them to suit your design. Keep refraction and colour separation subtle behind text; stronger effects work better on small controls.
 
 ## Rendering and accessibility
 
-Call `UseCupertino()` during application setup to support full-frame live sampling. When Reduce Transparency is enabled or a live GPU surface is unavailable, `GlassSurface` degrades to a stable tinted material. Do not place meaning exclusively in the refraction effect.
+Liquid Glass uses Skia through GPU or software rendering. When backdrop sampling is unavailable, it uses a tinted fill. Reduce Transparency replaces glass with an opaque fill. Keep the content understandable without the glass effect.
+
+The control refreshes briefly during input and layout changes. Set `IsLive="True"` when the background animates independently. For an occasional change made in code, call `Pulse()` after updating the background. Leave `IsLive` off for static backgrounds.
+
+## Limits and performance
+
+Numeric settings are clamped to supported ranges; `NaN` and infinite values reset to the property defaults.
+
+Large glass surfaces need more memory. If an effect exceeds the rendering limits or memory allocation fails, the control uses a tinted fill.
+
+Refraction supports moving a control and scaling it equally in both directions. Rotation, skew, reflection and unequal scaling use the tinted fallback. Without Skia, that fallback uses the top-left corner radius for all four corners.
+
+Each live frame samples and blurs the background again. Profile screens with several large glass controls on your target devices.

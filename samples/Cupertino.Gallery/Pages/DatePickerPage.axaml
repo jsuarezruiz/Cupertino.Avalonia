@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="Compact fields are capsules in iOS 26. Tapping the date opens a calendar popover.">
+                         Footer="Select the date field to open a calendar and choose a date.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Date" />
@@ -20,7 +20,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="Paired capsules sit 4pt apart, as iOS shows a date next to its time.">
+                         Footer="Place date and time fields together when users need to choose both, such as when scheduling an event.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Date and time" />
@@ -36,7 +36,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="AVALONIA DATEPICKER"
-                         Footer="Avalonia's stock DatePicker wears the same capsule and opens its own column presenter.">
+                         Footer="Avalonia's standard DatePicker uses the Cupertino appearance and opens its own column-based picker.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Stock control" />
@@ -48,7 +48,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A disabled field washes to 40%, as every Cupertino control does.">
+                         Footer="A disabled field shows its current date but cannot open the picker.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Disabled" />

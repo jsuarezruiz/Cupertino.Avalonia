@@ -6,11 +6,11 @@ ms.date: 2026-08-27
 
 # Theme and design tokens
 
-`CupertinoTheme` is layered on top of a base Avalonia theme. Standard Avalonia types keep their normal APIs while receiving iOS-oriented templates, sizing, typography, states, and motion.
+Add `CupertinoTheme` after a base Avalonia theme to give its controls iOS styling and motion. Their bindings, commands and events work as usual.
 
 ## Control classes
 
-Classes select semantic variants instead of hard-coded colors or dimensions.
+Use classes to choose a control's style and size:
 
 ```xml
 <StackPanel Spacing="8">
@@ -51,7 +51,7 @@ Frequently used resources include:
 
 ## Typography and motion
 
-The theme supplies semantic typography classes and iOS-like spring curves. Prefer the theme defaults and semantic roles over setting a font size on every element. Respect `CupertinoAccessibility.ReduceMotion` when adding custom animations beside the built-in controls.
+Use the theme's typography classes to keep text sizes consistent. The theme also provides spring animation curves. Check `CupertinoAccessibility.ReduceMotion` before running your own animations.
 
 ## Right-to-left layouts
 

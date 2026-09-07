@@ -20,12 +20,21 @@ public class CupertinoNavigationBar : TemplatedControl
     private const double TitleBaseMargin = 72;
     private const double TitleButtonGap = 12;
 
+    /// <summary>
+    /// Identifies the <see cref="Title"/> property.
+    /// </summary>
     public static readonly StyledProperty<string?> TitleProperty =
         AvaloniaProperty.Register<CupertinoNavigationBar, string?>(nameof(Title));
 
+    /// <summary>
+    /// Identifies the <see cref="LeadingContent"/> property.
+    /// </summary>
     public static readonly StyledProperty<object?> LeadingContentProperty =
         AvaloniaProperty.Register<CupertinoNavigationBar, object?>(nameof(LeadingContent));
 
+    /// <summary>
+    /// Identifies the <see cref="TrailingContent"/> property.
+    /// </summary>
     public static readonly StyledProperty<object?> TrailingContentProperty =
         AvaloniaProperty.Register<CupertinoNavigationBar, object?>(nameof(TrailingContent));
 
@@ -53,12 +62,33 @@ public class CupertinoNavigationBar : TemplatedControl
     public static readonly StyledProperty<double> CollapseDistanceProperty =
         AvaloniaProperty.Register<CupertinoNavigationBar, double>(nameof(CollapseDistance), 68.0);
 
+    /// <summary>
+    /// The primary text displayed by this control.
+    /// </summary>
     public string? Title { get => GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
+    /// <summary>
+    /// Content displayed before the title in the navigation bar.
+    /// </summary>
     public object? LeadingContent { get => GetValue(LeadingContentProperty); set => SetValue(LeadingContentProperty, value); }
+    /// <summary>
+    /// Content displayed after the title in the navigation bar.
+    /// </summary>
     public object? TrailingContent { get => GetValue(TrailingContentProperty); set => SetValue(TrailingContentProperty, value); }
+    /// <summary>
+    /// Whether the bar supports the large-title presentation.
+    /// </summary>
     public bool IsLargeTitle { get => GetValue(IsLargeTitleProperty); set => SetValue(IsLargeTitleProperty, value); }
+    /// <summary>
+    /// The scroll viewer whose vertical offset drives title collapse. Replacing it removes the old subscription.
+    /// </summary>
     public ScrollViewer? Scroller { get => GetValue(ScrollerProperty); set => SetValue(ScrollerProperty, value); }
+    /// <summary>
+    /// The current normalized collapse amount, from zero (expanded) to one (collapsed).
+    /// </summary>
     public double CollapseProgress { get => GetValue(CollapseProgressProperty); set => SetValue(CollapseProgressProperty, value); }
+    /// <summary>
+    /// The vertical scroll distance in logical pixels used to fully collapse the title.
+    /// </summary>
     public double CollapseDistance { get => GetValue(CollapseDistanceProperty); set => SetValue(CollapseDistanceProperty, value); }
 
     /// <summary>
@@ -96,9 +126,21 @@ public class CupertinoNavigationBar : TemplatedControl
     private static readonly (double Progress, double Opacity)[] InlineTitleSamples =
         [(0, 0), (36 / 68.0, 0), (48 / 68.0, 0.51), (1, 1)];
 
+    /// <summary>
+    /// The computed opacity of the expanded title.
+    /// </summary>
     public double LargeTitleOpacity => IsLargeTitle ? Sample(LargeTitleSamples, CollapseProgress) : 0;
+    /// <summary>
+    /// The computed opacity of the compact title.
+    /// </summary>
     public double InlineTitleOpacity => IsLargeTitle ? Sample(InlineTitleSamples, CollapseProgress) : 1;
+    /// <summary>
+    /// The computed opacity of the bar backdrop.
+    /// </summary>
     public double BackdropOpacity => Smoothstep(0.0, 0.45, CollapseProgress);
+    /// <summary>
+    /// The computed vertical translation of the expanded title, in logical pixels.
+    /// </summary>
     public double LargeTitleOffset => -12.0 * CollapseProgress;
 
     private static double Sample((double Progress, double Opacity)[] samples, double progress)
@@ -131,6 +173,7 @@ public class CupertinoNavigationBar : TemplatedControl
     private Control? _leading;
     private Control? _trailing;
 
+    /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -148,6 +191,7 @@ public class CupertinoNavigationBar : TemplatedControl
         UpdateInlineTitleMargin();
     }
 
+    /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -184,6 +228,7 @@ public class CupertinoNavigationBar : TemplatedControl
             : new Thickness(leading + TitleButtonGap, 0, trailing + TitleButtonGap, 0);
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -205,6 +250,7 @@ public class CupertinoNavigationBar : TemplatedControl
         }
     }
 
+    /// <inheritdoc/>
     protected override void OnSizeChanged(SizeChangedEventArgs e)
     {
         base.OnSizeChanged(e);
@@ -212,6 +258,7 @@ public class CupertinoNavigationBar : TemplatedControl
     }
 
     // Bounds subscriptions survive detach: the template is not reapplied on reattach.
+    /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);

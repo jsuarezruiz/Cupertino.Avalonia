@@ -15,18 +15,30 @@ namespace Cupertino.Controls;
 /// </summary>
 public class CupertinoSwipeView : ContentControl
 {
+    /// <summary>
+    /// Identifies the <see cref="LeadingActions"/> property.
+    /// </summary>
     public static readonly StyledProperty<object?> LeadingActionsProperty =
         AvaloniaProperty.Register<CupertinoSwipeView, object?>(nameof(LeadingActions));
 
+    /// <summary>
+    /// Identifies the <see cref="TrailingActions"/> property.
+    /// </summary>
     public static readonly StyledProperty<object?> TrailingActionsProperty =
         AvaloniaProperty.Register<CupertinoSwipeView, object?>(nameof(TrailingActions));
 
+    /// <summary>
+    /// Actions revealed at the leading edge. A Button or a panel of buttons supports full-swipe activation of the outermost enabled action.
+    /// </summary>
     public object? LeadingActions
     {
         get => GetValue(LeadingActionsProperty);
         set => SetValue(LeadingActionsProperty, value);
     }
 
+    /// <summary>
+    /// Actions revealed at the trailing edge. Full swipes use normal button activation, including commands and handled Click events.
+    /// </summary>
     public object? TrailingActions
     {
         get => GetValue(TrailingActionsProperty);
@@ -61,12 +73,16 @@ public class CupertinoSwipeView : ContentControl
     // Only one row can remain open.
     private static CupertinoSwipeView? s_open;
 
+    /// <summary>
+    /// Creates a CupertinoSwipeView with its default settings.
+    /// </summary>
     public CupertinoSwipeView()
     {
         _settle = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _settle.Tick += OnSettleTick;
     }
 
+    /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -88,6 +104,7 @@ public class CupertinoSwipeView : ContentControl
         }
     }
 
+    /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
@@ -190,6 +207,7 @@ public class CupertinoSwipeView : ContentControl
         }
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -267,6 +285,7 @@ public class CupertinoSwipeView : ContentControl
         host.RenderTransform = new ScaleTransform(scale, scale);
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
@@ -280,6 +299,7 @@ public class CupertinoSwipeView : ContentControl
         _settle.Stop();
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
@@ -323,6 +343,7 @@ public class CupertinoSwipeView : ContentControl
     private bool IsCommit() =>
         Math.Abs(_rawPosition) > Bounds.Width * CommitFraction;
 
+    /// <inheritdoc/>
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
@@ -339,10 +360,10 @@ public class CupertinoSwipeView : ContentControl
         if (IsCommit())
         {
             var host = x < 0 ? _trailing : _leading;
-            if (FindOutermostButton(host, trailing: x < 0) is { } button)
+            if (FindOutermostButton(host, trailing: x < 0) is { IsEffectivelyEnabled: true } button)
             {
                 CupertinoHaptics.Play(HapticFeedback.ImpactMedium);
-                button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                new Avalonia.Automation.Peers.ButtonAutomationPeer(button).Invoke();
             }
             if (s_open == this)
                 s_open = null;
@@ -360,6 +381,7 @@ public class CupertinoSwipeView : ContentControl
         StartSettle(_openAt, _dragVelocity);
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
         base.OnPointerCaptureLost(e);

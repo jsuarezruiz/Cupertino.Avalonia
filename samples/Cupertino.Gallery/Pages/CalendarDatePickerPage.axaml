@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="Avalonia's compact field and calendar control with Cupertino styling.">
+                         Footer="Choose a date using Avalonia's compact date field and calendar, styled to match the Cupertino theme.">
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Pick a date" />
           <WrapPanel Grid.Column="1" Classes="specimens">
@@ -18,7 +18,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="SelectedDateFormat switches between Short and Long text, and Custom hands the shape to CustomDateFormatString.">
+                         Footer="SelectedDateFormat controls how the date is displayed. Choose Short or Long, or use Custom with CustomDateFormatString for your own format.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Preset date" />
@@ -46,7 +46,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A disabled field dims to 40 percent and never drops its calendar.">
+                         Footer="A disabled field appears dimmed and cannot open its calendar.">
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Disabled" />
           <WrapPanel Grid.Column="1" Classes="specimens">

@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="ComboBox renders as the iOS menu button: accent label plus a chevron.up.chevron.down, with a thick-material dropdown.">
+                         Footer="Open the menu to choose an item. The selected item appears in the button beside the menu arrows.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Picker" />
@@ -36,7 +36,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="ComboBoxItem takes any content, and PlaceholderText labels the button until a choice is made.">
+                         Footer="Items can contain text, icons, or other controls. PlaceholderText describes the choice before an item is selected.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Item content" />
@@ -80,7 +80,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A disabled picker drops to 40 percent opacity and stops opening its menu.">
+                         Footer="A disabled picker appears dimmed and cannot open its menu.">
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Disabled" />
           <ComboBox Grid.Column="1" SelectedIndex="0" IsEnabled="False" HorizontalAlignment="Right">

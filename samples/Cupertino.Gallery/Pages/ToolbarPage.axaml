@@ -7,7 +7,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="The bottom toolbar groups actions in glass capsules. ToolbarSpacer separates groups and distributes free space.">
+                         Footer="Group related actions in a glass toolbar. Add a ToolbarSpacer to separate groups and distribute the available space.">
         <Grid Margin="16,11">
           <Border CornerRadius="10" ClipToBounds="True" Height="300">
             <Panel>
@@ -34,7 +34,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="ONE GROUP"
-                         Footer="Without a spacer every item stays on a single capsule.">
+                         Footer="Leave out the spacer to keep all actions together on one glass background.">
         <Grid Margin="16,11">
           <Border CornerRadius="10" ClipToBounds="True" Height="220">
             <Panel>

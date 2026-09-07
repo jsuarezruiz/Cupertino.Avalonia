@@ -7,7 +7,7 @@
   <ScrollViewer>
     <StackPanel Margin="0,74,0,120">
 
-      <cupertino:Section Header="BASIC" Footer="The bordered text field with a suggestions list on the popover material. Type a fruit.">
+      <cupertino:Section Header="BASIC" Footer="Start typing a fruit name to see suggestions, then choose one to fill the field.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Suggest" />
@@ -18,7 +18,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="CUSTOMIZED" Footer="FilterMode picks the match rule; MinimumPrefixLength holds the popup back until enough is typed.">
+      <cupertino:Section Header="CUSTOMIZED" Footer="Use FilterMode to choose how suggestions match your text. MinimumPrefixLength sets how many characters you must type before suggestions appear.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Contains" />
@@ -37,7 +37,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="STATES" Footer="A disabled box is a dimmed bordered field; no popup ever opens.">
+      <cupertino:Section Header="STATES" Footer="A disabled field appears dimmed and cannot accept text or show suggestions.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Disabled" />

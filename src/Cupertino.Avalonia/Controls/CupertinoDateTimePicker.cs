@@ -12,38 +12,78 @@ namespace Cupertino.Controls;
 [TemplatePart("PART_Time", typeof(CupertinoTimePicker))]
 public class CupertinoDateTimePicker : TemplatedControl
 {
+    /// <summary>
+    /// Identifies the <see cref="SelectedDateTime"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTimeOffset?> SelectedDateTimeProperty =
         AvaloniaProperty.Register<CupertinoDateTimePicker, DateTimeOffset?>(
             nameof(SelectedDateTime), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
+    /// <summary>
+    /// Identifies the <see cref="Minimum"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTimeOffset?> MinimumProperty =
         AvaloniaProperty.Register<CupertinoDateTimePicker, DateTimeOffset?>(nameof(Minimum));
 
+    /// <summary>
+    /// Identifies the <see cref="Maximum"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTimeOffset?> MaximumProperty =
         AvaloniaProperty.Register<CupertinoDateTimePicker, DateTimeOffset?>(nameof(Maximum));
 
+    /// <summary>
+    /// Identifies the <see cref="DateFormat"/> property.
+    /// </summary>
     public static readonly StyledProperty<string?> DateFormatProperty =
         AvaloniaProperty.Register<CupertinoDateTimePicker, string?>(nameof(DateFormat));
 
+    /// <summary>
+    /// Identifies the <see cref="ClockIdentifier"/> property.
+    /// </summary>
     public static readonly StyledProperty<string?> ClockIdentifierProperty =
         AvaloniaProperty.Register<CupertinoDateTimePicker, string?>(nameof(ClockIdentifier));
 
+    /// <summary>
+    /// Identifies the <see cref="MinuteIncrement"/> property.
+    /// </summary>
     public static readonly StyledProperty<int> MinuteIncrementProperty =
         AvaloniaProperty.Register<CupertinoDateTimePicker, int>(nameof(MinuteIncrement), 1);
 
+    /// <summary>
+    /// The selected date and time, or null. Values are constrained to Minimum and Maximum and normalized to the minute interval.
+    /// </summary>
     public DateTimeOffset? SelectedDateTime { get => GetValue(SelectedDateTimeProperty); set => SetValue(SelectedDateTimeProperty, value); }
+    /// <summary>
+    /// The inclusive earliest selectable date-time, or null for no lower bound.
+    /// </summary>
     public DateTimeOffset? Minimum { get => GetValue(MinimumProperty); set => SetValue(MinimumProperty, value); }
+    /// <summary>
+    /// The inclusive latest selectable date-time, or null for no upper bound.
+    /// </summary>
     public DateTimeOffset? Maximum { get => GetValue(MaximumProperty); set => SetValue(MaximumProperty, value); }
+    /// <summary>
+    /// The date label format string, or null to use d MMM yyyy with the current culture.
+    /// </summary>
     public string? DateFormat { get => GetValue(DateFormatProperty); set => SetValue(DateFormatProperty, value); }
+    /// <summary>
+    /// Use 12HourClock or 24HourClock; null follows the current culture.
+    /// </summary>
     public string? ClockIdentifier { get => GetValue(ClockIdentifierProperty); set => SetValue(ClockIdentifierProperty, value); }
+    /// <summary>
+    /// The minute-wheel interval, clamped to 1–59. Selections are normalized to the nearest permitted minute.
+    /// </summary>
     public int MinuteIncrement { get => GetValue(MinuteIncrementProperty); set => SetValue(MinuteIncrementProperty, value); }
 
+    /// <summary>
+    /// Raised after the selected date-time changes and its constraints have been applied.
+    /// </summary>
     public event EventHandler? SelectedDateTimeChanged;
 
     private CupertinoDatePicker? _date;
     private CupertinoTimePicker? _time;
     private bool _syncing;
 
+    /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         if (_date is not null)
@@ -67,23 +107,31 @@ public class CupertinoDateTimePicker : TemplatedControl
         {
             if (_date is not null)
             {
+                // Replace old bounds before selection, using its local calendar.
+                _date.MinimumDate = null;
+                _date.MaximumDate = null;
+                _date.MinimumDate = SelectedDateTime is { } selectedMinimum
+                    ? AtOffset(Minimum, selectedMinimum.Offset) : Minimum;
+                _date.MaximumDate = SelectedDateTime is { } selectedMaximum
+                    ? AtOffset(Maximum, selectedMaximum.Offset) : Maximum;
                 _date.SelectedDate = SelectedDateTime;
-                _date.MinimumDate = Minimum;
-                _date.MaximumDate = Maximum;
                 _date.DateFormat = DateFormat;
             }
             if (_time is not null)
             {
                 _time.ClockIdentifier = ClockIdentifier;
                 _time.MinuteIncrement = MinuteIncrement;
-                if (SelectedDateTime?.Date == Minimum?.Date)
-                    _time.MinimumTime = Minimum?.TimeOfDay;
+                if (SelectedDateTime is { } selected)
+                {
+                    var (minimum, maximum) = GetTimeBounds(selected);
+                    _time.MinimumTime = minimum;
+                    _time.MaximumTime = maximum;
+                }
                 else
+                {
                     _time.MinimumTime = null;
-                if (SelectedDateTime?.Date == Maximum?.Date)
-                    _time.MaximumTime = Maximum?.TimeOfDay;
-                else
                     _time.MaximumTime = null;
+                }
                 _time.SelectedTime = SelectedDateTime?.TimeOfDay;
             }
         }
@@ -95,7 +143,7 @@ public class CupertinoDateTimePicker : TemplatedControl
         if (_syncing || _date?.SelectedDate is not { } date)
             return;
         var time = _time?.SelectedTime ?? SelectedDateTime?.TimeOfDay ?? TimeSpan.Zero;
-        SetCurrentValue(SelectedDateTimeProperty, new DateTimeOffset(date.Date + time, date.Offset));
+        SetDateAndTime(date, time);
     }
 
     private void OnTimeChanged(object? sender, EventArgs e)
@@ -103,9 +151,24 @@ public class CupertinoDateTimePicker : TemplatedControl
         if (_syncing || _time?.SelectedTime is not { } time)
             return;
         var date = _date?.SelectedDate ?? SelectedDateTime ?? DateTimeOffset.Now;
-        SetCurrentValue(SelectedDateTimeProperty, new DateTimeOffset(date.Date + time, date.Offset));
+        SetDateAndTime(date, time);
     }
 
+    private void SetDateAndTime(DateTimeOffset date, TimeSpan time)
+    {
+        var ticks = Math.Clamp(date.Date.Ticks + time.Ticks,
+            Math.Max(DateTime.MinValue.Ticks, date.Offset.Ticks),
+            Math.Min(DateTime.MaxValue.Ticks, DateTime.MaxValue.Ticks + date.Offset.Ticks));
+        SetCurrentValue(SelectedDateTimeProperty, new DateTimeOffset(new DateTime(ticks), date.Offset));
+    }
+
+    private static DateTimeOffset? AtOffset(DateTimeOffset? value, TimeSpan offset) =>
+        value is { } date
+            ? new DateTimeOffset(new DateTime(Math.Clamp(date.UtcTicks + offset.Ticks,
+                DateTime.MinValue.Ticks, DateTime.MaxValue.Ticks)), offset)
+            : null;
+
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -146,17 +209,7 @@ public class CupertinoDateTimePicker : TemplatedControl
         if (Maximum is { } maximum && result > maximum)
             result = maximum;
 
-        var dayStart = new DateTimeOffset(result.Date, result.Offset);
-        var dayEnd = dayStart.AddDays(1) - TimeSpan.FromTicks(1);
-        var minimumTime = Minimum is { } min && min.Date == result.Date
-            ? min.TimeOfDay
-            : TimeSpan.Zero;
-        var maximumTime = Maximum is { } max && max.Date == result.Date
-            ? max.TimeOfDay
-            : dayEnd.TimeOfDay;
-        if (minimumTime > maximumTime)
-            minimumTime = maximumTime;
-
+        var (minimumTime, maximumTime) = GetTimeBounds(result);
         var time = CupertinoTimePicker.NormalizeTimeValue(
             result.TimeOfDay, EffectiveMinuteIncrement, minimumTime, maximumTime);
         result = new DateTimeOffset(result.Date + time, result.Offset);
@@ -166,6 +219,18 @@ public class CupertinoDateTimePicker : TemplatedControl
         if (Maximum is { } finalMaximum && result > finalMaximum)
             result = finalMaximum;
         return result;
+    }
+
+    private (TimeSpan Minimum, TimeSpan Maximum) GetTimeBounds(DateTimeOffset date)
+    {
+        // Express both absolute limits in the selected offset before rounding.
+        // The implicit UTC limits also constrain local times in years 1 and 9999.
+        var origin = date.Date.Ticks;
+        var minimum = Math.Clamp((Minimum?.UtcTicks ?? DateTime.MinValue.Ticks) + date.Offset.Ticks - origin,
+            0, TimeSpan.TicksPerDay - 1);
+        var maximum = Math.Clamp((Maximum?.UtcTicks ?? DateTime.MaxValue.Ticks) + date.Offset.Ticks - origin,
+            0, TimeSpan.TicksPerDay - 1);
+        return (TimeSpan.FromTicks(Math.Min(minimum, maximum)), TimeSpan.FromTicks(maximum));
     }
 
     private int EffectiveMinuteIncrement => Math.Clamp(MinuteIncrement, 1, 59);

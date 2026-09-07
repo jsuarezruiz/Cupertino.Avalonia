@@ -843,7 +843,7 @@ public class ThemeIntegrityTests
 
         theme.Accent = null;
         Assert.True(theme.TryGetResource("CupertinoAccentBrush", ThemeVariant.Light, out var restored));
-        Assert.Equal(Color.FromRgb(0x00, 0x88, 0xFF),
+        Assert.Equal(Color.FromRgb(0x00, 0x7A, 0xFF),
                      Assert.IsAssignableFrom<ISolidColorBrush>(restored).Color);
     }
 

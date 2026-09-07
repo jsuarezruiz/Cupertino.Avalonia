@@ -7,7 +7,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="DETENTS"
-                         Footer="A floating sheet with detents. Drag the grabber, flick down or tap the scrim to dismiss.">
+                         Footer="A sheet can stop at preset heights, called detents. Open one and drag the handle to resize it. Swipe down or select the dimmed background to dismiss it.">
         <StackPanel>
           <Button x:Name="MediumLargeButton" Classes="plain" Margin="16,11"
                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"

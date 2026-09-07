@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="iOS has no standalone checkbox; this follows the Reminders idiom: a 22pt circle that fills with the accent and shows a white checkmark.">
+                         Footer="Use checkboxes for options that can be selected independently. A selected option shows a checkmark in the accent colour.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Marks" />
@@ -21,7 +21,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="AS A LIST"
-                         Footer="The natural habitat: task rows in an inset card, the way Reminders draws them.">
+                         Footer="Checkboxes also work well in task lists. Select a row's checkbox to mark the task as complete.">
         <StackPanel>
           <Grid Classes="case" Height="30">
             <CheckBox Content="Water the plants" IsChecked="True" />
@@ -38,7 +38,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="IsThreeState adds an indeterminate dash; a scoped CupertinoAccentBrush override recolors one mark.">
+                         Footer="Set IsThreeState to allow an indeterminate state, shown as a dash. Override CupertinoAccentBrush to change an individual checkbox's colour.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Three-state" />
@@ -66,7 +66,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A disabled mark keeps its value and dims; a press dims with a fade.">
+                         Footer="Disabled checkboxes keep their current selection and cannot be changed through user input.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Disabled" />

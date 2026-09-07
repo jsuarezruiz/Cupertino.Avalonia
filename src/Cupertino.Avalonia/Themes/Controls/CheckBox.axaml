@@ -1,10 +1,11 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation">
 
   <ControlTheme x:Key="CupertinoCheckBox" TargetType="CheckBox">
     <Setter Property="Transitions">
       <Transitions>
-        <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+        <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
       </Transitions>
     </Setter>
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
@@ -24,7 +25,7 @@
                      Opacity="0">
               <Ellipse.Transitions>
                 <Transitions>
-                  <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                  <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 120}" />
                 </Transitions>
               </Ellipse.Transitions>
             </Ellipse>
@@ -36,7 +37,7 @@
                   Opacity="0">
               <Path.Transitions>
                 <Transitions>
-                  <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                  <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 120}" />
                 </Transitions>
               </Path.Transitions>
             </Path>
@@ -97,7 +98,7 @@
   <ControlTheme x:Key="CupertinoRadioButton" TargetType="RadioButton">
     <Setter Property="Transitions">
       <Transitions>
-        <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+        <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
       </Transitions>
     </Setter>
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
@@ -117,7 +118,7 @@
                      Opacity="0">
               <Ellipse.Transitions>
                 <Transitions>
-                  <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                  <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 120}" />
                 </Transitions>
               </Ellipse.Transitions>
             </Ellipse>
@@ -127,7 +128,7 @@
                      Opacity="0">
               <Ellipse.Transitions>
                 <Transitions>
-                  <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+                  <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 120}" />
                 </Transitions>
               </Ellipse.Transitions>
             </Ellipse>

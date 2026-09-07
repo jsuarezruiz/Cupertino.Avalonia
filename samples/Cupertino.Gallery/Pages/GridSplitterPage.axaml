@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="COLUMNS"
-                         Footer="Drag the hairline to resize the columns; it brightens to the accent under the pointer.">
+                         Footer="Drag the divider to resize the columns. It highlights when you move the pointer over it.">
         <Grid Classes="case">
           <Border CornerRadius="10" ClipToBounds="True" Height="160"
                   Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
@@ -22,7 +22,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="ROWS"
-                         Footer="ResizeDirection=&quot;Rows&quot; turns the hairline sideways to resize the rows instead.">
+                         Footer="Set ResizeDirection to Rows to resize the areas above and below a horizontal divider.">
         <Grid Classes="case">
           <Border CornerRadius="10" ClipToBounds="True" Height="200"
                   Background="{DynamicResource CupertinoGroupedBackgroundBrush}">

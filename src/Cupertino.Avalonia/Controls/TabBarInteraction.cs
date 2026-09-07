@@ -30,6 +30,9 @@ public static class TabBarInteraction
     private const double BottomAccessoryWidth = 74;
     private const string TwoItemClass = "cupertino-two-item";
 
+    /// <summary>
+    /// Identifies the <see cref="GetIsEnabled"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsEnabledProperty =
         AvaloniaProperty.RegisterAttached<TemplatedControl, bool>("IsEnabled", typeof(TabBarInteraction));
 
@@ -54,15 +57,19 @@ public static class TabBarInteraction
         });
     }
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static void SetIsEnabled(TemplatedControl element, bool value) =>
         element.SetValue(IsEnabledProperty, value);
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static bool GetIsEnabled(TemplatedControl element) =>
         element.GetValue(IsEnabledProperty);
 
+    /// <inheritdoc cref="IsSegmentedProperty"/>
     public static void SetIsSegmented(TemplatedControl element, bool value) =>
         element.SetValue(IsSegmentedProperty, value);
 
+    /// <inheritdoc cref="IsSegmentedProperty"/>
     public static bool GetIsSegmented(TemplatedControl element) =>
         element.GetValue(IsSegmentedProperty);
 

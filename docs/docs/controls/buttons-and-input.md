@@ -25,7 +25,7 @@ The theme restyles standard Avalonia controls, so bindings, commands, validation
 </StackPanel>
 ```
 
-Use `prominent` for the preferred action, `bordered` for a secondary action, and `plain` for a quiet action. Add `small` or `large` only when the surrounding hierarchy calls for a different control size.
+Use `prominent` for the main action, `bordered` for secondary actions, and `plain` for less prominent actions. Add `small` or `large` to change the control size.
 
 ## Fields and selection
 

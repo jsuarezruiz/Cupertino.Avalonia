@@ -1,6 +1,6 @@
 ---
 title: Getting started
-description: Install Cupertino.Avalonia, enable its renderer configuration, and register the theme.
+description: Install Cupertino.Avalonia and register the theme.
 ms.date: 2026-08-27
 ---
 
@@ -10,31 +10,13 @@ ms.date: 2026-08-27
 
 - .NET 8 or later
 - Avalonia 12.1.1
-- A GPU-backed surface for live Liquid Glass. The material falls back gracefully when live sampling is unavailable or Reduce Transparency is enabled.
+- Skia rendering for live Liquid Glass. When backdrop sampling is unavailable or Reduce Transparency is enabled, the material uses a flat fill.
 
 ## Install the package
 
 ```bash
 dotnet add package Cupertino.Avalonia
 ```
-
-## Configure rendering
-
-Call `UseCupertino()` on the application builder. It configures full-frame composition so live glass can sample the complete backdrop.
-
-```csharp
-using Avalonia;
-using Cupertino;
-
-public static AppBuilder BuildAvaloniaApp() =>
-    AppBuilder.Configure<App>()
-        .UsePlatformDetect()
-        .UseCupertino()
-        .WithInterFont();
-```
-
-> [!NOTE]
-> The theme still works without `UseCupertino()`, but live refractive surfaces can retain stale regions when the renderer uses dirty-rectangle clipping.
 
 ## Register the theme
 
@@ -72,10 +54,10 @@ xmlns:cupertino="https://cupertino.avaloniaui.net"
 </StackPanel>
 ```
 
-Use normal Avalonia controls whenever one exists. Cupertino-specific controls fill platform gaps and use the same binding, styling, and templating model.
+Use standard Avalonia controls where possible. The additional Cupertino controls use the same bindings, styles and templates.
 
 ## Next steps
 
 - Read the [control overview](controls/overview.md).
 - Learn how [theme resources](fundamentals/theme-and-tokens.md) support light and dark appearances.
-- Run the [gallery](gallery.md) to inspect every state interactively.
+- Run the [gallery](gallery.md) to try the controls and their sample states.

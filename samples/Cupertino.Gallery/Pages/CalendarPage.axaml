@@ -8,14 +8,14 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="Avalonia's Calendar with Cupertino styling, accent selection and subdued adjacent months.">
+                         Footer="Browse months and select a date. The selected day uses the accent colour, while days from adjacent months appear dimmed.">
         <Panel Margin="8,8">
           <Calendar x:Name="DemoCalendar" HorizontalAlignment="Center" />
         </Panel>
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="SelectionMode=&quot;MultipleRange&quot; sweeps whole runs of days, while DisplayDateStart and DisplayDateEnd fence the dates the grid will offer.">
+                         Footer="Use MultipleRange selection to choose groups of dates. DisplayDateStart and DisplayDateEnd limit the dates available in the calendar.">
         <StackPanel>
           <Grid Classes="case">
             <StackPanel Spacing="10">
@@ -37,7 +37,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="IsTodayHighlighted=&quot;False&quot; drops the accent on today, and a disabled calendar dims and ignores the pointer.">
+                         Footer="Turn off IsTodayHighlighted to hide today's highlight. A disabled calendar cannot be changed through user input.">
         <StackPanel>
           <Grid Classes="case">
             <StackPanel Spacing="10">

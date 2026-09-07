@@ -7,7 +7,7 @@
   <ScrollViewer>
     <StackPanel Margin="0,74,0,120">
 
-      <cupertino:Section Header="BASIC" Footer="The default field is a bordered 34pt capsule; PlaceholderText shows until you type.">
+      <cupertino:Section Header="BASIC" Footer="Enter text in the field. PlaceholderText provides a hint while the field is empty.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Field" />
@@ -21,7 +21,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="CUSTOMIZED" Footer="Classes plain and search restyle the chrome; PasswordChar and AcceptsReturn reshape the input.">
+      <cupertino:Section Header="CUSTOMIZED" Footer="Try plain and search styles, a password field using PasswordChar, and a multiline field using AcceptsReturn.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Plain" />
@@ -46,7 +46,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="STATES" Footer="Read-only text can still be selected and copied; a disabled field dims entirely.">
+      <cupertino:Section Header="STATES" Footer="Read-only text can still be selected and copied. A disabled field appears dimmed and cannot be edited.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Read-only" />

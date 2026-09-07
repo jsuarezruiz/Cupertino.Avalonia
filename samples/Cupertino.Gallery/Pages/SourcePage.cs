@@ -12,12 +12,13 @@ namespace Cupertino.Gallery.Pages;
 /// </summary>
 public sealed class SourcePage : UserControl
 {
-    private readonly TextMate.Installation _textMate;
+    private TextMate.Installation? _textMate;
+    private readonly TextEditor _editor;
     private readonly RegistryOptions _registry;
 
     public SourcePage(string xaml)
     {
-        var editor = new TextEditor
+        var editor = _editor = new TextEditor
         {
             Text = xaml,
             IsReadOnly = true,
@@ -30,9 +31,6 @@ public sealed class SourcePage : UserControl
         editor.Options.AllowScrollBelowDocument = false;
 
         _registry = new RegistryOptions(ThemeName.LightPlus);
-        _textMate = editor.InstallTextMate(_registry);
-        _textMate.SetGrammar(
-            _registry.GetScopeByLanguageId(_registry.GetLanguageByExtension(".xml").Id));
 
         var card = new Border
         {
@@ -49,7 +47,22 @@ public sealed class SourcePage : UserControl
         ApplyEditorTheme();
     }
 
+    protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _textMate = _editor.InstallTextMate(_registry);
+        _textMate.SetGrammar(_registry.GetScopeByLanguageId(_registry.GetLanguageByExtension(".xml").Id));
+        ApplyEditorTheme();
+    }
+
+    protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        _textMate?.Dispose();
+        _textMate = null;
+        base.OnDetachedFromVisualTree(e);
+    }
+
     private void ApplyEditorTheme() =>
-        _textMate.SetTheme(_registry.LoadTheme(
+        _textMate?.SetTheme(_registry.LoadTheme(
             ActualThemeVariant == ThemeVariant.Dark ? ThemeName.DarkPlus : ThemeName.LightPlus));
 }

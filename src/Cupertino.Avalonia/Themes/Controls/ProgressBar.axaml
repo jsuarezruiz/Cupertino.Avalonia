@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:c="using:Cupertino.Controls">
 
   <ControlTheme x:Key="CupertinoProgressBar" TargetType="ProgressBar">
@@ -23,7 +24,7 @@
                   HorizontalAlignment="Left">
             <Border.Transitions>
               <Transitions>
-                <DoubleTransition Property="Width" Duration="0:0:0.25" Easing="SineEaseOut" />
+                <DoubleTransition Property="Width" Duration="{motion:MotionDuration 250}" Easing="SineEaseOut" />
               </Transitions>
             </Border.Transitions>
           </Border>

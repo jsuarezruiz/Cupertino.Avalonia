@@ -26,9 +26,15 @@ public class CupertinoWheel : Control
     public static readonly StyledProperty<double> ItemHeightProperty =
         AvaloniaProperty.Register<CupertinoWheel, double>(nameof(ItemHeight), 32.0);
 
+    /// <summary>
+    /// Identifies the <see cref="Items"/> property.
+    /// </summary>
     public static readonly StyledProperty<IList<string>?> ItemsProperty =
         AvaloniaProperty.Register<CupertinoWheel, IList<string>?>(nameof(Items));
 
+    /// <summary>
+    /// Identifies the <see cref="SelectedIndex"/> property.
+    /// </summary>
     public static readonly StyledProperty<int> SelectedIndexProperty =
         AvaloniaProperty.Register<CupertinoWheel, int>(
             nameof(SelectedIndex), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
@@ -39,23 +45,56 @@ public class CupertinoWheel : Control
     public static readonly StyledProperty<bool> ShouldLoopProperty =
         AvaloniaProperty.Register<CupertinoWheel, bool>(nameof(ShouldLoop), true);
 
+    /// <summary>
+    /// Identifies the <see cref="FontSize"/> property.
+    /// </summary>
     public static readonly StyledProperty<double> FontSizeProperty =
         AvaloniaProperty.Register<CupertinoWheel, double>(nameof(FontSize), 23.0);
 
+    /// <summary>
+    /// Identifies the <see cref="Foreground"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush> ForegroundProperty =
         AvaloniaProperty.Register<CupertinoWheel, IBrush>(nameof(Foreground), Brushes.Black);
 
+    /// <summary>
+    /// Identifies the <see cref="TextAlignment"/> property.
+    /// </summary>
     public static readonly StyledProperty<TextAlignment> TextAlignmentProperty =
         AvaloniaProperty.Register<CupertinoWheel, TextAlignment>(
             nameof(TextAlignment), TextAlignment.Center);
 
+    /// <summary>
+    /// The wheel projection radius in logical pixels, clamped to 1–1000; nonfinite values use 86.
+    /// </summary>
     public double Radius { get => GetValue(RadiusProperty); set => SetValue(RadiusProperty, value); }
+    /// <summary>
+    /// The row height in logical pixels, clamped to 1–1000; nonfinite values use 32.
+    /// </summary>
     public double ItemHeight { get => GetValue(ItemHeightProperty); set => SetValue(ItemHeightProperty, value); }
+    /// <summary>
+    /// The strings displayed on the wheel. Observable collection changes are tracked while attached; replacing the list resets its motion.
+    /// </summary>
     public IList<string>? Items { get => GetValue(ItemsProperty); set => SetValue(ItemsProperty, value); }
+    /// <summary>
+    /// The selected row index. Values wrap when looping and otherwise clamp; external updates cancel an active drag or settle.
+    /// </summary>
     public int SelectedIndex { get => GetValue(SelectedIndexProperty); set => SetValue(SelectedIndexProperty, value); }
+    /// <summary>
+    /// Whether row indices wrap around at the beginning and end of the item list.
+    /// </summary>
     public bool ShouldLoop { get => GetValue(ShouldLoopProperty); set => SetValue(ShouldLoopProperty, value); }
+    /// <summary>
+    /// The text size in logical pixels, clamped to 1–1000; nonfinite values use 23.
+    /// </summary>
     public double FontSize { get => GetValue(FontSizeProperty); set => SetValue(FontSizeProperty, value); }
+    /// <summary>
+    /// The brush used to draw wheel row labels.
+    /// </summary>
     public IBrush Foreground { get => GetValue(ForegroundProperty); set => SetValue(ForegroundProperty, value); }
+    /// <summary>
+    /// Horizontal alignment of each row within the wheel.
+    /// </summary>
     public TextAlignment TextAlignment { get => GetValue(TextAlignmentProperty); set => SetValue(TextAlignmentProperty, value); }
 
     /// <summary>
@@ -67,6 +106,9 @@ public class CupertinoWheel : Control
     private double _offset;
     private bool _dragging;
     private double _lastY;
+    private readonly Rendering.FormattedTextCache _textCache = new();
+    private double? _measuredWidth;
+    private (System.Globalization.CultureInfo Culture, FontFamily Family, double Size, FlowDirection Direction)? _measurementStyle;
     private double _pressY;
     private double _travelled;
     private double _velocity;
@@ -75,6 +117,7 @@ public class CupertinoWheel : Control
     private double _settleTo;
     private double _springVel;
     private bool _settling;
+    private bool _committingSelection;
     private int _lastTickRow = int.MinValue;
     private bool _isAttached;
     private INotifyCollectionChanged? _observableItems;
@@ -90,14 +133,25 @@ public class CupertinoWheel : Control
         FocusableProperty.OverrideDefaultValue<CupertinoWheel>(true);
     }
 
+    /// <summary>
+    /// Creates a CupertinoWheel with its default settings.
+    /// </summary>
     public CupertinoWheel()
     {
         ClipToBounds = true;
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
+        if (change.Property == ItemsProperty || change.Property == FontSizeProperty ||
+            change.Property == TextElement.FontFamilyProperty || change.Property == FlowDirectionProperty)
+        {
+            _measuredWidth = null;
+            _textCache.Clear();
+            InvalidateMeasure();
+        }
 
         if (change.Property == RadiusProperty || change.Property == ItemHeightProperty
             || change.Property == FontSizeProperty)
@@ -115,7 +169,7 @@ public class CupertinoWheel : Control
             }
         }
 
-        // Do not let bound values fight an active drag.
+        // An external selection supersedes any gesture or spring still in flight.
         if (change.Property == SelectedIndexProperty)
         {
             var normalized = NormalizeIndex(SelectedIndex);
@@ -124,8 +178,14 @@ public class CupertinoWheel : Control
                 SetCurrentValue(SelectedIndexProperty, normalized);
                 return;
             }
-            if (!_dragging && !_settling)
+            if (!_committingSelection)
             {
+                _timer?.Stop();
+                _settling = false;
+                _dragging = false;
+                var pointer = _capturedPointer;
+                _capturedPointer = null;
+                pointer?.Capture(null);
                 _offset = normalized;
                 InvalidateVisual();
             }
@@ -148,6 +208,7 @@ public class CupertinoWheel : Control
         }
     }
 
+    /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -155,10 +216,13 @@ public class CupertinoWheel : Control
         ConnectItems();
     }
 
+    /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _isAttached = false;
         DisconnectItems();
+        _textCache.Clear();
+        _measuredWidth = null;
         _timer?.Stop();
         _settling = false;
         _dragging = false;
@@ -188,6 +252,8 @@ public class CupertinoWheel : Control
 
     private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        _measuredWidth = null;
+        _textCache.Clear();
         _timer?.Stop();
         _settling = false;
         _dragging = false;
@@ -202,22 +268,33 @@ public class CupertinoWheel : Control
         InvalidateVisual();
     }
 
+    /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize)
     {
         var h = Math.Min(Radius * 2.0 + ItemHeight, 216.0);
-        var w = 0.0;
-        if (Items is { Count: > 0 })
+        var style = (System.Globalization.CultureInfo.CurrentCulture, TextElement.GetFontFamily(this), FontSize, FlowDirection);
+        if (_measurementStyle != style)
         {
-            foreach (var s in Items)
-                w = Math.Max(w, Measure(s).Width);
+            _measurementStyle = style;
+            _measuredWidth = null;
+            _textCache.Clear();
         }
-        return new Size(Math.Min(w, availableSize.Width), h);
+        if (_measuredWidth is null)
+        {
+            var width = 0.0;
+            if (Items is { Count: > 0 })
+                foreach (var text in Items)
+                    width = Math.Max(width, Measure(text).Width);
+            _measuredWidth = width;
+        }
+        return new Size(Math.Min(_measuredWidth.Value, availableSize.Width), h);
     }
 
-    private FormattedText Measure(string text) => new(
+    private FormattedText Measure(string text) => _textCache.Get(
         text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection,
         new Typeface(TextElement.GetFontFamily(this)), FontSize, Foreground);
 
+    /// <inheritdoc/>
     public override void Render(DrawingContext context)
     {
         var bounds = Bounds;
@@ -260,7 +337,7 @@ public class CupertinoWheel : Control
                 _ => (bounds.Width - ft.Width) / 2,
             };
 
-            // Continuous fade by row distance, matching UIPickerView.
+            // Fade continuously as rows move away from the selection.
             var distance = Math.Abs(index - _offset);
             var opacity = 1.0 / (1.0 + 0.85 * Math.Pow(distance, 1.3));
 
@@ -270,7 +347,11 @@ public class CupertinoWheel : Control
                        Matrix.CreateScale(1, scaleY) *
                        Matrix.CreateTranslation(0, y)))
             {
-                context.DrawText(ft, new Point(x, y - ft.Height / 2));
+                // The wheel's layout follows RTL, while its glyphs stay upright.
+                var scaleX = FlowDirection == FlowDirection.RightToLeft ? -1 : 1;
+                using (context.PushTransform(Matrix.CreateScale(scaleX, 1) *
+                           Matrix.CreateTranslation(x + ft.Width / 2, y)))
+                    context.DrawText(ft, new Point(-ft.Width / 2, -ft.Height / 2));
             }
         }
     }
@@ -314,6 +395,7 @@ public class CupertinoWheel : Control
         return ((index % items.Count) + items.Count) % items.Count;
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
@@ -334,6 +416,7 @@ public class CupertinoWheel : Control
         e.Handled = true;
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
     {
         base.OnPointerCaptureLost(e);
@@ -354,6 +437,7 @@ public class CupertinoWheel : Control
         return _offset + Math.Asin(sin) / (ItemHeight / Radius);
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
@@ -383,6 +467,7 @@ public class CupertinoWheel : Control
         e.Handled = true;
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
@@ -410,6 +495,7 @@ public class CupertinoWheel : Control
         e.Handled = true;
     }
 
+    /// <inheritdoc/>
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
         base.OnPointerWheelChanged(e);
@@ -421,6 +507,7 @@ public class CupertinoWheel : Control
         e.Handled = true;
     }
 
+    /// <inheritdoc/>
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
@@ -471,12 +558,24 @@ public class CupertinoWheel : Control
 
         var n = items.Count;
         var idx = (int)Math.Round(offset);
-        SetCurrentValue(SelectedIndexProperty,
-                        ShouldLoop ? ((idx % n) + n) % n : Math.Clamp(idx, 0, n - 1));
+        _committingSelection = true;
+        try
+        {
+            SetCurrentValue(SelectedIndexProperty,
+                ShouldLoop ? ((idx % n) + n) % n : Math.Clamp(idx, 0, n - 1));
+        }
+        finally { _committingSelection = false; }
     }
 
     private void OnSettleTick(object? sender, EventArgs e)
     {
+        if (!_settling)
+            return;
+        if (CupertinoAccessibility.ReduceMotion)
+        {
+            _offset = _settleTo;
+            _springVel = 0;
+        }
         // Critically damped spring carrying the release velocity.
         const double dt = 0.016;
         const double omega = 10.0;

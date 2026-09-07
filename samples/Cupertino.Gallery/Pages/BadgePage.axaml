@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="WinUI's InfoBadge value model on the iOS anatomy: a number shows the capsule, counts cap at 99+, negative is the plain dot.">
+                         Footer="Use a badge for a count or a simple notification dot. Counts above 99 appear as 99+; a negative Value shows a dot.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Counts" />
@@ -29,7 +29,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="ON TABS"
-                         Footer="Tabs.BadgeValue puts one on a tab item's icon corner; null removes it.">
+                         Footer="Set Tabs.BadgeValue to add a badge to a tab icon. Set it to null to remove the badge.">
         <Grid Classes="case">
           <Border CornerRadius="10" ClipToBounds="True" Height="220"
                   Background="{DynamicResource CupertinoGroupedBackgroundBrush}">

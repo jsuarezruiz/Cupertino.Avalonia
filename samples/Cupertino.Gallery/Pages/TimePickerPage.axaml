@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="Tapping the capsule opens the wheel, which spins, flings and settles, and a tap on any visible row scrolls it into the selection.">
+                         Footer="Open the time field, then scroll the wheels to choose a time. You can also select a visible row to move it into place.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Time" />
@@ -20,7 +20,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="DURATION AND INLINE"
-                         Footer="CountdownDuration uses elapsed hours and minutes; Inline keeps the same wheels in the page instead of a popover.">
+                         Footer="Use CountdownDuration to choose a length of time in hours and minutes. Use Inline to keep the wheels visible in the page.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Duration" />
@@ -37,7 +37,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="ClockIdentifier switches the wheel to 24-hour; MinuteIncrement steps the minute column.">
+                         Footer="Use ClockIdentifier to choose a 12-hour or 24-hour clock. MinuteIncrement controls the spacing between available minutes; this example uses five-minute steps.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="24-hour, 5 min" />
@@ -51,7 +51,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="AVALONIA TIMEPICKER"
-                         Footer="Avalonia's stock TimePicker wears the same capsule and opens its own column presenter.">
+                         Footer="Avalonia's standard TimePicker uses the Cupertino appearance and opens its own column-based picker.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Stock control" />
@@ -63,7 +63,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A disabled field washes to 40%, as every Cupertino control does.">
+                         Footer="A disabled field shows its current time but cannot open the picker.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Disabled" />

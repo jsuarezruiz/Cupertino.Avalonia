@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="iOS has no tree, so this follows the list idiom: 44pt rows and the Expander's turning chevron.">
+                         Footer="Use a tree to browse nested items. Select an arrow to expand or collapse a branch.">
         <Grid Classes="case">
           <TreeView>
             <TreeViewItem Header="Library" IsExpanded="True">
@@ -28,7 +28,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="TreeViewItem.Header takes any content, so a row can carry a glyph beside its label.">
+                         Footer="A TreeViewItem header can combine an icon and text to describe the item.">
         <Grid Classes="case">
           <TreeView>
             <TreeViewItem IsExpanded="True">
@@ -59,7 +59,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A tapped row keeps the quiet fill of iOS selection, and a branch with IsEnabled=&quot;False&quot; dims and will not open.">
+                         Footer="The selected row stays highlighted. Disabled items appear dimmed and cannot be selected or expanded.">
         <Grid Classes="case">
           <TreeView>
             <TreeViewItem Header="Devices" IsExpanded="True">

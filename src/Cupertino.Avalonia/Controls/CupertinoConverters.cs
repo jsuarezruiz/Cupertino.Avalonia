@@ -16,8 +16,7 @@ public static class CupertinoConverters
             string.IsNullOrEmpty(s) ? string.Empty : s![..1].ToUpper(CultureInfo.CurrentCulture));
 
     /// <summary>
-    /// Converts a day-title column to its uppercase abbreviated weekday name,
-    /// assuming the culture's first day of week.
+    /// Converts a day-title column to its uppercase abbreviated weekday name, assuming the culture's first day of week.
     /// </summary>
     public static readonly IValueConverter DayColumnAbbreviation =
         new FuncValueConverter<int, string>(column =>

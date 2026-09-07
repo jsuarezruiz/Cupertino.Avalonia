@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
 
 
@@ -93,7 +94,7 @@
                   Background="{DynamicResource CupertinoSegmentSelectedBrush}">
             <Border.Transitions>
               <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 150}" />
               </Transitions>
             </Border.Transitions>
           </Border>
@@ -144,7 +145,7 @@
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Transitions">
       <Transitions>
-        <DoubleTransition Property="Opacity" Duration="0:0:0.12" />
+        <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 120}" />
       </Transitions>
     </Setter>
     <Setter Property="Template">
@@ -191,7 +192,7 @@
                   Background="{DynamicResource CupertinoTabPillBrush}">
             <Border.Transitions>
               <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 180}" />
               </Transitions>
             </Border.Transitions>
           </Border>
@@ -388,7 +389,7 @@
                   Background="{DynamicResource CupertinoSegmentSelectedBrush}">
             <Border.Transitions>
               <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
+                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 150}" />
               </Transitions>
             </Border.Transitions>
           </Border>
@@ -453,7 +454,7 @@
                   Background="{DynamicResource CupertinoTabPillBrush}">
             <Border.Transitions>
               <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 180}" />
               </Transitions>
             </Border.Transitions>
           </Border>

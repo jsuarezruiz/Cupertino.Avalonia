@@ -105,15 +105,15 @@ public class ToolbarRenderTests
         var minY = 40;
         var maxY = -1;
         for (var y = 0; y < 40; y++)
-        for (var x = 0; x < 40; x++)
-        {
-            if (luma[x, y] >= 64)
-                continue;
-            minX = System.Math.Min(minX, x);
-            maxX = System.Math.Max(maxX, x);
-            minY = System.Math.Min(minY, y);
-            maxY = System.Math.Max(maxY, y);
-        }
+            for (var x = 0; x < 40; x++)
+            {
+                if (luma[x, y] >= 64)
+                    continue;
+                minX = System.Math.Min(minX, x);
+                maxX = System.Math.Max(maxX, x);
+                minY = System.Math.Min(minY, y);
+                maxY = System.Math.Max(maxY, y);
+            }
 
         Assert.True(maxX >= minX && maxY >= minY, "search icon rendered no dark ink");
         // A centered odd-pixel ink extent rasterizes around either side of 19.5.
@@ -278,19 +278,23 @@ public class NavigationBarRenderTests
     {
         var nav = new CupertinoNavigationPage { RootTitle = "Root" };
         var window = new Window { Width = 402, Height = 300, Content = nav };
-        window.Show();
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        nav.Push("Detail", new Border());
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        window.UpdateLayout();
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        Probe.Snapshot("navigation-back", window);
+        try
+        {
+            window.Show();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            nav.Push("Detail", new Border());
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Probe.Snapshot("navigation-back", window);
 
-        var bar = nav.GetVisualDescendants().OfType<CupertinoNavigationBar>().Single();
-        var host = Assert.IsType<GlassSurface>(bar.LeadingContent);
-        Assert.Equal(36, host.Height);
-        var button = Assert.IsType<Button>(host.Child);
-        Assert.Empty(button.GetVisualDescendants().OfType<TextBlock>());
+            var bar = nav.GetVisualDescendants().OfType<CupertinoNavigationBar>().Single();
+            var host = Assert.IsType<GlassSurface>(bar.LeadingContent);
+            Assert.Equal(36, host.Height);
+            var button = Assert.IsType<Button>(host.Child);
+            Assert.Empty(button.GetVisualDescendants().OfType<TextBlock>());
+        }
+        finally { window.Close(); }
     }
 }
 
@@ -375,13 +379,17 @@ public class ThemeVariantRenderTests
             Content = card,
         };
         window.Background = Brushes.Black;
-        window.Show();
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        window.UpdateLayout();
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        Probe.Snapshot("theme-dark", window);
+        try
+        {
+            window.Show();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Probe.Snapshot("theme-dark", window);
 
-        var brush = Assert.IsType<SolidColorBrush>(card.Background);
-        Assert.True(brush.Color.R < 80, $"dark card should be dark, got {brush.Color}");
+            var brush = Assert.IsType<SolidColorBrush>(card.Background);
+            Assert.True(brush.Color.R < 80, $"dark card should be dark, got {brush.Color}");
+        }
+        finally { window.Close(); }
     }
 }

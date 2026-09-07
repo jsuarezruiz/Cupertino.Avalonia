@@ -32,7 +32,7 @@
                  Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
 
       <cupertino:Section Header="MATERIAL"
-                         Footer="The surface samples what is behind it: blur, refraction, a chromatic edge and a specular rim, in one Skia shader.">
+                         Footer="GlassSurface creates a glass background that blurs and distorts the content behind it. Compare more examples in Liquid Glass.">
         <Panel Height="188" Margin="16,14">
           <Border CornerRadius="18" ClipToBounds="True">
             <Panel>
@@ -67,7 +67,7 @@
             <StackPanel Margin="18,16" Spacing="6">
               <TextBlock Text="GlassSurface" FontSize="17" FontWeight="SemiBold"
                          Foreground="White" />
-              <TextBlock Text="Every surface in the library is built on this one control."
+              <TextBlock Text="A reusable glass background for your content."
                          FontSize="12" TextWrapping="Wrap" Foreground="#D9FFFFFF" />
             </StackPanel>
           </cupertino:GlassSurface>
@@ -77,39 +77,39 @@
       <cupertino:Section Header="AT A GLANCE">
         <Grid ColumnDefinitions="*,*,*" Margin="16,16">
           <StackPanel Spacing="1">
-            <TextBlock Classes="stat" Text="20+" />
-            <TextBlock Classes="statLabel" Text="controls" />
+            <TextBlock Classes="stat" Text="Themes" />
+            <TextBlock Classes="statLabel" Text="light and dark" />
           </StackPanel>
           <StackPanel Grid.Column="1" Spacing="1">
-            <TextBlock Classes="stat" Text="70" />
-            <TextBlock Classes="statLabel" Text="tests" />
+            <TextBlock Classes="stat" Text="Input" />
+            <TextBlock Classes="statLabel" Text="touch and mouse" />
           </StackPanel>
           <StackPanel Grid.Column="2" Spacing="1">
-            <TextBlock Classes="stat" Text="R=86pt" />
-            <TextBlock Classes="statLabel" Text="wheel radius" />
+            <TextBlock Classes="stat" Text="Motion" />
+            <TextBlock Classes="statLabel" Text="animated states" />
           </StackPanel>
         </Grid>
       </cupertino:Section>
 
       <cupertino:Section Header="HOW IT IS BUILT"
-                         Footer="Open Controls for every control with its main cases, or Settings to switch theme and accessibility.">
+                         Footer="Explore the control examples, or open Settings to try different appearances, colours, and accessibility options.">
         <StackPanel>
           <StackPanel Spacing="3" Margin="16,12">
-            <TextBlock Classes="feature" Text="Faithful geometry and motion" />
+            <TextBlock Classes="feature" Text="Try the interactions" />
             <TextBlock Classes="featureBody"
-                       Text="The picker wheel is a real cylinder at R=86pt, the tab blob peaks at 2.02x its width, and the navigation title hands over at 68pt of scroll." />
+                       Text="Scroll a picker wheel, drag between tabs, or scroll a page to see its large navigation title become compact." />
           </StackPanel>
           <Rectangle Classes="hair" />
           <StackPanel Spacing="3" Margin="16,12">
-            <TextBlock Classes="feature" Text="Stock controls where they fit" />
+            <TextBlock Classes="feature" Text="Familiar Avalonia controls" />
             <TextBlock Classes="featureBody"
-                       Text="ToggleSwitch, Slider, Expander and the whole button family are themes over Avalonia's own controls. Custom types appear only where Avalonia has none." />
+                       Text="The theme styles Avalonia controls such as buttons, switches, and sliders. Additional Cupertino controls provide navigation, sheets, and wheel pickers." />
           </StackPanel>
           <Rectangle Classes="hair" />
           <StackPanel Spacing="3" Margin="16,12">
-            <TextBlock Classes="feature" Text="Accessible by design" />
+            <TextBlock Classes="feature" Text="Accessibility options" />
             <TextBlock Classes="featureBody"
-                       Text="Reduce Transparency swaps the material for a flat fill without shifting a pixel, and Reduce Motion drops the travel while keeping what it meant." />
+                       Text="Try Reduce transparency for opaque backgrounds and Reduce motion for less animation. Both options are available in Settings." />
           </StackPanel>
         </StackPanel>
       </cupertino:Section>

@@ -12,6 +12,7 @@ public class CriticallyDampedEasing : Easing
     /// </summary>
     public double OmegaDuration { get; set; } = 7.0;
 
+    /// <inheritdoc/>
     public override double Ease(double progress)
     {
         var wd = OmegaDuration <= 0 ? 7.0 : OmegaDuration;

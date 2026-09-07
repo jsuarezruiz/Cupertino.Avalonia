@@ -25,7 +25,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="CONTROLS"
-                         Footer="Each pair sets the same value on both sides. The left specimen is UIKit, rendered live by iOS inside this app. The right specimen is this library.">
+                         Footer="Compare the same control and value in both columns. UIKit is on the left, and Cupertino.Avalonia is on the right.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*,*">
             <TextBlock Classes="colhead" Grid.Column="1" Text="iOS" />
@@ -110,7 +110,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="BARS AND NAVIGATION"
-                         Footer="Compact bars use two destinations so both live implementations keep valid intrinsic spacing. Full-size variants remain available on their individual gallery pages.">
+                         Footer="These compact examples use two destinations to fit both columns. Open each control's gallery page to explore its full-size examples.">
         <StackPanel>
           <Grid Margin="16,11,16,7" ColumnDefinitions="*,*" ColumnSpacing="8">
             <TextBlock Classes="colhead" Text="iOS" />
@@ -220,7 +220,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="FIELDS AND PICKERS"
-                         Footer="The two pickers open their own popovers: the left one is the UIKit compact style, the right one is this library's capsule.">
+                         Footer="Open a picker in either column to compare its selection experience. The left column uses UIKit, and the right uses Cupertino.Avalonia.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*,*">
             <TextBlock Classes="case" Text="Text field" />
@@ -261,7 +261,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="NOTES"
-                         Footer="Native views live in their own layer above the Avalonia surface, so glass, clipping and transforms do not apply to the left column. A small colour shift can come from colour management rather than the theme.">
+                         Footer="Native controls appear in a separate layer, so Avalonia glass effects, clipping, and transforms do not affect the left column. Colour management may also cause small colour differences.">
         <StackPanel />
       </cupertino:Section>
 

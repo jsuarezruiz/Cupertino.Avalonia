@@ -16,26 +16,26 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="Mail's rows: drag left to reveal the actions, keep going for the full swipe, and the outermost action fires and the row shuts. A short drag springs back.">
+                         Footer="Swipe a row to reveal Delete, then select it or continue swiping to activate it. The result appears below; these examples keep the row in place.">
         <StackPanel>
           <cupertino:CupertinoSwipeView Height="44">
             <cupertino:CupertinoSwipeView.TrailingActions>
               <Button Classes="swipe swipe-destructive" Content="Delete" Click="OnDelete" />
             </cupertino:CupertinoSwipeView.TrailingActions>
-            <TextBlock Classes="row" Text="Drag me left" />
+            <TextBlock Classes="row" Text="Swipe to reveal Delete" />
           </cupertino:CupertinoSwipeView>
           <Rectangle Classes="hair" />
           <cupertino:CupertinoSwipeView Height="44">
             <cupertino:CupertinoSwipeView.TrailingActions>
               <Button Classes="swipe swipe-destructive" Content="Delete" Click="OnDelete" />
             </cupertino:CupertinoSwipeView.TrailingActions>
-            <TextBlock Classes="row" Text="Me too" />
+            <TextBlock Classes="row" Text="Try a full swipe on this row" />
           </cupertino:CupertinoSwipeView>
         </StackPanel>
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="Both sides, several actions: leading marks read, trailing flags or deletes. Any control can ride in the slabs.">
+                         Footer="Swipe in either direction to reveal different actions. This row offers Read on one side and Flag and Delete on the other.">
         <StackPanel>
           <cupertino:CupertinoSwipeView x:Name="RichRow" Height="52">
             <cupertino:CupertinoSwipeView.LeadingActions>
@@ -52,7 +52,7 @@
             <StackPanel VerticalAlignment="Center" Margin="16,0" Spacing="2">
               <TextBlock Classes="headline" Text="Team lunch"
                          Foreground="{DynamicResource CupertinoLabelBrush}" />
-              <TextBlock Classes="footnote" Text="Both directions work on this one"
+              <TextBlock Classes="footnote" Text="Swipe either way to see the actions"
                          Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
             </StackPanel>
           </cupertino:CupertinoSwipeView>

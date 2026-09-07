@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
     <cupertino:Section Header="BASIC"
-                       Footer="The default Button is a 34.3pt capsule of live glass with a 17pt medium label, and it holds any content you compose.">
+                       Footer="The default button has a rounded glass background. Use a text label, an icon, or both to describe its action.">
       <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Glass" />
@@ -36,7 +36,7 @@
     </cupertino:Section>
 
     <cupertino:Section Header="CUSTOMIZED"
-                       Footer="The prominent class fills the capsule with accent glass and a white label; bordered is a flat translucent capsule; plain keeps just the accent label. A scoped CupertinoProminentTint override recolors one prominent capsule.">
+                       Footer="Use prominent to highlight a main action, bordered for a subtle background, or plain for a text-only appearance. Override CupertinoProminentTint to give an individual prominent button a custom colour.">
       <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Prominent" />
@@ -77,7 +77,7 @@
     </cupertino:Section>
 
     <cupertino:Section Header="SIZES"
-                       Footer="The small class is the 28pt capsule and large the 50pt one; either combines with a fill class.">
+                       Footer="Compare small, regular, and large buttons. The small and large classes can be combined with an appearance class such as prominent.">
       <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Sizes" />
@@ -91,7 +91,7 @@
     </cupertino:Section>
 
     <cupertino:Section Header="STATES"
-                       Footer="A disabled Button washes to half opacity, whichever style it wears, and the glass stops reacting to the pointer.">
+                       Footer="Disabled buttons appear dimmed and cannot be activated.">
       <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Disabled" />

@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="A plain Flyout drops arbitrary content on the popover material, hosted in the window's overlay layer so the glass is live.">
+                         Footer="Open a flyout to show extra information or controls beside the button that opened it.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Flyout" />
@@ -18,7 +18,7 @@
                 <Flyout>
                   <StackPanel Spacing="6" MinWidth="180">
                     <TextBlock Text="Now Playing" FontWeight="SemiBold" />
-                    <TextBlock Text="Glass on every surface: the popover samples the app behind it."
+                    <TextBlock Text="This flyout uses a glass background over the page content."
                                TextWrapping="Wrap" FontSize="13"
                                Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
                   </StackPanel>
@@ -31,7 +31,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="The popover can hold a small form; it stays open while the field has focus.">
+                         Footer="A flyout can contain a small form. Open this example and try editing the field inside it.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Form" />
@@ -53,7 +53,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="PLACEMENT"
-                         Footer="Placement picks the edge the popover anchors to; it flips when the window edge is too close.">
+                         Footer="Use Placement to choose which side of the button the flyout appears on. It can move to another side when space is limited.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Edge" />

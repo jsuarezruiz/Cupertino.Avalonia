@@ -7,9 +7,9 @@ public partial class TransitioningContentPage : UserControl
 {
     private static readonly string[] Lines =
     [
-        "Every surface is glass.",
-        "The material samples the app behind it.",
-        "Motion uses Cupertino timing.",
+        "This is the first view.",
+        "The content has changed to the second view.",
+        "One more change shows the third view.",
     ];
 
     private int _defaultLine;

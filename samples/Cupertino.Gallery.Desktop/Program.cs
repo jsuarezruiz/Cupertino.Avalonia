@@ -1,6 +1,5 @@
 using System.Globalization;
 using Avalonia;
-using Cupertino;
 
 namespace Cupertino.Gallery;
 
@@ -54,7 +53,6 @@ internal static class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .UseCupertino()
             .WithInterFont()
             .LogToTrace();
 }

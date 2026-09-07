@@ -17,6 +17,9 @@ public class CupertinoActivityIndicator : Control
     public static readonly StyledProperty<bool> IsActiveProperty =
         AvaloniaProperty.Register<CupertinoActivityIndicator, bool>(nameof(IsActive), true);
 
+    /// <summary>
+    /// Identifies the <see cref="Foreground"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush> ForegroundProperty =
         AvaloniaProperty.Register<CupertinoActivityIndicator, IBrush>(
             nameof(Foreground), Brushes.Gray);
@@ -28,8 +31,17 @@ public class CupertinoActivityIndicator : Control
         AvaloniaProperty.Register<CupertinoActivityIndicator, double>(
             nameof(SweepFraction), 1.0, coerce: (_, v) => Math.Clamp(v, 0, 1));
 
+    /// <summary>
+    /// Whether the indicator is visible and advances its animation while attached.
+    /// </summary>
     public bool IsActive { get => GetValue(IsActiveProperty); set => SetValue(IsActiveProperty, value); }
+    /// <summary>
+    /// The brush used to draw the indicator spokes.
+    /// </summary>
     public IBrush Foreground { get => GetValue(ForegroundProperty); set => SetValue(ForegroundProperty, value); }
+    /// <summary>
+    /// The fraction of spokes shown while arming a refresh; one enables the normal spin.
+    /// </summary>
     public double SweepFraction { get => GetValue(SweepFractionProperty); set => SetValue(SweepFractionProperty, value); }
 
     private const int Spokes = 8;
@@ -51,6 +63,7 @@ public class CupertinoActivityIndicator : Control
                                                   SweepFractionProperty);
     }
 
+    /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize)
     {
         var d = 20.0;
@@ -60,6 +73,7 @@ public class CupertinoActivityIndicator : Control
         return new Size(d, d);
     }
 
+    /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -71,6 +85,7 @@ public class CupertinoActivityIndicator : Control
         UpdateTimer();
     }
 
+    /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
@@ -82,6 +97,7 @@ public class CupertinoActivityIndicator : Control
         _timer = null;
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -115,6 +131,7 @@ public class CupertinoActivityIndicator : Control
             UpdateTimer();
     }
 
+    /// <inheritdoc/>
     public override void Render(DrawingContext context)
     {
         if (!IsActive)

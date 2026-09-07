@@ -25,8 +25,8 @@ public partial class SwipeViewPage : UserControl, IGalleryCaptureState
 
     private void Report(object? sender)
     {
-        var label = (sender as Button)?.Content?.ToString() ?? "?";
-        this.FindControl<TextBlock>("Log")!.Text = $"\"{label}\" fired";
+        var label = (sender as Button)?.Content?.ToString() ?? "Action";
+        this.FindControl<TextBlock>("Log")!.Text = $"Selected action: {label}";
     }
 
     private static void CloseHost(object? sender)

@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="TransitioningContentControl runs its transition each time Content changes; the theme default is a 0.25s cross-fade.">
+                         Footer="Change the content to see it fade into the next view. TransitioningContentControl animates each change to Content.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Default" />
@@ -22,7 +22,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="PageTransition takes any transition: a slower explicit CrossFade, or a horizontal PageSlide. One swap drives both, so the curves run side by side.">
+                         Footer="Set PageTransition to choose an animation. Use the button to compare a slower fade with a horizontal slide.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="CrossFade" />

@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="Expander renders as an iOS disclosure group: a 52pt row whose chevron turns down, with the revealed rows indented 21pt.">
+                         Footer="Select the header to show or hide the rows beneath it. The arrow turns to indicate whether the group is open.">
         <Expander Header="Wi-Fi Networks" Margin="16,0">
           <StackPanel>
             <!-- Center fixed-height rows with a container. -->
@@ -26,7 +26,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="Header takes any content, and ExpandDirection=&quot;Up&quot; is accepted although the disclosure idiom always reveals its rows beneath.">
+                         Footer="A header can combine an icon and text. This theme always places expanded content below the header, including when ExpandDirection is Up.">
         <StackPanel>
           <Expander Margin="16,0">
             <Expander.Header>
@@ -53,7 +53,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="IsExpanded presets the group open, and a disabled group dims to 40 percent with its chevron still.">
+                         Footer="Set IsExpanded to start with a group open. A disabled group cannot be expanded or collapsed through user input.">
         <StackPanel>
           <Expander Header="Advanced" Margin="16,0" IsExpanded="True">
             <Panel Height="52">

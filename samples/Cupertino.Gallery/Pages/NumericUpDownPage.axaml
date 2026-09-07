@@ -7,7 +7,7 @@
   <ScrollViewer>
     <StackPanel Margin="0,74,0,120">
 
-      <cupertino:Section Header="BASIC" Footer="NumericUpDown is a capsule field with a +/- stepper; Minimum and Maximum clamp the value.">
+      <cupertino:Section Header="BASIC" Footer="Enter a number or use the minus and plus buttons to adjust it. Minimum and Maximum keep the value within a range.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="With value" />
@@ -18,7 +18,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="CUSTOMIZED" Footer="Increment sets the step and FormatString the display; Classes=&quot;stepper&quot; drops the text field.">
+      <cupertino:Section Header="CUSTOMIZED" Footer="Set Increment to change the step size and FormatString to format the value. The stepper class shows only the minus and plus buttons.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Fractional" />
@@ -36,7 +36,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="STATES" Footer="A disabled stepper dims; the value stays put.">
+      <cupertino:Section Header="STATES" Footer="A disabled control shows its current value but cannot be edited or stepped.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Disabled" />

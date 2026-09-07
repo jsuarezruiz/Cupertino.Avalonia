@@ -88,7 +88,13 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
     {
         var leaseFeature = context.TryGetFeature<ISkiaSharpApiLeaseFeature>();
         if (leaseFeature is null)
+        {
+            var tint = Color.FromArgb((byte)Math.Clamp(_params.TintA * 255 + 60, 0, 255),
+                (byte)(_params.TintR * 255), (byte)(_params.TintG * 255), (byte)(_params.TintB * 255));
+            context.DrawRectangle(new Avalonia.Media.Immutable.ImmutableSolidColorBrush(tint), null,
+                _surface, _params.RadiusTopLeft, _params.RadiusTopLeft);
             return;
+        }
 
         using var lease = leaseFeature.Lease();
         var canvas = lease.SkCanvas;
@@ -101,14 +107,38 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         }
 
         var ctm = canvas.TotalMatrix;
+        // The shader samples in device space and requires an axis-aligned uniform scale.
+        if (!float.IsFinite(ctm.ScaleX) || ctm.ScaleX <= 0.001f ||
+            Math.Abs(ctm.ScaleX - ctm.ScaleY) > 0.001f ||
+            ctm.SkewX != 0 || ctm.SkewY != 0 || ctm.Persp0 != 0 || ctm.Persp1 != 0 || ctm.Persp2 != 1)
+        {
+            RenderFallback(canvas, null, default, 1f);
+            return;
+        }
         var localBounds = new SKRect(0, 0, (float)_surface.Width, (float)_surface.Height);
         var deviceRect = ctm.MapRect(localBounds);
 
         var scale = ctm.ScaleX > 0.001f ? ctm.ScaleX : 1f;
 
-        var w = Math.Max(1, (int)MathF.Ceiling(deviceRect.Width));
-        var h = Math.Max(1, (int)MathF.Ceiling(deviceRect.Height));
-        if (w > 8192 || h > 8192)
+        var sigma = _params.BlurRadius * scale * 0.5f;
+        var padding = MathF.Ceiling(sigma * 3f) + MathF.Ceiling((_params.Refraction * 1.35f + 2f) * scale);
+        var paddedWidth = MathF.Ceiling(deviceRect.Width) + padding * 2;
+        var paddedHeight = MathF.Ceiling(deviceRect.Height) + padding * 2;
+        // Include sampling padding in the limit; never convert an unbounded float to int.
+        // At four bytes per pixel, one offscreen allocation stays at or below 64 MiB.
+        if (!float.IsFinite(paddedWidth) || !float.IsFinite(paddedHeight) ||
+            paddedWidth < 1 || paddedHeight < 1 || paddedWidth > 8192 || paddedHeight > 8192 ||
+            (double)paddedWidth * paddedHeight > 16 * 1024 * 1024)
+        {
+            RenderFallback(canvas, null, default, 1f);
+            return;
+        }
+        var pad = (int)padding;
+        var info = new SKImageInfo((int)paddedWidth, (int)paddedHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+        using var blurSurface = lease.GrContext is { } grContext
+            ? SKSurface.Create(grContext, false, info)
+            : SKSurface.Create(info);
+        if (blurSurface is null)
         {
             RenderFallback(canvas, null, default, 1f);
             return;
@@ -142,25 +172,14 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         }
 
         // Pass 1: crop, blur and saturate into a padded offscreen surface.
-        var sigma = _params.BlurRadius * scale * 0.5f;
-        var reach = (int)MathF.Ceiling((_params.Refraction * 1.35f + 2f) * scale);
-        var pad = (sigma > 0.01f ? (int)MathF.Ceiling(sigma * 3f) : 0) + Math.Max(0, reach);
-
-        var info = new SKImageInfo(w + pad * 2, h + pad * 2, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
-        using var blurSurface = lease.GrContext is { } grContext
-            ? SKSurface.Create(grContext, false, info)
-            : SKSurface.Create(info);
-
         var bc = blurSurface.Canvas;
         bc.Clear(SKColors.Transparent);
-        using (var blurPaint = new SKPaint())
-        {
-            if (sigma > 0.01f)
-                blurPaint.ImageFilter = SKImageFilter.CreateBlur(sigma, sigma, SKShaderTileMode.Clamp);
-            if (Math.Abs(_params.Saturation - 1f) > 0.001f)
-                blurPaint.ColorFilter = SKColorFilter.CreateColorMatrix(CreateSaturationMatrix(_params.Saturation));
+        using var blurFilter = sigma > 0.01f
+            ? SKImageFilter.CreateBlur(sigma, sigma, SKShaderTileMode.Clamp) : null;
+        using var saturationFilter = Math.Abs(_params.Saturation - 1f) > 0.001f
+            ? SKColorFilter.CreateColorMatrix(CreateSaturationMatrix(_params.Saturation)) : null;
+        using (var blurPaint = new SKPaint { ImageFilter = blurFilter, ColorFilter = saturationFilter })
             bc.DrawImage(snapshot, pad - deviceRect.Left, pad - deviceRect.Top, blurPaint);
-        }
 
         using var blurred = blurSurface.Snapshot();
         using var blurredShader = blurred.ToShader(
@@ -231,11 +250,11 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
     {
         var rect = deviceRect;
         rect.Offset(0, offset * scale);
+        using var maskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, Math.Max(0.5f, blur * scale * 0.5f));
         using var paint = new SKPaint
         {
             Color = new SKColor(0, 0, 0, (byte)Math.Clamp(opacity * 255f, 0, 255)),
-            MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal,
-                Math.Max(0.5f, blur * scale * 0.5f)),
+            MaskFilter = maskFilter,
             IsAntialias = true,
         };
         using var roundRect = CreateRoundRect(
@@ -243,7 +262,7 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         canvas.DrawRoundRect(roundRect, paint);
     }
 
-    // Fallback for missing runtime effects or GPU surfaces.
+    // Fallback when runtime effects or a readable render surface are unavailable.
     private void RenderFallback(
         SKCanvas canvas, SKImage? blurred, SKRect deviceRect, float scale, int pad = 0)
     {

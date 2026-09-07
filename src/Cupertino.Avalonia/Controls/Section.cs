@@ -16,21 +16,31 @@ public class Section : HeaderedContentControl
     public static readonly StyledProperty<object?> FooterProperty =
         AvaloniaProperty.Register<Section, object?>(nameof(Footer));
 
+    /// <summary>
+    /// Identifies the <see cref="FooterTemplate"/> property.
+    /// </summary>
     public static readonly StyledProperty<IDataTemplate?> FooterTemplateProperty =
         AvaloniaProperty.Register<Section, IDataTemplate?>(nameof(FooterTemplate));
 
+    /// <summary>
+    /// Optional content below the section body.
+    /// </summary>
     public object? Footer
     {
         get => GetValue(FooterProperty);
         set => SetValue(FooterProperty, value);
     }
 
+    /// <summary>
+    /// The data template used to render Footer.
+    /// </summary>
     public IDataTemplate? FooterTemplate
     {
         get => GetValue(FooterTemplateProperty);
         set => SetValue(FooterTemplateProperty, value);
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -38,6 +48,7 @@ public class Section : HeaderedContentControl
             UpdatePseudoClasses();
     }
 
+    /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);

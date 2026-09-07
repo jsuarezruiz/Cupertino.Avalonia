@@ -24,7 +24,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="SYSTEM COLORS"
-                         Footer="The twelve iOS system colours as CupertinoSystem*Brush resources; each swaps its value with the theme variant.">
+                         Footer="These system colours are available as CupertinoSystem*Brush resources. Switch between light and dark appearance to see their variants.">
         <Grid Classes="case">
           <WrapPanel Classes="specimens">
             <StackPanel Classes="swatch">
@@ -80,7 +80,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="SEMANTIC ROLES"
-                         Footer="Roles, not hues: controls resolve these by name, which is what makes a scoped override or a theme change work.">
+                         Footer="Choose a brush by its purpose, such as label or separator, so colours follow the current theme.">
         <Grid Classes="case">
           <WrapPanel Classes="specimens">
             <StackPanel Classes="swatch">
@@ -104,7 +104,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="SURFACES"
-                         Footer="Card over grouped background, split by the hairline separator. The inset-grouped list is these three resources.">
+                         Footer="Combine a card background, a grouped page background, and a separator to create a grouped list.">
         <Grid Classes="case">
           <Border CornerRadius="10" ClipToBounds="True"
                   Background="{DynamicResource CupertinoGroupedBackgroundBrush}">

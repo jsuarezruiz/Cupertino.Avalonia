@@ -6,7 +6,9 @@ ms.date: 2026-08-27
 
 # Pickers and calendar
 
-Cupertino pickers support compact capsule fields and inline content. Compact pickers open a calendar or wheel popover.
+Cupertino pickers can appear as compact fields or inline editors. Tapping a compact field opens a calendar or wheel popover.
+
+Popovers move keyboard focus into their content, cycle focus with Tab and Shift+Tab, and close with Escape. Closing restores the previous focus when it still belongs to the same window.
 
 <table>
   <tr>
@@ -44,4 +46,8 @@ Cupertino pickers support compact capsule fields and inline content. Compact pic
 
 Set `ClockIdentifier` to `12HourClock` or `24HourClock` when the design must override the current culture. Otherwise, leave it unset and let the picker follow the user’s locale.
 
-Use `CupertinoCalendarView` when the calendar is the primary content rather than a temporary picker surface.
+Date pickers treat `MinimumDate` and `MaximumDate` as local calendar dates. Their calendars expand to include the selection and any date bounds you set.
+
+The combined date-time picker treats `Minimum` and `Maximum` as absolute points in time, accounting for the selected UTC offset. Rounding to a minute increment keeps the value within those bounds.
+
+Use `CupertinoCalendarView` to display a calendar directly in your page.

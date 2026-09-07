@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="TYPE RAMP"
-                         Footer="The iOS text styles as TextBlock classes, SF Pro metrics at the default Dynamic Type size. The family comes from the app; the demo renders Inter.">
+                         Footer="Compare the text styles available as TextBlock classes. Each pair shows the default font size and line height in device-independent pixels (DIPs). The headline uses a semibold weight.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="34 / 41" />
@@ -31,7 +31,7 @@
           </Grid>
           <Rectangle Classes="hair" />
           <Grid Classes="case" ColumnDefinitions="Auto,*">
-            <TextBlock Classes="case" Text="17 sb / 22" />
+            <TextBlock Classes="case" Text="17 / 22" />
             <TextBlock Grid.Column="1" Classes="headline" Text="Headline" />
           </Grid>
           <Rectangle Classes="hair" />
@@ -68,22 +68,22 @@
       </cupertino:Section>
 
       <cupertino:Section Header="EMPHASIZED"
-                         Footer="Add the emphasized class beside any ramp class for the bold cut.">
+                         Footer="Add the emphasized class to a text style to make it bold.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="title2" />
-            <TextBlock Grid.Column="1" Classes="title2 emphasized" Text="Emphasized Title 2" />
+            <TextBlock Grid.Column="1" Classes="title2 emphasized" Text="Title 2" />
           </Grid>
           <Rectangle Classes="hair" />
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="body" />
-            <TextBlock Grid.Column="1" Classes="body emphasized" Text="Emphasized Body" />
+            <TextBlock Grid.Column="1" Classes="body emphasized" Text="Body" />
           </Grid>
         </StackPanel>
       </cupertino:Section>
 
       <cupertino:Section Header="LABEL HIERARCHY"
-                         Footer="The four label levels; every text style can carry any of them.">
+                         Footer="Use label colours to distinguish primary text, supporting details, and placeholders. These brushes can be applied to any text style.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Levels" />

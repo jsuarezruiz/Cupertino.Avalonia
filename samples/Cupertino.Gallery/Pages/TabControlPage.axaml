@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="Classes=&quot;segmented&quot; is UISegmentedControl: a 32pt track, the selection slides as a white pill.">
+                         Footer="Use the segmented class to switch between related views. Selecting a segment moves the highlight and displays its content.">
         <StackPanel Margin="16,14">
           <TabControl Classes="segmented" SelectedIndex="0">
             <TabItem Header="Years">
@@ -25,7 +25,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="A segment header is arbitrary content, so a glyph can ride beside the text.">
+                         Footer="A segment header can combine an icon and text to describe its view.">
         <StackPanel Margin="16,14">
           <TabControl Classes="segmented" SelectedIndex="0">
             <TabItem x:Name="SegHomeTab">
@@ -66,7 +66,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="BOTTOM BAR"
-                         Footer="Classes=&quot;bottom&quot; floats the 62pt glass bar over live content. Scroll the Home photos and the glass re-reads what passes beneath. Drag the selection: the lens stretches, refracts what it crosses, and can ride onto the circle, which IS a tab, detached by Tabs.IsDetached; a second tap on it returns to the previous tab.">
+                         Footer="The bottom class places a glass tab bar over the content. Scroll the photos to see the background change, or drag across tabs to switch views. The separate circular tab uses Tabs.IsDetached; selecting it again returns to the previous tab.">
         <Grid Classes="case">
           <Border CornerRadius="10" ClipToBounds="True" Height="340">
             <TabControl Classes="bottom" SelectedIndex="0">

@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Reactive;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Cupertino.Animation;
 
 namespace Cupertino.Controls;
@@ -17,12 +18,21 @@ namespace Cupertino.Controls;
 /// </summary>
 public static class SwitchInteraction
 {
+    /// <summary>
+    /// Identifies the <see cref="GetIsEnabled"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsEnabledProperty =
         AvaloniaProperty.RegisterAttached<ToggleSwitch, bool>("IsEnabled", typeof(SwitchInteraction));
 
+    /// <summary>
+    /// Identifies the <see cref="GetOnTint"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<Color> OnTintProperty =
         AvaloniaProperty.RegisterAttached<ToggleSwitch, Color>("OnTint", typeof(SwitchInteraction));
 
+    /// <summary>
+    /// Identifies the <see cref="GetOffTint"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<Color> OffTintProperty =
         AvaloniaProperty.RegisterAttached<ToggleSwitch, Color>("OffTint", typeof(SwitchInteraction));
 
@@ -48,13 +58,19 @@ public static class SwitchInteraction
         ToggleSwitch.OffContentProperty.Changed.AddClassHandler<ToggleSwitch>((sw, _) => RefreshStateContent(sw));
     }
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static void SetIsEnabled(ToggleSwitch element, bool value) => element.SetValue(IsEnabledProperty, value);
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static bool GetIsEnabled(ToggleSwitch element) => element.GetValue(IsEnabledProperty);
 
+    /// <inheritdoc cref="OnTintProperty"/>
     public static void SetOnTint(ToggleSwitch element, Color value) => element.SetValue(OnTintProperty, value);
+    /// <inheritdoc cref="OnTintProperty"/>
     public static Color GetOnTint(ToggleSwitch element) => element.GetValue(OnTintProperty);
 
+    /// <inheritdoc cref="OffTintProperty"/>
     public static void SetOffTint(ToggleSwitch element, Color value) => element.SetValue(OffTintProperty, value);
+    /// <inheritdoc cref="OffTintProperty"/>
     public static Color GetOffTint(ToggleSwitch element) => element.GetValue(OffTintProperty);
 
     private static void OnCheckedChanged(object? sender, RoutedEventArgs e) =>
@@ -106,6 +122,7 @@ public static class SwitchInteraction
     {
         var sw = (ToggleSwitch)sender!;
         sw.GetValue(StateProperty)?.Dispose();
+        sw.SetValue(StateProperty, null);
 
         var knobs = e.NameScope.Find<Panel>("PART_MovingKnobs");
         var travelCanvas = e.NameScope.Find<Panel>("PART_SwitchKnob");
@@ -127,6 +144,8 @@ public static class SwitchInteraction
 
     private sealed class TrackingState : IDisposable
     {
+        private bool _observingAccessibility;
+
         public TrackingState(ToggleSwitch sw, Panel knobs, Panel travelCanvas, Border track)
         {
             Switch = sw;
@@ -142,6 +161,10 @@ public static class SwitchInteraction
 
             ReleaseTimer = new DispatcherTimer { Interval = ReleaseMaterialHold };
             ReleaseTimer.Tick += OnReleaseTimerTick;
+            Switch.AttachedToVisualTree += OnAttached;
+            Switch.DetachedFromVisualTree += OnDetached;
+            if (Switch.IsAttachedToVisualTree())
+                ObserveAccessibility();
             // Observe releases before ToggleSwitch updates Canvas.Left.
             Switch.AddHandler(InputElement.PointerPressedEvent, OnSwitchPointerPressed,
                 RoutingStrategies.Tunnel, handledEventsToo: true);
@@ -182,15 +205,54 @@ public static class SwitchInteraction
         {
             ReleaseTimer.Stop();
             ReleaseTimer.Tick -= OnReleaseTimerTick;
+            StopObservingAccessibility();
+            Switch.AttachedToVisualTree -= OnAttached;
+            Switch.DetachedFromVisualTree -= OnDetached;
             Switch.RemoveHandler(InputElement.PointerPressedEvent, OnSwitchPointerPressed);
             Switch.RemoveHandler(InputElement.PointerReleasedEvent, OnSwitchPointerReleased);
             Switch.Classes.Remove(ReleasingClass);
             Subscription?.Dispose();
         }
 
+        private void OnAttached(object? sender, VisualTreeAttachmentEventArgs e) => ObserveAccessibility();
+
+        private void OnDetached(object? sender, VisualTreeAttachmentEventArgs e)
+        {
+            ReleaseTimer.Stop();
+            Switch.Classes.Remove(ReleasingClass);
+            StopObservingAccessibility();
+        }
+
+        private void ObserveAccessibility()
+        {
+            if (_observingAccessibility)
+                return;
+            _observingAccessibility = true;
+            CupertinoAccessibility.Changed += OnAccessibilityChanged;
+            OnAccessibilityChanged(null, EventArgs.Empty);
+        }
+
+        private void StopObservingAccessibility()
+        {
+            if (!_observingAccessibility)
+                return;
+            _observingAccessibility = false;
+            CupertinoAccessibility.Changed -= OnAccessibilityChanged;
+        }
+
+        private void OnAccessibilityChanged(object? sender, EventArgs e)
+        {
+            Knobs.Transitions = CupertinoAccessibility.ReduceMotion ? null : ReleaseTransitions;
+            if (CupertinoAccessibility.ReduceMotion)
+            {
+                ReleaseTimer.Stop();
+                Switch.Classes.Remove(ReleasingClass);
+            }
+        }
+
         private void OnSwitchPointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            Knobs.Transitions = PressTransitions;
+            Knobs.Transitions = CupertinoAccessibility.ReduceMotion ? null : PressTransitions;
             ReleaseTimer.Stop();
             Switch.Classes.Remove(ReleasingClass);
         }
@@ -198,7 +260,13 @@ public static class SwitchInteraction
         private void OnSwitchPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
             // Preserve release material through spring travel.
-            Knobs.Transitions = ReleaseTransitions;
+            Knobs.Transitions = CupertinoAccessibility.ReduceMotion ? null : ReleaseTransitions;
+            if (CupertinoAccessibility.ReduceMotion)
+            {
+                ReleaseTimer.Stop();
+                Switch.Classes.Remove(ReleasingClass);
+                return;
+            }
             Switch.Classes.Add(ReleasingClass);
             ReleaseTimer.Stop();
             ReleaseTimer.Start();

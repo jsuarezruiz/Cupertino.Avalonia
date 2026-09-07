@@ -9,6 +9,9 @@ namespace Cupertino.Controls;
 /// </summary>
 public static class MaskedPrompt
 {
+    /// <summary>
+    /// Identifies the <see cref="GetIsEnabled"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsEnabledProperty =
         AvaloniaProperty.RegisterAttached<Control, bool>("IsEnabled", typeof(MaskedPrompt));
 
@@ -18,9 +21,11 @@ public static class MaskedPrompt
         IsEnabledProperty.Changed.AddClassHandler<MaskedTextBox>((m, _) => Update(m));
     }
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static void SetIsEnabled(Control element, bool value) =>
         element.SetValue(IsEnabledProperty, value);
 
+    /// <inheritdoc cref="IsEnabledProperty"/>
     public static bool GetIsEnabled(Control element) =>
         element.GetValue(IsEnabledProperty);
 

@@ -17,7 +17,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="A desktop menu bar: top-level items as quiet buttons, each dropping the thick-material menu panel.">
+                         Footer="Open a menu from the menu bar to see its available commands.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Menu bar" />
@@ -44,7 +44,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="MenuItem.Icon puts a glyph in the leading column; the destructive row tints its own.">
+                         Footer="Add an icon with MenuItem.Icon. Use the destructive class to highlight an action such as Delete in red.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="With icons" />
@@ -84,7 +84,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A disabled item dims and ignores the pointer; a whole top-level item can be disabled too.">
+                         Footer="Disabled commands appear dimmed and cannot be selected. You can also disable an entire menu.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Disabled" />

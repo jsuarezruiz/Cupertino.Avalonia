@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <ControlTheme x:Key="CupertinoButton" TargetType="Button">
@@ -15,8 +16,8 @@
     <Setter Property="RenderTransform" Value="scale(1.0)" />
     <Setter Property="Transitions">
       <Transitions>
-        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.13" Easing="SineEaseOut" />
-        <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+        <TransformOperationsTransition Property="RenderTransform" Duration="{motion:MotionDuration 130}" Easing="SineEaseOut" />
+        <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
       </Transitions>
     </Setter>
     <Setter Property="Template">
@@ -36,7 +37,7 @@
                                  Tint="{DynamicResource CupertinoGlassButtonTint}">
             <controls:GlassSurface.Transitions>
               <Transitions>
-                <ColorTransition Property="Tint" Duration="0:0:0.13" />
+                <ColorTransition Property="Tint" Duration="{motion:MotionDuration 130}" />
               </Transitions>
             </controls:GlassSurface.Transitions>
           </controls:GlassSurface>
@@ -59,7 +60,7 @@
                   Opacity="0">
             <Border.Transitions>
               <Transitions>
-                <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
               </Transitions>
             </Border.Transitions>
           </Border>

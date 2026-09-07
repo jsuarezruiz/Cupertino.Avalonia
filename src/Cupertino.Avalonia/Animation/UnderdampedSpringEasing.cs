@@ -17,6 +17,7 @@ public class UnderdampedSpringEasing : Easing
     /// </summary>
     public double OmegaDuration { get; set; } = 12.0;
 
+    /// <inheritdoc/>
     public override double Ease(double progress)
     {
         var zeta = Math.Clamp(DampingRatio, 0.05, 0.999);

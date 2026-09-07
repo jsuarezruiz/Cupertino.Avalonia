@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls"
                     xmlns:anim="clr-namespace:Cupertino.Animation">
 
@@ -15,13 +16,13 @@
     <Setter Property="(controls:SwitchInteraction.OffTint)" Value="{DynamicResource CupertinoSwitchTrackOffTint}" />
     <Setter Property="KnobTransitions">
       <Transitions>
-        <DoubleTransition Property="Canvas.Left" Duration="0:0:0.334">
+        <DoubleTransition Property="Canvas.Left" Duration="{motion:MotionDuration 334}">
           <DoubleTransition.Easing>
             <anim:SwitchTravelEasing />
           </DoubleTransition.Easing>
         </DoubleTransition>
         <TransformOperationsTransition Property="RenderTransform"
-                                       Duration="0:0:0.11"
+                                       Duration="{motion:MotionDuration 110}"
                                        Easing="SineEaseOut" />
       </Transitions>
     </Setter>
@@ -45,7 +46,7 @@
                     Opacity="0">
               <Border.Transitions>
                 <Transitions>
-                  <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                  <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
                 </Transitions>
               </Border.Transitions>
             </Border>
@@ -67,7 +68,7 @@
                                 Theme="{StaticResource CupertinoKnobRest}">
                   <ContentControl.Transitions>
                     <Transitions>
-                      <DoubleTransition Property="Opacity" Duration="0:0:0.07" />
+                      <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 70}" />
                     </Transitions>
                   </ContentControl.Transitions>
                 </ContentControl>
@@ -79,7 +80,7 @@
                                 Opacity="0">
                   <ContentControl.Transitions>
                     <Transitions>
-                      <DoubleTransition Property="Opacity" Duration="0:0:0.09" />
+                      <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 90}" />
                     </Transitions>
                   </ContentControl.Transitions>
                   <Grid IsHitTestVisible="False">

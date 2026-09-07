@@ -1,8 +1,10 @@
+using System;
 using System.Globalization;
 using Avalonia;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
+using Avalonia.Rendering.Composition;
 using Avalonia.Themes.Fluent;
 using Cupertino.Themes;
 
@@ -30,9 +32,22 @@ public class RenderTestApp : Application
         Styles.Add(theme);
     }
 
-    public static AppBuilder BuildAvaloniaApp() =>
-        AppBuilder.Configure<RenderTestApp>()
+    public static AppBuilder BuildAvaloniaApp()
+    {
+        var builder = AppBuilder.Configure<RenderTestApp>()
             .WithInterFont()
             .UseSkia()
             .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });
+
+        // Exercise glass with both application-selected region tracking modes as
+        // well as Avalonia's defaults; Cupertino must not replace these options.
+        var dirtyRects = Environment.GetEnvironmentVariable("CUPERTINO_TEST_DIRTY_RECTS");
+        if (dirtyRects is "regions" or "native-regions")
+            builder.With(new CompositionOptions
+            {
+                UseRegionDirtyRectClipping = true,
+                MaxDirtyRects = dirtyRects == "native-regions" ? 0 : 8,
+            });
+        return builder;
+    }
 }

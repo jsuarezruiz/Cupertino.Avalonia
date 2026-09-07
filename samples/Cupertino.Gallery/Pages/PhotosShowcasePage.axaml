@@ -4,7 +4,6 @@
              xmlns:local="using:Cupertino.Gallery"
              x:Class="Cupertino.Gallery.Pages.PhotosShowcasePage">
 
-  <!-- Bundled photos are freely licensed placeholders. -->
   <Panel Background="{DynamicResource CupertinoGroupedBackgroundBrush}">
     <Border Width="402" CornerRadius="44" ClipToBounds="True"
             Margin="0,88,0,24" HorizontalAlignment="Center"

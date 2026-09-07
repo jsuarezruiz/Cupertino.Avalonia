@@ -10,7 +10,7 @@ namespace Cupertino.Gallery;
 [Register(nameof(AppDelegate))]
 public partial class AppDelegate : AvaloniaAppDelegate<IosApp>
 {
-    // Inter is incompatible with iOS AOT.
+    // Use the system font on iOS; the theme resolves it at startup.
     protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
     {
         // .NET drops the iOS region override (e.g. en_US@rg=es), so take
@@ -21,30 +21,34 @@ public partial class AppDelegate : AvaloniaAppDelegate<IosApp>
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.CurrentCulture = culture;
 
-        CupertinoHaptics.Handler = static kind =>
+        CupertinoHaptics.Handler = kind =>
         {
             switch (kind)
             {
                 case HapticFeedback.Selection:
-                    new UISelectionFeedbackGenerator().SelectionChanged();
+                    using (var feedback = new UISelectionFeedbackGenerator())
+                        feedback.SelectionChanged();
                     break;
                 case HapticFeedback.ImpactLight:
-                    new UIImpactFeedbackGenerator(UIImpactFeedbackStyle.Light).ImpactOccurred();
+                    PlayImpact(UIImpactFeedbackStyle.Light);
                     break;
                 case HapticFeedback.ImpactMedium:
-                    new UIImpactFeedbackGenerator(UIImpactFeedbackStyle.Medium).ImpactOccurred();
+                    PlayImpact(UIImpactFeedbackStyle.Medium);
                     break;
                 case HapticFeedback.ImpactHeavy:
-                    new UIImpactFeedbackGenerator(UIImpactFeedbackStyle.Heavy).ImpactOccurred();
+                    PlayImpact(UIImpactFeedbackStyle.Heavy);
                     break;
                 case HapticFeedback.Success:
-                    new UINotificationFeedbackGenerator().NotificationOccurred(UINotificationFeedbackType.Success);
+                    using (var feedback = new UINotificationFeedbackGenerator())
+                        feedback.NotificationOccurred(UINotificationFeedbackType.Success);
                     break;
                 case HapticFeedback.Warning:
-                    new UINotificationFeedbackGenerator().NotificationOccurred(UINotificationFeedbackType.Warning);
+                    using (var feedback = new UINotificationFeedbackGenerator())
+                        feedback.NotificationOccurred(UINotificationFeedbackType.Warning);
                     break;
                 case HapticFeedback.Error:
-                    new UINotificationFeedbackGenerator().NotificationOccurred(UINotificationFeedbackType.Error);
+                    using (var feedback = new UINotificationFeedbackGenerator())
+                        feedback.NotificationOccurred(UINotificationFeedbackType.Error);
                     break;
             }
         };
@@ -53,4 +57,26 @@ public partial class AppDelegate : AvaloniaAppDelegate<IosApp>
         NativeComparisonHosts.Register();
         return base.CustomizeAppBuilder(builder);
     }
+
+    private void PlayImpact(UIImpactFeedbackStyle style)
+    {
+        if (OperatingSystem.IsIOSVersionAtLeast(17, 5) || OperatingSystem.IsMacCatalystVersionAtLeast(17, 5))
+        {
+            var view = UIApplication.SharedApplication.ConnectedScenes.OfType<UIWindowScene>()
+                .Where(scene => scene.ActivationState == UISceneActivationState.ForegroundActive)
+                .SelectMany(scene => scene.Windows)
+                .FirstOrDefault(window => window.IsKeyWindow)?.RootViewController?.View
+                ?? Window?.RootViewController?.View;
+            if (view is null)
+                return;
+            using var feedback = UIImpactFeedbackGenerator.GetFeedbackGenerator(style, view);
+            feedback.ImpactOccurred();
+        }
+        else
+        {
+            using var feedback = new UIImpactFeedbackGenerator(style);
+            feedback.ImpactOccurred();
+        }
+    }
+
 }

@@ -27,9 +27,21 @@ public sealed class NavigationEntry
         Parameter = parameter;
     }
 
+    /// <summary>
+    /// The application-defined route identifier; route lookup uses ordinal, case-sensitive comparison.
+    /// </summary>
     public string Route { get; }
+    /// <summary>
+    /// The primary text displayed by this control.
+    /// </summary>
     public string Title { get; }
+    /// <summary>
+    /// The page owned by this entry. It remains parented while retained in the stack and is released when its removal transition completes.
+    /// </summary>
     public Control Content { get; }
+    /// <summary>
+    /// An optional application-owned route parameter. State capture retains the object reference rather than serializing it.
+    /// </summary>
     public object? Parameter { get; }
 
     /// <summary>
@@ -38,15 +50,36 @@ public sealed class NavigationEntry
     internal Control Host { get; }
 }
 
+/// <summary>
+/// Identifies the kind of navigation operation.
+/// </summary>
 public enum CupertinoNavigationKind
 {
+    /// <summary>
+    /// Adds a route.
+    /// </summary>
     Push,
+    /// <summary>
+    /// Removes the top route.
+    /// </summary>
     Pop,
+    /// <summary>
+    /// Removes every route.
+    /// </summary>
     PopToRoot,
+    /// <summary>
+    /// Removes routes above an existing matching route.
+    /// </summary>
     PopToRoute,
+    /// <summary>
+    /// Replaces the stack from captured route data.
+    /// </summary>
     Restore,
 }
 
+/// <summary>
+/// Describes a proposed navigation operation that handlers may cancel.
+/// </summary>
 public sealed class CupertinoNavigatingEventArgs : CancelEventArgs
 {
     internal CupertinoNavigatingEventArgs(CupertinoNavigationKind kind, NavigationEntry? from, NavigationEntry? to)
@@ -56,11 +89,23 @@ public sealed class CupertinoNavigatingEventArgs : CancelEventArgs
         To = to;
     }
 
+    /// <summary>
+    /// The navigation operation represented by this event.
+    /// </summary>
     public CupertinoNavigationKind Kind { get; }
+    /// <summary>
+    /// The departing route entry, or null for the root.
+    /// </summary>
     public NavigationEntry? From { get; }
+    /// <summary>
+    /// The destination route entry, or null for the root.
+    /// </summary>
     public NavigationEntry? To { get; }
 }
 
+/// <summary>
+/// Describes a navigation operation whose visual transition has finished.
+/// </summary>
 public sealed class CupertinoNavigationCompletedEventArgs : EventArgs
 {
     internal CupertinoNavigationCompletedEventArgs(CupertinoNavigationKind kind, NavigationEntry? current)
@@ -69,11 +114,27 @@ public sealed class CupertinoNavigationCompletedEventArgs : EventArgs
         Current = current;
     }
 
+    /// <summary>
+    /// The navigation operation represented by this event.
+    /// </summary>
     public CupertinoNavigationKind Kind { get; }
+    /// <summary>
+    /// The current route after the completed transition, or null for the root.
+    /// </summary>
     public NavigationEntry? Current { get; }
 }
 
+/// <summary>
+/// A captured route identifier, display title, and application-owned parameter.
+/// </summary>
+/// <param name="Route">The application-defined route identifier; route lookup uses ordinal, case-sensitive comparison.</param>
+/// <param name="Title">The primary text displayed by this control.</param>
+/// <param name="Parameter">An optional application-owned route parameter. State capture retains the object reference rather than serializing it.</param>
 public sealed record CupertinoNavigationStateEntry(string Route, string Title, object? Parameter);
+/// <summary>
+/// An application-restorable snapshot of the route stack, excluding visual pages and the root.
+/// </summary>
+/// <param name="Entries">Route entries in push order. Parameter objects remain owned by the application.</param>
 public sealed record CupertinoNavigationState(IReadOnlyList<CupertinoNavigationStateEntry> Entries);
 
 /// <summary>
@@ -83,9 +144,15 @@ public sealed record CupertinoNavigationState(IReadOnlyList<CupertinoNavigationS
 [TemplatePart("PART_Host", typeof(Panel))]
 public class CupertinoNavigationPage : TemplatedControl
 {
+    /// <summary>
+    /// Identifies the <see cref="RootContent"/> property.
+    /// </summary>
     public static readonly StyledProperty<Control?> RootContentProperty =
         AvaloniaProperty.Register<CupertinoNavigationPage, Control?>(nameof(RootContent));
 
+    /// <summary>
+    /// Identifies the <see cref="RootTitle"/> property.
+    /// </summary>
     public static readonly StyledProperty<string?> RootTitleProperty =
         AvaloniaProperty.Register<CupertinoNavigationPage, string?>(nameof(RootTitle));
 
@@ -95,12 +162,27 @@ public class CupertinoNavigationPage : TemplatedControl
     public static readonly StyledProperty<object?> LeadingContentProperty =
         AvaloniaProperty.Register<CupertinoNavigationPage, object?>(nameof(LeadingContent));
 
+    /// <summary>
+    /// Identifies the <see cref="TrailingContent"/> property.
+    /// </summary>
     public static readonly StyledProperty<object?> TrailingContentProperty =
         AvaloniaProperty.Register<CupertinoNavigationPage, object?>(nameof(TrailingContent));
 
+    /// <summary>
+    /// The root page retained beneath the route stack. Replacing it releases the previous root from its backing control.
+    /// </summary>
     public Control? RootContent { get => GetValue(RootContentProperty); set => SetValue(RootContentProperty, value); }
+    /// <summary>
+    /// The title displayed when the route stack is empty.
+    /// </summary>
     public string? RootTitle { get => GetValue(RootTitleProperty); set => SetValue(RootTitleProperty, value); }
+    /// <summary>
+    /// Content displayed before the title in the navigation bar.
+    /// </summary>
     public object? LeadingContent { get => GetValue(LeadingContentProperty); set => SetValue(LeadingContentProperty, value); }
+    /// <summary>
+    /// Content displayed after the title in the navigation bar.
+    /// </summary>
     public object? TrailingContent { get => GetValue(TrailingContentProperty); set => SetValue(TrailingContentProperty, value); }
 
     // The outgoing page travels a third of the incoming page's distance.
@@ -117,6 +199,9 @@ public class CupertinoNavigationPage : TemplatedControl
     public static readonly StyledProperty<bool> IsBackGestureEnabledProperty =
         AvaloniaProperty.Register<CupertinoNavigationPage, bool>(nameof(IsBackGestureEnabled), true);
 
+    /// <summary>
+    /// Whether an edge swipe may begin interactive back navigation.
+    /// </summary>
     public bool IsBackGestureEnabled
     {
         get => GetValue(IsBackGestureEnabledProperty);
@@ -151,8 +236,17 @@ public class CupertinoNavigationPage : TemplatedControl
     /// </summary>
     public int Depth => _stack.Count;
 
+    /// <summary>
+    /// Whether the route stack contains a page that can be popped. Navigation callbacks may still cancel the operation.
+    /// </summary>
     public bool CanGoBack => _stack.Count > 0;
+    /// <summary>
+    /// The current route entries in push order, excluding the root; this view reflects subsequent navigation changes.
+    /// </summary>
     public IReadOnlyList<NavigationEntry> Stack => _stack;
+    /// <summary>
+    /// The top route entry, or null while showing the root.
+    /// </summary>
     public NavigationEntry? CurrentEntry => _stack.Count > 0 ? _stack[^1] : null;
 
     /// <summary>
@@ -164,7 +258,13 @@ public class CupertinoNavigationPage : TemplatedControl
     /// Raised after navigation completes.
     /// </summary>
     public event EventHandler? Navigated;
+    /// <summary>
+    /// Raised synchronously before an operation commits. Set Cancel to reject it; rejected pages remain reusable.
+    /// </summary>
     public event EventHandler<CupertinoNavigatingEventArgs>? Navigating;
+    /// <summary>
+    /// Raised after the visual transition finishes, including immediately when motion is reduced.
+    /// </summary>
     public event EventHandler<CupertinoNavigationCompletedEventArgs>? NavigationCompleted;
 
     private bool CanNavigate(CupertinoNavigationKind kind, NavigationEntry? from, NavigationEntry? to)
@@ -177,6 +277,7 @@ public class CupertinoNavigationPage : TemplatedControl
     private void CompleteNavigation(CupertinoNavigationKind kind) =>
         NavigationCompleted?.Invoke(this, new CupertinoNavigationCompletedEventArgs(kind, CurrentEntry));
 
+    /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         CompleteActiveTransition();
@@ -277,12 +378,19 @@ public class CupertinoNavigationPage : TemplatedControl
         host.RemoveHandler(PointerCaptureLostEvent, OnHostCaptureLost);
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 
         if (change.Property == RootContentProperty)
         {
+            CompleteActiveTransition();
+            CancelBackDrag(animate: false);
+            var previous = _rootHost;
+            _rootHost = null;
+            if (previous is not null)
+                ReleaseRetiredHost(previous);
             if (_stack.Count == 0)
                 ShowRoot();
             else
@@ -373,6 +481,15 @@ public class CupertinoNavigationPage : TemplatedControl
         return border;
     }
 
+    private void ReleaseRetiredHost(Control host)
+    {
+        if (ReferenceEquals(host, _rootHost) || _stack.Any(entry => ReferenceEquals(entry.Host, host)))
+            return;
+        _host?.Children.Remove(host);
+        if (host is Border border)
+            border.Child = null;
+    }
+
     private void ShowOnly(Control page)
     {
         if (_host is null)
@@ -403,8 +520,19 @@ public class CupertinoNavigationPage : TemplatedControl
 
         var behind = _host.Children.LastOrDefault();
         var entry = new NavigationEntry(route, title, content, Backed(content), parameter);
-        if (!CanNavigate(CupertinoNavigationKind.Push, CurrentEntry, entry))
-            return false;
+        var accepted = false;
+        try
+        {
+            accepted = CanNavigate(CupertinoNavigationKind.Push, CurrentEntry, entry);
+            if (!accepted)
+                return false;
+        }
+        finally
+        {
+            // Navigation callbacks can cancel or throw before ownership transfers.
+            if (!accepted)
+                ((Border)entry.Host).Child = null;
+        }
         _stack.Add(entry);
 
         if (_bar is not null)
@@ -450,6 +578,9 @@ public class CupertinoNavigationPage : TemplatedControl
     /// </summary>
     public void Pop() => TryPop();
 
+    /// <summary>
+    /// Attempts to remove the top route. Returns false if unavailable, dragging, or canceled; a popped page can be reused after the transition completes.
+    /// </summary>
     public bool TryPop()
     {
         if (_host is null || _dragging)
@@ -473,6 +604,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (!animated)
         {
             _host.Children.Remove(front);
+            ReleaseRetiredHost(front);
             if (!_host.Children.Contains(behind))
                 _host.Children.Add(behind);
             behind.RenderTransform = null;
@@ -502,6 +634,9 @@ public class CupertinoNavigationPage : TemplatedControl
     /// </summary>
     public void PopToRoot() => TryPopToRoot();
 
+    /// <summary>
+    /// Attempts to remove all routes in one transition. Returns false when unavailable, dragging, or canceled.
+    /// </summary>
     public bool TryPopToRoot()
     {
         if (_host is null || _dragging)
@@ -515,7 +650,11 @@ public class CupertinoNavigationPage : TemplatedControl
             return false;
 
         var front = _stack[^1].Host;
+        var retired = _stack.Select(entry => entry.Host).ToArray();
         _stack.Clear();
+        foreach (var host in retired)
+            if (!ReferenceEquals(host, front))
+                ReleaseRetiredHost(host);
 
         var animated = !CupertinoAccessibility.ReduceMotion;
         if (_bar is not null)
@@ -532,6 +671,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (!animated)
         {
             _host.Children.Remove(front);
+            ReleaseRetiredHost(front);
             if (!_host.Children.Contains(root))
                 _host.Children.Add(root);
             root.RenderTransform = null;
@@ -578,16 +718,25 @@ public class CupertinoNavigationPage : TemplatedControl
             return false;
 
         ResetBarChrome();
+        var retired = _stack.Skip(index + 1).Select(entry => entry.Host).ToArray();
         _stack.RemoveRange(index + 1, _stack.Count - index - 1);
         ShowCurrentEntry(destination);
+        foreach (var host in retired)
+            ReleaseRetiredHost(host);
         Navigated?.Invoke(this, EventArgs.Empty);
         CompleteNavigation(CupertinoNavigationKind.PopToRoute);
         return true;
     }
 
+    /// <summary>
+    /// Returns the most recently pushed entry with the exact route identifier, or null if absent.
+    /// </summary>
     public NavigationEntry? FindRoute(string route) =>
         _stack.LastOrDefault(entry => string.Equals(entry.Route, route, StringComparison.Ordinal));
 
+    /// <summary>
+    /// Captures route identifiers, titles, and parameter references in push order; visual controls and the root are excluded.
+    /// </summary>
     public CupertinoNavigationState CaptureState() => new(
         _stack.Select(entry => new CupertinoNavigationStateEntry(entry.Route, entry.Title, entry.Parameter)).ToArray());
 
@@ -606,28 +755,39 @@ public class CupertinoNavigationPage : TemplatedControl
         CompleteActiveTransition();
 
         var rebuilt = new List<NavigationEntry>(state.Entries.Count);
-        foreach (var saved in state.Entries)
+        try
         {
-            var content = pageFactory(saved);
-            if (content is null)
+            foreach (var saved in state.Entries)
+            {
+                var content = pageFactory(saved);
+                if (content is null)
+                    return false;
+                rebuilt.Add(new NavigationEntry(saved.Route, saved.Title, content, Backed(content), saved.Parameter));
+            }
+
+            var destination = rebuilt.Count > 0 ? rebuilt[^1] : null;
+            if (!CanNavigate(CupertinoNavigationKind.Restore, CurrentEntry, destination))
                 return false;
-            rebuilt.Add(new NavigationEntry(saved.Route, saved.Title, content, Backed(content), saved.Parameter));
+
+            ResetBarChrome();
+            var retired = _stack.Select(entry => entry.Host).ToArray();
+            _stack.Clear();
+            _stack.AddRange(rebuilt);
+            if (destination is not null)
+                ShowCurrentEntry(destination);
+            else
+                ShowRoot();
+            foreach (var host in retired)
+                ReleaseRetiredHost(host);
+            Navigated?.Invoke(this, EventArgs.Empty);
+            CompleteNavigation(CupertinoNavigationKind.Restore);
+            return true;
         }
-
-        var destination = rebuilt.Count > 0 ? rebuilt[^1] : null;
-        if (!CanNavigate(CupertinoNavigationKind.Restore, CurrentEntry, destination))
-            return false;
-
-        ResetBarChrome();
-        _stack.Clear();
-        _stack.AddRange(rebuilt);
-        if (destination is not null)
-            ShowCurrentEntry(destination);
-        else
-            ShowRoot();
-        Navigated?.Invoke(this, EventArgs.Empty);
-        CompleteNavigation(CupertinoNavigationKind.Restore);
-        return true;
+        finally
+        {
+            foreach (var entry in rebuilt)
+                ReleaseRetiredHost(entry.Host);
+        }
     }
 
     private void ShowCurrentEntry(NavigationEntry entry)
@@ -780,6 +940,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (_edgeShadow is not null)
             _host.Children.Remove(_edgeShadow);
         _host.Children.Remove(drop);
+        ReleaseRetiredHost(drop);
         drop.RenderTransform = null;
         keep.RenderTransform = null;
         ResetBarChrome();
@@ -811,7 +972,7 @@ public class CupertinoNavigationPage : TemplatedControl
         driver.Tick += (_, _) =>
         {
             var t = (DateTime.UtcNow - started).TotalMilliseconds / duration;
-            if (t >= 1)
+            if (t >= 1 || CupertinoAccessibility.ReduceMotion)
             {
                 if (ReferenceEquals(_driver, driver))
                     CompleteActiveTransition();
@@ -983,6 +1144,7 @@ public class CupertinoNavigationPage : TemplatedControl
         }
     }
 
+    /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         CompleteActiveTransition();

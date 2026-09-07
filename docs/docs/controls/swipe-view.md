@@ -35,7 +35,7 @@ ms.date: 2026-08-27
 </cupertino:CupertinoSwipeView>
 ```
 
-Only one row stays open at a time. Programmatic control uses explicit action-oriented names:
+Only one row stays open at a time. You can also open or close its actions from code:
 
 ```csharp
 MessageRow.OpenLeadingActions();
@@ -43,4 +43,4 @@ MessageRow.OpenTrailingActions();
 MessageRow.Close();
 ```
 
-These methods complement drag interaction; they do not model iOS navigation state. Keep actions short, recognizable, and ordered so the full-swipe action is the safest frequent action for that edge.
+Use short action labels. Put the action you want a full swipe to trigger at the outer edge.

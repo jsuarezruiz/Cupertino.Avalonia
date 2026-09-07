@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
   <ControlTheme x:Key="{x:Type controls:CupertinoSearchView}" TargetType="controls:CupertinoSearchView">
     <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -44,7 +45,7 @@
     </Setter>
     <Style Selector="^:collapsible /template/ controls|GlassSurface#PART_SearchSurface">
       <Setter Property="Transitions">
-        <Transitions><DoubleTransition Property="MaxWidth" Duration="0:0:0.28" /></Transitions>
+        <Transitions><DoubleTransition Property="MaxWidth" Duration="{motion:MotionDuration 280}" /></Transitions>
       </Setter>
     </Style>
     <Style Selector="^:collapsible /template/ controls|GlassSurface#PART_SearchSurface">

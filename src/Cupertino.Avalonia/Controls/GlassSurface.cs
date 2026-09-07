@@ -13,44 +13,50 @@ namespace Cupertino.Controls;
 /// </summary>
 public class GlassSurface : Decorator
 {
+    /// <summary>
+    /// Identifies the <see cref="CornerRadius"/> property.
+    /// </summary>
     public static readonly StyledProperty<CornerRadius> CornerRadiusProperty =
-        AvaloniaProperty.Register<GlassSurface, CornerRadius>(nameof(CornerRadius), new CornerRadius(24));
+        AvaloniaProperty.Register<GlassSurface, CornerRadius>(nameof(CornerRadius), new CornerRadius(24),
+            coerce: (_, value) => new CornerRadius(
+                Normalize(value.TopLeft, 24, 0, 10000), Normalize(value.TopRight, 24, 0, 10000),
+                Normalize(value.BottomRight, 24, 0, 10000), Normalize(value.BottomLeft, 24, 0, 10000)));
 
     /// <summary>
-    /// Frost blur sigma, in logical pixels.
+    /// Frost blur radius in logical pixels; the Gaussian sigma is half this value. Values are clamped to 0–128.
     /// </summary>
     public static readonly StyledProperty<double> BlurRadiusProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(BlurRadius), 20.0);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(BlurRadius), 20.0, coerce: (_, value) => Normalize(value, 20.0, 0, 128));
 
     /// <summary>
     /// Backdrop saturation boost (1 = unchanged).
     /// </summary>
     public static readonly StyledProperty<double> SaturationProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(Saturation), 1.5);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(Saturation), 1.5, coerce: (_, value) => Normalize(value, 1.5, 0, 8));
 
     /// <summary>
     /// Depth of the refracting bevel band along the edges, in logical pixels.
     /// </summary>
     public static readonly StyledProperty<double> GlassThicknessProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(GlassThickness), 16.0);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(GlassThickness), 16.0, coerce: (_, value) => Normalize(value, 16.0, 0, 512));
 
     /// <summary>
     /// How far the edge band displaces the backdrop sample, in logical pixels.
     /// </summary>
     public static readonly StyledProperty<double> RefractionStrengthProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(RefractionStrength), 24.0);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(RefractionStrength), 24.0, coerce: (_, value) => Normalize(value, 24.0, 0, 256));
 
     /// <summary>
     /// Chromatic aberration amount in the refraction band (0..1).
     /// </summary>
     public static readonly StyledProperty<double> ChromaticAberrationProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(ChromaticAberration), 0.5);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(ChromaticAberration), 0.5, coerce: (_, value) => Normalize(value, 0.5, 0, 1));
 
     /// <summary>
     /// Adds a radial component to the lens so the surface reads as slightly convex (0..1).
     /// </summary>
     public static readonly StyledProperty<double> DepthEffectProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(DepthEffect), 0.15);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(DepthEffect), 0.15, coerce: (_, value) => Normalize(value, 0.15, 0, 1));
 
     /// <summary>
     /// Glass tint; alpha controls tint strength.
@@ -62,47 +68,51 @@ public class GlassSurface : Decorator
     /// Direction the key light comes from, in degrees (135 = upper-left).
     /// </summary>
     public static readonly StyledProperty<double> LightAngleProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(LightAngle), 135.0);
-
-    public static readonly StyledProperty<double> LightIntensityProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(LightIntensity), 1.2);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(LightAngle), 135.0, coerce: (_, value) => Normalize(value, 135.0, -36000, 36000));
 
     /// <summary>
-    /// Strength of the bright fresnel rim at the very edge (0..1).
+    /// Identifies the <see cref="LightIntensity"/> property.
+    /// </summary>
+    public static readonly StyledProperty<double> LightIntensityProperty =
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(LightIntensity), 1.2, coerce: (_, value) => Normalize(value, 1.2, 0, 8));
+
+    /// <summary>
+    /// Strength of the bright fresnel rim at the very edge, clamped to 0–8.
     /// </summary>
     public static readonly StyledProperty<double> FresnelStrengthProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(FresnelStrength), 1.0);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(FresnelStrength), 1.0, coerce: (_, value) => Normalize(value, 1.0, 0, 8));
 
     /// <summary>
     /// Opacity of the drop shadow cast by the surface (0 disables it).
     /// </summary>
     public static readonly StyledProperty<double> ShadowOpacityProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(ShadowOpacity), 0.18);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(ShadowOpacity), 0.18, coerce: (_, value) => Normalize(value, 0.18, 0, 1));
 
     /// <summary>
     /// Shadow blur radius, in logical pixels.
     /// </summary>
     public static readonly StyledProperty<double> ShadowBlurProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(ShadowBlur), 14.0);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(ShadowBlur), 14.0, coerce: (_, value) => Normalize(value, 14.0, 0, 128));
 
     /// <summary>
     /// Vertical shadow offset, in logical pixels.
     /// </summary>
     public static readonly StyledProperty<double> ShadowOffsetProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(ShadowOffset), 4.0);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(ShadowOffset), 4.0, coerce: (_, value) => Normalize(value, 4.0, -512, 512));
 
     /// <summary>
     /// Balances contact and ambient shadow layers.
     /// </summary>
     public static readonly StyledProperty<double> ShadowContactWeightProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(ShadowContactWeight), 0.85);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(ShadowContactWeight), 0.85, coerce: (_, value) => Normalize(value, 0.85, 0, 1));
 
     /// <summary>
     /// Convex magnification; 1 is flat.
     /// </summary>
     public static readonly StyledProperty<double> MagnificationProperty =
-        AvaloniaProperty.Register<GlassSurface, double>(nameof(Magnification), 1.0);
+        AvaloniaProperty.Register<GlassSurface, double>(nameof(Magnification), 1.0, coerce: (_, value) => Normalize(value, 1.0, 0.01, 8));
 
+    /// <inheritdoc cref="MagnificationProperty"/>
     public double Magnification
     {
         get => GetValue(MagnificationProperty);
@@ -115,6 +125,9 @@ public class GlassSurface : Decorator
     public static readonly StyledProperty<bool> IsAdaptiveProperty =
         AvaloniaProperty.Register<GlassSurface, bool>(nameof(IsAdaptive), true);
 
+    private static double Normalize(double value, double fallback, double minimum, double maximum) =>
+        double.IsFinite(value) ? Math.Clamp(value, minimum, maximum) : fallback;
+
     static GlassSurface()
     {
         AffectsRender<GlassSurface>(
@@ -126,96 +139,120 @@ public class GlassSurface : Decorator
             ShadowContactWeightProperty);
     }
 
+    /// <summary>
+    /// The corner radii, in logical pixels.
+    /// </summary>
     public CornerRadius CornerRadius
     {
         get => GetValue(CornerRadiusProperty);
         set => SetValue(CornerRadiusProperty, value);
     }
 
+    /// <inheritdoc cref="BlurRadiusProperty"/>
     public double BlurRadius
     {
         get => GetValue(BlurRadiusProperty);
         set => SetValue(BlurRadiusProperty, value);
     }
 
+    /// <inheritdoc cref="SaturationProperty"/>
     public double Saturation
     {
         get => GetValue(SaturationProperty);
         set => SetValue(SaturationProperty, value);
     }
 
+    /// <inheritdoc cref="GlassThicknessProperty"/>
     public double GlassThickness
     {
         get => GetValue(GlassThicknessProperty);
         set => SetValue(GlassThicknessProperty, value);
     }
 
+    /// <inheritdoc cref="RefractionStrengthProperty"/>
     public double RefractionStrength
     {
         get => GetValue(RefractionStrengthProperty);
         set => SetValue(RefractionStrengthProperty, value);
     }
 
+    /// <inheritdoc cref="ChromaticAberrationProperty"/>
     public double ChromaticAberration
     {
         get => GetValue(ChromaticAberrationProperty);
         set => SetValue(ChromaticAberrationProperty, value);
     }
 
+    /// <inheritdoc cref="DepthEffectProperty"/>
     public double DepthEffect
     {
         get => GetValue(DepthEffectProperty);
         set => SetValue(DepthEffectProperty, value);
     }
 
+    /// <inheritdoc cref="TintProperty"/>
     public Color Tint
     {
         get => GetValue(TintProperty);
         set => SetValue(TintProperty, value);
     }
 
+    /// <inheritdoc cref="LightAngleProperty"/>
     public double LightAngle
     {
         get => GetValue(LightAngleProperty);
         set => SetValue(LightAngleProperty, value);
     }
 
+    /// <summary>
+    /// The edge-light intensity, clamped to 0–8; nonfinite values use 1.2.
+    /// </summary>
     public double LightIntensity
     {
         get => GetValue(LightIntensityProperty);
         set => SetValue(LightIntensityProperty, value);
     }
 
+    /// <inheritdoc cref="FresnelStrengthProperty"/>
     public double FresnelStrength
     {
         get => GetValue(FresnelStrengthProperty);
         set => SetValue(FresnelStrengthProperty, value);
     }
 
+    /// <inheritdoc cref="ShadowContactWeightProperty"/>
     public double ShadowContactWeight
     {
         get => GetValue(ShadowContactWeightProperty);
         set => SetValue(ShadowContactWeightProperty, value);
     }
 
+    /// <summary>
+    /// Shadow opacity, where zero removes the shadow and one is fully opaque.
+    /// </summary>
     public double ShadowOpacity
     {
         get => GetValue(ShadowOpacityProperty);
         set => SetValue(ShadowOpacityProperty, value);
     }
 
+    /// <inheritdoc cref="ShadowBlurProperty"/>
     public double ShadowBlur
     {
         get => GetValue(ShadowBlurProperty);
         set => SetValue(ShadowBlurProperty, value);
     }
 
+    /// <summary>
+    /// Vertical shadow displacement, in logical pixels.
+    /// </summary>
     public double ShadowOffset
     {
         get => GetValue(ShadowOffsetProperty);
         set => SetValue(ShadowOffsetProperty, value);
     }
 
+    /// <inheritdoc cref="IsAdaptiveProperty"/>
     public bool IsAdaptive
     {
         get => GetValue(IsAdaptiveProperty);
@@ -228,6 +265,7 @@ public class GlassSurface : Decorator
     public static readonly StyledProperty<bool> IsLiveProperty =
         AvaloniaProperty.Register<GlassSurface, bool>(nameof(IsLive), false);
 
+    /// <inheritdoc cref="IsLiveProperty"/>
     public bool IsLive
     {
         get => GetValue(IsLiveProperty);
@@ -239,9 +277,11 @@ public class GlassSurface : Decorator
     private DateTime _pulseUntil;
     private TopLevelPulseCoordinator? _coordinator;
 
-    // Partial repaints can resample already-rendered glass.
+    // Keep sampling briefly after input or layout activity, sharing one frame
+    // callback per top level instead of a timer for every surface.
     private const int PulseMilliseconds = 350;
 
+    /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -256,6 +296,7 @@ public class GlassSurface : Decorator
         Pulse();
     }
 
+    /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
@@ -273,6 +314,7 @@ public class GlassSurface : Decorator
         _coordinator?.RequestFrame();
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -319,14 +361,14 @@ public class GlassSurface : Decorator
 
         public void RequestFrame()
         {
-            if (_disposed || _framePending || _surfaces.Count == 0)
+            if (_disposed || _framePending || _surfaces.Count == 0 || CupertinoAccessibility.ReduceTransparency)
                 return;
 
             _framePending = true;
             _top.RequestAnimationFrame(_ =>
             {
                 _framePending = false;
-                if (_disposed)
+                if (_disposed || CupertinoAccessibility.ReduceTransparency)
                     return;
 
                 _surfaces.RemoveWhere(surface =>
@@ -343,6 +385,8 @@ public class GlassSurface : Decorator
                     && (surface.IsLive || now < surface._pulseUntil));
                 if (repaint)
                 {
+                    // Repaint the backdrop before sampling; invalidating only the
+                    // glass can leave previously rendered glass in retained pixels.
                     _top.InvalidateVisual();
                     foreach (var surface in _surfaces)
                     {
@@ -369,8 +413,14 @@ public class GlassSurface : Decorator
         }
     }
 
-    private void OnAccessibilityChanged(object? sender, EventArgs e) => InvalidateVisual();
+    private void OnAccessibilityChanged(object? sender, EventArgs e)
+    {
+        InvalidateVisual();
+        if (!CupertinoAccessibility.ReduceTransparency)
+            Pulse();
+    }
 
+    /// <inheritdoc/>
     public override void Render(DrawingContext context)
     {
         var bounds = new Rect(Bounds.Size);

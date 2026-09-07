@@ -7,7 +7,7 @@
   <ScrollViewer>
     <StackPanel Margin="0,74,0,120">
 
-      <cupertino:Section Header="BASIC" Footer="5.7pt rail, 37×24pt thumb, the same capsule the switch uses; the accent fill tracks the value.">
+      <cupertino:Section Header="BASIC" Footer="Drag the slider to adjust its value. The coloured part of the track shows the current position within the range.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Value" />
@@ -16,7 +16,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="CUSTOMIZED" Footer="Minimum, Maximum and Value set the range; a fixed Width makes a compact inline slider. Overriding CupertinoAccentBrush in a slider's Resources recolors its fill alone.">
+      <cupertino:Section Header="CUSTOMIZED" Footer="Set Minimum and Maximum to define the range, and Width for a compact slider. Override CupertinoAccentBrush in a slider's resources to give it a custom colour.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Range 10–20" />
@@ -49,7 +49,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="STATES" Footer="A disabled slider dims and ignores the pointer; the value stays put.">
+      <cupertino:Section Header="STATES" Footer="A disabled slider shows its current value but cannot be adjusted through user input.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Disabled" />

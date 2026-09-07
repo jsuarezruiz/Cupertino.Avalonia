@@ -12,6 +12,7 @@ namespace Cupertino.Gallery;
 
 public partial class SettingsPage : UserControl
 {
+    private bool _syncingPreferences = true;
     private static int s_directionPreference;
     private static readonly (string Name, Avalonia.Media.Color? Color)[] Accents =
     [
@@ -35,6 +36,9 @@ public partial class SettingsPage : UserControl
                 : 0;
         }
         this.FindControl<TabStrip>("DirectionStrip")!.SelectedIndex = s_directionPreference;
+        this.FindControl<ToggleSwitch>("ReduceGlass")!.IsChecked = CupertinoAccessibility.ReduceTransparency;
+        this.FindControl<ToggleSwitch>("ReduceMotion")!.IsChecked = CupertinoAccessibility.ReduceMotion;
+        _syncingPreferences = false;
 
         var row = this.FindControl<StackPanel>("AccentRow")!;
         var theme = Application.Current?.Styles.OfType<Cupertino.Themes.CupertinoTheme>()
@@ -72,6 +76,7 @@ public partial class SettingsPage : UserControl
             var dot = new Button { Padding = new Thickness(0), MinHeight = 0, Content = ring };
             dot.Classes.Add("plain");
             ToolTip.SetTip(dot, name);
+            Avalonia.Automation.AutomationProperties.SetName(dot, name);
             dot.Click += (_, _) =>
             {
                 if (theme is not null)
@@ -89,7 +94,7 @@ public partial class SettingsPage : UserControl
 
     private void OnAppearanceChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (Application.Current is not { } app || sender is not TabStrip strip)
+        if (_syncingPreferences || Application.Current is not { } app || sender is not TabStrip strip)
             return;
 
         app.RequestedThemeVariant = strip.SelectedIndex switch
@@ -100,17 +105,23 @@ public partial class SettingsPage : UserControl
         };
     }
 
-    private void OnReduceGlassChanged(object? sender, RoutedEventArgs e) =>
-        CupertinoAccessibility.ReduceTransparency =
-            this.FindControl<ToggleSwitch>("ReduceGlass")?.IsChecked == true;
+    private void OnReduceGlassChanged(object? sender, RoutedEventArgs e)
+    {
+        if (!_syncingPreferences)
+            CupertinoAccessibility.ReduceTransparency =
+                this.FindControl<ToggleSwitch>("ReduceGlass")?.IsChecked == true;
+    }
 
-    private void OnReduceMotionChanged(object? sender, RoutedEventArgs e) =>
-        CupertinoAccessibility.ReduceMotion =
-            this.FindControl<ToggleSwitch>("ReduceMotion")?.IsChecked == true;
+    private void OnReduceMotionChanged(object? sender, RoutedEventArgs e)
+    {
+        if (!_syncingPreferences)
+            CupertinoAccessibility.ReduceMotion =
+                this.FindControl<ToggleSwitch>("ReduceMotion")?.IsChecked == true;
+    }
 
     private void OnDirectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (sender is not TabStrip strip)
+        if (_syncingPreferences || sender is not TabStrip strip)
             return;
         s_directionPreference = Math.Clamp(strip.SelectedIndex, 0, 2);
         var direction = s_directionPreference switch

@@ -7,7 +7,7 @@
   <ScrollViewer>
     <StackPanel Margin="0,74,0,120">
 
-      <cupertino:Section Header="BASIC" Footer="63×28pt track, 37×24pt capsule knob. Drag the knob and the track colour follows it.">
+      <cupertino:Section Header="BASIC" Footer="Select the switch or drag its handle to turn it on or off. The track colour changes with its state.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Switch" />
@@ -19,7 +19,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="CUSTOMIZED" Footer="Content puts a label beside the switch; OnContent/OffContent swap the text with the state. Every colour resolves through DynamicResource, so overriding CupertinoSwitchTrackOnTint in a control's Resources recolors that switch alone.">
+      <cupertino:Section Header="CUSTOMIZED" Footer="Use Content for a label, or OnContent and OffContent for labels that follow the state. Override CupertinoSwitchTrackOnTint in a switch's resources to change its on colour.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="With label" />
@@ -54,7 +54,7 @@
         </StackPanel>
       </cupertino:Section>
 
-      <cupertino:Section Header="STATES" Footer="A disabled switch keeps its value. It only dims.">
+      <cupertino:Section Header="STATES" Footer="A disabled switch shows its current state but cannot be turned on or off.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*">
             <TextBlock Classes="case" Text="Enabled" />

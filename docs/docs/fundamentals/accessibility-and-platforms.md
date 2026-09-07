@@ -6,11 +6,36 @@ ms.date: 2026-08-27
 
 # Accessibility and platforms
 
-Cupertino.Avalonia is designed for desktop, iOS, Android, and Browser targets. The same XAML surface is used everywhere, with adaptations for the active renderer and accessibility settings.
+Cupertino.Avalonia supports desktop, iOS, Android and Browser. Your app can use the same controls on each platform and pass in the user's accessibility preferences.
+
+## Connect platform preferences
+
+Your app must read system preferences and pass them to `CupertinoAccessibility`. Implement `ICupertinoAccessibilityProvider` to keep them in sync. The galleries use switches in Settings for manual testing.
+
+Reduced motion and reduced transparency default to `false`; text scale defaults to `1.0`. Set your provider after Avalonia initializes:
+
+```csharp
+using Cupertino.Controls;
+
+// platformPreferences is your implementation of ICupertinoAccessibilityProvider.
+CupertinoAccessibility.Provider = platformPreferences;
+```
+
+A provider returns the current preferences through `Current` and raises `Changed` when they change. Cupertino applies updates on the UI thread. Replacing or removing the provider disconnects the old subscription; removing it keeps the last applied values.
+
+Your app owns the provider and its system event subscriptions. Refresh settings when the app resumes if needed, and release those subscriptions on shutdown. Test both startup values and changes while the app is running.
+
+For settings managed by your app, set the properties directly:
+
+```csharp
+CupertinoAccessibility.ReduceMotion = true;
+CupertinoAccessibility.ReduceTransparency = true;
+CupertinoAccessibility.TextScaleFactor = 1.25;
+```
 
 ## Reduced motion and transparency
 
-Built-in navigation, sheets, popovers, switches, and other animated controls consult `CupertinoAccessibility`. Custom motion should do the same:
+Built-in transitions respect Reduce Motion. Check the same setting in your own animations:
 
 ```csharp
 if (CupertinoAccessibility.ReduceMotion)
@@ -22,13 +47,15 @@ if (CupertinoAccessibility.ReduceMotion)
 StartTransition();
 ```
 
-Live glass falls back to a non-refractive material when Reduce Transparency is active. Keep text contrast and control boundaries usable in both modes.
+Activity indicators continue to show progress when reduced motion is enabled.
+
+Reduce Transparency replaces live glass with an opaque fill. Check that text and control boundaries remain easy to see in both modes.
 
 ## Input and focus
 
-- Provide tooltips or accessible names for icon-only buttons.
+- Give icon-only buttons accessible names. Tooltips can provide extra context.
 - Preserve a minimum 44 pt interaction target where practical.
-- Test keyboard focus and activation on desktop and Browser.
+- Dialogs and sheets move focus into the overlay, cycle Tab navigation, and support Escape dismissal. Test focus restoration and nested overlays on desktop and Browser.
 - Test touch drag thresholds for sheets, swipe rows, sliders, and navigation gestures on mobile.
 - Do not use color alone to communicate destructive, selected, or invalid states.
 
@@ -36,9 +63,9 @@ Live glass falls back to a non-refractive material when Reduce Transparency is a
 
 | Platform | Notes |
 | --- | --- |
-| Desktop | Supports pointer, keyboard, hover, and live GPU glass |
+| Desktop | Supports pointer, keyboard, hover, and live glass through Skia |
 | iOS | Primary reference for metrics, gestures, and behavior |
 | Android | Uses the same Cupertino visual language and touch behavior |
 | Browser | Supports the theme; renderer capabilities determine live-glass fidelity |
 
-The visual language follows iOS, but the controls remain Avalonia controls. Use Avalonia binding, commands, validation, automation properties, and focus navigation normally.
+Use Avalonia's bindings, commands, validation, accessibility properties and focus navigation as usual.

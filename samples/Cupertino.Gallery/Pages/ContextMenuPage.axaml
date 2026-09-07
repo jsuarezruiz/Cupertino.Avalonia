@@ -16,7 +16,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="The menu opens on the popover material; destructive items render red.">
+                         Footer="Right-click the sample to open its context menu. Destructive actions are highlighted in red.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*" Height="52">
             <TextBlock Classes="case" Text="Right click" />
@@ -36,7 +36,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="MenuItem.Icon puts a glyph in the leading column; the rows are the same 44pt menu rows a flyout uses.">
+                         Footer="Set MenuItem.Icon to place an icon beside a menu label.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*" Height="52">
             <TextBlock Classes="case" Text="With icons" />
@@ -74,7 +74,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A disabled item dims and ignores the pointer.">
+                         Footer="Disabled menu items appear dimmed and cannot be selected.">
         <StackPanel>
           <Grid Classes="case" ColumnDefinitions="Auto,*" Height="52">
             <TextBlock Classes="case" Text="Disabled" />

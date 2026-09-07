@@ -9,6 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>..\Cupertino.Gallery\Assets\AppIcon.ico</ApplicationIcon>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <MacAppBundleName>$(ApplicationTitle)</MacAppBundleName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,5 +22,45 @@
   <ItemGroup>
     <ProjectReference Include="..\Cupertino.Gallery\Cupertino.Gallery.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\Cupertino.Gallery\Assets\AppIcon.icns"
+          Link="Assets\AppIcon.icns" />
+    <None Include="Platforms\macOS\Info.plist" />
+  </ItemGroup>
+
+  <Target Name="CreateMacAppBundle"
+          AfterTargets="Publish"
+          Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+    <PropertyGroup>
+      <_MacAppBundleRoot>$(PublishDir)macos</_MacAppBundleRoot>
+      <_MacAppBundlePath>$(_MacAppBundleRoot)/$(MacAppBundleName).app</_MacAppBundlePath>
+      <_MacBundleVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '[+-].*$', ''))</_MacBundleVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_MacBundlePayload Include="$(PublishDir)**/*" Exclude="$(_MacAppBundleRoot)/**" />
+    </ItemGroup>
+
+    <RemoveDir Directories="$(_MacAppBundlePath)" />
+    <MakeDir Directories="$(_MacAppBundlePath)/Contents/MacOS;$(_MacAppBundlePath)/Contents/Resources" />
+    <Copy SourceFiles="@(_MacBundlePayload)"
+          DestinationFiles="@(_MacBundlePayload->'$(_MacAppBundlePath)/Contents/MacOS/%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="..\Cupertino.Gallery\Assets\AppIcon.icns"
+          DestinationFiles="$(_MacAppBundlePath)/Contents/Resources/AppIcon.icns" />
+    <Copy SourceFiles="Platforms\macOS\Info.plist"
+          DestinationFiles="$(_MacAppBundlePath)/Contents/Info.plist" />
+    <XmlPoke XmlInputPath="$(_MacAppBundlePath)/Contents/Info.plist"
+             Query="/plist/dict/key[text()='CFBundleExecutable']/following-sibling::string[1]"
+             Value="$(AssemblyName)" />
+    <XmlPoke XmlInputPath="$(_MacAppBundlePath)/Contents/Info.plist"
+             Query="/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]"
+             Value="$(_MacBundleVersion)" />
+    <XmlPoke XmlInputPath="$(_MacAppBundlePath)/Contents/Info.plist"
+             Query="/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]"
+             Value="$(_MacBundleVersion)" />
+    <Exec Command="chmod +x &quot;$(_MacAppBundlePath)/Contents/MacOS/$(AssemblyName)&quot;" />
+    <Exec Command="codesign --force --deep --sign - &quot;$(_MacAppBundlePath)&quot;" />
+  </Target>
 
 </Project>

@@ -7,7 +7,7 @@
   <ScrollViewer>
     <StackPanel Margin="0,74,0,120">
     <cupertino:Section Header="BASIC"
-                       Footer="Large title collapsing to an inline one over 68pt of scroll. CollapseProgress is settable, so both ends are shown here without a scroller; bind Scroller to drive it from real content.">
+                       Footer="Compare the large title with its compact appearance. Connect Scroller to a ScrollViewer to collapse the title as content scrolls; CollapseProgress lets you preview each state.">
       <StackPanel Spacing="10" Margin="16,8,16,12">
         <Border Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
                 CornerRadius="10" ClipToBounds="True" Height="168">
@@ -36,7 +36,7 @@
     </cupertino:Section>
 
     <cupertino:Section Header="CUSTOMIZED"
-                       Footer="IsLargeTitle=False makes an always-inline bar. The inline title holds the screen's centre line and truncates clear of whichever button is wider.">
+                       Footer="Set IsLargeTitle to false to keep the title compact. The title stays centred and shortens when needed to leave room for the navigation buttons.">
       <StackPanel Spacing="10" Margin="16,8,16,12">
         <Border Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
                 CornerRadius="10" ClipToBounds="True" Height="72">

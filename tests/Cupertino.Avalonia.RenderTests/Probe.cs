@@ -18,7 +18,7 @@ public static class Probe
     private const int ChannelTolerance = 3;
     private const double AllowedMismatchRatio = 0.002;
     private static readonly string ReferenceDirectory = FindReferenceDirectory();
-    private static readonly string FailureDirectory = Path.Combine(
+    internal static readonly string FailureDirectory = Path.Combine(
         Path.GetDirectoryName(ReferenceDirectory)!, "TestResults", "RenderDiffs");
 
     public static byte[,] Render(string referenceName, Control content, int width, int height, Color background)
@@ -30,14 +30,18 @@ public static class Probe
             Background = new SolidColorBrush(background),
             Content = content,
         };
-        window.Show();
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        window.UpdateLayout();
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        try
+        {
+            window.Show();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
 
-        using var frame = window.CaptureRenderedFrame()!;
-        AssertMatchesReference(referenceName, frame);
-        return ToLuma(frame);
+            using var frame = window.CaptureRenderedFrame()!;
+            AssertMatchesReference(referenceName, frame);
+            return ToLuma(frame);
+        }
+        finally { window.Close(); }
     }
 
     public static void Snapshot(string referenceName, Window window)

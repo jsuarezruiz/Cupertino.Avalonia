@@ -8,10 +8,11 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="UIRefreshControl: press inside the list, drag DOWN past its top and let go. The spinner materialises under the pull and holds while the refresh runs. Touch pulls it on a phone; IsMouseEnabled makes the same drag work with the mouse here (the wheel scrolls, only a drag pulls). The spinner steps with the visualizer's state; iOS fills its ticks continuously with pull distance, which the control does not surface.">
+                         Footer="Scroll to the top of the list, then drag down and release to refresh. Use a touch gesture or drag with the mouse; the mouse wheel only scrolls. The spinner remains visible while the refresh runs.">
         <Grid Classes="case">
           <Border CornerRadius="10" ClipToBounds="True" Height="360"
                   Background="{DynamicResource CupertinoCardBrush}">
+            <!-- Enable mouse dragging so desktop users can try the same pull gesture as touch users. -->
             <RefreshContainer x:Name="Refresher" IsMouseEnabled="True"
                               RefreshRequested="OnRefreshRequested">
               <ScrollViewer>
@@ -23,9 +24,9 @@
       </cupertino:Section>
 
       <cupertino:Section Header="PROGRAMMATIC"
-                         Footer="RequestRefresh() runs the same cycle without a gesture: what an app calls after a push arrives.">
+                         Footer="Use RequestRefresh() to start a refresh from code. The button runs the same refresh as the pull gesture.">
         <Grid Classes="case">
-          <Button Content="RequestRefresh()" Click="OnRequestRefresh" />
+          <Button Content="Refresh now" Click="OnRequestRefresh" />
         </Grid>
       </cupertino:Section>
 

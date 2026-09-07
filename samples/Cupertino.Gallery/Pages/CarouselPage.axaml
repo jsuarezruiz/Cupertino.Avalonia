@@ -33,7 +33,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="A Carousel shows one page at a time; the theme cross-fades between pages. The dots track SelectedIndex, the way a UIPageControl does.">
+                         Footer="A carousel shows one page at a time. Use Previous and Next to change pages; the dots show your current position.">
         <StackPanel>
           <Grid Classes="case">
             <Border CornerRadius="10" ClipToBounds="True" Height="180">
@@ -55,7 +55,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="PageTransition is swappable; this one slides horizontally like a paged scroll view, and each slide carries its own caption over a scrim.">
+                         Footer="Set PageTransition to change the animation. This example slides horizontally between pages with captions over each image.">
         <StackPanel>
           <Grid Classes="case">
             <Border CornerRadius="10" ClipToBounds="True" Height="180">
@@ -68,7 +68,7 @@
                   <Border Classes="scrim">
                     <StackPanel Spacing="2">
                       <TextBlock Classes="caption" Text="Aurora" />
-                      <TextBlock Classes="captionsub" Text="Slides are arbitrary content" />
+                      <TextBlock Classes="captionsub" Text="Combine an image with a caption" />
                     </StackPanel>
                   </Border>
                 </Panel>
@@ -77,7 +77,7 @@
                   <Border Classes="scrim">
                     <StackPanel Spacing="2">
                       <TextBlock Classes="caption" Text="Canyon" />
-                      <TextBlock Classes="captionsub" Text="Each carries its own layout" />
+                      <TextBlock Classes="captionsub" Text="Each page can have its own layout" />
                     </StackPanel>
                   </Border>
                 </Panel>
@@ -86,7 +86,7 @@
                   <Border Classes="scrim">
                     <StackPanel Spacing="2">
                       <TextBlock Classes="caption" Text="Reef" />
-                      <TextBlock Classes="captionsub" Text="Paged exactly like the plain one" />
+                      <TextBlock Classes="captionsub" Text="Use the buttons to browse the pages" />
                     </StackPanel>
                   </Border>
                 </Panel>

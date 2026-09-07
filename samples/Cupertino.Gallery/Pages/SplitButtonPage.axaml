@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="One capsule split by a hairline: the action on the left, a flyout chevron on the right. Destructive menu items read in red.">
+                         Footer="A split button combines a main action with a separate arrow that opens related choices. Destructive menu items are shown in red.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Split" />
@@ -29,7 +29,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="The action half holds any composed content; whatever it shows, the chevron half still opens the Flyout.">
+                         Footer="The main button can contain an icon, text, or both. The arrow continues to open the flyout.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="With icon" />
@@ -59,7 +59,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="TOGGLE"
-                         Footer="ToggleSplitButton flips IsChecked when the action half is clicked; the chevron half opens the flyout as usual.">
+                         Footer="ToggleSplitButton switches IsChecked when you select its main button. The arrow opens the menu without changing that state.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Toggle split" />
@@ -86,7 +86,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="Disabling a SplitButton washes the whole capsule, both halves, to 40%.">
+                         Footer="A disabled split button cannot run its main action or open its menu.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Disabled" />

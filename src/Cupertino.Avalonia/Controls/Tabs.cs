@@ -13,9 +13,15 @@ namespace Cupertino.Controls;
 /// </summary>
 public static class Tabs
 {
+    /// <summary>
+    /// Identifies the <see cref="GetAccessory"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<object?> AccessoryProperty =
         AvaloniaProperty.RegisterAttached<Control, object?>("Accessory", typeof(Tabs));
 
+    /// <summary>
+    /// Identifies the <see cref="GetIsDetached"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsDetachedProperty =
         AvaloniaProperty.RegisterAttached<Control, bool>("IsDetached", typeof(Tabs));
 
@@ -56,21 +62,27 @@ public static class Tabs
         });
     }
 
+    /// <inheritdoc cref="AccessoryProperty"/>
     public static void SetAccessory(Control element, object? value) =>
         element.SetValue(AccessoryProperty, value);
 
+    /// <inheritdoc cref="AccessoryProperty"/>
     public static object? GetAccessory(Control element) =>
         element.GetValue(AccessoryProperty);
 
+    /// <inheritdoc cref="IsDetachedProperty"/>
     public static void SetIsDetached(Control element, bool value) =>
         element.SetValue(IsDetachedProperty, value);
 
+    /// <inheritdoc cref="IsDetachedProperty"/>
     public static bool GetIsDetached(Control element) =>
         element.GetValue(IsDetachedProperty);
 
+    /// <inheritdoc cref="BadgeValueProperty"/>
     public static void SetBadgeValue(Control element, int? value) =>
         element.SetValue(BadgeValueProperty, value);
 
+    /// <inheritdoc cref="BadgeValueProperty"/>
     public static int? GetBadgeValue(Control element) =>
         element.GetValue(BadgeValueProperty);
 

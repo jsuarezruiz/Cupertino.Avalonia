@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="A link is accent label text with no capsule at all; give it a NavigateUri and it opens in the default browser.">
+                         Footer="Use a hyperlink button to open a web address in the default browser. Set NavigateUri to its destination.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Link" />
@@ -28,7 +28,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="The link is ordinary text, so text properties restyle it, and composed content can add a glyph.">
+                         Footer="Adjust the text properties to change the link's appearance, or add an icon beside its label.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Text" />
@@ -58,7 +58,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A disabled link keeps its accent colour but washes to 40% and ignores the pointer.">
+                         Footer="A disabled link appears dimmed and cannot open its destination.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Disabled" />

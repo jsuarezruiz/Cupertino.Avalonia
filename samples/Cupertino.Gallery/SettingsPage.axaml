@@ -7,7 +7,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="APPEARANCE"
-                         Footer="Reduce transparency and reduce motion mirror the iOS switches. An app wires them to the platform setting; the controls read them.">
+                         Footer="Choose a light or dark appearance, or follow the system. Reduce transparency uses opaque backgrounds; Reduce motion limits animations in the gallery.">
         <StackPanel Margin="16,14" Spacing="12">
           <TabStrip x:Name="AppearanceStrip" Classes="segmented" SelectedIndex="0"
                     SelectionChanged="OnAppearanceChanged">
@@ -21,6 +21,7 @@
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource CupertinoLabelBrush}" />
             <ToggleSwitch x:Name="ReduceGlass" Grid.Column="1"
+                          AutomationProperties.Name="Reduce transparency"
                           IsCheckedChanged="OnReduceGlassChanged" />
           </Grid>
 
@@ -29,13 +30,14 @@
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource CupertinoLabelBrush}" />
             <ToggleSwitch x:Name="ReduceMotion" Grid.Column="1"
+                          AutomationProperties.Name="Reduce motion"
                           IsCheckedChanged="OnReduceMotionChanged" />
           </Grid>
         </StackPanel>
       </cupertino:Section>
 
       <cupertino:Section Header="LAYOUT DIRECTION"
-                         Footer="System follows the current UI culture. LTR and RTL force the whole gallery so mirrored layout, gestures, calendars, and navigation can be inspected live.">
+                         Footer="System follows the current interface language. Choose LTR (left to right) or RTL (right to left) to preview the gallery in that direction.">
         <StackPanel Margin="16,14" Spacing="8">
           <TextBlock Text="Direction" FontSize="17"
                      Foreground="{DynamicResource CupertinoLabelBrush}" />
@@ -49,7 +51,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="ACCENT"
-                         Footer="CupertinoTheme.Accent retints the whole accent family (buttons, focus, selection) in both variants, at runtime.">
+                         Footer="Choose an accent colour for buttons, focus indicators, and selections. The change applies to both light and dark appearances.">
         <StackPanel x:Name="AccentRow" Orientation="Horizontal" Spacing="12" Margin="16,14" />
       </cupertino:Section>
 

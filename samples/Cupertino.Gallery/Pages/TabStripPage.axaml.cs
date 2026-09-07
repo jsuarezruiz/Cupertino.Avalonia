@@ -7,8 +7,8 @@ public partial class TabStripPage : UserControl
 {
     private static readonly string[] Modes =
     [
-        "The overview: one line standing in for a summary.",
-        "The detail: the strip changed, the stage cross-faded.",
+        "Overview: a summary of your content.",
+        "Details: more information about your content.",
     ];
 
     public TabStripPage()

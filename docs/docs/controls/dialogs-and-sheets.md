@@ -15,7 +15,7 @@ ms.date: 2026-08-27
 
 ## Dialogs
 
-`Dialog.ShowAsync` returns the selected `DialogAction`. Roles drive presentation and preferred focus.
+`Dialog.ShowAsync` returns the selected `DialogAction`. Each action's role controls its styling and initial focus.
 
 ```csharp
 var result = await Dialog.ShowAsync(
@@ -29,11 +29,11 @@ if (result?.Role == DialogActionRole.Destructive)
     DeletePhoto();
 ```
 
-With more than two actions, the dialog stacks actions automatically. Use `ShowSheetAsync` for an action-sheet presentation.
+Dialogs stack actions vertically when there are more than two. Use `ShowSheetAsync` to present an action sheet.
 
 ## Sheets
 
-`CupertinoSheet` presents arbitrary Avalonia content. Medium-and-large sheets float at the medium detent and can expand; large-only sheets open near full height.
+`CupertinoSheet` can show any Avalonia content. With `MediumAndLarge` detents, it opens at medium height and can expand. A large-only sheet opens near full height.
 
 ```csharp
 await CupertinoSheet.ShowAsync(
@@ -42,4 +42,6 @@ await CupertinoSheet.ShowAsync(
     SheetDetents.MediumAndLarge);
 ```
 
-Users can drag the grabber, flick down, or tap the scrim to dismiss. Keep primary content away from the grabber area, and ensure the sheet remains usable at every enabled detent.
+Users can dismiss a sheet by dragging or flicking down, tapping the dimmed background, or pressing Escape. Tab and Shift+Tab keep focus inside the sheet; closing it restores the previous focus when possible.
+
+Keep content clear of the grabber and check the layout at every enabled sheet height.

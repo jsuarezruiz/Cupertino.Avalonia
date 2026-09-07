@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="A plain ListBox is transparent, so the Section supplies the inset-grouped card around its 44pt rows.">
+                         Footer="Choose an item from the list. A Section supplies the rounded card around these rows.">
         <ListBox SelectionMode="Single" SelectedIndex="0">
           <ListBoxItem Content="First row" />
           <ListBoxItem Content="Second row" />
@@ -60,10 +60,10 @@
       <TextBlock FontSize="13" TextWrapping="Wrap"
                  Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
                  Margin="32,7,32,24"
-                 Text="Classes=&quot;inset&quot; draws the grouped card itself; adding &quot;icons&quot; switches to 52pt rows whose separator starts at the label, past the 29pt tile." />
+                 Text="Use the inset class to give the list its own rounded card. Add icons for taller rows with separators aligned to the labels." />
 
       <cupertino:Section Header="STATES"
-                         Footer="SelectionMode=&quot;Multiple&quot; keeps every tapped row lit, and a row with IsEnabled=&quot;False&quot; dims and ignores the tap.">
+                         Footer="Use Multiple selection to select more than one item. A disabled row appears dimmed and cannot be selected.">
         <ListBox SelectionMode="Multiple">
           <ListBoxItem Content="Shared album" IsSelected="True" />
           <ListBoxItem Content="Family photos" IsSelected="True" />

@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="The capsule plus a menu chevron; it opens a MenuFlyout on thick material.">
+                         Footer="Select the button to open a menu of related actions or choices.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Drop-down" />
@@ -52,7 +52,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOMIZED"
-                         Footer="DropDownButton shares Button's class hooks: prominent, plain, small and large; the chevron always follows the label colour.">
+                         Footer="Use the prominent, plain, small, and large classes to change the button's appearance. The menu arrow follows the label colour.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Fills" />
@@ -101,7 +101,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="STATES"
-                         Footer="A disabled DropDownButton washes to half opacity and its flyout will not open.">
+                         Footer="A disabled button appears dimmed and cannot open its menu.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Disabled" />

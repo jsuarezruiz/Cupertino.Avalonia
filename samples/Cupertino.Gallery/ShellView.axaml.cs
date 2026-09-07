@@ -83,19 +83,34 @@ public partial class ShellView : UserControl
         new("Liquid Glass", "◇", "#FF6E6E73", () => new LiquidGlassPage(), "Styles"),
     ];
 
+    private Avalonia.Controls.Platform.IInsetsManager? _insets;
+
+    protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        if (TopLevel.GetTopLevel(this) is not { } top || top.InsetsManager is not { } insets)
+            return;
+        _insets = insets;
+        insets.DisplayEdgeToEdgePreference = true;
+        TopLevel.SetAutoSafeAreaPadding(top, false);
+        Padding = insets.SafeAreaPadding;
+        insets.SafeAreaChanged += OnSafeAreaChanged;
+    }
+
+    protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        if (_insets is not null)
+            _insets.SafeAreaChanged -= OnSafeAreaChanged;
+        _insets = null;
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void OnSafeAreaChanged(object? sender, Avalonia.Controls.Platform.SafeAreaChangedArgs e) =>
+        Padding = e.SafeAreaPadding;
+
     public ShellView()
     {
         InitializeComponent();
-
-        AttachedToVisualTree += (_, _) =>
-        {
-            if (TopLevel.GetTopLevel(this) is not { } top || top.InsetsManager is not { } insets)
-                return;
-            insets.DisplayEdgeToEdgePreference = true;
-            TopLevel.SetAutoSafeAreaPadding(top, false);
-            Padding = insets.SafeAreaPadding;
-            insets.SafeAreaChanged += (_, e) => Padding = e.SafeAreaPadding;
-        };
 
         var nav = this.FindControl<CupertinoNavigationPage>("Nav")!;
 
@@ -159,6 +174,8 @@ public partial class ShellView : UserControl
         gear.Click += (_, _) => nav.Push("Settings", new SettingsPage());
         ToolTip.SetTip(source, "View source");
         ToolTip.SetTip(gear, "Settings");
+        Avalonia.Automation.AutomationProperties.SetName(source, "View source");
+        Avalonia.Automation.AutomationProperties.SetName(gear, "Settings");
 
         var trailingCapsule = new Cupertino.Controls.GlassSurface
         {

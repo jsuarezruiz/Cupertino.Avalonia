@@ -22,15 +22,21 @@ public class CupertinoToolbar : ItemsControl
     private Grid? _groups;
     private ItemsSourceView? _itemsView;
 
+    /// <summary>
+    /// Creates a CupertinoToolbar with its default settings.
+    /// </summary>
     public CupertinoToolbar() => ConnectItemsView();
 
+    /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
+        ClearGroups();
         base.OnApplyTemplate(e);
         _groups = e.NameScope.Find<Grid>("PART_Groups");
         BuildGroups();
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -52,7 +58,7 @@ public class CupertinoToolbar : ItemsControl
     private void OnItemsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) =>
         BuildGroups();
 
-    private void BuildGroups()
+    private void ClearGroups()
     {
         if (_groups is null)
             return;
@@ -63,6 +69,13 @@ public class CupertinoToolbar : ItemsControl
                 row.Children.Clear();
         _groups.Children.Clear();
         _groups.ColumnDefinitions.Clear();
+    }
+
+    private void BuildGroups()
+    {
+        if (_groups is null)
+            return;
+        ClearGroups();
 
         var hasSpacer = false;
         foreach (var probe in Items)

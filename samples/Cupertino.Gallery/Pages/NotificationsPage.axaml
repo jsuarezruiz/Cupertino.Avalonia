@@ -8,7 +8,7 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="BASIC"
-                         Footer="A banner on the thick material, top centre as iOS shows them; it dismisses itself after a moment.">
+                         Footer="Show a notification banner at the top of the window. It closes automatically after a short time.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Show" />
@@ -20,7 +20,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="TYPES"
-                         Footer="The four NotificationType values differ only in the small leading dot.">
+                         Footer="Compare information, success, warning, and error notifications. Each uses a different colour for its indicator.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Type" />
@@ -35,7 +35,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="DURATION"
-                         Footer="Expiration sets how long a banner stays; TimeSpan.Zero pins it until dismissed. Hover it for the close button.">
+                         Footer="Set Expiration to control how long a notification stays visible. TimeSpan.Zero keeps it open until dismissed. Hover over a banner to reveal its close button.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Timing" />
@@ -49,7 +49,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CUSTOM CONTENT"
-                         Footer="Show(control) hosts arbitrary content in the banner; the INotification path is just a convenience template.">
+                         Footer="Pass a control to Show to create a notification with your own layout, such as this music preview.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Content" />
@@ -61,17 +61,17 @@
       </cupertino:Section>
 
       <cupertino:Section Header="CALLBACKS"
-                         Footer="OnClick and OnClose report back; clicking a banner dismisses it.">
+                         Footer="Use OnClick and OnClose to respond when a notification is selected or closed. Try the banner and watch the result below.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
-          <TextBlock Classes="case" Text="Wired" />
+          <TextBlock Classes="case" Text="Callbacks" />
           <WrapPanel Grid.Column="1" Classes="specimens">
             <Button Content="Show and watch" Click="OnCallbacks" />
           </WrapPanel>
         </Grid>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Last event" />
-          <TextBlock x:Name="CallbackResult" Grid.Column="1" Text="—"
+          <TextBlock x:Name="CallbackResult" Grid.Column="1" Text="No event yet"
                      FontSize="15" VerticalAlignment="Center"
                      Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
         </Grid>

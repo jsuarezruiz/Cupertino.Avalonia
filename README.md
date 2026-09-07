@@ -35,6 +35,8 @@ Add `CupertinoTheme` after your base theme.
 </Application>
 ```
 
+Your app supplies system accessibility preferences through `CupertinoAccessibility`. See the [accessibility guide](docs/docs/fundamentals/accessibility-and-platforms.md) for setup.
+
 ```xml
 <StackPanel xmlns:cupertino="https://cupertino.avaloniaui.net" Spacing="12">
   <Button Content="Continue" Classes="prominent" />
@@ -46,11 +48,11 @@ Add `CupertinoTheme` after your base theme.
 
 ## What is included
 
-**Themed Avalonia controls.** Buttons in every role and size, switches, sliders, text fields including search and masked variants, checkboxes and radios, pickers for date and time, lists, trees, tabs, menus, flyouts, dialogs, progress, refresh and expanders.
+**Themed Avalonia controls.** Buttons, switches, sliders, text fields, checkboxes, radio buttons, pickers, lists, tabs, menus and more. Use the usual Avalonia bindings, commands and events.
 
-**Controls iOS has that Avalonia does not.** `CupertinoSheet` with detents, `CupertinoSwipeView` for row actions, `CupertinoBadge`, `CupertinoToolbar`, `CupertinoNavigationPage` with the interactive back gesture and restorable routes, reusable `CupertinoListCell` and `CupertinoFormRow`, `CupertinoSearchView`, `CupertinoPageControl`, inline and compact date, time, duration and paired date-time pickers, `CupertinoCalendarView`, `CupertinoIcon` and the Liquid Glass surface itself.
+**Additional Cupertino controls.** Navigation stacks with back gestures, sheets, swipe actions, toolbars, badges, grouped list and form rows, search, page indicators, date and time editors, calendars, icons and Liquid Glass.
 
-**The design language.** Dynamic Type scaling, inherited RTL layout, the colour system in both light and dark variants, motion curves, and `GlassSurface`, a shader based material that samples and refracts what passes beneath it.
+**The design language.** Scalable text, right-to-left layouts, light and dark colours, motion curves, and glass that blurs and refracts the content behind it.
 
 ## The gallery
 
@@ -60,8 +62,7 @@ Add `CupertinoTheme` after your base theme.
 dotnet run --project samples/Cupertino.Gallery.Desktop
 ```
 
-Mobile heads are available at `samples/Cupertino.Gallery.iOS` and
-`samples/Cupertino.Gallery.Android`.
+Mobile heads are available at `samples/Cupertino.Gallery.iOS` and `samples/Cupertino.Gallery.Android`.
 
 ### Screenshots
 
@@ -200,8 +201,8 @@ ALLOW_DIRTY=1 ./build/pack-nuget.sh 0.1.0-preview.1
 
 ## Requirements
 
-.NET 8 or later and Avalonia 12.1.1. Desktop, iOS, Android and Browser targets all render the themes; the glass material needs a GPU surface and degrades to a flat material where one is not available or where Reduce Transparency is on.
+.NET 8 or later and Avalonia 12.1.1. The themes support desktop, iOS, Android and Browser. Liquid Glass uses Skia through GPU or software rendering, with a flat fill when backdrop sampling is unavailable or Reduce Transparency is enabled.
 
 ## Licence
 
-MIT. The icon set is original vector work authored to Apple's published metrics, because SF Symbols cannot be redistributed.
+MIT. The library includes its own vector icon set.

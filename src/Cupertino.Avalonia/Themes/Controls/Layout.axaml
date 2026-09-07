@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls"
                     xmlns:anim="clr-namespace:Cupertino.Animation">
 
@@ -35,7 +36,7 @@
                       Opacity="0" IsHitTestVisible="False">
                 <Border.Transitions>
                   <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+                    <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 250}" />
                   </Transitions>
                 </Border.Transitions>
               </Border>
@@ -84,7 +85,7 @@
                       Opacity="0" IsHitTestVisible="False">
                 <Border.Transitions>
                   <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+                    <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 250}" />
                   </Transitions>
                 </Border.Transitions>
               </Border>
@@ -133,7 +134,7 @@
                       Opacity="0" IsHitTestVisible="False">
                 <Border.Transitions>
                   <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+                    <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 250}" />
                   </Transitions>
                 </Border.Transitions>
               </Border>
@@ -182,7 +183,7 @@
                       Opacity="0" IsHitTestVisible="False">
                 <Border.Transitions>
                   <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.25" />
+                    <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 250}" />
                   </Transitions>
                 </Border.Transitions>
               </Border>
@@ -207,7 +208,7 @@
     <Style Selector="^:left:open /template/ Panel#PART_PaneRoot">
       <Setter Property="Transitions">
         <Transitions>
-          <DoubleTransition Property="Width" Duration="0:0:0.3">
+          <DoubleTransition Property="Width" Duration="{motion:MotionDuration 300}">
             <DoubleTransition.Easing>
               <anim:CriticallyDampedEasing OmegaDuration="8.4" />
             </DoubleTransition.Easing>
@@ -219,7 +220,7 @@
     <Style Selector="^:right:open /template/ Panel#PART_PaneRoot">
       <Setter Property="Transitions">
         <Transitions>
-          <DoubleTransition Property="Width" Duration="0:0:0.3">
+          <DoubleTransition Property="Width" Duration="{motion:MotionDuration 300}">
             <DoubleTransition.Easing>
               <anim:CriticallyDampedEasing OmegaDuration="8.4" />
             </DoubleTransition.Easing>
@@ -231,7 +232,7 @@
     <Style Selector="^:left:closed /template/ Panel#PART_PaneRoot">
       <Setter Property="Transitions">
         <Transitions>
-          <DoubleTransition Property="Width" Duration="0:0:0.3">
+          <DoubleTransition Property="Width" Duration="{motion:MotionDuration 300}">
             <DoubleTransition.Easing>
               <anim:CriticallyDampedEasing OmegaDuration="8.4" />
             </DoubleTransition.Easing>
@@ -243,7 +244,7 @@
     <Style Selector="^:right:closed /template/ Panel#PART_PaneRoot">
       <Setter Property="Transitions">
         <Transitions>
-          <DoubleTransition Property="Width" Duration="0:0:0.3">
+          <DoubleTransition Property="Width" Duration="{motion:MotionDuration 300}">
             <DoubleTransition.Easing>
               <anim:CriticallyDampedEasing OmegaDuration="8.4" />
             </DoubleTransition.Easing>
@@ -255,7 +256,7 @@
     <Style Selector="^:top:open /template/ Panel#PART_PaneRoot">
       <Setter Property="Transitions">
         <Transitions>
-          <DoubleTransition Property="Height" Duration="0:0:0.3">
+          <DoubleTransition Property="Height" Duration="{motion:MotionDuration 300}">
             <DoubleTransition.Easing>
               <anim:CriticallyDampedEasing OmegaDuration="8.4" />
             </DoubleTransition.Easing>
@@ -267,7 +268,7 @@
     <Style Selector="^:bottom:open /template/ Panel#PART_PaneRoot">
       <Setter Property="Transitions">
         <Transitions>
-          <DoubleTransition Property="Height" Duration="0:0:0.3">
+          <DoubleTransition Property="Height" Duration="{motion:MotionDuration 300}">
             <DoubleTransition.Easing>
               <anim:CriticallyDampedEasing OmegaDuration="8.4" />
             </DoubleTransition.Easing>
@@ -279,7 +280,7 @@
     <Style Selector="^:top:closed /template/ Panel#PART_PaneRoot">
       <Setter Property="Transitions">
         <Transitions>
-          <DoubleTransition Property="Height" Duration="0:0:0.3">
+          <DoubleTransition Property="Height" Duration="{motion:MotionDuration 300}">
             <DoubleTransition.Easing>
               <anim:CriticallyDampedEasing OmegaDuration="8.4" />
             </DoubleTransition.Easing>
@@ -291,7 +292,7 @@
     <Style Selector="^:bottom:closed /template/ Panel#PART_PaneRoot">
       <Setter Property="Transitions">
         <Transitions>
-          <DoubleTransition Property="Height" Duration="0:0:0.3">
+          <DoubleTransition Property="Height" Duration="{motion:MotionDuration 300}">
             <DoubleTransition.Easing>
               <anim:CriticallyDampedEasing OmegaDuration="8.4" />
             </DoubleTransition.Easing>
@@ -351,7 +352,7 @@
     <Setter Property="IsSwipeEnabled" Value="True" />
     <Setter Property="(controls:CarouselInteraction.IsMouseEnabled)" Value="True" />
     <Setter Property="PageTransition">
-      <CrossFade Duration="0:0:0.25" />
+      <anim:CupertinoCrossFade Duration="0:0:0.25" />
     </Setter>
     <Setter Property="Template">
       <ControlTemplate>
@@ -363,7 +364,7 @@
 
   <ControlTheme x:Key="{x:Type TransitioningContentControl}" TargetType="TransitioningContentControl">
     <Setter Property="PageTransition">
-      <CrossFade Duration="0:0:0.25" />
+      <anim:CupertinoCrossFade Duration="0:0:0.25" />
     </Setter>
     <Setter Property="Template">
       <ControlTemplate>

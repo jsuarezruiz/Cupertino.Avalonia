@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Specialized;
+using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -10,9 +11,18 @@ using Avalonia.VisualTree;
 
 namespace Cupertino.Controls;
 
+/// <summary>
+/// Chooses whether the search field is always visible or can collapse.
+/// </summary>
 public enum CupertinoSearchDisplayMode
 {
+    /// <summary>
+    /// The search field stays in the normal layout.
+    /// </summary>
     Inline,
+    /// <summary>
+    /// A compact button can expand into the search field.
+    /// </summary>
     Collapsible,
 }
 
@@ -27,51 +37,112 @@ public enum CupertinoSearchDisplayMode
 [PseudoClasses(":expanded", ":collapsible", ":scopes", ":empty")]
 public class CupertinoSearchView : TemplatedControl
 {
+    /// <summary>
+    /// Identifies the <see cref="ItemsSource"/> property.
+    /// </summary>
     public static readonly StyledProperty<IEnumerable?> ItemsSourceProperty =
         AvaloniaProperty.Register<CupertinoSearchView, IEnumerable?>(nameof(ItemsSource));
 
+    /// <summary>
+    /// Identifies the <see cref="Text"/> property.
+    /// </summary>
     public static readonly StyledProperty<string?> TextProperty =
         AvaloniaProperty.Register<CupertinoSearchView, string?>(
             nameof(Text), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
+    /// <summary>
+    /// Identifies the <see cref="Scopes"/> property.
+    /// </summary>
     public static readonly StyledProperty<IList<string>?> ScopesProperty =
         AvaloniaProperty.Register<CupertinoSearchView, IList<string>?>(nameof(Scopes));
 
+    /// <summary>
+    /// Identifies the <see cref="SelectedScopeIndex"/> property.
+    /// </summary>
     public static readonly StyledProperty<int> SelectedScopeIndexProperty =
         AvaloniaProperty.Register<CupertinoSearchView, int>(
             nameof(SelectedScopeIndex), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
+    /// <summary>
+    /// Identifies the <see cref="SelectedItem"/> property.
+    /// </summary>
     public static readonly StyledProperty<object?> SelectedItemProperty =
         AvaloniaProperty.Register<CupertinoSearchView, object?>(
             nameof(SelectedItem), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
+    /// <summary>
+    /// Identifies the <see cref="IsExpanded"/> property.
+    /// </summary>
     public static readonly StyledProperty<bool> IsExpandedProperty =
         AvaloniaProperty.Register<CupertinoSearchView, bool>(
             nameof(IsExpanded), true, defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
+    /// <summary>
+    /// Identifies the <see cref="DisplayMode"/> property.
+    /// </summary>
     public static readonly StyledProperty<CupertinoSearchDisplayMode> DisplayModeProperty =
         AvaloniaProperty.Register<CupertinoSearchView, CupertinoSearchDisplayMode>(nameof(DisplayMode));
 
+    /// <summary>
+    /// Identifies the <see cref="ItemTemplate"/> property.
+    /// </summary>
     public static readonly StyledProperty<IDataTemplate?> ItemTemplateProperty =
         AvaloniaProperty.Register<CupertinoSearchView, IDataTemplate?>(nameof(ItemTemplate));
 
+    /// <summary>
+    /// Identifies the <see cref="EmptyContent"/> property.
+    /// </summary>
     public static readonly StyledProperty<object?> EmptyContentProperty =
         AvaloniaProperty.Register<CupertinoSearchView, object?>(nameof(EmptyContent), "No Results");
 
-    private IReadOnlyList<object> _filteredItems = Array.Empty<object>();
+    private ObservableCollection<object> _filteredItems = new();
+    private readonly List<(object? Value, bool Matches)> _sourceEntries = new();
+    /// <summary>
+    /// Identifies the <see cref="FilteredItems"/> property.
+    /// </summary>
     public static readonly DirectProperty<CupertinoSearchView, IReadOnlyList<object>> FilteredItemsProperty =
         AvaloniaProperty.RegisterDirect<CupertinoSearchView, IReadOnlyList<object>>(
             nameof(FilteredItems), o => o.FilteredItems);
 
+    /// <summary>
+    /// The searchable source. Observable add, remove, replace, and move notifications update results incrementally while attached.
+    /// </summary>
     public IEnumerable? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
+    /// <summary>
+    /// The search query. Changes synchronously filter the source on the UI thread using a trimmed query.
+    /// </summary>
     public string? Text { get => GetValue(TextProperty); set => SetValue(TextProperty, value); }
+    /// <summary>
+    /// Optional scope labels. Observable changes update the scope selector while attached.
+    /// </summary>
     public IList<string>? Scopes { get => GetValue(ScopesProperty); set => SetValue(ScopesProperty, value); }
+    /// <summary>
+    /// The selected scope index, clamped to the available labels; zero when no scopes exist.
+    /// </summary>
     public int SelectedScopeIndex { get => GetValue(SelectedScopeIndexProperty); set => SetValue(SelectedScopeIndexProperty, value); }
+    /// <summary>
+    /// The selected result item, synchronized with the results list.
+    /// </summary>
     public object? SelectedItem { get => GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
+    /// <summary>
+    /// Whether the search field is expanded in collapsible mode.
+    /// </summary>
     public bool IsExpanded { get => GetValue(IsExpandedProperty); set => SetValue(IsExpandedProperty, value); }
+    /// <summary>
+    /// Chooses an always-visible search field or a field that can collapse to a button.
+    /// </summary>
     public CupertinoSearchDisplayMode DisplayMode { get => GetValue(DisplayModeProperty); set => SetValue(DisplayModeProperty, value); }
+    /// <summary>
+    /// The template used for individual filtered results.
+    /// </summary>
     public IDataTemplate? ItemTemplate { get => GetValue(ItemTemplateProperty); set => SetValue(ItemTemplateProperty, value); }
+    /// <summary>
+    /// Content displayed when no results match the current query and scope.
+    /// </summary>
     public object? EmptyContent { get => GetValue(EmptyContentProperty); set => SetValue(EmptyContentProperty, value); }
+    /// <summary>
+    /// The current results in source order, including duplicates. Collection notifications report incremental changes; query changes replace this list.
+    /// </summary>
     public IReadOnlyList<object> FilteredItems => _filteredItems;
 
     private Func<object, string, int, bool>? _filter;
@@ -107,6 +178,9 @@ public class CupertinoSearchView : TemplatedControl
         }
     }
 
+    /// <summary>
+    /// Raised when Enter is pressed in the search field.
+    /// </summary>
     public event EventHandler? SearchSubmitted;
 
     private TextBox? _field;
@@ -118,11 +192,15 @@ public class CupertinoSearchView : TemplatedControl
     private bool _syncing;
     private int _scopeSynchronizationGeneration;
 
+    /// <summary>
+    /// Creates a CupertinoSearchView with its default settings.
+    /// </summary>
     public CupertinoSearchView()
     {
         UpdatePseudoClasses();
     }
 
+    /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         if (_field is not null)
@@ -168,6 +246,7 @@ public class CupertinoSearchView : TemplatedControl
         ApplyFilter();
     }
 
+    /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -178,6 +257,7 @@ public class CupertinoSearchView : TemplatedControl
         ApplyFilter();
     }
 
+    /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _isAttached = false;
@@ -195,6 +275,9 @@ public class CupertinoSearchView : TemplatedControl
 
     private void FocusField() => Avalonia.Threading.Dispatcher.UIThread.Post(() => _field?.Focus());
 
+    /// <summary>
+    /// Clears the query and collapses the field when DisplayMode is Collapsible.
+    /// </summary>
     public void Cancel()
     {
         SetCurrentValue(TextProperty, string.Empty);
@@ -229,6 +312,7 @@ public class CupertinoSearchView : TemplatedControl
             SetCurrentValue(SelectedItemProperty, _results.SelectedItem);
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -281,7 +365,118 @@ public class CupertinoSearchView : TemplatedControl
             _results.SelectedItem = SelectedItem;
     }
 
-    private void OnSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => ApplyFilter();
+    private void OnSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action == NotifyCollectionChangedAction.Reset ||
+            (e.OldItems is not null && e.OldStartingIndex < 0) ||
+            (e.NewItems is not null && e.NewStartingIndex < 0))
+        {
+            ApplyFilter();
+            return;
+        }
+
+        if (e.Action == NotifyCollectionChangedAction.Move && e.OldItems is { } movedItems)
+        {
+            MoveSourceEntries(e.OldStartingIndex, e.NewStartingIndex, movedItems.Count);
+            return;
+        }
+
+        var selected = SelectedItem;
+        var preserveSelection = selected is not null && e.OldItems?.Contains(selected) == true;
+        var wasSyncing = _syncing;
+        if (preserveSelection)
+            _syncing = true;
+        try
+        {
+            if (e.OldItems is { } oldItems)
+            {
+                var start = e.OldStartingIndex;
+                var filteredIndex = FilteredIndex(start);
+                for (var i = 0; i < oldItems.Count; ++i)
+                    if (_sourceEntries[start + i].Matches)
+                        _filteredItems.RemoveAt(filteredIndex);
+                _sourceEntries.RemoveRange(start, oldItems.Count);
+            }
+            if (e.NewItems is { } newItems)
+            {
+                var start = e.NewStartingIndex;
+                var filteredIndex = FilteredIndex(start);
+                var query = (Text ?? string.Empty).Trim();
+                for (var i = 0; i < newItems.Count; ++i)
+                {
+                    var entry = CreateEntry(newItems[i], query);
+                    _sourceEntries.Insert(start + i, entry);
+                    if (entry.Matches)
+                        _filteredItems.Insert(filteredIndex++, entry.Value!);
+                }
+            }
+            if (preserveSelection)
+            {
+                // Another equal-valued result may remain after removing a duplicate.
+                if (!_filteredItems.Contains(selected!))
+                    SetCurrentValue(SelectedItemProperty, null);
+                if (_results is not null)
+                    _results.SelectedItem = SelectedItem;
+            }
+        }
+        finally
+        {
+            _syncing = wasSyncing;
+        }
+        PseudoClasses.Set(":empty", _filteredItems.Count == 0);
+    }
+
+    private void MoveSourceEntries(int oldIndex, int newIndex, int count)
+    {
+        var oldFilteredIndex = FilteredIndex(oldIndex);
+        var moved = _sourceEntries.GetRange(oldIndex, count);
+        var matchingCount = moved.Count(entry => entry.Matches);
+        _sourceEntries.RemoveRange(oldIndex, count);
+        // The filtered collection still contains the moved entries at this point.
+        var newFilteredIndex = newIndex == _sourceEntries.Count
+            ? _filteredItems.Count - matchingCount
+            : FilteredIndex(newIndex);
+        _sourceEntries.InsertRange(newIndex, moved);
+
+        // Preserve collection identity and selection by reporting moves, rather
+        // than temporarily removing selected items from the results list.
+        var wasSyncing = _syncing;
+        _syncing = true;
+        try
+        {
+            if (oldFilteredIndex < newFilteredIndex)
+            {
+                for (var i = matchingCount - 1; i >= 0; --i)
+                    _filteredItems.Move(oldFilteredIndex + i, newFilteredIndex + i);
+            }
+            else if (oldFilteredIndex > newFilteredIndex)
+            {
+                for (var i = 0; i < matchingCount; ++i)
+                    _filteredItems.Move(oldFilteredIndex + i, newFilteredIndex + i);
+            }
+            // Avalonia can clear list selection while processing a move.
+            if (_results is not null)
+                _results.SelectedItem = SelectedItem;
+        }
+        finally
+        {
+            _syncing = wasSyncing;
+        }
+    }
+
+    private int FilteredIndex(int sourceIndex)
+    {
+        if (sourceIndex == _sourceEntries.Count)
+            return _filteredItems.Count;
+        var count = 0;
+        for (var i = 0; i < sourceIndex; ++i)
+            if (_sourceEntries[i].Matches)
+                ++count;
+        return count;
+    }
+
+    private (object? Value, bool Matches) CreateEntry(object? value, string query) =>
+        (value, value is not null && (Filter?.Invoke(value, query, SelectedScopeIndex) ?? DefaultMatch(value, query)));
 
     private void OnScopesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -350,21 +545,25 @@ public class CupertinoSearchView : TemplatedControl
     private int NormalizeScopeIndex(int index) =>
         Scopes is { Count: > 0 } scopes ? Math.Clamp(index, 0, scopes.Count - 1) : 0;
 
+    /// <summary>
+    /// Synchronously re-evaluates the entire source. Use after changing item search text or a non-observable collection.
+    /// </summary>
     public void Refresh() => ApplyFilter();
 
     private void ApplyFilter()
     {
         var oldItems = _filteredItems;
-        var filteredItems = new List<object>();
+        var filteredItems = new ObservableCollection<object>();
+        _sourceEntries.Clear();
         var query = (Text ?? string.Empty).Trim();
         if (ItemsSource is not null)
         {
             foreach (var value in ItemsSource)
             {
-                if (value is null)
-                    continue;
-                if (Filter?.Invoke(value, query, SelectedScopeIndex) ?? DefaultMatch(value, query))
-                    filteredItems.Add(value);
+                var entry = CreateEntry(value, query);
+                _sourceEntries.Add(entry);
+                if (entry.Matches)
+                    filteredItems.Add(value!);
             }
         }
 

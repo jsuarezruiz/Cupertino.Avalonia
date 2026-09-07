@@ -15,47 +15,107 @@ namespace Cupertino.Controls;
 /// </summary>
 public class CupertinoMonthGrid : Control
 {
+    /// <summary>
+    /// Identifies the <see cref="DisplayMonth"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTime> DisplayMonthProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, DateTime>(nameof(DisplayMonth), DateTime.Today);
 
+    /// <summary>
+    /// Identifies the <see cref="SelectedDate"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTimeOffset?> SelectedDateProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, DateTimeOffset?>(
             nameof(SelectedDate), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
+    /// <summary>
+    /// Identifies the <see cref="Foreground"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush> ForegroundProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, IBrush>(nameof(Foreground), Brushes.Black);
 
+    /// <summary>
+    /// Identifies the <see cref="AccentBrush"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush> AccentBrushProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, IBrush>(nameof(AccentBrush), Brushes.DodgerBlue);
 
+    /// <summary>
+    /// Identifies the <see cref="SelectionBrush"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush> SelectionBrushProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, IBrush>(nameof(SelectionBrush), Brushes.Transparent);
 
+    /// <summary>
+    /// Identifies the <see cref="SelectionForeground"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush> SelectionForegroundProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, IBrush>(nameof(SelectionForeground), Brushes.White);
 
+    /// <summary>
+    /// Identifies the <see cref="WeekdayBrush"/> property.
+    /// </summary>
     public static readonly StyledProperty<IBrush> WeekdayBrushProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, IBrush>(nameof(WeekdayBrush), Brushes.Gray);
 
+    /// <summary>
+    /// Identifies the <see cref="FirstDayOfWeek"/> property.
+    /// </summary>
     public static readonly StyledProperty<DayOfWeek> FirstDayOfWeekProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, DayOfWeek>(nameof(FirstDayOfWeek),
             CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
 
+    /// <summary>
+    /// Identifies the <see cref="MinimumDate"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTimeOffset?> MinimumDateProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, DateTimeOffset?>(nameof(MinimumDate));
 
+    /// <summary>
+    /// Identifies the <see cref="MaximumDate"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTimeOffset?> MaximumDateProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, DateTimeOffset?>(nameof(MaximumDate));
 
+    /// <summary>
+    /// A date in the displayed month; the day component does not change the month layout.
+    /// </summary>
     public DateTime DisplayMonth { get => GetValue(DisplayMonthProperty); set => SetValue(DisplayMonthProperty, value); }
+    /// <summary>
+    /// The selected calendar date, or null for no selection. Date bounds compare local calendar dates rather than UTC instants.
+    /// </summary>
     public DateTimeOffset? SelectedDate { get => GetValue(SelectedDateProperty); set => SetValue(SelectedDateProperty, value); }
+    /// <summary>
+    /// The brush used to draw the text or indicator.
+    /// </summary>
     public IBrush Foreground { get => GetValue(ForegroundProperty); set => SetValue(ForegroundProperty, value); }
+    /// <summary>
+    /// The text brush for today when that day is not selected.
+    /// </summary>
     public IBrush AccentBrush { get => GetValue(AccentBrushProperty); set => SetValue(AccentBrushProperty, value); }
+    /// <summary>
+    /// The fill brush for the selected-day disc.
+    /// </summary>
     public IBrush SelectionBrush { get => GetValue(SelectionBrushProperty); set => SetValue(SelectionBrushProperty, value); }
+    /// <summary>
+    /// The text brush for the selected day.
+    /// </summary>
     public IBrush SelectionForeground { get => GetValue(SelectionForegroundProperty); set => SetValue(SelectionForegroundProperty, value); }
+    /// <summary>
+    /// The brush for weekday headings and disabled days.
+    /// </summary>
     public IBrush WeekdayBrush { get => GetValue(WeekdayBrushProperty); set => SetValue(WeekdayBrushProperty, value); }
+    /// <summary>
+    /// The weekday in the first calendar column; defaults to the current culture when the control type is initialized.
+    /// </summary>
     public DayOfWeek FirstDayOfWeek { get => GetValue(FirstDayOfWeekProperty); set => SetValue(FirstDayOfWeekProperty, value); }
+    /// <summary>
+    /// The earliest selectable local calendar date, or null for no explicit lower bound.
+    /// </summary>
     public DateTimeOffset? MinimumDate { get => GetValue(MinimumDateProperty); set => SetValue(MinimumDateProperty, value); }
+    /// <summary>
+    /// The latest selectable local calendar date, or null for no explicit upper bound.
+    /// </summary>
     public DateTimeOffset? MaximumDate { get => GetValue(MaximumDateProperty); set => SetValue(MaximumDateProperty, value); }
 
     // Scale all geometry from the square cell size.
@@ -70,6 +130,7 @@ public class CupertinoMonthGrid : Control
     private double Cell => Bounds.Width / 7;
     private double WeekdayRowHeight => Cell * WeekdayRowRatio;
 
+    private readonly Rendering.FormattedTextCache _textCache = new();
     private DateTime? _poppingSelection;
     private DateTime _popStart;
     private DateTime? _slideFromMonth;
@@ -79,11 +140,12 @@ public class CupertinoMonthGrid : Control
 
     static CupertinoMonthGrid()
     {
+        AffectsMeasure<CupertinoMonthGrid>(DisplayMonthProperty, FirstDayOfWeekProperty);
         AffectsRender<CupertinoMonthGrid>(DisplayMonthProperty, SelectedDateProperty,
                                           ForegroundProperty, AccentBrushProperty,
                                           SelectionBrushProperty, SelectionForegroundProperty,
                                           WeekdayBrushProperty, FirstDayOfWeekProperty,
-                                          MinimumDateProperty, MaximumDateProperty);
+                                          MinimumDateProperty, MaximumDateProperty, FlowDirectionProperty);
         FocusableProperty.OverrideDefaultValue<CupertinoMonthGrid>(true);
     }
 
@@ -92,6 +154,7 @@ public class CupertinoMonthGrid : Control
     /// </summary>
     public event EventHandler<DateTime>? DayPicked;
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
@@ -140,6 +203,7 @@ public class CupertinoMonthGrid : Control
         InvalidateVisual();
     }
 
+    /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
@@ -157,6 +221,7 @@ public class CupertinoMonthGrid : Control
         return (int)Math.Ceiling((ColumnOf(first) + days) / 7.0);
     }
 
+    /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize)
     {
         var width = double.IsInfinity(availableSize.Width) ? 7 * 55.9 : availableSize.Width;
@@ -164,6 +229,7 @@ public class CupertinoMonthGrid : Control
         return new Size(width, cell * WeekdayRowRatio + RowCount() * cell);
     }
 
+    /// <inheritdoc/>
     public override void Render(DrawingContext context)
     {
         context.FillRectangle(Brushes.Transparent, new Rect(Bounds.Size));
@@ -179,11 +245,10 @@ public class CupertinoMonthGrid : Control
         for (var c = 0; c < 7; c++)
         {
             var dow = (DayOfWeek)(((int)FirstDayOfWeek + c) % 7);
-            var ft = new FormattedText(abbrev[(int)dow].ToUpper(culture), culture,
+            var ft = _textCache.Get(abbrev[(int)dow].ToUpper(culture), culture,
                                        FlowDirection, typeface,
                                        cell * WeekdayFontRatio, WeekdayBrush);
-            context.DrawText(ft, new Point(colPitch * (c + 0.5) - ft.Width / 2,
-                                           weekdayRow / 2 - ft.Height / 2));
+            DrawText(context, ft, colPitch * (c + 0.5), weekdayRow / 2);
         }
 
         var current = new DateTime(DisplayMonth.Year, DisplayMonth.Month, 1);
@@ -244,10 +309,19 @@ public class CupertinoMonthGrid : Control
                 : !isEnabled ? WeekdayBrush
                 : isToday ? AccentBrush : Foreground;
             var face = isSelected ? bold : typeface;
-            var ft = new FormattedText(d.ToString(culture), culture, FlowDirection,
+            var ft = _textCache.Get(d.ToString(culture), culture, FlowDirection,
                                        face, cell * DayFontRatio, brush);
-            context.DrawText(ft, new Point(cx - ft.Width / 2, cy - ft.Height / 2));
+            DrawText(context, ft, cx, cy);
         }
+    }
+
+    private void DrawText(DrawingContext context, FormattedText text, double cx, double cy)
+    {
+        // Keep Avalonia's mirrored columns and pointer coordinates, but undo
+        // the reflection for glyphs; FlowDirection already handles text shaping.
+        var scaleX = FlowDirection == FlowDirection.RightToLeft ? -1 : 1;
+        using (context.PushTransform(Matrix.CreateScale(scaleX, 1) * Matrix.CreateTranslation(cx, cy)))
+            context.DrawText(text, new Point(-text.Width / 2, -text.Height / 2));
     }
 
     private DateTime? DateAt(Point p)
@@ -276,6 +350,7 @@ public class CupertinoMonthGrid : Control
         (MinimumDate is null || date >= MinimumDate.Value.Date) &&
         (MaximumDate is null || date <= MaximumDate.Value.Date);
 
+    /// <inheritdoc/>
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
@@ -287,6 +362,7 @@ public class CupertinoMonthGrid : Control
         e.Handled = true;
     }
 
+    /// <inheritdoc/>
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
@@ -330,10 +406,16 @@ public class CupertinoMonthGrid : Control
 [PseudoClasses(":monthpicker")]
 public class CupertinoCalendarView : TemplatedControl
 {
+    /// <summary>
+    /// Identifies the <see cref="SelectedDate"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTimeOffset?> SelectedDateProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, DateTimeOffset?>(
             nameof(SelectedDate), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
+    /// <summary>
+    /// Identifies the <see cref="DisplayMonth"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTime> DisplayMonthProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, DateTime>(nameof(DisplayMonth), DateTime.Today);
 
@@ -343,8 +425,17 @@ public class CupertinoCalendarView : TemplatedControl
     public static readonly StyledProperty<bool> IsMonthPickerOpenProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, bool>(nameof(IsMonthPickerOpen));
 
+    /// <summary>
+    /// The selected calendar date, or null for no selection. Date bounds compare local calendar dates rather than UTC instants.
+    /// </summary>
     public DateTimeOffset? SelectedDate { get => GetValue(SelectedDateProperty); set => SetValue(SelectedDateProperty, value); }
+    /// <summary>
+    /// A date in the displayed month; the day component does not change the month layout.
+    /// </summary>
     public DateTime DisplayMonth { get => GetValue(DisplayMonthProperty); set => SetValue(DisplayMonthProperty, value); }
+    /// <summary>
+    /// Whether the month and year wheels replace the day grid.
+    /// </summary>
     public bool IsMonthPickerOpen { get => GetValue(IsMonthPickerOpenProperty); set => SetValue(IsMonthPickerOpenProperty, value); }
 
     /// <summary>
@@ -353,23 +444,50 @@ public class CupertinoCalendarView : TemplatedControl
     public static readonly StyledProperty<int> MinYearProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, int>(nameof(MinYear), 1900);
 
+    /// <summary>
+    /// Identifies the <see cref="MaxYear"/> property.
+    /// </summary>
     public static readonly StyledProperty<int> MaxYearProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, int>(nameof(MaxYear), 2100);
 
+    /// <summary>
+    /// Identifies the <see cref="MinimumDate"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTimeOffset?> MinimumDateProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, DateTimeOffset?>(nameof(MinimumDate));
 
+    /// <summary>
+    /// Identifies the <see cref="MaximumDate"/> property.
+    /// </summary>
     public static readonly StyledProperty<DateTimeOffset?> MaximumDateProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, DateTimeOffset?>(nameof(MaximumDate));
 
+    /// <summary>
+    /// Identifies the <see cref="FirstDayOfWeek"/> property.
+    /// </summary>
     public static readonly StyledProperty<DayOfWeek> FirstDayOfWeekProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, DayOfWeek>(nameof(FirstDayOfWeek),
             CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
 
+    /// <summary>
+    /// The lowest year in the month picker and selectable calendar range, clamped to 1–9999; defaults to 1900.
+    /// </summary>
     public int MinYear { get => GetValue(MinYearProperty); set => SetValue(MinYearProperty, value); }
+    /// <summary>
+    /// The highest year in the month picker and selectable calendar range, clamped to 1–9999; defaults to 2100.
+    /// </summary>
     public int MaxYear { get => GetValue(MaxYearProperty); set => SetValue(MaxYearProperty, value); }
+    /// <summary>
+    /// The earliest selectable local calendar date, or null for no explicit lower bound.
+    /// </summary>
     public DateTimeOffset? MinimumDate { get => GetValue(MinimumDateProperty); set => SetValue(MinimumDateProperty, value); }
+    /// <summary>
+    /// The latest selectable local calendar date, or null for no explicit upper bound.
+    /// </summary>
     public DateTimeOffset? MaximumDate { get => GetValue(MaximumDateProperty); set => SetValue(MaximumDateProperty, value); }
+    /// <summary>
+    /// The weekday in the first calendar column; defaults to the current culture when the control type is initialized.
+    /// </summary>
     public DayOfWeek FirstDayOfWeek { get => GetValue(FirstDayOfWeekProperty); set => SetValue(FirstDayOfWeekProperty, value); }
 
     /// <summary>
@@ -385,6 +503,7 @@ public class CupertinoCalendarView : TemplatedControl
     private bool _normalizingYearRange;
     private bool _normalizingDateRange;
 
+    /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -486,6 +605,7 @@ public class CupertinoCalendarView : TemplatedControl
         SetCurrentValue(DisplayMonthProperty, MonthFromOrdinal(target, DisplayMonth.Kind));
     }
 
+    /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);

@@ -8,12 +8,12 @@
     <StackPanel Margin="0,74,0,120">
 
       <cupertino:Section Header="GLYPHS"
-                         Footer="Original vector glyphs are used because SF Symbols cannot be redistributed. CupertinoIcon handles alignment and paint mode.">
+                         Footer="Browse the library's vector icons. Use each name with CupertinoIcon to display it in your app.">
         <WrapPanel x:Name="IconGrid" Margin="16,14" ItemSpacing="4" LineSpacing="14" />
       </cupertino:Section>
 
       <cupertino:Section Header="USAGE"
-                         Footer="Size scales the design box uniformly; Foreground defaults to the label colour and follows the theme.">
+                         Footer="Set Size to scale an icon and Foreground to change its colour. By default, icons use the theme's label colour.">
         <StackPanel Orientation="Horizontal" Spacing="14" Margin="16,14">
           <cupertino:CupertinoIcon Glyph="camera" Size="16" VerticalAlignment="Center" />
           <cupertino:CupertinoIcon Glyph="camera" Size="24" VerticalAlignment="Center" />

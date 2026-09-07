@@ -16,7 +16,7 @@ public partial class DialogPage : UserControl, IGalleryCaptureState
             new DialogAction("Delete", DialogActionRole.Destructive));
 
     private void Report(DialogAction? chosen) =>
-        this.FindControl<TextBlock>("Result")!.Text = chosen?.Title ?? "dismissed";
+        this.FindControl<TextBlock>("Result")!.Text = chosen is null ? "Dialog dismissed" : $"Selected action: {chosen.Title}";
 
     private async void OnInfo(object? sender, RoutedEventArgs e) =>
         Report(await Dialog.ShowAsync(this,

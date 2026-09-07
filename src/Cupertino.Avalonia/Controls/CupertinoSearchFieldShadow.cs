@@ -14,24 +14,39 @@ namespace Cupertino.Controls;
 /// </summary>
 public sealed class CupertinoSearchFieldShadow : Control
 {
+    /// <summary>
+    /// Identifies the <see cref="GetIsAdornerEnabled"/> attached setting.
+    /// </summary>
     public static readonly AttachedProperty<bool> IsAdornerEnabledProperty =
         AvaloniaProperty.RegisterAttached<CupertinoSearchFieldShadow, Control, bool>("IsAdornerEnabled");
 
     private static readonly AttachedProperty<CupertinoSearchFieldShadow?> AdornerProperty =
         AvaloniaProperty.RegisterAttached<CupertinoSearchFieldShadow, Control, CupertinoSearchFieldShadow?>("Adorner");
 
+    /// <summary>
+    /// Identifies the <see cref="CornerRadius"/> property.
+    /// </summary>
     public static readonly StyledProperty<CornerRadius> CornerRadiusProperty =
         AvaloniaProperty.Register<CupertinoSearchFieldShadow, CornerRadius>(
             nameof(CornerRadius), new CornerRadius(22.5));
 
+    /// <summary>
+    /// Identifies the <see cref="ShadowOpacity"/> property.
+    /// </summary>
     public static readonly StyledProperty<double> ShadowOpacityProperty =
         AvaloniaProperty.Register<CupertinoSearchFieldShadow, double>(
             nameof(ShadowOpacity), 0.073);
 
+    /// <summary>
+    /// Identifies the <see cref="ShadowSigma"/> property.
+    /// </summary>
     public static readonly StyledProperty<double> ShadowSigmaProperty =
         AvaloniaProperty.Register<CupertinoSearchFieldShadow, double>(
             nameof(ShadowSigma), 15.0);
 
+    /// <summary>
+    /// Identifies the <see cref="ShadowOffset"/> property.
+    /// </summary>
     public static readonly StyledProperty<double> ShadowOffsetProperty =
         AvaloniaProperty.Register<CupertinoSearchFieldShadow, double>(
             nameof(ShadowOffset), 5.0);
@@ -65,35 +80,50 @@ public sealed class CupertinoSearchFieldShadow : Control
         });
     }
 
+    /// <inheritdoc cref="IsAdornerEnabledProperty"/>
     public static bool GetIsAdornerEnabled(Control field) => field.GetValue(IsAdornerEnabledProperty);
 
+    /// <inheritdoc cref="IsAdornerEnabledProperty"/>
     public static void SetIsAdornerEnabled(Control field, bool value) =>
         field.SetValue(IsAdornerEnabledProperty, value);
 
+    /// <summary>
+    /// The corner radii, in logical pixels.
+    /// </summary>
     public CornerRadius CornerRadius
     {
         get => GetValue(CornerRadiusProperty);
         set => SetValue(CornerRadiusProperty, value);
     }
 
+    /// <summary>
+    /// Shadow opacity, where zero removes the shadow and one is fully opaque.
+    /// </summary>
     public double ShadowOpacity
     {
         get => GetValue(ShadowOpacityProperty);
         set => SetValue(ShadowOpacityProperty, value);
     }
 
+    /// <summary>
+    /// The shadow Gaussian sigma in logical pixels.
+    /// </summary>
     public double ShadowSigma
     {
         get => GetValue(ShadowSigmaProperty);
         set => SetValue(ShadowSigmaProperty, value);
     }
 
+    /// <summary>
+    /// Vertical shadow displacement, in logical pixels.
+    /// </summary>
     public double ShadowOffset
     {
         get => GetValue(ShadowOffsetProperty);
         set => SetValue(ShadowOffsetProperty, value);
     }
 
+    /// <inheritdoc/>
     public override void Render(DrawingContext context)
     {
         const double materialInset = 2.0 / 3.0;

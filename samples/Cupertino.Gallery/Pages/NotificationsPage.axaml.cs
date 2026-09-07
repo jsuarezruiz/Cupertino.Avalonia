@@ -26,7 +26,7 @@ public partial class NotificationsPage : UserControl
         _manager?.Show(new Notification(title, message, type));
 
     private void OnInfo(object? sender, RoutedEventArgs e) =>
-        Show("Now Playing", "Glass on every surface.", NotificationType.Information);
+        Show("Now Playing", "Your music is ready to play.", NotificationType.Information);
 
     private void OnSuccess(object? sender, RoutedEventArgs e) =>
         Show("Saved", "The document is safely on disk.", NotificationType.Success);
@@ -90,7 +90,7 @@ public partial class NotificationsPage : UserControl
         var result = this.FindControl<TextBlock>("CallbackResult")!;
         _manager?.Show(new Notification("Meeting in 5", "Design review, Studio 2.",
             NotificationType.Information, TimeSpan.FromSeconds(8),
-            onClick: () => result.Text = "clicked",
-            onClose: () => result.Text = "closed"));
+            onClick: () => result.Text = "Notification selected",
+            onClose: () => result.Text = "Notification closed"));
     }
 }
