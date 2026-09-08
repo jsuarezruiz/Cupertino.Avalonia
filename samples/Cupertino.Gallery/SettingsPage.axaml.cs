@@ -87,7 +87,10 @@ public partial class SettingsPage : UserControl
         }
         Select(theme?.Accent);
 
-        this.FindControl<TextBlock>("LibVersion")!.Text = VersionInfo.Library;
+        var libraryVersion = VersionInfo.Library;
+        this.FindControl<Grid>("VersionRow")!.IsVisible = libraryVersion is not null;
+        this.FindControl<global::Avalonia.Controls.Shapes.Rectangle>("VersionBottomSeparator")!.IsVisible = libraryVersion is not null;
+        this.FindControl<TextBlock>("LibVersion")!.Text = libraryVersion;
         this.FindControl<TextBlock>("AvaloniaVersion")!.Text = VersionInfo.Avalonia;
         this.FindControl<TextBlock>("RuntimeVersion")!.Text = Environment.Version.ToString();
     }

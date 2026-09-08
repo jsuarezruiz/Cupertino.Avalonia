@@ -66,14 +66,15 @@
           </StackPanel>
           <Rectangle Height="0.5" Fill="{DynamicResource CupertinoSeparatorBrush}"
                      Margin="16,0,0,0" />
-          <Grid ColumnDefinitions="*,Auto" Height="44" Margin="16,0">
+          <Grid x:Name="VersionRow" ColumnDefinitions="*,Auto" Height="44" Margin="16,0">
             <TextBlock Text="Version" FontSize="17" VerticalAlignment="Center"
                        Foreground="{DynamicResource CupertinoLabelBrush}" />
             <TextBlock x:Name="LibVersion" Grid.Column="1" FontSize="17"
                        VerticalAlignment="Center"
                        Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
           </Grid>
-          <Rectangle Height="0.5" Fill="{DynamicResource CupertinoSeparatorBrush}"
+          <Rectangle x:Name="VersionBottomSeparator"
+                     Height="0.5" Fill="{DynamicResource CupertinoSeparatorBrush}"
                      Margin="16,0,0,0" />
           <Grid ColumnDefinitions="*,Auto" Height="44" Margin="16,0">
             <TextBlock Text="Avalonia" FontSize="17" VerticalAlignment="Center"

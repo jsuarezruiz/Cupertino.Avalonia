@@ -40,8 +40,9 @@ public partial class RootPage : UserControl
         this.FindControl<CupertinoTimePicker>("HighlightTime")!.SelectedTime =
             DateTimeOffset.Now.TimeOfDay;
 
-        this.FindControl<TextBlock>("HeroVersion")!.Text =
-            "Version " + VersionInfo.Library;
+        var heroVersion = this.FindControl<TextBlock>("HeroVersion")!;
+        heroVersion.IsVisible = VersionInfo.Library is not null;
+        heroVersion.Text = VersionInfo.Library is { } version ? "Version " + version : null;
 
         var hero = this.FindControl<Panel>("Hero")!;
         hero.PointerPressed += (_, _) => hero.Opacity = 0.75;

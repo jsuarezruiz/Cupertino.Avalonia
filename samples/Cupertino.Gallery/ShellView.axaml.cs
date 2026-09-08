@@ -30,6 +30,7 @@ public sealed class CatalogEntry
 public partial class ShellView : UserControl
 {
     public const double WideLayoutBreakpoint = 760;
+    private const double WideDetailLargeTitleInset = 39;
 
     // Avoid running shaders on hidden pages.
     private readonly IReadOnlyList<CatalogEntry> _entries =
@@ -198,10 +199,17 @@ public partial class ShellView : UserControl
         }
     }
 
-    private void ShowWideDetail(string title, Control content)
+    private void ShowWideDetail(string title, Control content, bool contentIncludesLargeTitleInset = false)
     {
         if (_wideDetailNav.Depth > 0)
             _wideDetailNav.RestoreState(new CupertinoNavigationState([]), _ => null);
+        if (!contentIncludesLargeTitleInset)
+        {
+            var margin = content.Margin;
+            content.Margin = new Avalonia.Thickness(
+                margin.Left, margin.Top + WideDetailLargeTitleInset,
+                margin.Right, margin.Bottom);
+        }
         _wideDetailNav.RootTitle = title;
         _wideDetailNav.RootContent = content;
     }
@@ -223,7 +231,7 @@ public partial class ShellView : UserControl
             else if (_currentEntry is { } entry)
                 ShowWideDetail(entry.Title, entry.Build());
             else
-                ShowWideDetail("Welcome", new HomePage());
+                ShowWideDetail("Welcome", new HomePage(), contentIncludesLargeTitleInset: true);
             return;
         }
 

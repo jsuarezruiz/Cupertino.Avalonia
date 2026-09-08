@@ -178,6 +178,43 @@ public class GalleryIntegrationTests
         }
     }
 
+    [AvaloniaFact]
+    public void Wide_settings_content_starts_below_the_large_title()
+    {
+        var shell = new ShellView();
+        var window = new Window { Width = 1000, Height = 844, Content = shell };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var catalogNav = shell.FindControl<CupertinoNavigationPage>("WideCatalogNav")!;
+            var settingsButton = catalogNav.GetVisualDescendants().OfType<Button>()
+                .Single(button => button.GetValue(global::Avalonia.Automation.AutomationProperties.NameProperty) == "Settings");
+            settingsButton.RaiseEvent(new global::Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var detailNav = shell.FindControl<CupertinoNavigationPage>("WideDetailNav")!;
+            var settings = Assert.IsType<SettingsPage>(detailNav.CurrentContent);
+            var largeTitle = detailNav.GetVisualDescendants().OfType<TextBlock>()
+                .Single(text => text.Name == "PART_LargeTitle");
+            var sectionHeader = settings.GetVisualDescendants().OfType<TextBlock>()
+                .Single(text => text.Text == "APPEARANCE");
+            var titleBottom = largeTitle.TranslatePoint(
+                new Point(0, largeTitle.Bounds.Height), shell)!.Value.Y;
+            var headerTop = sectionHeader.TranslatePoint(default, shell)!.Value.Y;
+
+            Assert.True(headerTop >= titleBottom,
+                $"section header starts at {headerTop:F1}, above the title bottom at {titleBottom:F1}");
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
     [AvaloniaTheory]
     [InlineData(true, true, true)]
     [InlineData(false, true, false)]
@@ -289,8 +326,11 @@ public class GalleryIntegrationTests
             window.Show();
             var motion = page.FindControl<ToggleSwitch>("ReduceMotion")!;
             var glass = page.FindControl<ToggleSwitch>("ReduceGlass")!;
+            var libraryVersion = page.FindControl<TextBlock>("LibVersion")!;
+            var libraryVersionRow = page.FindControl<Grid>("VersionRow")!;
             Assert.Equal("Reduce motion", ControlAutomationPeer.CreatePeerForElement(motion)!.GetName());
             Assert.Equal("Reduce transparency", ControlAutomationPeer.CreatePeerForElement(glass)!.GetName());
+            Assert.Equal(!string.IsNullOrWhiteSpace(libraryVersion.Text), libraryVersionRow.IsVisible);
             motion.IsChecked = !oldMotion;
             glass.IsChecked = !oldGlass;
             Assert.Equal(!oldMotion, CupertinoAccessibility.ReduceMotion);
