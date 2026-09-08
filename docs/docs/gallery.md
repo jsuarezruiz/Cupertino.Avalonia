@@ -38,6 +38,6 @@ dotnet workload install wasm-tools
 dotnet run --project samples/Cupertino.Gallery.Browser
 ```
 
-Publishing produces a static site at `samples/Cupertino.Gallery.Browser/bin/Release/net10.0-browser/publish/wwwroot`. The documentation workflow deploys it to the [WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia.Site/gallery/) from `main`, alongside the project documentation.
+Publishing produces a static site at `samples/Cupertino.Gallery.Browser/bin/Release/net10.0-browser/publish/wwwroot`. The documentation workflow stores the gallery and project documentation together as a private Actions artifact.
 
 The source for each gallery page lives in [`samples/Cupertino.Gallery/Pages`](https://github.com/jsuarezruiz/Cupertino.Avalonia/tree/main/samples/Cupertino.Gallery/Pages).

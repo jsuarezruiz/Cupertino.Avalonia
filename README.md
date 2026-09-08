@@ -71,9 +71,8 @@ dotnet workload install wasm-tools
 dotnet run --project samples/Cupertino.Gallery.Browser
 ```
 
-The documentation workflow publishes it at the
-[WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia.Site/gallery/)
-after changes reach `main`.
+The documentation workflow also builds the WebAssembly gallery and stores it as
+a private Actions artifact after changes reach `main`.
 
 ### Screenshots
 
@@ -194,11 +193,7 @@ after changes reach `main`.
 
 ## Documentation
 
-The full documentation includes setup guides, design-system concepts, control examples and generated API reference:
-
-**[Read the Cupertino.Avalonia documentation](https://jsuarezruiz.github.io/Cupertino.Avalonia.Site/)**
-
-The source lives in [`docs`](docs/) and is built with DocFX.
+The full documentation includes setup guides, design-system concepts, control examples and generated API reference. Its source lives in [`docs`](docs/) and is built with DocFX.
 
 * [FAQ](FAQ.md)
 * [Changelog](CHANGELOG.md)

@@ -1,4 +1,4 @@
-name: Deploy documentation
+name: Build documentation
 
 on:
   push:
@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: deploy-site
+  group: build-site
   cancel-in-progress: true
 
 jobs:
@@ -53,24 +53,9 @@ jobs:
       - name: Disable Jekyll processing
         run: touch docs/_site/.nojekyll
 
-      - name: Publish documentation and gallery
-        env:
-          DEPLOY_KEY: ${{ secrets.PAGES_DEPLOY_KEY }}
-          GIT_SSH_COMMAND: ssh -i "${{ runner.temp }}/cupertino-site-deploy-key" -o IdentitiesOnly=yes -o UserKnownHostsFile="${{ runner.temp }}/cupertino-site-known-hosts"
-        shell: bash
-        run: |
-          if [[ -z "$DEPLOY_KEY" ]]; then
-            echo "The PAGES_DEPLOY_KEY repository secret is not configured." >&2
-            exit 1
-          fi
-
-          printf '%s\n' "$DEPLOY_KEY" > "${{ runner.temp }}/cupertino-site-deploy-key"
-          chmod 600 "${{ runner.temp }}/cupertino-site-deploy-key"
-          ssh-keyscan github.com > "${{ runner.temp }}/cupertino-site-known-hosts"
-
-          git -C docs/_site init
-          git -C docs/_site checkout -b gh-pages
-          git -C docs/_site add --all
-          git -C docs/_site -c 'user.name=github-actions[bot]' -c 'user.email=41898282+github-actions[bot]@users.noreply.github.com' commit -m "Deploy $GITHUB_SHA"
-          git -C docs/_site remote add origin git@github.com:jsuarezruiz/Cupertino.Avalonia.Site.git
-          git -C docs/_site push --force origin gh-pages
+      - name: Upload documentation and gallery
+        uses: actions/upload-artifact@v7
+        with:
+          name: documentation-and-gallery
+          path: docs/_site
+          if-no-files-found: error
