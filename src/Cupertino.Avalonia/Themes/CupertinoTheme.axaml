@@ -30,6 +30,7 @@
           <SolidColorBrush x:Key="CupertinoSliderThumbDragAccentBrush" Color="#FF0E91FF" />
           <SolidColorBrush x:Key="CupertinoSliderThumbDragRemainderBrush" Color="#FFE1E2E1" />
           <SolidColorBrush x:Key="CupertinoSliderThumbDragBaseBrush" Color="#FFF7F7F7" />
+          <Color x:Key="CupertinoNavigationBarTint">#FFF2F2F7</Color>
           <Color x:Key="CupertinoBarButtonTint">#C2FFFFFF</Color>
           <SolidColorBrush x:Key="CupertinoSheetGrabberBrush" Color="#4D3C3C43" />
           <SolidColorBrush x:Key="CupertinoSecondaryLabelBrush" Color="#993C3C43" />
@@ -112,6 +113,7 @@
           <SolidColorBrush x:Key="CupertinoSliderThumbDragAccentBrush" Color="#FF188BFF" />
           <SolidColorBrush x:Key="CupertinoSliderThumbDragRemainderBrush" Color="#FF464648" />
           <SolidColorBrush x:Key="CupertinoSliderThumbDragBaseBrush" Color="#FF2C2C2E" />
+          <Color x:Key="CupertinoNavigationBarTint">#FF000000</Color>
           <Color x:Key="CupertinoBarButtonTint">#C2303034</Color>
           <SolidColorBrush x:Key="CupertinoSheetGrabberBrush" Color="#5BEBEBF5" />
           <SolidColorBrush x:Key="CupertinoSecondaryLabelBrush" Color="#99EBEBF5" />

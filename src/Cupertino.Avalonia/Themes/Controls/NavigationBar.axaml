@@ -54,11 +54,12 @@
                           ChromaticAberration="0" DepthEffect="0"
                           ShadowOpacity="0"
                           IsAdaptive="True"
+                          Tint="{DynamicResource CupertinoNavigationBarTint}"
                           Opacity="{TemplateBinding BackdropOpacity}">
             <c:GlassSurface.OpacityMask>
               <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
                 <GradientStop Offset="0.0" Color="#FFFFFFFF" />
-                <GradientStop Offset="0.45" Color="#B3FFFFFF" />
+                <GradientStop Offset="0.78" Color="#FFFFFFFF" />
                 <GradientStop Offset="1.0" Color="#00FFFFFF" />
               </LinearGradientBrush>
             </c:GlassSurface.OpacityMask>
