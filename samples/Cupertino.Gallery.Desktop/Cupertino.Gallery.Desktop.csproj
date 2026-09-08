@@ -35,7 +35,6 @@
     <PropertyGroup>
       <_MacAppBundleRoot>$(PublishDir)macos</_MacAppBundleRoot>
       <_MacAppBundlePath>$(_MacAppBundleRoot)/$(MacAppBundleName).app</_MacAppBundlePath>
-      <_MacBundleVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '[+-].*$', ''))</_MacBundleVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -55,10 +54,10 @@
              Value="$(AssemblyName)" />
     <XmlPoke XmlInputPath="$(_MacAppBundlePath)/Contents/Info.plist"
              Query="/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]"
-             Value="$(_MacBundleVersion)" />
+             Value="$(ApplicationDisplayVersion)" />
     <XmlPoke XmlInputPath="$(_MacAppBundlePath)/Contents/Info.plist"
              Query="/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]"
-             Value="$(_MacBundleVersion)" />
+             Value="$(ApplicationVersion)" />
     <Exec Command="chmod +x &quot;$(_MacAppBundlePath)/Contents/MacOS/$(AssemblyName)&quot;" />
     <Exec Command="codesign --force --deep --sign - &quot;$(_MacAppBundlePath)&quot;" />
   </Target>

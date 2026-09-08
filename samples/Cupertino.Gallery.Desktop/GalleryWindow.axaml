@@ -4,7 +4,7 @@
         xmlns:local="using:Cupertino.Gallery"
         x:Class="Cupertino.Gallery.GalleryWindow"
         x:DataType="local:GalleryWindow"
-        Width="402" Height="874"
+        Width="1180" Height="820"
         MinWidth="360" MinHeight="600"
         Background="{DynamicResource CupertinoGroupedBackgroundBrush}"
         Icon="avares://Cupertino.Gallery/Assets/AppIcon.png"

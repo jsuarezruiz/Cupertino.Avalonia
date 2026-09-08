@@ -1,0 +1,13 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:cupertino="https://cupertino.avaloniaui.net"
+             x:Class="Cupertino.Gallery.BrowserApp"
+             RequestedThemeVariant="Default">
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+    <Style Selector="UserControl > ScrollViewer">
+      <Setter Property="cupertino:ScrollBounce.IsEnabled" Value="True" />
+    </Style>
+  </Application.Styles>
+</Application>

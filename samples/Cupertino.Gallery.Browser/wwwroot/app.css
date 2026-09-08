@@ -1,0 +1,83 @@
+:root {
+  color-scheme: light dark;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f2f2f7;
+}
+
+html,
+body,
+#out {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+.splash {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  height: 100%;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  color: #1c1c1e;
+  background:
+    radial-gradient(circle at 28% 24%, rgb(90 200 250 / 26%), transparent 32%),
+    radial-gradient(circle at 72% 68%, rgb(191 90 242 / 22%), transparent 36%),
+    #f2f2f7;
+}
+
+.app-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgb(255 255 255 / 72%);
+  border-radius: 16px;
+  color: white;
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(145deg, #32ade6, #5856d6 60%, #af52de);
+  box-shadow: 0 14px 40px rgb(88 86 214 / 26%);
+}
+
+.splash div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.splash strong {
+  font-size: 19px;
+  letter-spacing: -0.02em;
+}
+
+.splash span {
+  color: #6e6e73;
+  font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    background: #000;
+  }
+
+  .splash {
+    color: #f2f2f7;
+    background:
+      radial-gradient(circle at 28% 24%, rgb(10 132 255 / 24%), transparent 32%),
+      radial-gradient(circle at 72% 68%, rgb(191 90 242 / 20%), transparent 36%),
+      #000;
+  }
+
+  .splash span {
+    color: #98989d;
+  }
+}

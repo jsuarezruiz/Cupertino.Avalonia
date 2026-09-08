@@ -9,8 +9,6 @@
   <key>CFBundleGetInfoString</key><string>Interactive control gallery for the Cupertino.Avalonia iOS 26 design system.</string>
   <key>NSHumanReadableCopyright</key><string>Copyright © 2026 Javier Suárez Ruiz</string>
   <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>1.0</string>
-  <key>CFBundleVersion</key><string>1</string>
   <key>LSRequiresIPhoneOS</key><true/>
   <key>UILaunchScreen</key><dict/>
   <key>XSAppIconAssets</key><string>Assets.xcassets/AppIcon.appiconset</string>

@@ -413,12 +413,14 @@ public class WheelTests
 
 public class CalendarTests
 {
-    private static CupertinoMonthGrid ShowGrid(double width, DateTime month)
+    private static CupertinoMonthGrid ShowGrid(
+        double width, DateTime month, DayOfWeek firstDayOfWeek = DayOfWeek.Monday)
     {
         var grid = new CupertinoMonthGrid
         {
             Width = width,
             DisplayMonth = month,
+            FirstDayOfWeek = firstDayOfWeek,
             VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top,
         };
         var window = new Window { Width = width + 40, Height = 500, Content = grid };
@@ -442,14 +444,14 @@ public class CalendarTests
         }
     }
 
-    [AvaloniaFact]
-    public void July_2026_starts_on_a_wednesday()
+    [AvaloniaTheory]
+    [InlineData(DayOfWeek.Monday, 2)]
+    [InlineData(DayOfWeek.Sunday, 3)]
+    public void July_2026_starts_on_a_wednesday(DayOfWeek firstDayOfWeek, int column)
     {
-        var grid = ShowGrid(298, new DateTime(2026, 7, 1));
+        var grid = ShowGrid(298, new DateTime(2026, 7, 1), firstDayOfWeek);
         var cell = 298 / 7.0;
         var weekdayBand = cell * 0.314;
-
-        const int column = 2;
 
         var picked = default(DateTime?);
         grid.DayPicked += (_, d) => picked = d;

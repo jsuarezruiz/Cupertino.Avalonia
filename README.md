@@ -64,6 +64,17 @@ dotnet run --project samples/Cupertino.Gallery.Desktop
 
 Mobile heads are available at `samples/Cupertino.Gallery.iOS` and `samples/Cupertino.Gallery.Android`.
 
+The WebAssembly gallery runs in a browser:
+
+```bash
+dotnet workload install wasm-tools
+dotnet run --project samples/Cupertino.Gallery.Browser
+```
+
+The documentation workflow publishes it at the
+[WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia.Site/gallery/)
+after changes reach `main`.
+
 ### Screenshots
 
 #### Design language
@@ -185,7 +196,7 @@ Mobile heads are available at `samples/Cupertino.Gallery.iOS` and `samples/Cuper
 
 The full documentation includes setup guides, design-system concepts, control examples and generated API reference:
 
-**[Read the Cupertino.Avalonia documentation](https://jsuarezruiz.github.io/Cupertino.Avalonia/)**
+**[Read the Cupertino.Avalonia documentation](https://jsuarezruiz.github.io/Cupertino.Avalonia.Site/)**
 
 The source lives in [`docs`](docs/) and is built with DocFX.
 

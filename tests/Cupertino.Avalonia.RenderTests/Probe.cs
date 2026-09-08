@@ -17,9 +17,15 @@ public static class Probe
 {
     private const int ChannelTolerance = 3;
     private const double AllowedMismatchRatio = 0.002;
-    private static readonly string ReferenceDirectory = FindReferenceDirectory();
+    private static readonly string ReferenceRootDirectory = FindReferenceDirectory();
+    // Skia rasterizes text differently on each OS, even with the same bundled font.
+    private static readonly string ReferenceDirectory = Path.Combine(ReferenceRootDirectory,
+        OperatingSystem.IsMacOS() ? "macos" :
+        OperatingSystem.IsWindows() ? "windows" :
+        OperatingSystem.IsLinux() ? "linux" :
+        throw new PlatformNotSupportedException("No render references are configured for this OS."));
     internal static readonly string FailureDirectory = Path.Combine(
-        Path.GetDirectoryName(ReferenceDirectory)!, "TestResults", "RenderDiffs");
+        Path.GetDirectoryName(ReferenceRootDirectory)!, "TestResults", "RenderDiffs");
 
     public static byte[,] Render(string referenceName, Control content, int width, int height, Color background)
     {
@@ -61,8 +67,13 @@ public static class Probe
             return;
         }
 
-        Assert.True(File.Exists(referencePath),
-            $"Missing render reference '{referencePath}'. Run with UPDATE_RENDER_REFERENCES=1 to create it.");
+        if (!File.Exists(referencePath))
+        {
+            SaveActual(referenceName, frame);
+            Assert.Fail(
+                $"Missing render reference '{referencePath}'. See '{FailureDirectory}' for the actual image. " +
+                "Run with UPDATE_RENDER_REFERENCES=1 to create it after review.");
+        }
 
         using var stream = new MemoryStream();
         frame.Save(stream, PngBitmapEncoderOptions.Default);

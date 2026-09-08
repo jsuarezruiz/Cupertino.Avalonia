@@ -29,6 +29,8 @@ public sealed class CatalogEntry
 
 public partial class ShellView : UserControl
 {
+    public const double WideLayoutBreakpoint = 760;
+
     // Avoid running shaders on hidden pages.
     private readonly IReadOnlyList<CatalogEntry> _entries =
     [
@@ -84,6 +86,13 @@ public partial class ShellView : UserControl
     ];
 
     private Avalonia.Controls.Platform.IInsetsManager? _insets;
+    private readonly CupertinoNavigationPage _compactNav;
+    private readonly CupertinoNavigationPage _wideCatalogNav;
+    private readonly CupertinoNavigationPage _wideDetailNav;
+    private readonly Grid _wideLayout;
+    private CatalogEntry? _currentEntry;
+    private bool _showingSettings;
+    private bool _isWide;
 
     protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
     {
@@ -112,15 +121,32 @@ public partial class ShellView : UserControl
     {
         InitializeComponent();
 
-        var nav = this.FindControl<CupertinoNavigationPage>("Nav")!;
+        _compactNav = this.FindControl<CupertinoNavigationPage>("Nav")!;
+        _wideCatalogNav = this.FindControl<CupertinoNavigationPage>("WideCatalogNav")!;
+        _wideDetailNav = this.FindControl<CupertinoNavigationPage>("WideDetailNav")!;
+        _wideLayout = this.FindControl<Grid>("WideLayout")!;
 
         var entries = _entries;
         if (NativeComparison.IsAvailable)
             entries = [.. _entries, new("Side by Side", "⇋", "#FF34AADC", () => new SideBySidePage(), "Showcases")];
 
-        var root = new RootPage(entries);
-        root.EntryChosen += (_, entry) => nav.Push(entry.Title, entry.Build());
-        root.SettingsChosen += (_, _) => nav.Push("Settings", new SettingsPage());
+        var compactRoot = new RootPage(entries);
+        compactRoot.EntryChosen += (_, entry) => OpenEntry(entry);
+        compactRoot.SettingsChosen += (_, _) => OpenSettings();
+        _compactNav.RootContent = compactRoot;
+
+        var wideRoot = new RootPage(entries);
+        wideRoot.EntryChosen += (_, entry) => OpenEntry(entry);
+        wideRoot.SettingsChosen += (_, _) => OpenSettings();
+        _wideCatalogNav.RootContent = wideRoot;
+        _wideDetailNav.RootContent = new HomePage();
+
+        _compactNav.TrailingContent = MakeActions(_compactNav, showSource: true, showSettings: true);
+        _wideCatalogNav.TrailingContent = MakeActions(_wideCatalogNav, showSource: false, showSettings: true);
+        _wideDetailNav.TrailingContent = MakeActions(_wideDetailNav, showSource: true, showSettings: false);
+        _compactNav.NavigationCompleted += (_, _) => UpdateCompactSelection();
+
+        SizeChanged += (_, e) => UpdateAdaptiveLayout(e.NewSize.Width);
 
         var args = Environment.GetCommandLineArgs();
         var pageArg = Array.IndexOf(args, "--page");
@@ -133,51 +159,158 @@ public partial class ShellView : UserControl
                 e => string.Equals(e.Title, requested, StringComparison.OrdinalIgnoreCase));
             if (wanted is not null)
             {
-                // Wait for the navigation host.
+                // Wait until the adaptive host has selected its initial layout.
                 void OpenOnce(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
                 {
-                    nav.Loaded -= OpenOnce;
-                    var content = wanted.Build();
-                    GalleryCaptureState.Attach(content);
-                    nav.Push(wanted.Title, content);
+                    Loaded -= OpenOnce;
+                    OpenEntry(wanted, attachCaptureState: true);
                 }
-                nav.Loaded += OpenOnce;
+                Loaded += OpenOnce;
             }
         }
+    }
 
-        var source = new Button
+    private void OpenEntry(CatalogEntry entry, bool attachCaptureState = false)
+    {
+        _currentEntry = entry;
+        _showingSettings = false;
+        var content = entry.Build();
+        if (attachCaptureState)
+            GalleryCaptureState.Attach(content);
+
+        if (_isWide)
+            ShowWideDetail(entry.Title, content);
+        else
+            _compactNav.TryPush("catalog", entry.Title, content, entry);
+    }
+
+    private void OpenSettings()
+    {
+        _showingSettings = true;
+        if (_isWide)
         {
-            Classes = { "plain" },
-            Padding = new Avalonia.Thickness(8, 7),
-            IsVisible = false,
-            Content = MakeBarIcon("chevron.left.forwardslash.chevron.right"),
-        };
-        source.Click += (_, _) =>
+            _currentEntry = null;
+            ShowWideDetail("Settings", new SettingsPage());
+        }
+        else
         {
-            if (SourceResourceFor(nav.CurrentContent) is not { } resource)
-                return;
-            using var stream = typeof(ShellView).Assembly.GetManifestResourceStream(resource)!;
-            using var reader = new System.IO.StreamReader(stream);
-            nav.Push("Source", new Pages.SourcePage(reader.ReadToEnd()));
-        };
-        nav.Navigated += (_, _) =>
-            source.IsVisible = SourceResourceFor(nav.CurrentContent) is not null;
+            _compactNav.TryPush("settings", "Settings", new SettingsPage());
+        }
+    }
 
-        nav.RootContent = root;
+    private void ShowWideDetail(string title, Control content)
+    {
+        if (_wideDetailNav.Depth > 0)
+            _wideDetailNav.RestoreState(new CupertinoNavigationState([]), _ => null);
+        _wideDetailNav.RootTitle = title;
+        _wideDetailNav.RootContent = content;
+    }
 
-        var gear = new Button
+    private void UpdateAdaptiveLayout(double width)
+    {
+        var useWideLayout = width >= WideLayoutBreakpoint;
+        if (_isWide == useWideLayout)
+            return;
+
+        _isWide = useWideLayout;
+        _compactNav.IsVisible = !useWideLayout;
+        _wideLayout.IsVisible = useWideLayout;
+
+        if (useWideLayout)
         {
-            Classes = { "plain" },
-            Padding = new Avalonia.Thickness(8, 7),
-            Content = MakeBarIcon("gear"),
-        };
-        gear.Click += (_, _) => nav.Push("Settings", new SettingsPage());
-        ToolTip.SetTip(source, "View source");
-        ToolTip.SetTip(gear, "Settings");
-        Avalonia.Automation.AutomationProperties.SetName(source, "View source");
-        Avalonia.Automation.AutomationProperties.SetName(gear, "Settings");
+            if (_showingSettings)
+                ShowWideDetail("Settings", new SettingsPage());
+            else if (_currentEntry is { } entry)
+                ShowWideDetail(entry.Title, entry.Build());
+            else
+                ShowWideDetail("Welcome", new HomePage());
+            return;
+        }
 
-        var trailingCapsule = new Cupertino.Controls.GlassSurface
+        var state = _showingSettings
+            ? new CupertinoNavigationState([new("settings", "Settings", null)])
+            : _currentEntry is { } selected
+                ? new CupertinoNavigationState([new("catalog", selected.Title, selected)])
+                : new CupertinoNavigationState([]);
+        _compactNav.RestoreState(state, saved => saved.Route switch
+        {
+            "settings" => new SettingsPage(),
+            "catalog" when saved.Parameter is CatalogEntry entry => entry.Build(),
+            _ => null,
+        });
+    }
+
+    private void UpdateCompactSelection()
+    {
+        if (_isWide)
+            return;
+        if (_compactNav.CurrentContent is SettingsPage)
+        {
+            _showingSettings = true;
+            return;
+        }
+        if (_compactNav.CurrentContent is SourcePage)
+            return;
+        if (_compactNav.CurrentEntry?.Parameter is CatalogEntry entry)
+        {
+            _currentEntry = entry;
+            _showingSettings = false;
+            return;
+        }
+        if (_compactNav.Depth == 0)
+        {
+            _currentEntry = null;
+            _showingSettings = false;
+        }
+    }
+
+    private GlassSurface MakeActions(
+        CupertinoNavigationPage nav, bool showSource, bool showSettings)
+    {
+        var actions = new StackPanel
+        {
+            Orientation = Avalonia.Layout.Orientation.Horizontal,
+            Spacing = 2,
+            Margin = new Avalonia.Thickness(8, 0),
+        };
+        Button? source = null;
+        if (showSource)
+        {
+            source = new Button
+            {
+                Classes = { "plain" },
+                Padding = new Avalonia.Thickness(8, 7),
+                IsVisible = false,
+                Content = MakeBarIcon("chevron.left.forwardslash.chevron.right"),
+            };
+            source.Click += (_, _) =>
+            {
+                if (SourceResourceFor(nav.CurrentContent) is not { } resource)
+                    return;
+                using var stream = typeof(ShellView).Assembly.GetManifestResourceStream(resource)!;
+                using var reader = new System.IO.StreamReader(stream);
+                nav.TryPush("source", "Source", new SourcePage(reader.ReadToEnd()));
+            };
+            ToolTip.SetTip(source, "View source");
+            Avalonia.Automation.AutomationProperties.SetName(source, "View source");
+            actions.Children.Add(source);
+        }
+
+        if (showSettings)
+        {
+            var gear = new Button
+            {
+                Classes = { "plain" },
+                Padding = new Avalonia.Thickness(8, 7),
+                Content = MakeBarIcon("gear"),
+            };
+            gear.Click += (_, _) => OpenSettings();
+            ToolTip.SetTip(gear, "Settings");
+            Avalonia.Automation.AutomationProperties.SetName(gear, "Settings");
+            actions.Children.Add(gear);
+        }
+
+        var capsule = new GlassSurface
         {
             Height = 36,
             CornerRadius = new Avalonia.CornerRadius(18),
@@ -194,17 +327,24 @@ public partial class ShellView : UserControl
             ShadowBlur = 12,
             ShadowOffset = 2,
             ShadowContactWeight = 0.2,
-            Child = new StackPanel
-            {
-                Orientation = Avalonia.Layout.Orientation.Horizontal,
-                Spacing = 2,
-                Margin = new Avalonia.Thickness(8, 0),
-                Children = { source, gear },
-            },
+            Child = actions,
         };
-        trailingCapsule.Bind(Cupertino.Controls.GlassSurface.TintProperty,
+        capsule.Bind(GlassSurface.TintProperty,
             this.GetResourceObservable("CupertinoBarButtonTint"));
-        nav.TrailingContent = trailingCapsule;
+
+        if (source is not null)
+        {
+            void UpdateSourceAction()
+            {
+                source.IsVisible = SourceResourceFor(nav.CurrentContent) is not null;
+                if (!showSettings)
+                    capsule.IsVisible = source.IsVisible;
+            }
+            nav.Navigated += (_, _) => UpdateSourceAction();
+            UpdateSourceAction();
+        }
+
+        return capsule;
     }
 
     private static string? SourceResourceFor(Control? page)

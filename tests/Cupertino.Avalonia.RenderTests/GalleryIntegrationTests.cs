@@ -51,8 +51,12 @@ public class GalleryIntegrationTests
             window.Show();
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
-            var nav = shell.FindControl<CupertinoNavigationPage>("Nav")!;
-            var root = Assert.IsType<RootPage>(nav.RootContent);
+            var wide = width >= ShellView.WideLayoutBreakpoint;
+            var nav = shell.FindControl<CupertinoNavigationPage>(
+                wide ? "WideDetailNav" : "Nav")!;
+            var catalogNav = shell.FindControl<CupertinoNavigationPage>(
+                wide ? "WideCatalogNav" : "Nav")!;
+            var root = Assert.IsType<RootPage>(catalogNav.RootContent);
             var catalog = root.GetVisualDescendants().OfType<ListBox>()
                 .SelectMany(list => list.Items.OfType<CatalogEntry>()
                     .Select(entry => (List: list, Entry: entry))).ToArray();
@@ -66,7 +70,7 @@ public class GalleryIntegrationTests
                 Dispatcher.UIThread.RunJobs();
                 var page = Assert.IsAssignableFrom<Control>(nav.CurrentContent);
                 Assert.NotSame(root, page);
-                Assert.Equal(1, nav.Depth);
+                Assert.Equal(wide ? 0 : 1, nav.Depth);
                 Assert.True(page.Bounds.Width > 0 && page.Bounds.Height > 0, entry.Title);
                 visited.Add(page.GetType());
                 Capture(window, page.GetType().Name, dark, width, rtl, "top");
@@ -88,10 +92,19 @@ public class GalleryIntegrationTests
                 });
                 Assert.True(diagnostics.Messages.Count == 0,
                     entry.Title + ": " + string.Join(Environment.NewLine, diagnostics.Messages));
-                Assert.True(nav.TryPop());
-                window.UpdateLayout();
-                Assert.Same(root, nav.CurrentContent);
-                Assert.Null(page.GetVisualParent());
+                if (wide)
+                {
+                    nav.RootContent = new HomePage();
+                    window.UpdateLayout();
+                    Assert.Null(page.GetVisualParent());
+                }
+                else
+                {
+                    Assert.True(nav.TryPop());
+                    window.UpdateLayout();
+                    Assert.Same(root, nav.CurrentContent);
+                    Assert.Null(page.GetVisualParent());
+                }
                 Assert.Null(list.SelectedItem);
             }
 
@@ -107,6 +120,60 @@ public class GalleryIntegrationTests
             window.Close();
             Logger.Sink = oldSink;
             CupertinoAccessibility.TextScaleFactor = oldScale;
+            CupertinoAccessibility.ReduceMotion = oldMotion;
+        }
+    }
+
+    [AvaloniaFact]
+    public void Gallery_preserves_the_open_sample_when_its_layout_changes()
+    {
+        var oldMotion = CupertinoAccessibility.ReduceMotion;
+        var shell = new ShellView();
+        var window = new Window { Width = 600, Height = 844, Content = shell };
+        try
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var compactNav = shell.FindControl<CupertinoNavigationPage>("Nav")!;
+            var wideLayout = shell.FindControl<Grid>("WideLayout")!;
+            var wideCatalogNav = shell.FindControl<CupertinoNavigationPage>("WideCatalogNav")!;
+            var wideDetailNav = shell.FindControl<CupertinoNavigationPage>("WideDetailNav")!;
+            Assert.True(compactNav.IsVisible);
+            Assert.False(wideLayout.IsVisible);
+
+            var compactRoot = Assert.IsType<RootPage>(compactNav.RootContent);
+            var button = compactRoot.ControlEntries.Single(entry => entry.Title == "Button");
+            var list = compactRoot.GetVisualDescendants().OfType<ListBox>()
+                .Single(item => item.Items.Contains(button));
+            list.SelectedItem = button;
+            Dispatcher.UIThread.RunJobs();
+            Assert.IsType<ButtonPage>(compactNav.CurrentContent);
+
+            window.Width = 1000;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(compactNav.IsVisible);
+            Assert.True(wideLayout.IsVisible);
+            Assert.IsType<RootPage>(wideCatalogNav.RootContent);
+            Assert.IsType<ButtonPage>(wideDetailNav.CurrentContent);
+            Assert.True(wideCatalogNav.Bounds.Width > 0);
+            Assert.True(wideDetailNav.Bounds.Width > wideCatalogNav.Bounds.Width);
+
+            window.Width = 600;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(compactNav.IsVisible);
+            Assert.False(wideLayout.IsVisible);
+            Assert.IsType<ButtonPage>(compactNav.CurrentContent);
+            Assert.True(compactNav.TryPop());
+            Assert.Same(compactRoot, compactNav.CurrentContent);
+        }
+        finally
+        {
+            window.Close();
             CupertinoAccessibility.ReduceMotion = oldMotion;
         }
     }

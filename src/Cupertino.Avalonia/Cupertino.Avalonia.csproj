@@ -7,9 +7,6 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>Cupertino</RootNamespace>
     <AssemblyName>Cupertino.Avalonia</AssemblyName>
-    <!-- Release builds override Version from the vMAJOR.MINOR.PATCH[-PRERELEASE] tag. -->
-    <VersionPrefix>0.0.0</VersionPrefix>
-    <VersionSuffix>local</VersionSuffix>
     <IsPackable>true</IsPackable>
     <PackageId>Cupertino.Avalonia</PackageId>
     <Title>Cupertino Avalonia</Title>

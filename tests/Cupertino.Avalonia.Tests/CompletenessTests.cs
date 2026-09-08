@@ -179,13 +179,16 @@ public class AccessibilityAndDirectionTests
         }
     }
 
-    [AvaloniaFact]
-    public void Rtl_calendar_mirrors_visual_columns_and_hit_testing()
+    [AvaloniaTheory]
+    [InlineData(DayOfWeek.Monday, 4)]
+    [InlineData(DayOfWeek.Sunday, 3)]
+    public void Rtl_calendar_mirrors_visual_columns_and_hit_testing(DayOfWeek firstDayOfWeek, int column)
     {
         var grid = new CupertinoMonthGrid
         {
             Width = 298,
             DisplayMonth = new DateTime(2026, 7, 1),
+            FirstDayOfWeek = firstDayOfWeek,
             FlowDirection = FlowDirection.RightToLeft,
             VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Top,
         };
@@ -199,7 +202,7 @@ public class AccessibilityAndDirectionTests
         grid.DayPicked += (_, date) => picked = date;
         grid.RaiseEvent(new PointerReleasedEventArgs(
             grid, new Pointer(8, PointerType.Mouse, true), grid,
-            new Point(cell * 4.5, weekday + cell * .5), 0,
+            new Point(cell * (column + .5), weekday + cell * .5), 0,
             new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonReleased),
             KeyModifiers.None, MouseButton.Left));
 

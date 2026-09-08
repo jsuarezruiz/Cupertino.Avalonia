@@ -28,5 +28,17 @@
     </Style>
   </UserControl.Styles>
 
-  <cupertino:CupertinoNavigationPage x:Name="Nav" RootTitle="Cupertino" />
+  <Grid>
+    <cupertino:CupertinoNavigationPage x:Name="Nav" RootTitle="Cupertino" />
+
+    <Grid x:Name="WideLayout" ColumnDefinitions="360,1,*" IsVisible="False">
+      <cupertino:CupertinoNavigationPage x:Name="WideCatalogNav"
+                                         RootTitle="Cupertino" />
+      <Border Grid.Column="1"
+              Background="{DynamicResource CupertinoSeparatorBrush}" />
+      <cupertino:CupertinoNavigationPage x:Name="WideDetailNav"
+                                         Grid.Column="2"
+                                         RootTitle="Welcome" />
+    </Grid>
+  </Grid>
 </UserControl>

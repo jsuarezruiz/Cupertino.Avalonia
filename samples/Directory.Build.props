@@ -2,8 +2,11 @@
   <Import Project="../Directory.Build.props" />
 
   <PropertyGroup>
-    <VersionPrefix>0.0.0</VersionPrefix>
-    <VersionSuffix>local</VersionSuffix>
+    <!-- App manifests need a numeric display version; assemblies retain the preview suffix. -->
+    <ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '[+-].*$', ''))</ApplicationDisplayVersion>
+    <!-- CI supplies an increasing build number. Local builds can override ApplicationVersion. -->
+    <ApplicationVersion Condition="'$(ApplicationVersion)' == '' and '$(GITHUB_RUN_NUMBER)' != ''">$(GITHUB_RUN_NUMBER)</ApplicationVersion>
+    <ApplicationVersion Condition="'$(ApplicationVersion)' == ''">1</ApplicationVersion>
     <ApplicationTitle>Cupertino Gallery</ApplicationTitle>
     <AssemblyTitle>Cupertino Gallery</AssemblyTitle>
     <Product>Cupertino.Avalonia Gallery</Product>

@@ -22,8 +22,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
       - name: Behavior tests
@@ -33,7 +33,7 @@ jobs:
 
       - name: Upload render differences
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: render-differences-${{ matrix.os }}
           path: tests/Cupertino.Avalonia.RenderTests/TestResults/RenderDiffs
@@ -42,9 +42,9 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -71,7 +71,7 @@ jobs:
         run: ./build/pack-nuget.sh "0.0.0-ci.${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}" artifacts/packages
 
       - name: Upload NuGet packages
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: nuget-packages
           path: |
@@ -82,8 +82,8 @@ jobs:
   ios:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -107,8 +107,8 @@ jobs:
     env:
       BUILD_CONFIGURATION: Release
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -117,3 +117,24 @@ jobs:
 
       - name: Build Android gallery
         run: dotnet build samples/Cupertino.Gallery.Android/Cupertino.Gallery.Android.csproj --configuration "${{ env.BUILD_CONFIGURATION }}" --verbosity minimal
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install WebAssembly tools
+        run: dotnet workload install wasm-tools
+
+      - name: Publish browser gallery
+        run: dotnet publish samples/Cupertino.Gallery.Browser/Cupertino.Gallery.Browser.csproj --configuration "${{ env.BUILD_CONFIGURATION }}" --verbosity minimal
+
+      - name: Upload browser gallery
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-gallery
+          path: samples/Cupertino.Gallery.Browser/bin/Release/net10.0-browser/publish/wwwroot
+          if-no-files-found: error

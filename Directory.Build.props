@@ -1,5 +1,7 @@
 <Project>
   <PropertyGroup>
+    <!-- The release workflow passes the tag version to every project with -p:Version. -->
+    <Version Condition="'$(Version)' == ''">0.0.0-local</Version>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>

@@ -8,6 +8,8 @@ dotnet test Cupertino.Avalonia.sln -c Release
 
 These tests use Avalonia Headless with Skia and Inter fonts. They compare control images, check glass repainting, and verify text orientation in right-to-left layouts.
 
+Pixel comparisons use references for the current operating system under `ReferenceImages/macos`, `ReferenceImages/linux`, or `ReferenceImages/windows`. Skia rasterizes text differently on each OS even with the same font. See [the reference-image guide](ReferenceImages/README.md) for reviewing and updating these images.
+
 Gallery tests open each catalog page, render it, scroll where possible, and navigate back. They also check for binding warnings and missing catalog entries.
 
 The gallery matrix uses these configurations:
