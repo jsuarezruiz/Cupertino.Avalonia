@@ -145,6 +145,8 @@ public class GalleryIntegrationTests
             Assert.False(wideLayout.IsVisible);
 
             var compactRoot = Assert.IsType<RootPage>(compactNav.RootContent);
+            Assert.Equal("Cupertino", compactNav.RootTitle);
+            Assert.True(compactRoot.FindControl<Section>("HeroSection")!.IsVisible);
             var button = compactRoot.ControlEntries.Single(entry => entry.Title == "Button");
             var list = compactRoot.GetVisualDescendants().OfType<ListBox>()
                 .Single(item => item.Items.Contains(button));
@@ -157,7 +159,9 @@ public class GalleryIntegrationTests
             Dispatcher.UIThread.RunJobs();
             Assert.False(compactNav.IsVisible);
             Assert.True(wideLayout.IsVisible);
-            Assert.IsType<RootPage>(wideCatalogNav.RootContent);
+            var wideRoot = Assert.IsType<RootPage>(wideCatalogNav.RootContent);
+            Assert.Equal("Samples", wideCatalogNav.RootTitle);
+            Assert.False(wideRoot.FindControl<Section>("HeroSection")!.IsVisible);
             Assert.IsType<ButtonPage>(wideDetailNav.CurrentContent);
             Assert.True(wideCatalogNav.Bounds.Width > 0);
             Assert.True(wideDetailNav.Bounds.Width > wideCatalogNav.Bounds.Width);

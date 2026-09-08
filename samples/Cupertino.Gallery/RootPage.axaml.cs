@@ -29,11 +29,12 @@ public partial class RootPage : UserControl
     {
     }
 
-    public RootPage(IReadOnlyList<CatalogEntry> entries)
+    public RootPage(IReadOnlyList<CatalogEntry> entries, bool showHero = true)
     {
         _all = entries;
         DataContext = this;
         InitializeComponent();
+        this.FindControl<Section>("HeroSection")!.IsVisible = showHero;
         Refill(string.Empty);
         this.FindControl<CupertinoDatePicker>("HighlightDate")!.SelectedDate =
             DateTimeOffset.Now;

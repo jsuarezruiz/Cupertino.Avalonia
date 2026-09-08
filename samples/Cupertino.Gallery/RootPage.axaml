@@ -43,7 +43,7 @@
   <ScrollViewer>
     <StackPanel Margin="0,113,0,120">
 
-      <cupertino:Section>
+      <cupertino:Section x:Name="HeroSection">
         <Panel x:Name="Hero" Height="188" Margin="16,14" Background="Transparent">
           <Panel.Transitions>
             <Transitions>

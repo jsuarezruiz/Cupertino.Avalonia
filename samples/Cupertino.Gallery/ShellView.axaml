@@ -33,7 +33,7 @@
 
     <Grid x:Name="WideLayout" ColumnDefinitions="360,1,*" IsVisible="False">
       <cupertino:CupertinoNavigationPage x:Name="WideCatalogNav"
-                                         RootTitle="Cupertino" />
+                                         RootTitle="Samples" />
       <Border Grid.Column="1"
               Background="{DynamicResource CupertinoSeparatorBrush}" />
       <cupertino:CupertinoNavigationPage x:Name="WideDetailNav"

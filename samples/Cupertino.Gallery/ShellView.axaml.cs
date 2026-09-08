@@ -136,7 +136,7 @@ public partial class ShellView : UserControl
         compactRoot.SettingsChosen += (_, _) => OpenSettings();
         _compactNav.RootContent = compactRoot;
 
-        var wideRoot = new RootPage(entries);
+        var wideRoot = new RootPage(entries, showHero: false);
         wideRoot.EntryChosen += (_, entry) => OpenEntry(entry);
         wideRoot.SettingsChosen += (_, _) => OpenSettings();
         _wideCatalogNav.RootContent = wideRoot;
