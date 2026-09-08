@@ -162,6 +162,9 @@ public class GalleryIntegrationTests
             var wideRoot = Assert.IsType<RootPage>(wideCatalogNav.RootContent);
             Assert.Equal("Samples", wideCatalogNav.RootTitle);
             Assert.False(wideRoot.FindControl<Section>("HeroSection")!.IsVisible);
+            Assert.Contains("desktop-search-host",
+                wideRoot.FindControl<Section>("SearchSection")!.Classes);
+            Assert.Equal(296, wideRoot.FindControl<TextBox>("Filter")!.Bounds.Width);
             Assert.IsType<ButtonPage>(wideDetailNav.CurrentContent);
             Assert.True(wideCatalogNav.Bounds.Width > 0);
             Assert.True(wideDetailNav.Bounds.Width > wideCatalogNav.Bounds.Width);

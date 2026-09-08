@@ -6,6 +6,20 @@
              x:DataType="local:RootPage">
 
   <UserControl.Styles>
+    <Style Selector="cupertino|Section.desktop-search-host">
+      <Setter Property="Margin" Value="0,0,0,16" />
+    </Style>
+    <Style Selector="cupertino|Section.desktop-search-host /template/ Border#Card">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="ClipToBounds" Value="False" />
+    </Style>
+    <Style Selector="cupertino|Section.desktop-search-host TextBox#Filter">
+      <Setter Property="Width" Value="296" />
+      <Setter Property="Margin" Value="0,8" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
     <Style Selector="TextBlock.highlight-title">
       <Setter Property="FontSize" Value="15" />
       <Setter Property="FontWeight" Value="SemiBold" />
@@ -94,7 +108,7 @@
         </Panel>
       </cupertino:Section>
 
-      <cupertino:Section>
+      <cupertino:Section x:Name="SearchSection">
         <TextBox x:Name="Filter" Classes="search" Margin="16,10"
                  PlaceholderText="Search"
                  TextChanged="OnFilterChanged" />

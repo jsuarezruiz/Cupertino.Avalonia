@@ -35,6 +35,8 @@ public partial class RootPage : UserControl
         DataContext = this;
         InitializeComponent();
         this.FindControl<Section>("HeroSection")!.IsVisible = showHero;
+        if (!showHero)
+            this.FindControl<Section>("SearchSection")!.Classes.Add("desktop-search-host");
         Refill(string.Empty);
         this.FindControl<CupertinoDatePicker>("HighlightDate")!.SelectedDate =
             DateTimeOffset.Now;
