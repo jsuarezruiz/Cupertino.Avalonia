@@ -5,6 +5,7 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
+using Avalonia.VisualTree;
 using SkiaSharp;
 
 namespace Cupertino.Controls;
@@ -14,6 +15,8 @@ namespace Cupertino.Controls;
 /// </summary>
 public sealed class CupertinoSearchFieldShadow : Control
 {
+    private readonly List<Visual> _visibilitySources = new();
+
     /// <summary>
     /// Identifies the <see cref="GetIsAdornerEnabled"/> attached setting.
     /// </summary>
@@ -67,7 +70,11 @@ public sealed class CupertinoSearchFieldShadow : Control
                 if (adorner is not null)
                     return;
 
-                adorner = new CupertinoSearchFieldShadow { IsHitTestVisible = false };
+                adorner = new CupertinoSearchFieldShadow
+                {
+                    IsHitTestVisible = false,
+                    IsVisible = field.IsEffectivelyVisible,
+                };
                 AdornerLayer.SetIsClipEnabled(adorner, false);
                 field.SetValue(AdornerProperty, adorner);
                 AdornerLayer.SetAdorner(field, adorner);
@@ -78,6 +85,45 @@ public sealed class CupertinoSearchFieldShadow : Control
                 field.SetValue(AdornerProperty, null);
             }
         });
+    }
+
+    /// <inheritdoc/>
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        // The overlay is outside the field's visual ancestry, so it does not
+        // inherit visibility when a page or an adaptive layout is hidden.
+        if (AdornerLayer.GetAdornedElement(this) is { } field)
+        {
+            foreach (var source in field.GetSelfAndVisualAncestors())
+            {
+                source.PropertyChanged += OnSourcePropertyChanged;
+                _visibilitySources.Add(source);
+            }
+            UpdateSourceVisibility();
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        foreach (var source in _visibilitySources)
+            source.PropertyChanged -= OnSourcePropertyChanged;
+        _visibilitySources.Clear();
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void OnSourcePropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+    {
+        if (e.Property == IsVisibleProperty)
+            UpdateSourceVisibility();
+    }
+
+    private void UpdateSourceVisibility()
+    {
+        // Read each source directly: its effective visibility may still be
+        // propagating to descendants during the property-change notification.
+        IsVisible = _visibilitySources.All(source => source.IsVisible);
     }
 
     /// <inheritdoc cref="IsAdornerEnabledProperty"/>

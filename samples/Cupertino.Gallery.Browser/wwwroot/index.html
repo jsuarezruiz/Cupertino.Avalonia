@@ -9,18 +9,22 @@
   <title>Cupertino.Avalonia Gallery</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./app.css">
+  <!-- Keep the startup overlay visible even if the shared stylesheet is cached. -->
+  <style>#loading { position: fixed; inset: 0; z-index: 1; }</style>
+  <link rel="preload" id="webassembly" />
+  <script type="importmap"></script>
 </head>
 <body>
-  <main id="out">
-    <div class="splash" role="status" aria-live="polite">
-      <div class="app-icon" aria-hidden="true">C</div>
-      <div>
-        <strong>Cupertino.Avalonia</strong>
-        <span>Loading the gallery…</span>
-      </div>
+  <main id="out" aria-label="Cupertino gallery" aria-busy="true"></main>
+  <div id="loading" class="splash" role="status" aria-live="polite">
+    <div class="app-icon" aria-hidden="true">C</div>
+    <div class="splash-copy">
+      <strong id="loading-title">Cupertino.Avalonia</strong>
+      <span id="loading-message">Loading the gallery…</span>
+      <button id="reload-gallery" type="button" hidden>Reload gallery</button>
     </div>
-  </main>
+  </div>
   <noscript>This gallery needs JavaScript and WebAssembly enabled.</noscript>
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="main#[.{fingerprint}].js"></script>
 </body>
 </html>

@@ -48,10 +48,23 @@ body {
   box-shadow: 0 14px 40px rgb(88 86 214 / 26%);
 }
 
-.splash div:last-child {
+.splash-copy {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  max-width: 300px;
+}
+
+#reload-gallery {
+  align-self: flex-start;
+  margin-top: 12px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 20px;
+  background: #007aff;
+  color: white;
+  font: inherit;
+  cursor: pointer;
 }
 
 .splash strong {

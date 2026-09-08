@@ -2,6 +2,8 @@
 
 An iOS 26 design system for [Avalonia](https://avaloniaui.net): control themes, typography, colour, motion and icons, plus the controls iOS has and Avalonia does not.
 
+**[Try the live web gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)**. Explore the controls in your browser, with no installation required.
+
 ![Cupertino.Avalonia banner](images/cupertino-avalonia-banner.png)
 
 <p align="center"><strong>Controls in action</strong><br>Fluid transitions, responsive effects and Liquid Glass in motion.</p>
@@ -56,23 +58,24 @@ Your app supplies system accessibility preferences through `CupertinoAccessibili
 
 ## The gallery
 
-`samples/Cupertino.Gallery` is a browsable catalogue of every control with live samples and the source for each page. Run it on your desktop:
+**[Open the WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)** to try the controls, switch between light and dark appearances, and view sample code. Wide windows show the catalogue beside the selected sample; narrow windows use a single page with back navigation.
 
-```bash
-dotnet run --project samples/Cupertino.Gallery.Desktop
-```
-
-Mobile heads are available at `samples/Cupertino.Gallery.iOS` and `samples/Cupertino.Gallery.Android`.
-
-The WebAssembly gallery runs in a browser:
+To run the web sample locally, install the .NET 10 SDK, then run these commands from the repository root:
 
 ```bash
 dotnet workload install wasm-tools
 dotnet run --project samples/Cupertino.Gallery.Browser
 ```
 
-The documentation workflow also builds the WebAssembly gallery and stores it as
-a private Actions artifact after changes reach `main`.
+Install `wasm-tools` once. Open the local URL printed in the terminal and keep the command running while testing. The sample must be built and served over HTTP; opening `wwwroot/index.html` directly will not run it.
+
+The shared catalogue lives in `samples/Cupertino.Gallery`. To run it on your desktop:
+
+```bash
+dotnet run --project samples/Cupertino.Gallery.Desktop
+```
+
+Mobile heads are available at `samples/Cupertino.Gallery.iOS` and `samples/Cupertino.Gallery.Android`.
 
 ### Screenshots
 
