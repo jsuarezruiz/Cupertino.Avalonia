@@ -138,7 +138,7 @@ public class CupertinoTimePicker : TemplatedControl
     public string DisplayText => SelectedTime is { } t
         ? Mode == CupertinoTimePickerMode.CountdownDuration
             ? string.Format(CultureInfo.CurrentCulture, "{0} hr {1} min", (int)t.TotalHours, t.Minutes)
-            : DateTime.Today.Add(t).ToString(Is12Hour ? "h:mm tt" : "HH:mm",
+            : DateTime.Today.Add(t).ToString(Is12Hour ? "h:mm\u202Ftt" : "HH:mm",
                                              CultureInfo.CurrentCulture)
         : "Select";
 

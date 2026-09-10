@@ -14,18 +14,18 @@
               <Image Source="avares://Cupertino.Gallery/Assets/Photos/harbor.jpg" Stretch="UniformToFill" />
               <cupertino:CupertinoToolbar>
                 <Button ToolTip.Tip="Back">
-                  <cupertino:CupertinoIcon Glyph="chevron.left" Size="20" />
+                  <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="chevron.left" Size="20" />
                 </Button>
                 <Button ToolTip.Tip="Forward">
-                  <cupertino:CupertinoIcon Glyph="chevron.right" Size="20" />
+                  <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="chevron.right" Size="20" />
                 </Button>
                 <cupertino:ToolbarSpacer />
                 <Button ToolTip.Tip="Search">
-                  <cupertino:CupertinoIcon Glyph="magnifyingglass" Size="20" />
+                  <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="magnifyingglass" Size="20" />
                 </Button>
                 <cupertino:ToolbarSpacer />
                 <Button ToolTip.Tip="Library">
-                  <cupertino:CupertinoIcon Glyph="square.stack" Size="20" />
+                  <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="square.stack" Size="20" />
                 </Button>
               </cupertino:CupertinoToolbar>
             </Panel>
@@ -42,13 +42,13 @@
                      Stretch="UniformToFill" />
               <cupertino:CupertinoToolbar>
               <Button ToolTip.Tip="Play">
-                <cupertino:CupertinoIcon Glyph="play" Size="20" />
+                <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="play" Size="20" />
               </Button>
               <Button ToolTip.Tip="Pause">
-                <cupertino:CupertinoIcon Glyph="pause" Size="20" />
+                <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="pause" Size="20" />
               </Button>
               <Button ToolTip.Tip="Forward">
-                <cupertino:CupertinoIcon Glyph="forward" Size="20" />
+                <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="forward" Size="20" />
               </Button>
               </cupertino:CupertinoToolbar>
             </Panel>

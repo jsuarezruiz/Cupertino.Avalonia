@@ -359,17 +359,20 @@ public class PickerCompletenessTests
             var content = Assert.IsType<Border>(panel.Children[1]);
             var transform = glass.RenderTransform!.Value;
 
-            Assert.Equal(transform.M11, transform.M22, 3);
-            Assert.Equal(0.5, transform.M11, 3);
-            Assert.Null(content.RenderTransform);
+            Assert.Equal(anchor.Bounds.Width / panel.Bounds.Width, transform.M11, 3);
+            Assert.Equal(anchor.Bounds.Height / panel.Bounds.Height, transform.M22, 3);
+            Assert.NotEqual(0, transform.M31);
+            Assert.NotEqual(0, transform.M32);
+            Assert.False(content.RenderTransform!.Value.IsIdentity);
             Assert.Equal(0, content.Opacity);
             Assert.Equal(1, host.Opacity);
             Assert.Equal(1, anchor.Opacity);
 
-            await Task.Delay(350);
+            await Task.Delay(500);
             global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
 
             Assert.True(glass.RenderTransform!.Value.IsIdentity);
+            Assert.True(content.RenderTransform!.Value.IsIdentity);
             Assert.Equal(1, content.Opacity);
 
             CupertinoPopover.Close(anchor);

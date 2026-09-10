@@ -1,0 +1,58 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+  <ControlTheme x:Key="{x:Type ContextMenu}" TargetType="ContextMenu">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
+          <Grid MinWidth="220">
+            <controls:GlassSurface Classes="source-transition-material" CornerRadius="26"
+                                     BlurRadius="36" Saturation="1.8"
+                                     Tint="{DynamicResource CupertinoContextMenuTint}"
+                                     GlassThickness="0.35" RefractionStrength="0.10"
+                                     ChromaticAberration="0" DepthEffect="0.25"
+                                     IsAdaptive="True"
+                                     ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+            <Border Classes="source-transition-content" CornerRadius="26" ClipToBounds="True">
+              <ItemsPresenter Name="PART_ItemsPresenter"
+                              ItemsPanel="{TemplateBinding ItemsPanel}"
+                              Margin="0,6" />
+            </Border>
+          </Grid>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type FlyoutPresenter}" TargetType="FlyoutPresenter">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Padding" Value="16" />
+    <Setter Property="MaxWidth" Value="456" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
+          <Grid>
+            <controls:GlassSurface Classes="source-transition-material" CornerRadius="14"
+                                     BlurRadius="28" Saturation="1.8"
+                                     GlassThickness="0.35" RefractionStrength="0.10"
+                                     ChromaticAberration="0" DepthEffect="0.25"
+                                     IsAdaptive="True"
+                                     ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+            <Border Classes="source-transition-content" CornerRadius="14" ClipToBounds="True">
+              <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                            VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                <ContentPresenter Content="{TemplateBinding Content}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Padding="{TemplateBinding Padding}" />
+              </ScrollViewer>
+            </Border>
+          </Grid>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>
+

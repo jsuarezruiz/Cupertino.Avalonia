@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:motion="clr-namespace:Cupertino.Animation"
-                    xmlns:controls="using:Cupertino.Controls">
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <ControlTheme x:Key="CupertinoRepeatButton" TargetType="RepeatButton">
     <Setter Property="FocusAdorner" Value="{x:Null}" />
@@ -9,7 +9,7 @@
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="Padding" Value="14,7" />
-    <Setter Property="MinHeight" Value="34.3" />
+    <Setter Property="MinHeight" Value="36" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="ClipToBounds" Value="False" />
@@ -28,11 +28,12 @@
         <Panel ClipToBounds="False">
           <controls:GlassSurface x:Name="GlassBg"
                                  CornerRadius="999"
-                                 BlurRadius="12" GlassThickness="5"
+                                 BlurRadius="12" GlassThickness="1"
                                  RefractionStrength="7" ChromaticAberration="0.2"
                                  DepthEffect="0.25" Saturation="0.65"
                                  LightIntensity="0.15" FresnelStrength="0.30"
-                                 ShadowOpacity="0.13" ShadowBlur="9" ShadowOffset="2"
+                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
+                                 ShadowContactWeight="0"
                                  Tint="{DynamicResource CupertinoGlassButtonTint}" />
           <ContentPresenter x:Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}"
@@ -79,7 +80,7 @@
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="Padding" Value="14,7" />
-    <Setter Property="MinHeight" Value="34.3" />
+    <Setter Property="MinHeight" Value="36" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="ClipToBounds" Value="False" />
@@ -95,11 +96,12 @@
         <Panel ClipToBounds="False">
           <controls:GlassSurface x:Name="GlassBg"
                                  CornerRadius="999"
-                                 BlurRadius="12" GlassThickness="5"
+                                 BlurRadius="12" GlassThickness="1"
                                  RefractionStrength="7" ChromaticAberration="0.2"
                                  DepthEffect="0.25" Saturation="0.65"
                                  LightIntensity="0.15" FresnelStrength="0.30"
-                                 ShadowOpacity="0.13" ShadowBlur="9" ShadowOffset="2"
+                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
+                                 ShadowContactWeight="0"
                                  Tint="{DynamicResource CupertinoGlassButtonTint}" />
           <ContentPresenter x:Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}"
@@ -201,11 +203,12 @@
         <Panel ClipToBounds="False">
           <controls:GlassSurface x:Name="GlassBg"
                                  CornerRadius="999"
-                                 BlurRadius="12" GlassThickness="5"
+                                 BlurRadius="12" GlassThickness="1"
                                  RefractionStrength="7" ChromaticAberration="0.2"
                                  DepthEffect="0.25" Saturation="0.65"
                                  LightIntensity="0.15" FresnelStrength="0.30"
-                                 ShadowOpacity="0.13" ShadowBlur="9" ShadowOffset="2"
+                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
+                                 ShadowContactWeight="0"
                                  Tint="{DynamicResource CupertinoGlassButtonTint}" />
           <!-- Names are required by inherited selectors. -->
           <Border x:Name="FlatBg"
@@ -282,7 +285,7 @@
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
-    <Setter Property="MinHeight" Value="34.3" />
+    <Setter Property="MinHeight" Value="36" />
     <Setter Property="Padding" Value="14,7" />
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Template">
@@ -290,11 +293,12 @@
         <Panel ClipToBounds="False">
           <controls:GlassSurface x:Name="GlassBg"
                                  CornerRadius="999"
-                                 BlurRadius="12" GlassThickness="5"
+                                 BlurRadius="12" GlassThickness="1"
                                  RefractionStrength="7" ChromaticAberration="0.2"
                                  DepthEffect="0.25" Saturation="0.65"
                                  LightIntensity="0.15" FresnelStrength="0.30"
-                                 ShadowOpacity="0.13" ShadowBlur="9" ShadowOffset="2"
+                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
+                                 ShadowContactWeight="0"
                                  Tint="{DynamicResource CupertinoGlassButtonTint}" />
           <Border CornerRadius="999" ClipToBounds="True">
             <Grid ColumnDefinitions="*,0.5,Auto">

@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:sys="using:System"
-                    xmlns:c="using:Cupertino.Controls">
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <ControlTheme x:Key="{x:Type CalendarDayButton}" TargetType="CalendarDayButton">
     <Setter Property="Width" Value="44" />
@@ -154,7 +154,7 @@
   <ControlTheme x:Key="{x:Type CalendarItem}" TargetType="CalendarItem">
     <Setter Property="DayTitleTemplate">
       <Template x:DataType="sys:String">
-        <TextBlock Text="{Binding Converter={x:Static c:CupertinoConverters.DayInitial}}"
+        <TextBlock Text="{Binding Converter={x:Static controls:CupertinoConverters.DayInitial}}"
                    FontSize="{DynamicResource CupertinoFontSize10}"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    Foreground="{DynamicResource CupertinoTertiaryLabelBrush}" />

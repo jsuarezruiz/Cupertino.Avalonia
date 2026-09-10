@@ -324,7 +324,7 @@ public static class TabBarInteraction
         private void SetItemPillsVisible(bool visible)
         {
             foreach (var item in Items)
-                item.Classes.Set("cupertino-nopill", !visible);
+                item.Classes.Set("cupertino-no-pill", !visible);
         }
 
         private double _settleFrom, _settleTo, _settleT, _settleStretch = 1;
@@ -724,9 +724,6 @@ public static class TabBarInteraction
         {
             foreach (var item in Items)
             {
-                item.Classes.Set("cupertino-tabhot", false);
-                item.Classes.Set("cupertino-tabcold", false);
-
                 // Return colour ownership to styles and bindings.
                 item.ClearValue(TemplatedControl.ForegroundProperty);
             }

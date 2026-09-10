@@ -83,6 +83,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <controls:GlassSurface CornerRadius="30"
+                               IsBackdropFrozen="True"
                                BlurRadius="30"
                                GlassThickness="3"
                                RefractionStrength="3"

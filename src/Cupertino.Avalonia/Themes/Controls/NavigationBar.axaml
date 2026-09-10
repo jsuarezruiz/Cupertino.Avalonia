@@ -1,37 +1,33 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:c="using:Cupertino.Controls">
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <ControlTheme x:Key="CupertinoBarButton" TargetType="Button">
-    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoBarForegroundBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
     <Setter Property="Padding" Value="12,0" />
     <Setter Property="MinWidth" Value="44" />
-    <Setter Property="Height" Value="36" />
+    <Setter Property="Height" Value="44" />
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel ClipToBounds="False">
-          <!-- The outer border prevents the material shadow from clipping. -->
-          <Border CornerRadius="18" Background="Transparent"
-                  BoxShadow="0 2 12 0 #1A000000">
-            <c:GlassSurface CornerRadius="18"
-                            BlurRadius="18" GlassThickness="0" Saturation="1"
-                            RefractionStrength="0" ChromaticAberration="0"
-                            DepthEffect="0" LightIntensity="0"
-                            FresnelStrength="0" Magnification="1"
-                            Tint="{DynamicResource CupertinoBarButtonTint}"
-                            ShadowOpacity="0">
-              <ContentPresenter Name="PART_ContentPresenter"
-                                Content="{TemplateBinding Content}"
-                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                Padding="{TemplateBinding Padding}"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-            </c:GlassSurface>
-          </Border>
-        </Panel>
+        <controls:GlassSurface CornerRadius="22" ClipToBounds="False"
+                        BlurRadius="18" GlassThickness="1" Saturation="1"
+                        RefractionStrength="0" ChromaticAberration="0"
+                        DepthEffect="0" LightIntensity="0.25"
+                        FresnelStrength="0" Magnification="1"
+                        Tint="{DynamicResource CupertinoBarButtonTint}"
+                        ShadowOpacity="0.1" ShadowBlur="24"
+                        ShadowOffset="2" ShadowContactWeight="0">
+          <ContentPresenter Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+        </controls:GlassSurface>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pressed">
@@ -39,14 +35,14 @@
     </Style>
   </ControlTheme>
 
-  <ControlTheme x:Key="{x:Type c:CupertinoNavigationBar}" TargetType="c:CupertinoNavigationBar">
+  <ControlTheme x:Key="{x:Type controls:CupertinoNavigationBar}" TargetType="controls:CupertinoNavigationBar">
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Height" Value="113" />
     <Setter Property="VerticalAlignment" Value="Top" />
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <c:GlassSurface x:Name="PART_Backdrop"
+          <controls:GlassSurface x:Name="PART_Backdrop"
                           Height="110" VerticalAlignment="Top"
                           CornerRadius="0"
                           BlurRadius="7" Saturation="1.15"
@@ -56,26 +52,24 @@
                           IsAdaptive="True"
                           Tint="{DynamicResource CupertinoNavigationBarTint}"
                           Opacity="{TemplateBinding BackdropOpacity}">
-            <c:GlassSurface.OpacityMask>
+            <controls:GlassSurface.OpacityMask>
               <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
                 <GradientStop Offset="0.0" Color="#FFFFFFFF" />
                 <GradientStop Offset="0.78" Color="#FFFFFFFF" />
                 <GradientStop Offset="1.0" Color="#00FFFFFF" />
               </LinearGradientBrush>
-            </c:GlassSurface.OpacityMask>
-          </c:GlassSurface>
+            </controls:GlassSurface.OpacityMask>
+          </controls:GlassSurface>
 
           <!-- Span all columns so asymmetric buttons do not shift the title. -->
           <Grid x:Name="PART_ToolbarRow"
-                ColumnDefinitions="Auto,*,Auto" Height="34" Margin="16,22,16,0"
+                ColumnDefinitions="Auto,*,Auto" Height="44" Margin="16,17,16,0"
                 VerticalAlignment="Top">
             <TextBlock x:Name="PART_InlineTitle"
                        Grid.Column="0" Grid.ColumnSpan="3"
                        Text="{TemplateBinding Title}"
                        FontSize="{DynamicResource CupertinoFontSize17}" FontWeight="SemiBold"
-                       LetterSpacing="0.9"
                        Margin="72,0"
-                       Padding="0,0,1,0"
                        HorizontalAlignment="Center" VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        Foreground="{DynamicResource CupertinoLabelBrush}"
@@ -113,19 +107,19 @@
 
     <!-- Embedded bars do not own the status-bar inset. -->
     <Style Selector="^.embedded">
-      <Setter Property="Height" Value="44" />
+      <Setter Property="Height" Value="54" />
     </Style>
     <Style Selector="^.embedded /template/ Grid#PART_ToolbarRow">
-      <Setter Property="Margin" Value="16,5,16,0" />
+      <Setter Property="Margin" Value="16,0,16,0" />
     </Style>
   </ControlTheme>
 
-  <ControlTheme x:Key="{x:Type c:CupertinoNavigationPage}" TargetType="c:CupertinoNavigationPage">
+  <ControlTheme x:Key="{x:Type controls:CupertinoNavigationPage}" TargetType="controls:CupertinoNavigationPage">
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
           <Panel x:Name="PART_Host" ClipToBounds="True" />
-          <c:CupertinoNavigationBar x:Name="PART_Bar" VerticalAlignment="Top" />
+          <controls:CupertinoNavigationBar x:Name="PART_Bar" VerticalAlignment="Top" />
         </Panel>
       </ControlTemplate>
     </Setter>

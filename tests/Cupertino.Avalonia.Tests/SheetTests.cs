@@ -1,4 +1,5 @@
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -121,7 +122,7 @@ public class ToolbarTests
         var capsules = global::Avalonia.VisualTree.VisualExtensions
             .GetVisualDescendants(toolbar).OfType<GlassSurface>().ToList();
         Assert.Equal(2, capsules.Count);
-        Assert.Equal(40, capsules[0].Height);
+        Assert.Equal(48, capsules[0].Bounds.Height);
     }
 
     [AvaloniaFact]
@@ -141,14 +142,14 @@ public class ToolbarTests
     }
 
     [AvaloniaFact]
-    public void Embedded_toolbar_applies_the_native_leading_pair_overhang_only_to_the_pair()
+    public void Embedded_toolbar_keeps_groups_and_hit_targets_inside_the_available_width()
     {
         var toolbar = new CupertinoToolbar { Width = 160 };
         toolbar.Classes.Add("embedded");
-        toolbar.Items.Add(new Button { Content = "back" });
-        toolbar.Items.Add(new Button { Content = "forward" });
+        toolbar.Items.Add(new Button { Content = new CupertinoIcon { Glyph = "chevron.left" } });
+        toolbar.Items.Add(new Button { Content = new CupertinoIcon { Glyph = "chevron.right" } });
         toolbar.Items.Add(new ToolbarSpacer());
-        toolbar.Items.Add(new Button { Content = "search" });
+        toolbar.Items.Add(new Button { Content = new CupertinoIcon { Glyph = "magnifyingglass" } });
 
         var window = new Window { Width = 240, Height = 120, Content = toolbar };
         window.Show();
@@ -158,9 +159,11 @@ public class ToolbarTests
         var capsules = global::Avalonia.VisualTree.VisualExtensions
             .GetVisualDescendants(toolbar).OfType<GlassSurface>().ToList();
         Assert.Equal(2, capsules.Count);
-        var overhang = Assert.IsType<global::Avalonia.Media.TranslateTransform>(capsules[0].RenderTransform);
-        Assert.Equal(-5.35, overhang.X, 2);
-        Assert.Null(capsules[1].RenderTransform);
+        Assert.Equal(new Rect(0, 0, 100, 48), capsules[0].Bounds);
+        Assert.Equal(new Rect(112, 0, 48, 48), capsules[1].Bounds);
+        Assert.All(capsules, capsule => Assert.Null(capsule.RenderTransform));
+        Assert.All(toolbar.Items.OfType<Button>(), button =>
+            Assert.Equal(new Size(48, 48), button.Bounds.Size));
     }
 
     [AvaloniaFact]

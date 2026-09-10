@@ -73,7 +73,7 @@ public class SheetRenderTests
 public class ToolbarRenderTests
 {
     [AvaloniaFact]
-    public void Capsules_are_forty_points_tall()
+    public void Capsules_are_forty_eight_points_tall()
     {
         var toolbar = new CupertinoToolbar();
         toolbar.Items.Add(new Button { Content = "a" });
@@ -84,7 +84,7 @@ public class ToolbarRenderTests
 
         var capsules = toolbar.GetVisualDescendants().OfType<GlassSurface>().ToList();
         Assert.Equal(2, capsules.Count);
-        Assert.All(capsules, c => Assert.Equal(40, c.Height));
+        Assert.All(capsules, c => Assert.Equal(48, c.Bounds.Height));
         Assert.Equal(new global::Avalonia.Thickness(35, 0, 35, 32), toolbar.Margin);
     }
 
@@ -290,7 +290,7 @@ public class NavigationBarRenderTests
 
             var bar = nav.GetVisualDescendants().OfType<CupertinoNavigationBar>().Single();
             var host = Assert.IsType<GlassSurface>(bar.LeadingContent);
-            Assert.Equal(36, host.Height);
+            Assert.Equal(44, host.Bounds.Height);
             var button = Assert.IsType<Button>(host.Child);
             Assert.Empty(button.GetVisualDescendants().OfType<TextBlock>());
         }

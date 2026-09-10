@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:motion="clr-namespace:Cupertino.Animation"
-                    xmlns:c="using:Cupertino.Controls">
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <!-- Overlay-hosted pickers can sample the application backdrop. -->
 
@@ -9,30 +9,33 @@
     <Setter Property="Background" Value="{DynamicResource CupertinoPickerFieldBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
-    <Setter Property="Height" Value="34" />
-    <Setter Property="Padding" Value="13,0" />
-    <Setter Property="CornerRadius" Value="17" />
+    <Setter Property="Height" Value="36" />
+    <Setter Property="Padding" Value="12,0" />
+    <Setter Property="CornerRadius" Value="999" />
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Border x:Name="Capsule"
+        <Panel>
+          <Border x:Name="Capsule"
                 Background="{TemplateBinding Background}"
                 CornerRadius="{TemplateBinding CornerRadius}"
-                BorderBrush="Transparent"
-                BorderThickness="2"
                 Padding="{TemplateBinding Padding}">
           <ContentPresenter Content="{TemplateBinding Content}"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center" />
-        </Border>
+          </Border>
+          <!-- The focus ring must not add padding or change the capsule size. -->
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="999" Margin="-2" BorderThickness="2"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}" Opacity="0" />
+        </Panel>
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pressed">
       <Setter Property="Opacity" Value="0.55" />
     </Style>
-    <Style Selector="^:focus-visible /template/ Border#Capsule">
-      <Setter Property="BorderBrush" Value="{DynamicResource CupertinoFocusRingBrush}" />
-      <Setter Property="BorderThickness" Value="2" />
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="^:disabled">
       <Setter Property="Opacity" Value="0.4" />
@@ -80,7 +83,7 @@
     </Style>
   </ControlTheme>
 
-  <ControlTheme x:Key="{x:Type c:CupertinoCalendarView}" TargetType="c:CupertinoCalendarView">
+  <ControlTheme x:Key="{x:Type controls:CupertinoCalendarView}" TargetType="controls:CupertinoCalendarView">
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel Margin="16,12,16,16">
@@ -127,7 +130,7 @@
           </Grid>
 
           <Panel Width="298">
-            <c:CupertinoMonthGrid x:Name="PART_Grid"
+            <controls:CupertinoMonthGrid x:Name="PART_Grid"
                                   DisplayMonth="{TemplateBinding DisplayMonth}"
                                   SelectedDate="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                   MinimumDate="{TemplateBinding MinimumDate}"
@@ -145,9 +148,9 @@
                       HorizontalAlignment="Stretch" VerticalAlignment="Center" />
               <StackPanel Orientation="Horizontal" Spacing="32"
                           HorizontalAlignment="Center">
-                <c:CupertinoWheel x:Name="PART_MonthWheel" TextAlignment="Left"
+                <controls:CupertinoWheel x:Name="PART_MonthWheel" TextAlignment="Left"
                                   Foreground="{DynamicResource CupertinoLabelBrush}" />
-                <c:CupertinoWheel x:Name="PART_YearWheel" TextAlignment="Left"
+                <controls:CupertinoWheel x:Name="PART_YearWheel" TextAlignment="Left"
                                   Foreground="{DynamicResource CupertinoLabelBrush}" />
               </StackPanel>
             </Panel>
@@ -162,7 +165,7 @@
     <Style Selector="^:monthpicker /template/ TextBlock#PART_Title">
       <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
     </Style>
-    <Style Selector="^:monthpicker /template/ c|CupertinoMonthGrid#PART_Grid">
+    <Style Selector="^:monthpicker /template/ controls|CupertinoMonthGrid#PART_Grid">
       <Setter Property="IsVisible" Value="False" />
     </Style>
     <Style Selector="^:monthpicker /template/ Panel#MonthPicker">
@@ -176,7 +179,7 @@
     </Style>
   </ControlTheme>
 
-  <ControlTheme x:Key="{x:Type c:CupertinoDatePicker}" TargetType="c:CupertinoDatePicker">
+  <ControlTheme x:Key="{x:Type controls:CupertinoDatePicker}" TargetType="controls:CupertinoDatePicker">
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">
@@ -185,7 +188,7 @@
           <Button x:Name="PART_FlyoutButton"
                   Theme="{StaticResource CupertinoPickerFieldButton}"
                   Content="{TemplateBinding DisplayText}" />
-          <c:CupertinoCalendarView x:Name="PART_InlineCalendar" IsVisible="False" />
+          <controls:CupertinoCalendarView x:Name="PART_InlineCalendar" IsVisible="False" />
         </Grid>
       </ControlTemplate>
     </Setter>
@@ -196,20 +199,21 @@
     <Style Selector="^:inline /template/ Button#PART_FlyoutButton">
       <Setter Property="IsVisible" Value="False" />
     </Style>
-    <Style Selector="^:inline /template/ c|CupertinoCalendarView#PART_InlineCalendar">
+    <Style Selector="^:inline /template/ controls|CupertinoCalendarView#PART_InlineCalendar">
       <Setter Property="IsVisible" Value="True" />
     </Style>
   </ControlTheme>
 
-  <ControlTheme x:Key="{x:Type c:CupertinoTimePicker}" TargetType="c:CupertinoTimePicker">
+  <ControlTheme x:Key="{x:Type controls:CupertinoTimePicker}" TargetType="controls:CupertinoTimePicker">
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
         <Grid>
           <Button x:Name="PART_FlyoutButton"
-                  Theme="{StaticResource CupertinoPickerFieldButton}"
-                  Content="{TemplateBinding DisplayText}" />
+                  Theme="{StaticResource CupertinoPickerFieldButton}">
+            <TextBlock Text="{TemplateBinding DisplayText}" FontFeatures="tnum" />
+          </Button>
           <ContentControl x:Name="PART_InlineHost" IsVisible="False" />
         </Grid>
       </ControlTemplate>
@@ -222,13 +226,13 @@
     <Style Selector="^:inline /template/ ContentControl#PART_InlineHost"><Setter Property="IsVisible" Value="True" /></Style>
   </ControlTheme>
 
-  <ControlTheme x:Key="{x:Type c:CupertinoDateTimePicker}" TargetType="c:CupertinoDateTimePicker">
+  <ControlTheme x:Key="{x:Type controls:CupertinoDateTimePicker}" TargetType="controls:CupertinoDateTimePicker">
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="Template">
       <ControlTemplate>
         <StackPanel Orientation="Horizontal" Spacing="4">
-          <c:CupertinoDatePicker x:Name="PART_Date" />
-          <c:CupertinoTimePicker x:Name="PART_Time" />
+          <controls:CupertinoDatePicker x:Name="PART_Date" />
+          <controls:CupertinoTimePicker x:Name="PART_Time" />
         </StackPanel>
       </ControlTemplate>
     </Setter>

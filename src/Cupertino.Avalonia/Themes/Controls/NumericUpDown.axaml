@@ -29,8 +29,7 @@
           </Border>
           <ContentPresenter Content="{TemplateBinding Content}"
                             HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            RenderTransform="translate(0px,-1.5px)" />
+                            VerticalContentAlignment="Center" />
         </Panel>
       </ControlTemplate>
     </Setter>
@@ -55,22 +54,28 @@
                             VerticalContentAlignment="Center" />
 
           <Border x:Name="Capsule"
-                  Background="{DynamicResource CupertinoSegmentTrackBrush}"
+                  Background="{DynamicResource CupertinoStepperTrackBrush}"
                   CornerRadius="16" Height="32" Width="94"
                   ClipToBounds="True"
                   VerticalAlignment="Center">
             <Grid ColumnDefinitions="*,*">
               <RepeatButton x:Name="PART_DecreaseButton"
-                            Theme="{StaticResource CupertinoStepperButton}"
-                            Content="&#x2212;" FontSize="26" />
+                            Theme="{StaticResource CupertinoStepperButton}">
+                <Path Data="M1,7 L12,7" Width="13" Height="14"
+                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}"
+                      StrokeThickness="1.8" StrokeLineCap="Round" />
+              </RepeatButton>
               <RepeatButton Grid.Column="1" x:Name="PART_IncreaseButton"
-                            Theme="{StaticResource CupertinoStepperButton}"
-                            Content="+" FontSize="25" />
+                            Theme="{StaticResource CupertinoStepperButton}">
+                <Path Data="M1,7 L12,7 M6.5,1.5 L6.5,12.5" Width="13" Height="14"
+                      Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RepeatButton}}"
+                      StrokeThickness="1.8" StrokeLineCap="Round" />
+              </RepeatButton>
               <Rectangle x:Name="Divider" Grid.ColumnSpan="2"
                          Width="1" Height="24"
                          HorizontalAlignment="Center" VerticalAlignment="Center"
-                         IsHitTestVisible="False" Opacity="0.84"
-                         Fill="{DynamicResource CupertinoSeparatorBrush}" />
+                         IsHitTestVisible="False"
+                         Fill="{DynamicResource CupertinoTertiaryLabelBrush}" />
             </Grid>
           </Border>
         </StackPanel>

@@ -33,4 +33,4 @@ Review the saved gallery images for layout problems. They contain changing sampl
 
 Gallery navigation tests disable motion for consistent results. Separate tests cover animations.
 
-The native comparison page requires iOS and is excluded. Check GPU performance, touch, haptics and screen-reader behavior on devices. For manual desktop checks, use the gallery's Settings page to change appearance, layout direction, reduced motion and reduced transparency.
+The native comparison page requires iOS and is excluded. See [Compare with UIKit](../../samples/Cupertino.Gallery.iOS/README.md) for the manual comparison workflow. Check GPU performance, touch, haptics and screen-reader behavior on devices. For manual desktop checks, use the gallery's Settings page to change appearance, layout direction, reduced motion and reduced transparency.

@@ -1,7 +1,5 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:c="using:Cupertino.Controls">
-
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
   <ControlTheme x:Key="CupertinoPickerCapsule" TargetType="Button">
     <Setter Property="Background" Value="{DynamicResource CupertinoPickerFieldBrush}" />
@@ -112,38 +110,6 @@
                       CornerRadius="14"
                       BoxShadow="0 10 30 0 #33000000">
                 <TimePickerPresenter x:Name="PART_PickerPresenter" />
-              </Border>
-            </Panel>
-          </Popup>
-        </Panel>
-      </ControlTemplate>
-    </Setter>
-    <Style Selector="^:disabled">
-      <Setter Property="Opacity" Value="0.4" />
-    </Style>
-  </ControlTheme>
-
-  <ControlTheme x:Key="{x:Type AutoCompleteBox}" TargetType="AutoCompleteBox">
-    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
-    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Panel>
-          <TextBox x:Name="PART_TextBox"
-                   Classes="search"
-                   PlaceholderText="{TemplateBinding PlaceholderText}" />
-          <Popup x:Name="PART_Popup"
-                 IsLightDismissEnabled="True"
-                 PlacementTarget="{Binding #PART_TextBox}"
-                 Placement="BottomEdgeAlignedLeft">
-            <Panel Classes="cupertino-popover" Margin="18,6,18,18">
-              <Border Background="{DynamicResource CupertinoMenuPanelBrush}"
-                      CornerRadius="12" ClipToBounds="True"
-                      MaxHeight="240"
-                      BoxShadow="0 10 30 0 #33000000">
-                <ListBox x:Name="PART_SelectingItemsControl"
-                         Background="Transparent"
-                         ItemTemplate="{TemplateBinding ItemTemplate}" />
               </Border>
             </Panel>
           </Popup>

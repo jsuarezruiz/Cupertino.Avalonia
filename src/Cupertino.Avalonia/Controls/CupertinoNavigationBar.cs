@@ -225,7 +225,8 @@ public class CupertinoNavigationBar : TemplatedControl
             : Avalonia.Layout.HorizontalAlignment.Left;
         title.Margin = staysCentered
             ? new Thickness(symmetric, 0)
-            : new Thickness(leading + TitleButtonGap, 0, trailing + TitleButtonGap, 0);
+            : new Thickness(leading > 0 ? leading + TitleButtonGap : 0, 0,
+                            trailing > 0 ? trailing + TitleButtonGap : 0, 0);
     }
 
     /// <inheritdoc/>

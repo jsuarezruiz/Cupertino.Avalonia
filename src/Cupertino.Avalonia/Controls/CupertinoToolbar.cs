@@ -90,8 +90,6 @@ public class CupertinoToolbar : ItemsControl
             ? Avalonia.Layout.HorizontalAlignment.Stretch
             : Avalonia.Layout.HorizontalAlignment.Center;
 
-        // Embedded toolbars use wider spacing between adjacent actions.
-        var isEmbedded = Classes.Contains("embedded");
         var run = new List<Control>();
         var column = 0;
         void Flush()
@@ -101,31 +99,28 @@ public class CupertinoToolbar : ItemsControl
             var row = new StackPanel
             {
                 Orientation = Avalonia.Layout.Orientation.Horizontal,
-                Spacing = isEmbedded && run.Count > 1 ? 10.5 : 0,
+                // UIToolbar on iOS 26 uses 48 point actions with a 4 point gap.
+                Spacing = 4,
             };
             foreach (var c in run)
                 row.Children.Add(c);
             var capsule = new GlassSurface
             {
-                Height = 40,
-                CornerRadius = new CornerRadius(20),
+                MinHeight = 48,
+                CornerRadius = new CornerRadius(24),
                 BlurRadius = 18,
-                GlassThickness = 0,
+                GlassThickness = 1,
                 Saturation = 1,
                 RefractionStrength = 0,
                 ChromaticAberration = 0,
                 DepthEffect = 0,
-                LightIntensity = 0,
+                LightIntensity = 0.25,
                 FresnelStrength = 0,
                 Magnification = 1,
                 ShadowOpacity = 0.10,
-                ShadowBlur = 12,
+                ShadowBlur = 24,
                 ShadowOffset = 2,
-                ShadowContactWeight = 0.2,
-                MinWidth = isEmbedded ? (run.Count > 1 ? 99.3 : 48) : 0,
-                RenderTransform = isEmbedded && column == 0 && run.Count > 1
-                    ? new TranslateTransform(-5.35, 0)
-                    : null,
+                ShadowContactWeight = 0,
                 Child = row,
             };
             capsule.Bind(GlassSurface.TintProperty,
@@ -141,7 +136,7 @@ public class CupertinoToolbar : ItemsControl
             if (item is ToolbarSpacer)
             {
                 Flush();
-                _groups.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
+                _groups.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star) { MinWidth = 12 });
                 column++;
             }
             else if (item is Control c)

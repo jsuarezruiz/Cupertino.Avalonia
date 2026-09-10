@@ -103,6 +103,74 @@ public class GlassRepaintTests
         finally { window.Close(); }
     }
 
+    [AvaloniaFact]
+    public void Non_uniformly_scaled_glass_keeps_the_full_shader_material()
+    {
+        var backdrop = new PatternBackdrop();
+        var glass = new GlassSurface
+        {
+            Width = 180,
+            Height = 90,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            RenderTransformOrigin = RelativePoint.Center,
+            RenderTransform = new ScaleTransform(0.35, 0.65),
+            ShadowOpacity = 0,
+        };
+        var window = new Window
+        {
+            Width = 400,
+            Height = 240,
+            Content = new Grid { Children = { backdrop, glass } },
+        };
+        try
+        {
+            window.Show();
+            using var frame = Capture(window);
+            var cx = frame.Width / 2;
+            var cy = frame.Height / 2;
+
+            // A fallback tint preserves the checker edge under the translucent
+            // fill. The full material blurs that edge even with unequal scales.
+            Assert.InRange(ChannelDelta(
+                frame.GetPixel(cx - 1, cy), frame.GetPixel(cx, cy)), 0, 20);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Frozen_glass_keeps_its_clean_backdrop_across_partial_updates()
+    {
+        var backdrop = new Border { Background = Brushes.Blue };
+        var glass = new GlassSurface
+        {
+            Width = 180,
+            Height = 90,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            IsBackdropFrozen = true,
+            ShadowOpacity = 0,
+        };
+        var window = new Window
+        {
+            Width = 400,
+            Height = 240,
+            Content = new Grid { Children = { backdrop, glass } },
+        };
+        try
+        {
+            window.Show();
+            using var initial = Capture(window);
+            var center = initial.GetPixel(initial.Width / 2, initial.Height / 2);
+
+            backdrop.Background = Brushes.Red;
+            using var updated = Capture(window);
+
+            Assert.Equal(center, updated.GetPixel(updated.Width / 2, updated.Height / 2));
+        }
+        finally { window.Close(); }
+    }
+
     private static SKBitmap Capture(Window window)
     {
         using var frame = window.CaptureRenderedFrame();

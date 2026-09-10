@@ -12,7 +12,7 @@
         <Grid Background="Transparent" MinHeight="24" ClipToBounds="False">
           <Border x:Name="Rail"
                   Background="{TemplateBinding Foreground}"
-                  Height="5.7" CornerRadius="{TemplateBinding CornerRadius}"
+                  Height="6" CornerRadius="{TemplateBinding CornerRadius}"
                   VerticalAlignment="Center" />
         </Grid>
       </ControlTemplate>
@@ -27,7 +27,7 @@
         <Grid Background="Transparent" MinWidth="24" ClipToBounds="False">
           <Border x:Name="Rail"
                   Background="{TemplateBinding Foreground}"
-                  Width="5.7" CornerRadius="{TemplateBinding CornerRadius}"
+                  Width="6" CornerRadius="{TemplateBinding CornerRadius}"
                   HorizontalAlignment="Center" />
         </Grid>
       </ControlTemplate>
@@ -76,7 +76,7 @@
                     Width="37" Height="24"
                     CornerRadius="12"
                     Background="{DynamicResource CupertinoKnobBrush}"
-                    BoxShadow="0 3 12 0 #24000000, 0 0 1 0 #1F000000">
+                    BoxShadow="0 3 12 0 #24000000">
               <Border.Transitions>
                 <Transitions>
                   <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 70}" />

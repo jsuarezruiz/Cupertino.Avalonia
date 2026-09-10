@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:motion="clr-namespace:Cupertino.Animation"
-                    xmlns:c="using:Cupertino.Controls">
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <ControlTheme x:Key="CupertinoProgressBar" TargetType="ProgressBar">
     <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
@@ -58,7 +58,7 @@
       <Setter Property="Template">
         <ControlTemplate>
           <Panel>
-            <c:CupertinoActivityIndicator
+            <controls:CupertinoActivityIndicator
                 Width="{TemplateBinding MinHeight}"
                 Height="{TemplateBinding MinHeight}"
                 Foreground="{TemplateBinding Foreground}" />

@@ -79,6 +79,27 @@ public class AuditRegressionTests
     }
 
     [AvaloniaFact]
+    public void Date_and_time_fields_use_the_same_native_height()
+    {
+        var picker = new CupertinoDateTimePicker
+        {
+            SelectedDateTime = new DateTimeOffset(2026, 9, 10, 9, 41, 0, TimeSpan.Zero),
+        };
+        var window = Show(picker);
+        try
+        {
+            var fields = picker.GetVisualDescendants().OfType<Button>()
+                .Where(button => button.Name == "PART_FlyoutButton").ToArray();
+            Assert.Equal(2, fields.Length);
+            Assert.All(fields, field => Assert.Equal(36, field.Bounds.Height));
+        }
+        finally
+        {
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public void Date_popup_tracks_selection_changed_while_open()
     {
         var picker = new CupertinoDatePicker { SelectedDate = new DateTimeOffset(2026, 9, 1, 0, 0, 0, TimeSpan.Zero) };

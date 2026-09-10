@@ -31,6 +31,11 @@
     <EnablePackageValidation>true</EnablePackageValidation>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <!-- Apple system-font integration wraps Avalonia's current text shaper. -->
+    <AvaloniaAccessUnstablePrivateApis>true</AvaloniaAccessUnstablePrivateApis>
+    <!-- Keep the explicit compatibility warning visible without making the
+         package's intentional adapter fail warning-as-error release builds. -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);AVA3001</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

@@ -55,6 +55,9 @@ public class DialogTests
 
         var buttons = dialog.GetVisualDescendants().OfType<Button>().ToList();
         Assert.True(buttons.Count == 2, $"Expected 2 action buttons, found {buttons.Count}.");
+        var material = Assert.Single(dialog.GetVisualDescendants().OfType<GlassSurface>());
+        Assert.True(material.IsBackdropFrozen,
+            "Modal glass must keep its clean backdrop while focus and motion invalidate partial regions.");
 
         Assert.False(task.IsCompleted);
         dialog.Close(null);

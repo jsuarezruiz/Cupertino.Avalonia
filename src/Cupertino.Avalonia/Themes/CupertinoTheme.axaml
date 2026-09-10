@@ -1,6 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:motion="clr-namespace:Cupertino.Animation"
+        xmlns:motion="clr-namespace:Cupertino.Animation"
         x:Class="Cupertino.Themes.CupertinoTheme">
 
   <Styles.Resources>
@@ -9,19 +9,20 @@
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
           <Color x:Key="CupertinoSystemGreen">#FF34C759</Color>
-          <Color x:Key="CupertinoSystemBlue">#FF007AFF</Color>
+          <Color x:Key="CupertinoSystemBlue">#FF0088FF</Color>
           <Color x:Key="CupertinoSwitchTrackOffTint">#FFC3C3C5</Color>
           <Color x:Key="CupertinoSwitchTrackOnTint">#FF34C759</Color>
           <SolidColorBrush x:Key="CupertinoLabelBrush" Color="#FF000000" />
           <SolidColorBrush x:Key="CupertinoKnobBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoKnobPressedBrush" Color="#C9FFFFFF" />
-          <SolidColorBrush x:Key="CupertinoFocusRingBrush" Color="#99007AFF" />
-          <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FF007AFF" />
-          <SolidColorBrush x:Key="CupertinoSliderRemainderBrush" Color="#2B505050" />
+          <SolidColorBrush x:Key="CupertinoFocusRingBrush" Color="#990088FF" />
+          <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FF0088FF" />
+          <SolidColorBrush x:Key="CupertinoSliderRemainderBrush" Color="#24505050" />
           <Color x:Key="CupertinoGlassButtonTint">#8CF2F2F5</Color>
-          <Color x:Key="CupertinoProminentTint">#FF007AFF</Color>
+          <Color x:Key="CupertinoProminentTint">#FF0088FF</Color>
+          <SolidColorBrush x:Key="CupertinoProminentRimBrush" Color="#7744FFFF" />
           <Color x:Key="CupertinoProminentPressedTint">#FF4BB7FF</Color>
-          <SolidColorBrush x:Key="CupertinoProminentForegroundBrush" Color="#FF84FFFF" />
+          <SolidColorBrush x:Key="CupertinoProminentForegroundBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoBorderedFillBrush" Color="#8CA2A2A2" />
           <SolidColorBrush x:Key="CupertinoGroupedBackgroundBrush" Color="#F2F2F7" />
           <SolidColorBrush x:Key="CupertinoCardBrush" Color="#FFFFFFFF" />
@@ -32,6 +33,7 @@
           <SolidColorBrush x:Key="CupertinoSliderThumbDragBaseBrush" Color="#FFF7F7F7" />
           <Color x:Key="CupertinoNavigationBarTint">#FFF2F2F7</Color>
           <Color x:Key="CupertinoBarButtonTint">#C2FFFFFF</Color>
+          <SolidColorBrush x:Key="CupertinoBarForegroundBrush" Color="#FF222222" />
           <SolidColorBrush x:Key="CupertinoSheetGrabberBrush" Color="#4D3C3C43" />
           <SolidColorBrush x:Key="CupertinoSecondaryLabelBrush" Color="#993C3C43" />
           <SolidColorBrush x:Key="CupertinoTertiaryLabelBrush" Color="#4D3C3C43" />
@@ -42,16 +44,17 @@
           <SolidColorBrush x:Key="CupertinoScrollIndicatorBrush" Color="#59000000" />
           <SolidColorBrush x:Key="CupertinoScrollIndicatorPressedBrush" Color="#8C000000" />
           <SolidColorBrush x:Key="CupertinoSegmentTrackBrush" Color="#1F787880" />
+          <SolidColorBrush x:Key="CupertinoStepperTrackBrush" Color="#1F787880" />
           <SolidColorBrush x:Key="CupertinoPickerFieldBrush" Color="#1E767680" />
           <SolidColorBrush x:Key="CupertinoPickerHighlightBrush" Color="#14767680" />
-          <SolidColorBrush x:Key="CupertinoAccentSubtleBrush" Color="#1F007AFF" />
+          <SolidColorBrush x:Key="CupertinoAccentSubtleBrush" Color="#1F0088FF" />
           <SolidColorBrush x:Key="CupertinoSegmentSelectedBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoTabPillBrush" Color="#8AFFFFFF" />
           <Color x:Key="CupertinoTabPillTint">#0AFFFFFF</Color>
           <Color x:Key="CupertinoTabBarTint">#B8FFFFFF</Color>
           <Color x:Key="CupertinoTabLensTint">#12000000</Color>
           <Color x:Key="CupertinoSegmentLensTint">#17FFFFFF</Color>
-          <SolidColorBrush x:Key="CupertinoTabAccentBrush" Color="#FF007AFF" />
+          <SolidColorBrush x:Key="CupertinoTabAccentBrush" Color="#FF0088FF" />
           <SolidColorBrush x:Key="CupertinoLabelOnGlassBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoTabPillBorderBrush" Color="#40FFFFFF" />
           <SolidColorBrush x:Key="CupertinoFieldBorderBrush" Color="#FFCCCCCC" />
@@ -66,7 +69,7 @@
           <Color x:Key="CupertinoContextMenuTint">#D1F9F9FF</Color>
           <SolidColorBrush x:Key="CupertinoMenuRowHoverBrush" Color="#0D000000" />
           <SolidColorBrush x:Key="CupertinoMenuRowPressedBrush" Color="#1F000000" />
-          <SolidColorBrush x:Key="CupertinoSelectionBrush" Color="#4D007AFF" />
+          <SolidColorBrush x:Key="CupertinoSelectionBrush" Color="#4D0088FF" />
           <SolidColorBrush x:Key="CupertinoFieldBorderHoverBrush" Color="#FFA9A9AE" />
           <SolidColorBrush x:Key="CupertinoReadOnlyFieldBrush" Color="#FFF2F2F7" />
           <SolidColorBrush x:Key="CupertinoDangerBrush" Color="#FFFF3B30" />
@@ -79,7 +82,7 @@
           <SolidColorBrush x:Key="CupertinoSystemMintBrush" Color="#FF00C7BE" />
           <SolidColorBrush x:Key="CupertinoSystemTealBrush" Color="#FF30B0C7" />
           <SolidColorBrush x:Key="CupertinoSystemCyanBrush" Color="#FF32ADE6" />
-          <SolidColorBrush x:Key="CupertinoSystemBlueBrush" Color="#FF007AFF" />
+          <SolidColorBrush x:Key="CupertinoSystemBlueBrush" Color="#FF0088FF" />
           <SolidColorBrush x:Key="CupertinoSystemIndigoBrush" Color="#FF5856D6" />
           <SolidColorBrush x:Key="CupertinoSystemPurpleBrush" Color="#FFAF52DE" />
           <SolidColorBrush x:Key="CupertinoSystemPinkBrush" Color="#FFFF2D55" />
@@ -92,17 +95,18 @@
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <Color x:Key="CupertinoSystemGreen">#FF30D158</Color>
-          <Color x:Key="CupertinoSystemBlue">#FF0A84FF</Color>
+          <Color x:Key="CupertinoSystemBlue">#FF0091FF</Color>
           <Color x:Key="CupertinoSwitchTrackOffTint">#52787880</Color>
           <Color x:Key="CupertinoSwitchTrackOnTint">#FF30D158</Color>
           <SolidColorBrush x:Key="CupertinoLabelBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoKnobBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoKnobPressedBrush" Color="#C9FFFFFF" />
-          <SolidColorBrush x:Key="CupertinoFocusRingBrush" Color="#990A84FF" />
-          <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FF0A84FF" />
+          <SolidColorBrush x:Key="CupertinoFocusRingBrush" Color="#990091FF" />
+          <SolidColorBrush x:Key="CupertinoAccentBrush" Color="#FF0091FF" />
           <SolidColorBrush x:Key="CupertinoSliderRemainderBrush" Color="#1CFAFAFA" />
           <Color x:Key="CupertinoGlassButtonTint">#8CFAFAFC</Color>
-          <Color x:Key="CupertinoProminentTint">#FF0A84FF</Color>
+          <Color x:Key="CupertinoProminentTint">#FF0091FF</Color>
+          <SolidColorBrush x:Key="CupertinoProminentRimBrush" Color="#7700FFFF" />
           <Color x:Key="CupertinoProminentPressedTint">#FF3A9BFF</Color>
           <SolidColorBrush x:Key="CupertinoProminentForegroundBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoBorderedFillBrush" Color="#6FAFAFAF" />
@@ -114,7 +118,8 @@
           <SolidColorBrush x:Key="CupertinoSliderThumbDragRemainderBrush" Color="#FF464648" />
           <SolidColorBrush x:Key="CupertinoSliderThumbDragBaseBrush" Color="#FF2C2C2E" />
           <Color x:Key="CupertinoNavigationBarTint">#FF000000</Color>
-          <Color x:Key="CupertinoBarButtonTint">#C2303034</Color>
+          <Color x:Key="CupertinoBarButtonTint">#C21A1A1C</Color>
+          <SolidColorBrush x:Key="CupertinoBarForegroundBrush" Color="#FFF4F4F5" />
           <SolidColorBrush x:Key="CupertinoSheetGrabberBrush" Color="#5BEBEBF5" />
           <SolidColorBrush x:Key="CupertinoSecondaryLabelBrush" Color="#99EBEBF5" />
           <SolidColorBrush x:Key="CupertinoTertiaryLabelBrush" Color="#4DEBEBF5" />
@@ -124,17 +129,18 @@
           <SolidColorBrush x:Key="CupertinoRowHoverBrush" Color="#14FFFFFF" />
           <SolidColorBrush x:Key="CupertinoScrollIndicatorBrush" Color="#59FFFFFF" />
           <SolidColorBrush x:Key="CupertinoScrollIndicatorPressedBrush" Color="#8CFFFFFF" />
-          <SolidColorBrush x:Key="CupertinoSegmentTrackBrush" Color="#29787880" />
+          <SolidColorBrush x:Key="CupertinoSegmentTrackBrush" Color="#3D747482" />
+          <SolidColorBrush x:Key="CupertinoStepperTrackBrush" Color="#2C787880" />
           <SolidColorBrush x:Key="CupertinoPickerFieldBrush" Color="#2E767680" />
           <SolidColorBrush x:Key="CupertinoPickerHighlightBrush" Color="#1F767680" />
-          <SolidColorBrush x:Key="CupertinoAccentSubtleBrush" Color="#2E0A84FF" />
-          <SolidColorBrush x:Key="CupertinoSegmentSelectedBrush" Color="#FF636366" />
+          <SolidColorBrush x:Key="CupertinoAccentSubtleBrush" Color="#2E0091FF" />
+          <SolidColorBrush x:Key="CupertinoSegmentSelectedBrush" Color="#FF69696F" />
           <SolidColorBrush x:Key="CupertinoTabPillBrush" Color="#59FFFFFF" />
           <Color x:Key="CupertinoTabPillTint">#1FFFFFFF</Color>
           <Color x:Key="CupertinoTabBarTint">#8C242428</Color>
           <Color x:Key="CupertinoTabLensTint">#17FFFFFF</Color>
           <Color x:Key="CupertinoSegmentLensTint">#17000000</Color>
-          <SolidColorBrush x:Key="CupertinoTabAccentBrush" Color="#FF0A84FF" />
+          <SolidColorBrush x:Key="CupertinoTabAccentBrush" Color="#FF0091FF" />
           <SolidColorBrush x:Key="CupertinoLabelOnGlassBrush" Color="#FFFFFFFF" />
           <SolidColorBrush x:Key="CupertinoTabPillBorderBrush" Color="#33FFFFFF" />
           <SolidColorBrush x:Key="CupertinoFieldBorderBrush" Color="#FF48484A" />
@@ -142,14 +148,14 @@
           <SolidColorBrush x:Key="CupertinoSearchFieldBrush" Color="#3D767680" />
           <SolidColorBrush x:Key="CupertinoSearchPlaceholderBrush" Color="#FF5C5C60" />
           <SolidColorBrush x:Key="CupertinoSearchClearBrush" Color="#4DEBEBF5" />
-          <SolidColorBrush x:Key="CupertinoSearchCaretBrush" Color="#FF0A84FF" />
+          <SolidColorBrush x:Key="CupertinoSearchCaretBrush" Color="#FF0091FF" />
           <SolidColorBrush x:Key="CupertinoProgressTrackBrush" Color="#FF3A3A3C" />
           <SolidColorBrush x:Key="CupertinoMenuPanelBrush" Color="#F52C2C2E" />
           <SolidColorBrush x:Key="CupertinoContextMenuScrimBrush" Color="#1A302858" />
           <Color x:Key="CupertinoContextMenuTint">#C21C1C1E</Color>
           <SolidColorBrush x:Key="CupertinoMenuRowHoverBrush" Color="#14FFFFFF" />
           <SolidColorBrush x:Key="CupertinoMenuRowPressedBrush" Color="#26FFFFFF" />
-          <SolidColorBrush x:Key="CupertinoSelectionBrush" Color="#4D0A84FF" />
+          <SolidColorBrush x:Key="CupertinoSelectionBrush" Color="#4D0091FF" />
           <SolidColorBrush x:Key="CupertinoFieldBorderHoverBrush" Color="#FF6C6C70" />
           <SolidColorBrush x:Key="CupertinoReadOnlyFieldBrush" Color="#FF242426" />
           <SolidColorBrush x:Key="CupertinoDangerBrush" Color="#FFFF453A" />
@@ -162,7 +168,7 @@
           <SolidColorBrush x:Key="CupertinoSystemMintBrush" Color="#FF63E6E2" />
           <SolidColorBrush x:Key="CupertinoSystemTealBrush" Color="#FF40C8E0" />
           <SolidColorBrush x:Key="CupertinoSystemCyanBrush" Color="#FF64D2FF" />
-          <SolidColorBrush x:Key="CupertinoSystemBlueBrush" Color="#FF0A84FF" />
+          <SolidColorBrush x:Key="CupertinoSystemBlueBrush" Color="#FF0091FF" />
           <SolidColorBrush x:Key="CupertinoSystemIndigoBrush" Color="#FF5E5CE6" />
           <SolidColorBrush x:Key="CupertinoSystemPurpleBrush" Color="#FFBF5AF2" />
           <SolidColorBrush x:Key="CupertinoSystemPinkBrush" Color="#FFFF375F" />
@@ -176,39 +182,56 @@
       </ResourceDictionary.ThemeDictionaries>
 
       <ResourceDictionary.MergedDictionaries>
+        <!-- Shared prerequisites. Keep these first because later themes use
+             their named resources through StaticResource. -->
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Icons.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Knob.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ToggleSwitch.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Slider.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Button.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ListBox.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ScrollBar.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Section.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TabControl.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TextBox.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Dialog.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ProgressBar.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CheckBox.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ComboBox.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/NumericUpDown.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/MenuFlyout.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/DateTimePicker.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/NavigationBar.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Expander.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Buttons.axaml" />
+
+        <!-- Input and selection controls. -->
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/AutoCompleteBox.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ButtonVariants.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Calendar.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Misc.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CalendarDatePicker.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CheckBox.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ColorPicker.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ComboBox.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/DateTimePicker.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/NumericUpDown.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Pickers.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Layout.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Refresh.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Swipe.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Slider.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ToggleSwitch.axaml" />
+
+        <!-- Content, status and layout controls. -->
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Badge.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Carousel.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoRows.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Expander.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/GridSplitter.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Label.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ListBox.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/PageControl.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ProgressBar.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Refresh.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ScrollBar.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/SearchView.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Section.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/SplitView.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Swipe.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TabControl.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TreeView.axaml" />
+
+        <!-- Transient surfaces and navigation. -->
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Dialog.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Flyout.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Menu.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/MenuFlyout.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/NavigationBar.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Notifications.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Sheet.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Toolbar.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ColorPicker.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ListRows.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/PageControl.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/SearchView.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ToolTip.axaml" />
       </ResourceDictionary.MergedDictionaries>
 
     </ResourceDictionary>

@@ -26,17 +26,17 @@
     <Setter Property="Margin" Value="-3,4.5" />
     <Setter Property="CornerRadius" Value="26.5" />
     <Setter Property="BlurRadius" Value="4" />
-    <Setter Property="GlassThickness" Value="5" />
+    <Setter Property="GlassThickness" Value="1" />
     <Setter Property="RefractionStrength" Value="9" />
     <Setter Property="ChromaticAberration" Value="0.3" />
     <Setter Property="DepthEffect" Value="0.1" />
     <Setter Property="Saturation" Value="1.3" />
-    <Setter Property="LightIntensity" Value="0.3" />
+    <Setter Property="LightIntensity" Value="0.1" />
     <Setter Property="FresnelStrength" Value="0.12" />
     <Setter Property="IsAdaptive" Value="False" />
     <Setter Property="Magnification" Value="1.04" />
     <Setter Property="Tint" Value="{DynamicResource CupertinoTabLensTint}" />
-    <Setter Property="ShadowOpacity" Value="0.035" />
+    <Setter Property="ShadowOpacity" Value="0" />
     <Setter Property="ShadowBlur" Value="6" />
     <Setter Property="ShadowOffset" Value="1.5" />
   </ControlTheme>
@@ -65,14 +65,15 @@
     <Setter Property="CornerRadius" Value="31" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="BlurRadius" Value="18" />
-    <Setter Property="GlassThickness" Value="8" />
+    <Setter Property="GlassThickness" Value="1" />
     <Setter Property="Saturation" Value="1.8" />
     <Setter Property="RefractionStrength" Value="8" />
-    <Setter Property="LightIntensity" Value="0.5" />
-    <Setter Property="FresnelStrength" Value="0.55" />
+    <Setter Property="LightIntensity" Value="0.25" />
+    <Setter Property="FresnelStrength" Value="0.25" />
     <Setter Property="Tint" Value="{DynamicResource CupertinoTabBarTint}" />
-    <Setter Property="ShadowOpacity" Value="0.06" />
-    <Setter Property="ShadowBlur" Value="11" />
+    <Setter Property="ShadowOpacity" Value="0.1" />
+    <Setter Property="ShadowContactWeight" Value="0" />
+    <Setter Property="ShadowBlur" Value="24" />
     <Setter Property="ShadowOffset" Value="3" />
   </ControlTheme>
 
@@ -117,7 +118,7 @@
     <Style Selector="^:selected /template/ Border#Pill">
       <Setter Property="Opacity" Value="1" />
     </Style>
-    <Style Selector="^.cupertino-nopill /template/ Border#Pill">
+    <Style Selector="^.cupertino-no-pill /template/ Border#Pill">
       <Setter Property="Opacity" Value="0" />
     </Style>
     <Style Selector="^:selected">
@@ -174,7 +175,7 @@
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize10}" />
-    <Setter Property="LetterSpacing" Value="0.25" />
+    <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="Width" Value="86" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -236,14 +237,8 @@
     <Style Selector="^:pointerover:not(:selected) /template/ Border#Hover">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
-    <Style Selector="^.cupertino-nopill /template/ controls|GlassSurface#Lens">
+    <Style Selector="^.cupertino-no-pill /template/ controls|GlassSurface#Lens">
       <Setter Property="IsVisible" Value="False" />
-    </Style>
-    <Style Selector="^.cupertino-tabhot">
-      <Setter Property="Foreground" Value="{DynamicResource CupertinoTabAccentBrush}" />
-    </Style>
-    <Style Selector="^.cupertino-tabcold">
-      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
     </Style>
     <Style Selector="^:focus-visible /template/ Border#FocusRing">
       <Setter Property="IsVisible" Value="True" />
@@ -412,7 +407,7 @@
     <Style Selector="^:selected /template/ Border#Pill">
       <Setter Property="Opacity" Value="1" />
     </Style>
-    <Style Selector="^.cupertino-nopill /template/ Border#Pill">
+    <Style Selector="^.cupertino-no-pill /template/ Border#Pill">
       <Setter Property="Opacity" Value="0" />
     </Style>
     <Style Selector="^:selected">
@@ -437,7 +432,7 @@
     <Setter Property="ClipToBounds" Value="False" />
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize10}" />
-    <Setter Property="LetterSpacing" Value="0.25" />
+    <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="Width" Value="86" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -498,14 +493,8 @@
     <Style Selector="^:pointerover:not(:selected) /template/ Border#Hover">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
-    <Style Selector="^.cupertino-nopill /template/ controls|GlassSurface#Lens">
+    <Style Selector="^.cupertino-no-pill /template/ controls|GlassSurface#Lens">
       <Setter Property="IsVisible" Value="False" />
-    </Style>
-    <Style Selector="^.cupertino-tabhot">
-      <Setter Property="Foreground" Value="{DynamicResource CupertinoTabAccentBrush}" />
-    </Style>
-    <Style Selector="^.cupertino-tabcold">
-      <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
     </Style>
     <Style Selector="^:focus-visible /template/ Border#FocusRing">
       <Setter Property="IsVisible" Value="True" />

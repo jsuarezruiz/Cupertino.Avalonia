@@ -26,6 +26,14 @@ Add `CupertinoTheme` after your base theme.
 
 Your app supplies system accessibility preferences through `CupertinoAccessibility`. See the [accessibility guide](https://jsuarezruiz.github.io/Cupertino.Avalonia/docs/fundamentals/accessibility-and-platforms.html) for setup.
 
+On Apple platforms, enable native CoreText advances when configuring the app so SF typography keeps its platform spacing:
+
+```csharp
+AppBuilder.Configure<App>()
+    .UsePlatformDetect()
+    .UseCupertinoSystemFont();
+```
+
 See the [gallery and screenshots](https://github.com/jsuarezruiz/Cupertino.Avalonia#the-gallery) for the complete control catalogue.
 
 ## Links

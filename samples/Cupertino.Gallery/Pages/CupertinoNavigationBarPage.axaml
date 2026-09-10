@@ -13,10 +13,12 @@
                 CornerRadius="10" ClipToBounds="True" Height="168">
           <cupertino:CupertinoNavigationBar Title="Settings" CollapseProgress="0">
             <cupertino:CupertinoNavigationBar.LeadingContent>
-              <Button Content="Edit" Classes="plain" />
+              <Button Content="Edit" Theme="{StaticResource CupertinoBarButton}" />
             </cupertino:CupertinoNavigationBar.LeadingContent>
             <cupertino:CupertinoNavigationBar.TrailingContent>
-              <Button Content="+" Classes="plain" />
+              <Button Theme="{StaticResource CupertinoBarButton}" Padding="0" ToolTip.Tip="Add">
+                <cupertino:CupertinoIcon Glyph="plus" Size="24" StrokeThickness="2" />
+              </Button>
             </cupertino:CupertinoNavigationBar.TrailingContent>
           </cupertino:CupertinoNavigationBar>
         </Border>
@@ -25,10 +27,12 @@
                 CornerRadius="10" ClipToBounds="True" Height="116">
           <cupertino:CupertinoNavigationBar Title="Settings" CollapseProgress="1">
             <cupertino:CupertinoNavigationBar.LeadingContent>
-              <Button Content="Edit" Classes="plain" />
+              <Button Content="Edit" Theme="{StaticResource CupertinoBarButton}" />
             </cupertino:CupertinoNavigationBar.LeadingContent>
             <cupertino:CupertinoNavigationBar.TrailingContent>
-              <Button Content="+" Classes="plain" />
+              <Button Theme="{StaticResource CupertinoBarButton}" Padding="0" ToolTip.Tip="Add">
+                <cupertino:CupertinoIcon Glyph="plus" Size="24" StrokeThickness="2" />
+              </Button>
             </cupertino:CupertinoNavigationBar.TrailingContent>
           </cupertino:CupertinoNavigationBar>
         </Border>
@@ -42,7 +46,7 @@
                 CornerRadius="10" ClipToBounds="True" Height="72">
           <cupertino:CupertinoNavigationBar Title="Inline only" IsLargeTitle="False">
             <cupertino:CupertinoNavigationBar.TrailingContent>
-              <Button Content="Done" Classes="plain" />
+              <Button Content="Done" Theme="{StaticResource CupertinoBarButton}" />
             </cupertino:CupertinoNavigationBar.TrailingContent>
           </cupertino:CupertinoNavigationBar>
         </Border>
@@ -52,10 +56,10 @@
           <cupertino:CupertinoNavigationBar Title="A Very Long Destination Title"
                                             IsLargeTitle="False">
             <cupertino:CupertinoNavigationBar.LeadingContent>
-              <Button Content="‹ All Settings" Classes="plain" />
+              <Button Content="‹ All Settings" Theme="{StaticResource CupertinoBarButton}" />
             </cupertino:CupertinoNavigationBar.LeadingContent>
             <cupertino:CupertinoNavigationBar.TrailingContent>
-              <Button Content="Edit" Classes="plain" />
+              <Button Content="Edit" Theme="{StaticResource CupertinoBarButton}" />
             </cupertino:CupertinoNavigationBar.TrailingContent>
           </cupertino:CupertinoNavigationBar>
         </Border>

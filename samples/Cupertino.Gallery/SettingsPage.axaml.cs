@@ -48,10 +48,16 @@ public partial class SettingsPage : UserControl
         void Select(Avalonia.Media.Color? selected)
         {
             foreach (var (ring, ringColor) in rings)
-                ring.BorderBrush = ringColor == selected
-                    ? new Avalonia.Media.SolidColorBrush(
-                        ringColor ?? Avalonia.Media.Color.Parse("#FF007AFF"))
-                    : Avalonia.Media.Brushes.Transparent;
+            {
+                ring.ClearValue(Border.BorderBrushProperty);
+                if (ringColor != selected)
+                    ring.BorderBrush = Brushes.Transparent;
+                else if (ringColor is { } value)
+                    ring.BorderBrush = new SolidColorBrush(value);
+                else
+                    ring.Bind(Border.BorderBrushProperty,
+                        ring.GetResourceObservable("CupertinoSystemBlueBrush"));
+            }
         }
 
         foreach (var (name, color) in Accents)
@@ -67,10 +73,12 @@ public partial class SettingsPage : UserControl
                 {
                     Width = 30,
                     Height = 30,
-                    Fill = new Avalonia.Media.SolidColorBrush(
-                        color ?? Avalonia.Media.Color.Parse("#FF007AFF")),
+                    Fill = color is { } value ? new SolidColorBrush(value) : Brushes.Transparent,
                 },
             };
+            if (color is null)
+                ring.Child!.Bind(global::Avalonia.Controls.Shapes.Shape.FillProperty,
+                    ring.GetResourceObservable("CupertinoSystemBlueBrush"));
             rings.Add((ring, color));
 
             var dot = new Button { Padding = new Thickness(0), MinHeight = 0, Content = ring };

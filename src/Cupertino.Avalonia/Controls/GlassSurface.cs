@@ -136,7 +136,7 @@ public class GlassSurface : Decorator
             DepthEffectProperty, TintProperty, LightAngleProperty, LightIntensityProperty,
             FresnelStrengthProperty, IsAdaptiveProperty, MagnificationProperty,
             ShadowOpacityProperty, ShadowBlurProperty, ShadowOffsetProperty,
-            ShadowContactWeightProperty);
+            ShadowContactWeightProperty, IsBackdropFrozenProperty);
     }
 
     /// <summary>
@@ -272,6 +272,23 @@ public class GlassSurface : Decorator
         set => SetValue(IsLiveProperty, value);
     }
 
+    /// <summary>
+    /// Identifies the <see cref="IsBackdropFrozen"/> property.
+    /// </summary>
+    public static readonly StyledProperty<bool> IsBackdropFrozenProperty =
+        AvaloniaProperty.Register<GlassSurface, bool>(nameof(IsBackdropFrozen), false);
+
+    /// <summary>
+    /// Keeps the first clean backdrop captured by this surface for its lifetime.
+    /// Use this for modal materials whose obscured content cannot change while
+    /// they are open.
+    /// </summary>
+    public bool IsBackdropFrozen
+    {
+        get => GetValue(IsBackdropFrozenProperty);
+        set => SetValue(IsBackdropFrozenProperty, value);
+    }
+
     private static readonly ConditionalWeakTable<TopLevel, TopLevelPulseCoordinator> Coordinators = new();
 
     private DateTime _pulseUntil;
@@ -293,7 +310,8 @@ public class GlassSurface : Decorator
             _coordinator.Add(this);
         }
 
-        Pulse();
+        if (!IsBackdropFrozen)
+            Pulse();
     }
 
     /// <inheritdoc/>
@@ -318,7 +336,10 @@ public class GlassSurface : Decorator
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property == IsLiveProperty && change.GetNewValue<bool>())
+        if (change.Property == IsBackdropFrozenProperty && change.GetNewValue<bool>())
+            _pulseUntil = default;
+        else if ((change.Property == IsLiveProperty && change.GetNewValue<bool>()) ||
+                 (change.Property == IsBackdropFrozenProperty && !change.GetNewValue<bool>()))
             Pulse();
     }
 
@@ -355,7 +376,8 @@ public class GlassSurface : Decorator
         {
             var until = DateTime.UtcNow.AddMilliseconds(PulseMilliseconds);
             foreach (var surface in _surfaces)
-                surface._pulseUntil = until;
+                if (!surface.IsBackdropFrozen)
+                    surface._pulseUntil = until;
             RequestFrame();
         }
 
@@ -381,8 +403,16 @@ public class GlassSurface : Decorator
                 }
 
                 var now = DateTime.UtcNow;
-                var repaint = _surfaces.Any(surface => surface.IsEffectivelyVisible
-                    && (surface.IsLive || now < surface._pulseUntil));
+                var repaint = false;
+                foreach (var surface in _surfaces)
+                {
+                    if (surface.IsBackdropFrozen || !surface.IsEffectivelyVisible
+                        || (!surface.IsLive && now >= surface._pulseUntil))
+                        continue;
+
+                    repaint = true;
+                    break;
+                }
                 if (repaint)
                 {
                     // Repaint the backdrop before sampling; invalidating only the
@@ -390,7 +420,7 @@ public class GlassSurface : Decorator
                     _top.InvalidateVisual();
                     foreach (var surface in _surfaces)
                     {
-                        if (surface.IsEffectivelyVisible
+                        if (!surface.IsBackdropFrozen && surface.IsEffectivelyVisible
                             && (surface.IsLive || now < surface._pulseUntil))
                             surface.InvalidateVisual();
                     }
@@ -439,7 +469,8 @@ public class GlassSurface : Decorator
             return;
         }
 
-        context.Custom(new LiquidGlassDrawOperation(bounds, opBounds, GlassParams.From(this)));
+        context.Custom(new LiquidGlassDrawOperation(
+            bounds, opBounds, GlassParams.From(this), IsBackdropFrozen));
     }
 
     // Flat fallback for Reduce Transparency.

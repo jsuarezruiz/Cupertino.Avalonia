@@ -27,7 +27,8 @@
       <cupertino:Section Header="CONTROLS"
                          Footer="Compare the same control and value in both columns. UIKit is on the left, and Cupertino.Avalonia is on the right.">
         <StackPanel>
-          <Grid Classes="case" ColumnDefinitions="Auto,*,*">
+          <!-- Reserve the same label column as the comparison rows below. -->
+          <Grid Classes="case" ColumnDefinitions="88,*,*">
             <TextBlock Classes="colhead" Grid.Column="1" Text="iOS" />
             <TextBlock Classes="colhead" Grid.Column="2" Text="Avalonia" />
           </Grid>
@@ -124,28 +125,27 @@
             <ContentControl Classes="native" x:Name="NativeTabBar"
                             Width="160" Height="83" />
             <TabStrip Grid.Column="1" Classes="bottom" Width="160" Height="62"
-                      SelectedIndex="0" HorizontalAlignment="Center" VerticalAlignment="Top"
-                      Margin="0,3.5,0,0">
+                      SelectedIndex="0" HorizontalAlignment="Center" VerticalAlignment="Top">
               <TabStripItem x:Name="CompareHomeTab">
-                <Grid Height="62" MinWidth="59">
+                <Grid Height="54" MinWidth="59">
                   <cupertino:CupertinoIcon Glyph="house" Size="32" StrokeThickness="1.9"
                                            IsVisible="{Binding !#CompareHomeTab.IsSelected}"
                                            Foreground="{Binding #CompareHomeTab.Foreground}"
                                            HorizontalAlignment="Center" VerticalAlignment="Top"
                                            Margin="0,4.9,0,0"
                                            RenderTransform="scale(0.99,0.96) translate(0.15px,0px)" />
-                  <cupertino:CupertinoIcon Glyph="house.fill" Size="33"
+                  <cupertino:CupertinoIcon Glyph="house.tab.fill" Size="33"
                                            IsVisible="{Binding #CompareHomeTab.IsSelected}"
                                            Foreground="{Binding #CompareHomeTab.Foreground}"
                                            HorizontalAlignment="Center" VerticalAlignment="Top"
                                            Margin="0,4.5,0,0"
                                            RenderTransform="scale(1.019,0.986) translate(0.15px,-0.15px)" />
                   <TextBlock Text="Home" HorizontalAlignment="Center" VerticalAlignment="Top"
-                             Margin="0,35.8,0,0" RenderTransform="scale(1.095,1)" />
+                             Margin="0,35,0,0" />
                 </Grid>
               </TabStripItem>
               <TabStripItem x:Name="CompareSettingsTab">
-                <Grid Height="62" MinWidth="59">
+                <Grid Height="54" MinWidth="59">
                   <cupertino:CupertinoIcon Glyph="gearshape" Size="26.3" StrokeThickness="1.7"
                                            IsVisible="{Binding !#CompareSettingsTab.IsSelected}"
                                            Foreground="{Binding #CompareSettingsTab.Foreground}"
@@ -157,7 +157,7 @@
                                            HorizontalAlignment="Center" VerticalAlignment="Top"
                                            Margin="0,6.8,0,0" RenderTransform="scale(1,0.973)" />
                   <TextBlock Text="Settings" HorizontalAlignment="Center" VerticalAlignment="Top"
-                             Margin="0,35.8,0,0" RenderTransform="scale(1.01,1)" />
+                             Margin="0,35,0,0" />
                 </Grid>
               </TabStripItem>
             </TabStrip>
@@ -173,10 +173,9 @@
                                               Title="Library" IsLargeTitle="False"
                                               HorizontalAlignment="Center">
               <cupertino:CupertinoNavigationBar.TrailingContent>
-                <Button Theme="{StaticResource CupertinoBarButton}" Width="44">
-                  <TextBlock Text="+" FontSize="35" FontWeight="Light"
-                             VerticalAlignment="Center"
-                             RenderTransform="translate(0px,-2px)" />
+                <Button Theme="{StaticResource CupertinoBarButton}" Width="44" Padding="0"
+                        ToolTip.Tip="Add">
+                  <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="plus" Size="24" StrokeThickness="2" />
                 </Button>
               </cupertino:CupertinoNavigationBar.TrailingContent>
             </cupertino:CupertinoNavigationBar>
@@ -189,31 +188,15 @@
             <ContentControl Classes="native" x:Name="NativeToolbar"
                             Width="160" Height="60" />
             <cupertino:CupertinoToolbar Grid.Column="1" Classes="embedded" Width="160"
-                                       Margin="4,0,4,12.5" HorizontalAlignment="Center">
-              <Button>
-                <cupertino:CupertinoIcon Glyph="chevron.left" Size="24" StrokeThickness="2"
-                                         RenderTransformOrigin="50%,50%">
-                  <cupertino:CupertinoIcon.RenderTransform>
-                    <TransformGroup>
-                      <ScaleTransform ScaleX="1.12" />
-                      <TranslateTransform Y="-3" />
-                    </TransformGroup>
-                  </cupertino:CupertinoIcon.RenderTransform>
-                </cupertino:CupertinoIcon>
+                                       VerticalAlignment="Top" HorizontalAlignment="Center">
+              <Button ToolTip.Tip="Back">
+                <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="chevron.left" Size="24" StrokeThickness="2" />
               </Button>
-              <Button>
-                <cupertino:CupertinoIcon Glyph="chevron.right" Size="24" StrokeThickness="2"
-                                         RenderTransformOrigin="50%,50%">
-                  <cupertino:CupertinoIcon.RenderTransform>
-                    <TransformGroup>
-                      <ScaleTransform ScaleX="1.12" />
-                      <TranslateTransform Y="-3" />
-                    </TransformGroup>
-                  </cupertino:CupertinoIcon.RenderTransform>
-                </cupertino:CupertinoIcon>
+              <Button ToolTip.Tip="Forward">
+                <cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="chevron.right" Size="24" StrokeThickness="2" />
               </Button>
               <cupertino:ToolbarSpacer />
-              <Button><cupertino:CupertinoIcon Glyph="magnifyingglass" Size="28" StrokeThickness="2.1" /></Button>
+              <Button ToolTip.Tip="Search"><cupertino:CupertinoIcon Foreground="{DynamicResource CupertinoBarForegroundBrush}" Glyph="magnifyingglass" Size="28" StrokeThickness="2.1" /></Button>
             </cupertino:CupertinoToolbar>
           </Grid>
         </StackPanel>

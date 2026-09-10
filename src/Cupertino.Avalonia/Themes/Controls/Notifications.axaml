@@ -1,0 +1,142 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation"
+                    xmlns:notifications="clr-namespace:Avalonia.Controls.Notifications;assembly=Avalonia.Controls">
+
+  <ControlTheme x:Key="{x:Type notifications:NotificationCard}"
+                TargetType="notifications:NotificationCard">
+    <Setter Property="Width" Value="350" />
+    <!-- Preserve DataType matching when custom controls are shown. -->
+    <Setter Property="ContentTemplate">
+      <DataTemplate>
+        <ContentControl Content="{Binding}">
+          <ContentControl.DataTemplates>
+            <DataTemplate DataType="notifications:INotification">
+              <StackPanel Spacing="2">
+                <TextBlock Text="{Binding Title}" FontSize="{DynamicResource CupertinoFontSize15}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding Message}" FontSize="{DynamicResource CupertinoFontSize13}"
+                           Foreground="{DynamicResource CupertinoSecondaryLabelBrush}"
+                           TextWrapping="Wrap" />
+              </StackPanel>
+            </DataTemplate>
+          </ContentControl.DataTemplates>
+        </ContentControl>
+      </DataTemplate>
+    </Setter>
+    <Setter Property="Template">
+      <ControlTemplate>
+        <!-- Avoid recursive backdrop sampling in the adorner layer. -->
+        <Panel Margin="8,4,8,12">
+          <Border CornerRadius="18"
+                  Background="{DynamicResource CupertinoMenuPanelBrush}"
+                  ClipToBounds="True"
+                  BoxShadow="0 10 30 0 #33000000, 0 2 6 0 #1F000000">
+            <Grid ColumnDefinitions="Auto,*,Auto" Margin="16,12">
+              <Ellipse x:Name="TypeDot" Width="8" Height="8"
+                       Margin="0,6,10,0" VerticalAlignment="Top"
+                       Fill="{DynamicResource CupertinoAccentBrush}" />
+              <ContentPresenter Grid.Column="1"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}" />
+              <Button x:Name="Close" Grid.Column="2"
+                      Classes="plain" MinHeight="0" Padding="4"
+                      Margin="8,0,0,0" VerticalAlignment="Top"
+                      IsVisible="False"
+                      notifications:NotificationCard.CloseOnClick="True">
+                <Path Data="{StaticResource CupertinoXMarkGeometry}"
+                      Stroke="{DynamicResource CupertinoSecondaryLabelBrush}"
+                      StrokeThickness="2" StrokeLineCap="Round"
+                      Width="10" Height="10" Stretch="Uniform" />
+              </Button>
+            </Grid>
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^">
+      <Style.Animations>
+        <Animation Duration="{motion:MotionDuration 250}" Easing="QuadraticEaseOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="TranslateTransform.Y" Value="-16" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <Style Selector="^[IsClosing=true]">
+      <Style.Animations>
+        <Animation Duration="{motion:MotionDuration 120}" Easing="QuadraticEaseIn" FillMode="Forward">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="1" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="0" />
+          </KeyFrame>
+        </Animation>
+        <Animation Duration="{motion:MotionDuration 140}" FillMode="Forward">
+          <KeyFrame Cue="100%">
+            <Setter Property="IsClosed" Value="True" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <Style Selector="^:pointerover /template/ Button#Close">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="^[NotificationType=Success] /template/ Ellipse#TypeDot">
+      <Setter Property="Fill" Value="{DynamicResource CupertinoSuccessBrush}" />
+    </Style>
+    <Style Selector="^[NotificationType=Warning] /template/ Ellipse#TypeDot">
+      <Setter Property="Fill" Value="{DynamicResource CupertinoWarningBrush}" />
+    </Style>
+    <Style Selector="^[NotificationType=Error] /template/ Ellipse#TypeDot">
+      <Setter Property="Fill" Value="{DynamicResource CupertinoDangerBrush}" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type notifications:WindowNotificationManager}"
+                TargetType="notifications:WindowNotificationManager">
+    <Setter Property="Margin" Value="0,8" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <ReversibleStackPanel Name="PART_Items" />
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:topleft /template/ ReversibleStackPanel#PART_Items">
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="^:topright /template/ ReversibleStackPanel#PART_Items">
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+    <Style Selector="^:topcenter /template/ ReversibleStackPanel#PART_Items">
+      <Setter Property="VerticalAlignment" Value="Top" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="^:bottomleft /template/ ReversibleStackPanel#PART_Items">
+      <Setter Property="ReverseOrder" Value="True" />
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+    <Style Selector="^:bottomright /template/ ReversibleStackPanel#PART_Items">
+      <Setter Property="ReverseOrder" Value="True" />
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
+    <Style Selector="^:bottomcenter /template/ ReversibleStackPanel#PART_Items">
+      <Setter Property="ReverseOrder" Value="True" />
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
+

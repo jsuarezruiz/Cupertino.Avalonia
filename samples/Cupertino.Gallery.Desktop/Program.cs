@@ -54,5 +54,6 @@ internal static class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
+            .UseCupertinoSystemFont()
             .LogToTrace();
 }

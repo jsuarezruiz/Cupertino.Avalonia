@@ -39,6 +39,8 @@ Add `CupertinoTheme` after your base theme.
 
 Your app supplies system accessibility preferences through `CupertinoAccessibility`. See the [accessibility guide](docs/docs/fundamentals/accessibility-and-platforms.md) for setup.
 
+On Apple platforms, add `.UseCupertinoSystemFont()` to the app builder after selecting the platform. It preserves CoreText's native SF glyph advances while retaining Avalonia's shaping fallback for unsupported runs.
+
 ```xml
 <StackPanel xmlns:cupertino="https://cupertino.avaloniaui.net" Spacing="12">
   <Button Content="Continue" Classes="prominent" />

@@ -88,6 +88,68 @@ public class InteractionTests
     }
 
     [AvaloniaFact]
+    public void Removing_a_switch_label_restores_the_centred_track()
+    {
+        var toggle = new ToggleSwitch { Content = "Wi-Fi", IsChecked = true };
+        var window = ShowHosting(toggle);
+        try
+        {
+            var label = toggle.GetVisualDescendants().OfType<ContentPresenter>()
+                .Single(p => p.Name == "LabelContent");
+            var track = toggle.GetVisualDescendants().OfType<Border>()
+                .Single(b => b.Name == "Track");
+            Assert.Equal(12, label.Margin.Right);
+
+            toggle.Content = null;
+            window.UpdateLayout();
+            var position = track.TranslatePoint(default, toggle)!.Value;
+            Assert.Equal(toggle.Bounds.Width / 2, position.X + track.Bounds.Width / 2, 3);
+            Assert.Equal(0, label.Margin.Right);
+
+            toggle.Content = "Wi-Fi";
+            window.UpdateLayout();
+            Assert.Equal(12, label.Margin.Right);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaTheory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Held_switch_knob_stays_inside_its_layout_envelope(bool isChecked)
+    {
+        var previousMotion = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = true;
+        var toggle = new ToggleSwitch { IsChecked = isChecked };
+        var window = ShowHosting(toggle);
+        try
+        {
+            var knobs = toggle.GetVisualDescendants().OfType<Panel>()
+                .Single(panel => panel.Name == "PART_MovingKnobs");
+            var centre = toggle.TranslatePoint(
+                new Point(toggle.Bounds.Width / 2, toggle.Bounds.Height / 2), window)!.Value;
+
+            window.MouseDown(centre, MouseButton.Left);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            var topLeft = knobs.TranslatePoint(default, toggle)!.Value;
+            var bottomRight = knobs.TranslatePoint(
+                new Point(knobs.Bounds.Width, knobs.Bounds.Height), toggle)!.Value;
+            Assert.True(topLeft.X >= 0 && topLeft.Y >= 0,
+                $"held knob starts outside the switch at {topLeft}");
+            Assert.True(bottomRight.X <= toggle.Bounds.Width && bottomRight.Y <= toggle.Bounds.Height,
+                $"held knob ends outside {toggle.Bounds.Size} at {bottomRight}");
+
+            window.MouseUp(centre, MouseButton.Left);
+        }
+        finally
+        {
+            window.Close();
+            CupertinoAccessibility.ReduceMotion = previousMotion;
+        }
+    }
+
+    [AvaloniaFact]
     public void Stepper_buttons_change_the_value()
     {
         var nud = new NumericUpDown { Value = 3, Minimum = 0, Maximum = 10, Increment = 1 };
@@ -223,6 +285,100 @@ public class InteractionTests
             CupertinoAccessibility.ReduceMotion = true;
             firstMenu.Close();
             secondMenu.Close();
+            CupertinoAccessibility.ReduceMotion = old;
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task Menu_popup_stays_present_for_the_closing_transition()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = false;
+        var file = new MenuItem { Header = "File" };
+        file.Items.Add(new MenuItem { Header = "Open" });
+        var menu = new Menu { Items = { file } };
+        var window = ShowHosting(menu);
+
+        try
+        {
+            menu.Open();
+            file.Open();
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            var popup = file.GetVisualDescendants().OfType<Popup>().Single();
+            Assert.True(popup.IsOpen);
+            Assert.Equal(PlacementMode.Center, popup.Placement);
+            Assert.Equal(77.5, popup.VerticalOffset);
+            var popupPanel = Assert.IsAssignableFrom<Panel>(popup.Child);
+            var popupLayout = Assert.IsType<Grid>(popupPanel.Children[0]);
+            Assert.Equal(248, popupLayout.MinWidth);
+            var openItem = Assert.IsType<MenuItem>(file.Items[0]);
+            Assert.Equal(52, openItem.MinHeight);
+            Assert.Equal(new Thickness(29, 0), openItem.Padding);
+            Assert.Equal(1, file.Opacity);
+            await Task.Delay(350);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(1, file.Opacity);
+
+            file.Close();
+
+            Assert.False(file.IsSubMenuOpen);
+            Assert.True(popup.IsOpen);
+            Assert.False(popup.Child!.IsHitTestVisible);
+            Assert.Equal(1, file.Opacity);
+
+            await Task.Delay(300);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Assert.False(popup.IsOpen);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            file.Close();
+            CupertinoAccessibility.ReduceMotion = old;
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task Switching_top_level_menus_replaces_the_closing_popup()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = false;
+        var file = new MenuItem { Header = "File" };
+        file.Items.Add(new MenuItem { Header = "Open" });
+        var edit = new MenuItem { Header = "Edit" };
+        edit.Items.Add(new MenuItem { Header = "Copy" });
+        var menu = new Menu { Items = { file, edit } };
+        var window = ShowHosting(menu);
+
+        try
+        {
+            menu.Open();
+            file.Open();
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            await Task.Delay(500);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            var filePopup = file.GetVisualDescendants().OfType<Popup>().Single();
+            var editPopup = edit.GetVisualDescendants().OfType<Popup>().Single();
+            file.Close();
+            edit.Open();
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.False(filePopup.IsOpen);
+            Assert.True(editPopup.IsOpen);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            file.Close();
+            edit.Close();
             CupertinoAccessibility.ReduceMotion = old;
             window.Close();
         }
@@ -1278,7 +1434,7 @@ public class ButtonFamilyTests
         foreach (var (name, control) in cases)
         {
             Show(control);
-            Assert.True(control.Bounds.Height >= 34,
+            Assert.True(control.Bounds.Height >= 36,
                         $"{name} height: {control.Bounds.Height}");
         }
     }
@@ -1405,8 +1561,19 @@ public class ButtonInteractionTests
             var openingTransform = Assert.IsType<TransformOperations>(glass.RenderTransform);
 
             Assert.False(openingTransform.IsIdentity);
-            Assert.Equal(0.5, openingTransform.Value.M11, 3);
-            Assert.Equal(0.5, openingTransform.Value.M22, 3);
+            Assert.Equal(button.Bounds.Width / panel.Bounds.Width,
+                openingTransform.Value.M11, 3);
+            Assert.Equal(button.Bounds.Height / panel.Bounds.Height,
+                openingTransform.Value.M22, 3);
+            var sourceOrigin = button.TranslatePoint(default, window)!.Value;
+            var targetOrigin = panel.TranslatePoint(default, window)!.Value;
+            var expectedOffset = new Vector(
+                sourceOrigin.X + button.Bounds.Width / 2
+                    - targetOrigin.X - panel.Bounds.Width / 2,
+                sourceOrigin.Y + button.Bounds.Height / 2
+                    - targetOrigin.Y - panel.Bounds.Height / 2);
+            Assert.Equal(expectedOffset.X, openingTransform.Value.M31, 3);
+            Assert.Equal(expectedOffset.Y, openingTransform.Value.M32, 3);
             Assert.Equal(Matrix.Identity, panel.RenderTransform?.Value);
             Assert.Equal(1, button.Opacity);
             Assert.True(flyout.Popup.ShouldUseOverlayLayer);
@@ -1523,7 +1690,7 @@ public class ButtonInteractionTests
             Assert.False(Assert.IsType<TransformOperations>(material.RenderTransform).IsIdentity);
             Assert.InRange(content.Opacity, 0, 0.99);
 
-            await Task.Delay(350);
+            await Task.Delay(500);
             global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
 
             Assert.True(Assert.IsType<TransformOperations>(material.RenderTransform).IsIdentity);
@@ -1657,6 +1824,18 @@ public class ThemeCoverageTests
 
 public class TimePickerFormatTests
 {
+    [AvaloniaFact]
+    public void The_period_designator_uses_a_narrow_nonbreaking_space()
+    {
+        var picker = new CupertinoTimePicker
+        {
+            ClockIdentifier = "12HourClock",
+            SelectedTime = new TimeSpan(9, 41, 0),
+        };
+        Assert.Equal("9:41\u202F" + System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.AMDesignator,
+            picker.DisplayText);
+    }
+
     [AvaloniaTheory]
     [InlineData("24HourClock", 14, 30, "14:30")]
     [InlineData("24HourClock", 9, 5, "09:05")]
@@ -2021,6 +2200,40 @@ public class NavigationGestureTests
 
 public class NavigationTitleCentringTests
 {
+    [AvaloniaFact]
+    public void A_narrow_bar_does_not_reserve_a_gap_for_an_absent_leading_button()
+    {
+        var add = new Button
+        {
+            Width = 44,
+            Padding = new Thickness(0),
+            Content = new CupertinoIcon { Glyph = "plus" },
+        };
+        var bar = new CupertinoNavigationBar
+        {
+            Classes = { "embedded" },
+            Width = 160,
+            Title = "Library",
+            IsLargeTitle = false,
+            TrailingContent = add,
+        };
+        var window = new Window { Width = 200, Height = 150, Content = bar };
+        try
+        {
+            window.Show();
+            add.Theme = (global::Avalonia.Styling.ControlTheme)bar.FindResource("CupertinoBarButton")!;
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var title = bar.GetVisualDescendants().OfType<TextBlock>()
+                .Single(t => t.Name == "PART_InlineTitle");
+            Assert.Equal(16, title.TranslatePoint(default, bar)!.Value.X);
+            Assert.Equal(new Size(44, 44), add.Bounds.Size);
+            Assert.Equal(new Point(100, 0), add.TranslatePoint(default, bar)!.Value);
+            Assert.True(title.TranslatePoint(new Point(title.Bounds.Width, 0), bar)!.Value.X <= 88);
+        }
+        finally { window.Close(); }
+    }
+
     [AvaloniaTheory]
     [InlineData(0, 0)]
     [InlineData(0, 90)]

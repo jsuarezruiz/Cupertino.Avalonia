@@ -3,6 +3,8 @@
                     xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
 
+  <!-- Custom Cupertino list and form row controls. -->
+
   <ControlTheme x:Key="{x:Type controls:CupertinoListCell}" TargetType="controls:CupertinoListCell">
     <Setter Property="Background" Value="{DynamicResource CupertinoCardBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />

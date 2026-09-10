@@ -37,10 +37,10 @@ public class CupertinoTheme : Styles
         ("CupertinoProminentTint", 0xFF, 0xFF, true),
     ];
 
-    private static readonly Color LightBlue = Color.FromRgb(0x00, 0x7A, 0xFF);
-    private static readonly Color DarkBlue = Color.FromRgb(0x0A, 0x84, 0xFF);
+    private static readonly Color LightBlue = Color.FromRgb(0x00, 0x88, 0xFF);
+    private static readonly Color DarkBlue = Color.FromRgb(0x00, 0x91, 0xFF);
 
-    private static readonly Color LightTabBlue = Color.FromRgb(0x00, 0x7A, 0xFF);
+    private static readonly Color LightTabBlue = Color.FromRgb(0x00, 0x88, 0xFF);
 
     /// <summary>
     /// Creates a CupertinoTheme with its default settings.
@@ -130,6 +130,15 @@ public class CupertinoTheme : Styles
                 var color = Color.FromArgb(alpha, hue.R, hue.G, hue.B);
                 variant[role.Key] = role.IsColor ? color : new SolidColorBrush(color);
             }
+
+            // Native blue glass uses a cyan rim. A custom accent keeps a
+            // neutral highlight so it cannot acquire a blue edge.
+            var isLight = variantKey == ThemeVariant.Light;
+            variant["CupertinoProminentRimBrush"] = new SolidColorBrush(
+                accent.HasValue ? Color.FromArgb(0x77, 255, 255, 255)
+                : isLight ? Color.FromArgb(0x77, 0x44, 255, 255)
+                : Color.FromArgb(0x77, 0, 255, 255));
+            variant["CupertinoProminentForegroundBrush"] = new SolidColorBrush(Colors.White);
 
             // Light glass deepens the accent; dark glass preserves it.
             variant["CupertinoTabAccentBrush"] = new SolidColorBrush(

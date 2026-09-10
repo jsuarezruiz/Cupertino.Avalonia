@@ -40,6 +40,22 @@ public class ThemeIntegrityTests
         Assert.True(onlyInDark.Length == 0, "Missing from Light: " + string.Join(", ", onlyInDark));
     }
 
+    [AvaloniaFact]
+    public void Light_and_dark_declare_the_same_resource_types()
+    {
+        var light = ThemeDictionary(ThemeVariant.Light);
+        var dark = ThemeDictionary(ThemeVariant.Dark);
+
+        foreach (var key in light.Keys)
+        {
+            Assert.True(dark.TryGetResource(key, ThemeVariant.Dark, out var darkValue),
+                $"Missing from Dark: {key}");
+            Assert.True(light.TryGetResource(key, ThemeVariant.Light, out var lightValue),
+                $"Missing from Light: {key}");
+            Assert.Equal(lightValue?.GetType(), darkValue?.GetType());
+        }
+    }
+
     [AvaloniaTheory]
     [InlineData("Light")]
     [InlineData("Dark")]
@@ -590,7 +606,7 @@ public class ThemeIntegrityTests
 
         Assert.False(indicator.IsVisible);
         Assert.DoesNotContain(strip.GetVisualDescendants().OfType<TabStripItem>(),
-            item => item.Classes.Contains("cupertino-nopill"));
+            item => item.Classes.Contains("cupertino-no-pill"));
         window.MouseUp(new Point(start.X + 24, start.Y), MouseButton.Left);
     }
 
@@ -679,7 +695,7 @@ public class ThemeIntegrityTests
         Assert.False(indicator.IsVisible,
             "scroll takeover must not strand the stretched pill between segments");
         Assert.DoesNotContain(strip.GetVisualDescendants().OfType<TabStripItem>(),
-            i => i.Classes.Contains("cupertino-nopill"));
+            i => i.Classes.Contains("cupertino-no-pill"));
 
         window.MouseUp(new Point(start.X + 24, start.Y + 14), MouseButton.Left);
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
@@ -841,10 +857,30 @@ public class ThemeIntegrityTests
         Assert.Equal((byte)0xFF, prominent.A);
         Assert.Equal(Colors.Orange.R, prominent.R);
 
+        Assert.True(theme.TryGetResource("CupertinoProminentForegroundBrush", ThemeVariant.Dark, out var label));
+        Assert.Equal(Colors.White, Assert.IsAssignableFrom<ISolidColorBrush>(label).Color);
+        Assert.True(theme.TryGetResource("CupertinoProminentRimBrush", ThemeVariant.Light, out var rim));
+        Assert.Equal(Color.FromArgb(0x77, 255, 255, 255), Assert.IsAssignableFrom<ISolidColorBrush>(rim).Color);
+
         theme.Accent = null;
         Assert.True(theme.TryGetResource("CupertinoAccentBrush", ThemeVariant.Light, out var restored));
-        Assert.Equal(Color.FromRgb(0x00, 0x7A, 0xFF),
+        Assert.Equal(Color.FromRgb(0x00, 0x88, 0xFF),
                      Assert.IsAssignableFrom<ISolidColorBrush>(restored).Color);
+        Assert.True(theme.TryGetResource("CupertinoProminentForegroundBrush", ThemeVariant.Dark, out var restoredLabel));
+        Assert.Equal(Colors.White, Assert.IsAssignableFrom<ISolidColorBrush>(restoredLabel).Color);
+    }
+
+    [AvaloniaTheory]
+    [InlineData("Light")]
+    [InlineData("Dark")]
+    public void Prominent_buttons_use_the_native_white_label(string variantName)
+    {
+        var variant = variantName == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+        var resources = ThemeDictionary(variant);
+
+        Assert.True(resources.TryGetResource(
+            "CupertinoProminentForegroundBrush", variant, out var value));
+        Assert.Equal(Colors.White, Assert.IsAssignableFrom<ISolidColorBrush>(value).Color);
     }
 
     [AvaloniaFact]

@@ -1,8 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:motion="clr-namespace:Cupertino.Animation"
-                    xmlns:controls="clr-namespace:Cupertino.Controls"
-                    xmlns:anim="clr-namespace:Cupertino.Animation">
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <!-- PART_SwitchKnob width defines travel and the drag threshold. -->
   <ControlTheme x:Key="CupertinoToggleSwitch" TargetType="ToggleSwitch">
@@ -18,7 +17,7 @@
       <Transitions>
         <DoubleTransition Property="Canvas.Left" Duration="{motion:MotionDuration 334}">
           <DoubleTransition.Easing>
-            <anim:SwitchTravelEasing />
+            <motion:SwitchTravelEasing />
           </DoubleTransition.Easing>
         </DoubleTransition>
         <TransformOperationsTransition Property="RenderTransform"
@@ -30,7 +29,7 @@
       <ControlTemplate>
         <Grid ColumnDefinitions="*,Auto,Auto" Background="Transparent" ClipToBounds="False">
 
-          <ContentPresenter Grid.Column="0"
+          <ContentPresenter x:Name="LabelContent" Grid.Column="0"
                             VerticalAlignment="Center"
                             HorizontalAlignment="Left"
                             Content="{TemplateBinding Content}"
@@ -151,6 +150,11 @@
       </ControlTemplate>
     </Setter>
 
+    <!-- An unlabelled switch must keep its track centred in the hit area. -->
+    <Style Selector="^ /template/ ContentPresenter#LabelContent:empty">
+      <Setter Property="Margin" Value="0" />
+    </Style>
+
     <Style Selector="^:checked /template/ Border#Track">
       <Setter Property="Background" Value="{DynamicResource CupertinoSwitchTrackOnTint}" />
     </Style>
@@ -167,11 +171,14 @@
       <Setter Property="Margin" Value="0" />
     </Style>
 
+    <!-- Keep the held liquid knob inside the 71 x 36 switch envelope.  A larger
+         centred scale overflows at either travel endpoint and can be clipped by
+         a card, scroll presenter, or the platform compositor. -->
     <Style Selector="^:pressed /template/ Grid#PART_MovingKnobs">
-      <Setter Property="RenderTransform" Value="scale(1.5,1.55)" />
+      <Setter Property="RenderTransform" Value="scale(1.3,1.45)" />
     </Style>
     <Style Selector="^:dragging /template/ Grid#PART_MovingKnobs">
-      <Setter Property="RenderTransform" Value="scale(1.5,1.55)" />
+      <Setter Property="RenderTransform" Value="scale(1.3,1.45)" />
     </Style>
     <Style Selector="^:pressed /template/ ContentControl#KnobRest">
       <Setter Property="Opacity" Value="0" />

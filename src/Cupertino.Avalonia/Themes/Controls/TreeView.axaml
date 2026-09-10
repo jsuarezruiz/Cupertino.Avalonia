@@ -1,0 +1,114 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation">
+
+  <ControlTheme x:Key="{x:Type TreeViewItem}" TargetType="TreeViewItem">
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <StackPanel>
+          <Border x:Name="PART_Header" MinHeight="44" Background="Transparent">
+            <Border.Transitions>
+              <Transitions>
+                <BrushTransition Property="Background" Duration="{motion:MotionDuration 180}" />
+              </Transitions>
+            </Border.Transitions>
+            <Grid ColumnDefinitions="Auto,*" Margin="{TemplateBinding Padding}">
+              <ToggleButton x:Name="PART_ExpandCollapseChevron"
+                            Theme="{StaticResource CupertinoTreeChevron}"
+                            IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
+              <ContentPresenter Grid.Column="1"
+                                Name="PART_HeaderPresenter"
+                                Content="{TemplateBinding Header}"
+                                ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                VerticalAlignment="Center" />
+            </Grid>
+          </Border>
+          <ItemsPresenter Name="PART_ItemsPresenter"
+                          IsVisible="{TemplateBinding IsExpanded}"
+                          ItemsPanel="{TemplateBinding ItemsPanel}" />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+
+    <Style Selector="^:pointerover /template/ Border#PART_Header">
+      <Setter Property="Background" Value="{DynamicResource CupertinoRowHoverBrush}" />
+    </Style>
+    <Style Selector="^:selected /template/ Border#PART_Header">
+      <Setter Property="Background" Value="{DynamicResource CupertinoAccentSubtleBrush}" />
+    </Style>
+    <Style Selector="^:expanded /template/ ItemsPresenter#PART_ItemsPresenter">
+      <Style.Animations>
+        <Animation Duration="{motion:MotionDuration 200}" Easing="QuadraticEaseOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="TranslateTransform.Y" Value="-6" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="TranslateTransform.Y" Value="0" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+    <Style Selector="^:empty /template/ ToggleButton#PART_ExpandCollapseChevron">
+      <Setter Property="Opacity" Value="0" />
+      <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoTreeChevron" TargetType="ToggleButton">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Width" Value="24" />
+    <Setter Property="Height" Value="24" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="FocusAdorner" Value="{x:Null}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Background="Transparent">
+          <Path x:Name="Glyph"
+                Data="{StaticResource CupertinoChevronRightGeometry}"
+                Stroke="{DynamicResource CupertinoTertiaryLabelBrush}"
+                StrokeThickness="2" StrokeLineCap="Round" StrokeJoin="Round"
+                Width="16" Height="16" Stretch="None"
+                HorizontalAlignment="Center" VerticalAlignment="Center"
+                RenderTransformOrigin="50%,50%">
+            <Path.Transitions>
+              <Transitions>
+                <TransformOperationsTransition Property="RenderTransform" Duration="{motion:MotionDuration 200}" />
+              </Transitions>
+            </Path.Transitions>
+          </Path>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:checked /template/ Path#Glyph">
+      <Setter Property="RenderTransform" Value="rotate(90deg)" />
+    </Style>
+  </ControlTheme>
+
+  <ControlTheme x:Key="{x:Type TreeView}" TargetType="TreeView">
+    <Setter Property="Background" Value="{DynamicResource CupertinoCardBrush}" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Background="{TemplateBinding Background}"
+                CornerRadius="{TemplateBinding CornerRadius}"
+                ClipToBounds="True">
+          <ScrollViewer>
+            <ItemsPresenter Name="PART_ItemsPresenter"
+                            ItemsPanel="{TemplateBinding ItemsPanel}" />
+          </ScrollViewer>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>
+

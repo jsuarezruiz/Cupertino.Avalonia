@@ -63,6 +63,15 @@ public class CupertinoActivityIndicator : Control
                                                   SweepFractionProperty);
     }
 
+    /// <summary>
+    /// Creates an activity indicator using the secondary label colour.
+    /// </summary>
+    public CupertinoActivityIndicator()
+    {
+        this.Bind(ForegroundProperty, this.GetResourceObservable("CupertinoSecondaryLabelBrush"),
+                  Avalonia.Data.BindingPriority.Style);
+    }
+
     /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize)
     {

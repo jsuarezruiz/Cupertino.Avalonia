@@ -130,6 +130,9 @@ public partial class ShellView : UserControl
         var entries = _entries;
         if (NativeComparison.IsAvailable)
             entries = [.. _entries, new("Side by Side", "⇋", "#FF34AADC", () => new SideBySidePage(), "Showcases")];
+        if (NativeComparison.IsAvailable
+            && Environment.GetEnvironmentVariable("GALLERY_MOTION_CAPTURE") == "1")
+            entries = [.. entries, new("Motion Verification", "◫", "#FF8E8E93", () => new MotionVerificationPage(), "Showcases")];
 
         var compactRoot = new RootPage(entries);
         compactRoot.EntryChosen += (_, entry) => OpenEntry(entry);
@@ -320,21 +323,21 @@ public partial class ShellView : UserControl
 
         var capsule = new GlassSurface
         {
-            Height = 36,
-            CornerRadius = new Avalonia.CornerRadius(18),
+            Height = 44,
+            CornerRadius = new Avalonia.CornerRadius(22),
             BlurRadius = 18,
-            GlassThickness = 0,
+            GlassThickness = 1,
             Saturation = 1,
             RefractionStrength = 0,
             ChromaticAberration = 0,
             DepthEffect = 0,
-            LightIntensity = 0,
+            LightIntensity = 0.25,
             FresnelStrength = 0,
             Magnification = 1,
             ShadowOpacity = 0.10,
-            ShadowBlur = 12,
+            ShadowBlur = 24,
             ShadowOffset = 2,
-            ShadowContactWeight = 0.2,
+            ShadowContactWeight = 0,
             Child = actions,
         };
         capsule.Bind(GlassSurface.TintProperty,
@@ -367,7 +370,7 @@ public partial class ShellView : UserControl
     {
         var icon = new CupertinoIcon { Glyph = glyph, Size = 22 };
         icon.Bind(CupertinoIcon.ForegroundProperty,
-                  icon.GetResourceObservable("CupertinoLabelBrush"));
+                  icon.GetResourceObservable("CupertinoBarForegroundBrush"));
         return icon;
     }
 }

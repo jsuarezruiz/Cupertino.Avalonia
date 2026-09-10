@@ -190,8 +190,6 @@
       <Setter Property="CornerRadius" Value="23.5" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Padding" Value="14,0,16,0" />
-      <Setter Property="LetterSpacing" Value="0.47" />
-      <Setter Property="LineHeight" Value="23" />
       <Setter Property="(controls:CupertinoSearchFieldShadow.IsAdornerEnabled)" Value="True" />
       <Setter Property="CaretBrush" Value="Transparent" />
     </Style>
@@ -260,6 +258,10 @@
 
   <ControlTheme x:Key="{x:Type TextBox}"
                 TargetType="TextBox"
+                BasedOn="{StaticResource CupertinoTextBox}" />
+
+  <ControlTheme x:Key="{x:Type MaskedTextBox}"
+                TargetType="MaskedTextBox"
                 BasedOn="{StaticResource CupertinoTextBox}" />
 
 </ResourceDictionary>

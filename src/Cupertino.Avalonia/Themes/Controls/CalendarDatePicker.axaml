@@ -1,0 +1,63 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+  <ControlTheme x:Key="{x:Type CalendarDatePicker}" TargetType="CalendarDatePicker">
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
+    <Setter Property="Background" Value="{DynamicResource CupertinoPickerFieldBrush}" />
+    <Setter Property="CornerRadius" Value="17" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <Border Background="{TemplateBinding Background}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
+                  MinHeight="34" Padding="13,0"
+                  VerticalAlignment="Center">
+            <Panel>
+              <TextBox x:Name="PART_TextBox"
+                       Classes="plain"
+                       IsVisible="False"
+                       PlaceholderText="{TemplateBinding PlaceholderText}" />
+              <TextBlock Text="{Binding #PART_TextBox.Text}"
+                         FontSize="{TemplateBinding FontSize}"
+                         Foreground="{TemplateBinding Foreground}"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center" />
+              <Button x:Name="PART_Button"
+                      Classes="plain" MinHeight="0"
+                      Background="Transparent" Padding="0"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      FocusAdorner="{x:Null}" />
+            </Panel>
+          </Border>
+          <Popup x:Name="PART_Popup" IsLightDismissEnabled="True"
+                 controls:CupertinoFlyoutTransition.IsEnabled="True"
+                 Placement="BottomEdgeAlignedLeft">
+            <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
+              <Grid>
+                <controls:GlassSurface Classes="source-transition-material" CornerRadius="14"
+                                       BlurRadius="36" Saturation="1.8"
+                                       Tint="{DynamicResource CupertinoPopoverTint}"
+                                       GlassThickness="0.35" RefractionStrength="0.10"
+                                       ChromaticAberration="0" DepthEffect="0.25"
+                                       IsAdaptive="True"
+                                       ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+                <Border Classes="source-transition-content" CornerRadius="14" ClipToBounds="True">
+                  <Calendar x:Name="PART_Calendar" Background="Transparent" />
+                </Border>
+              </Grid>
+            </Panel>
+          </Popup>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+  </ControlTheme>
+
+</ResourceDictionary>
+

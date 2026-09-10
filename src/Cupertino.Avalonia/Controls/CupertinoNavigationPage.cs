@@ -302,7 +302,7 @@ public class CupertinoNavigationPage : TemplatedControl
             RenderTransform = TransformOperations.Parse("scale(1.5)"),
         };
         _backChevron.Bind(Avalonia.Controls.Shapes.Shape.StrokeProperty,
-                     this.GetResourceObservable("CupertinoLabelBrush"));
+                     this.GetResourceObservable("CupertinoBarForegroundBrush"));
         UpdateDirectionChrome();
 
         // Avoid inherited platform button styles.
@@ -313,25 +313,25 @@ public class CupertinoNavigationPage : TemplatedControl
             IsVisible = false,
             Padding = new Thickness(12, 0),
             MinWidth = 44,
-            Height = 36,
+            Height = 44,
         };
         _backHost = new GlassSurface
         {
-            Height = 36,
-            CornerRadius = new CornerRadius(18),
+            Height = 44,
+            CornerRadius = new CornerRadius(22),
             BlurRadius = 18,
-            GlassThickness = 0,
+            GlassThickness = 1,
             Saturation = 1,
             RefractionStrength = 0,
             ChromaticAberration = 0,
             DepthEffect = 0,
-            LightIntensity = 0,
+            LightIntensity = 0.25,
             FresnelStrength = 0,
             Magnification = 1,
             ShadowOpacity = 0.10,
-            ShadowBlur = 12,
+            ShadowBlur = 24,
             ShadowOffset = 2,
-            ShadowContactWeight = 0.2,
+            ShadowContactWeight = 0,
             Child = _back,
             IsVisible = false,
         };

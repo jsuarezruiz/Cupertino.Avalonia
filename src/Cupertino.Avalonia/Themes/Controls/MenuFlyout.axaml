@@ -36,11 +36,12 @@
                   Margin="8,0,0,0" VerticalAlignment="Center" />
           </Grid>
           <Popup x:Name="PART_Popup"
-                 IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
                  controls:CupertinoFlyoutTransition.IsEnabled="True"
+                 controls:CupertinoFlyoutTransition.IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
+                 IsLightDismissEnabled="False"
                  Placement="RightEdgeAlignedTop">
             <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
-              <Grid MinWidth="220">
+              <Grid x:Name="PopupLayout" MinWidth="220">
                 <controls:GlassSurface Classes="source-transition-material" CornerRadius="26"
                                        BlurRadius="36" Saturation="1.8"
                                        Tint="{DynamicResource CupertinoPopoverTint}"
@@ -75,6 +76,10 @@
     <Style Selector="^.destructive">
       <Setter Property="Foreground" Value="{DynamicResource CupertinoDangerBrush}" />
     </Style>
+    <Style Selector="^.cupertino-primary-menu-action">
+      <Setter Property="MinHeight" Value="52" />
+      <Setter Property="Padding" Value="29,0" />
+    </Style>
     <Style Selector="^:disabled">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
@@ -89,6 +94,9 @@
         <Border Background="{TemplateBinding Background}" Height="0.5" />
       </ControlTemplate>
     </Setter>
+    <Style Selector="^.cupertino-primary-menu-separator">
+      <Setter Property="Margin" Value="23,0" />
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type MenuFlyoutPresenter}" TargetType="MenuFlyoutPresenter">

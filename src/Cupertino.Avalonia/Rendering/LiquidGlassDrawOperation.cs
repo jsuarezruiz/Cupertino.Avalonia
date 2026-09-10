@@ -65,12 +65,16 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
     private readonly GlassParams _params;
 
     private readonly Rect _surface;
+    private readonly bool _freezeBackdrop;
+    private SKImage? _frozenBackdrop;
 
-    public LiquidGlassDrawOperation(Rect surface, Rect bounds, GlassParams parameters)
+    public LiquidGlassDrawOperation(
+        Rect surface, Rect bounds, GlassParams parameters, bool freezeBackdrop)
     {
         _surface = surface;
         Bounds = bounds;
         _params = parameters;
+        _freezeBackdrop = freezeBackdrop;
     }
 
     public Rect Bounds { get; }
@@ -82,6 +86,8 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
 
     public void Dispose()
     {
+        _frozenBackdrop?.Dispose();
+        _frozenBackdrop = null;
     }
 
     public void Render(ImmediateDrawingContext context)
@@ -107,10 +113,14 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         }
 
         var ctm = canvas.TotalMatrix;
-        // The shader samples in device space and requires an axis-aligned uniform scale.
+        // The shader works in device space, so independent axis scales are safe:
+        // deviceRect already contains the transformed size.  Use the vertical
+        // scale for radii and optical distances so a source-bound flyout morph
+        // never switches to the flat fallback while approaching scale(1).
         if (!float.IsFinite(ctm.ScaleX) || ctm.ScaleX <= 0.001f ||
-            Math.Abs(ctm.ScaleX - ctm.ScaleY) > 0.001f ||
-            ctm.SkewX != 0 || ctm.SkewY != 0 || ctm.Persp0 != 0 || ctm.Persp1 != 0 || ctm.Persp2 != 1)
+            !float.IsFinite(ctm.ScaleY) || ctm.ScaleY <= 0.001f ||
+            ctm.SkewX != 0 || ctm.SkewY != 0 ||
+            ctm.Persp0 != 0 || ctm.Persp1 != 0 || ctm.Persp2 != 1)
         {
             RenderFallback(canvas, null, default, 1f);
             return;
@@ -118,7 +128,7 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         var localBounds = new SKRect(0, 0, (float)_surface.Width, (float)_surface.Height);
         var deviceRect = ctm.MapRect(localBounds);
 
-        var scale = ctm.ScaleX > 0.001f ? ctm.ScaleX : 1f;
+        var scale = ctm.ScaleY;
 
         var sigma = _params.BlurRadius * scale * 0.5f;
         var padding = MathF.Ceiling(sigma * 3f) + MathF.Ceiling((_params.Refraction * 1.35f + 2f) * scale);
@@ -144,7 +154,8 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
             return;
         }
 
-        using var snapshot = surface.Snapshot();
+        using var transientSnapshot = _freezeBackdrop ? null : surface.Snapshot();
+        var snapshot = transientSnapshot ?? (_frozenBackdrop ??= surface.Snapshot());
 
         // Draw the shadow after capture so glass cannot sample it.
         if (_params.ShadowOpacity > 0.002f)

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Animation;
@@ -18,15 +19,19 @@ namespace Cupertino.Controls;
 /// </summary>
 public static class CupertinoFlyoutTransition
 {
+    internal enum MotionProfile
+    {
+        Standard,
+        Menu,
+        Popover,
+    }
+
     private sealed class PropertyOwner : AvaloniaObject
     {
     }
 
-    private static readonly TransformOperations CollapsedMaterialTransform =
-        TransformOperations.Parse("scale(0.5)");
-
     private static readonly TransformOperations ExpandedTransform =
-        TransformOperations.Parse("scale(1)");
+        TransformOperations.Parse("scale(1,1) translate(0px,0px)");
 
     private static readonly BoxShadows CompactBorderShadow = new(new BoxShadow
     {
@@ -41,6 +46,14 @@ public static class CupertinoFlyoutTransition
     public static readonly AttachedProperty<bool> IsEnabledProperty =
         AvaloniaProperty.RegisterAttached<PropertyOwner, AvaloniaObject, bool>("IsEnabled");
 
+    /// <summary>
+    /// Identifies the requested open state used by a raw <see cref="Popup"/> that
+    /// needs a cancellable closing transition.
+    /// </summary>
+    public static readonly AttachedProperty<bool> IsOpenProperty =
+        AvaloniaProperty.RegisterAttached<PropertyOwner, Popup, bool>(
+            "IsOpen", defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
+
     private static readonly ConditionalWeakTable<PopupFlyoutBase, FlyoutState> Flyouts = new();
     private static readonly ConditionalWeakTable<ContextMenu, ContextMenuState> ContextMenus = new();
     private static readonly ConditionalWeakTable<Popup, PopupState> Popups = new();
@@ -52,6 +65,8 @@ public static class CupertinoFlyoutTransition
     {
         IsEnabledProperty.Changed.Subscribe(
             new AnonymousObserver<AvaloniaPropertyChangedEventArgs<bool>>(OnIsEnabledChanged));
+        IsOpenProperty.Changed.Subscribe(
+            new AnonymousObserver<AvaloniaPropertyChangedEventArgs<bool>>(OnIsOpenChanged));
     }
 
     /// <inheritdoc cref="IsEnabledProperty"/>
@@ -60,6 +75,12 @@ public static class CupertinoFlyoutTransition
     /// <inheritdoc cref="IsEnabledProperty"/>
     public static void SetIsEnabled(AvaloniaObject control, bool value) =>
         control.SetValue(IsEnabledProperty, value);
+
+    /// <inheritdoc cref="IsOpenProperty"/>
+    public static bool GetIsOpen(Popup popup) => popup.GetValue(IsOpenProperty);
+
+    /// <inheritdoc cref="IsOpenProperty"/>
+    public static void SetIsOpen(Popup popup, bool value) => popup.SetValue(IsOpenProperty, value);
 
     internal static void Initialize()
     {
@@ -89,7 +110,21 @@ public static class CupertinoFlyoutTransition
         if (change.Sender is ContextMenu menu)
             Attach(menu);
         else if (change.Sender is Popup popup)
+        {
             Attach(popup);
+            if (GetIsOpen(popup) && Popups.TryGetValue(popup, out var state))
+                state.SetOpen(true);
+        }
+    }
+
+    private static void OnIsOpenChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        if (change.Sender is not Popup popup || !GetIsEnabled(popup))
+            return;
+
+        Attach(popup);
+        if (Popups.TryGetValue(popup, out var state))
+            state.SetOpen(change.GetNewValue<bool>());
     }
 
     private static void Attach(PopupFlyoutBase flyout)
@@ -155,7 +190,8 @@ public static class CupertinoFlyoutTransition
         var anchorBounds = GetAnchorBounds(anchor, root, targetBounds, placement);
         return StartSession(
             root, anchor, panel, material, content, glass,
-            anchorBounds, targetBounds, closeOwner);
+            anchorBounds, targetBounds, closeOwner,
+            IsTopLevelMenuItem(anchor) ? MotionProfile.Menu : MotionProfile.Standard);
     }
 
     internal static TransitionSession? CreateSession(
@@ -177,7 +213,8 @@ public static class CupertinoFlyoutTransition
 
         return StartSession(
             root, anchor, panel, material, content, material as GlassSurface,
-            new Rect(point, anchor.Bounds.Size), targetBounds, closeOwner);
+            new Rect(point, anchor.Bounds.Size), targetBounds, closeOwner,
+            MotionProfile.Popover);
     }
 
     private static TransitionSession StartSession(
@@ -189,22 +226,67 @@ public static class CupertinoFlyoutTransition
         GlassSurface? glass,
         Rect anchorBounds,
         Rect targetBounds,
-        Action closeOwner)
+        Action closeOwner,
+        MotionProfile profile)
     {
-        var source = anchorBounds.Center;
-        var collapsedOrigin = new RelativePoint(
-            Math.Clamp((source.X - targetBounds.X) / targetBounds.Width, 0, 1),
-            Math.Clamp((source.Y - targetBounds.Y) / targetBounds.Height, 0, 1),
-            RelativeUnit.Relative);
+        var collapsedOrigin = new RelativePoint(0.5, 0.5, RelativeUnit.Relative);
+        var collapsedTransform = CreateCollapsedTransform(anchorBounds, targetBounds);
         var active = ActiveSessions.GetOrCreateValue(root);
         active.Session?.FinishForReplacement();
 
         var session = new TransitionSession(
             active, root, panel, material, content, glass,
-            CollapsedMaterialTransform, collapsedOrigin, closeOwner);
+            collapsedTransform, collapsedOrigin, closeOwner, profile);
         active.Session = session;
         session.Open();
         return session;
+    }
+
+    private static bool IsTopLevelMenuItem(Control anchor) =>
+        anchor is MenuItem { Parent: Menu };
+
+    private static void ConfigureTopLevelMenuPopup(Popup popup, Control anchor)
+    {
+        if (!IsTopLevelMenuItem(anchor))
+            return;
+
+        // UIKit's primary-action menu expands around the source instead of
+        // opening from an edge. Keep submenus on their normal edge placement.
+        popup.Placement = PlacementMode.Center;
+        popup.VerticalOffset = 77.5;
+        if (popup.Child is Panel { Children.Count: > 0 } presenter
+            && presenter.Children[0] is Grid layout
+            && layout.MinWidth < 248)
+            layout.MinWidth = 248;
+
+        if (anchor is not MenuItem menu)
+            return;
+
+        foreach (var entry in menu.Items)
+        {
+            if (entry is MenuItem item
+                && !item.Classes.Contains("cupertino-primary-menu-action"))
+                item.Classes.Add("cupertino-primary-menu-action");
+            else if (entry is Separator separator
+                     && !separator.Classes.Contains("cupertino-primary-menu-separator"))
+                separator.Classes.Add("cupertino-primary-menu-separator");
+        }
+    }
+
+    private static TransformOperations CreateCollapsedTransform(
+        Rect sourceBounds,
+        Rect targetBounds)
+    {
+        var scaleX = targetBounds.Width > 0 && sourceBounds.Width > 0
+            ? Math.Clamp(sourceBounds.Width / targetBounds.Width, 0.08, 1)
+            : 0.18;
+        var scaleY = targetBounds.Height > 0 && sourceBounds.Height > 0
+            ? Math.Clamp(sourceBounds.Height / targetBounds.Height, 0.08, 1)
+            : 0.18;
+        var offset = sourceBounds.Center - targetBounds.Center;
+        var value = string.Create(CultureInfo.InvariantCulture,
+            $"scale({scaleX:0.######},{scaleY:0.######}) translate({offset.X:0.######}px,{offset.Y:0.######}px)");
+        return TransformOperations.Parse(value);
     }
 
     private static Control FindPopoverPanel(Control presenter) =>
@@ -241,109 +323,131 @@ public static class CupertinoFlyoutTransition
             : new Rect(targetBounds.Center, default(Size));
     }
 
-    private static Transitions CreateMaterialTransitions(TimeSpan duration, Easing easing) =>
+    private static Transitions CreateMaterialTransitions(
+        TimeSpan duration,
+        TimeSpan opacityDuration,
+        Easing transformEasing,
+        Easing opacityEasing) =>
     [
         new TransformOperationsTransition
         {
             Property = Visual.RenderTransformProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
         new DoubleTransition
         {
             Property = Visual.OpacityProperty,
-            Duration = TimeSpan.FromMilliseconds(160),
-            Easing = easing,
+            Duration = opacityDuration,
+            Easing = opacityEasing,
         },
         new DoubleTransition
         {
             Property = GlassSurface.BlurRadiusProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
         new DoubleTransition
         {
             Property = GlassSurface.SaturationProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
         new DoubleTransition
         {
             Property = GlassSurface.RefractionStrengthProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
         new DoubleTransition
         {
             Property = GlassSurface.DepthEffectProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
         new DoubleTransition
         {
             Property = GlassSurface.ShadowOpacityProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
         new DoubleTransition
         {
             Property = GlassSurface.ShadowBlurProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
         new DoubleTransition
         {
             Property = GlassSurface.ShadowOffsetProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
     ];
 
-    private static Transitions CreatePlainMaterialTransitions(TimeSpan duration, Easing easing) =>
+    private static Transitions CreatePlainMaterialTransitions(
+        TimeSpan duration,
+        TimeSpan opacityDuration,
+        Easing transformEasing,
+        Easing opacityEasing) =>
     [
         new TransformOperationsTransition
         {
             Property = Visual.RenderTransformProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
         new DoubleTransition
         {
             Property = Visual.OpacityProperty,
-            Duration = TimeSpan.FromMilliseconds(160),
-            Easing = easing,
+            Duration = opacityDuration,
+            Easing = opacityEasing,
         },
     ];
 
-    private static Transitions CreateBorderMaterialTransitions(TimeSpan duration, Easing easing) =>
+    private static Transitions CreateBorderMaterialTransitions(
+        TimeSpan duration,
+        TimeSpan opacityDuration,
+        Easing transformEasing,
+        Easing opacityEasing) =>
     [
         new TransformOperationsTransition
         {
             Property = Visual.RenderTransformProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
         new DoubleTransition
         {
             Property = Visual.OpacityProperty,
-            Duration = TimeSpan.FromMilliseconds(160),
-            Easing = easing,
+            Duration = opacityDuration,
+            Easing = opacityEasing,
         },
         new BoxShadowsTransition
         {
             Property = Border.BoxShadowProperty,
             Duration = duration,
-            Easing = easing,
+            Easing = transformEasing,
         },
     ];
 
-    private static Transitions CreateContentTransitions(TimeSpan duration, Easing easing) =>
+    private static Transitions CreateContentTransitions(
+        TimeSpan duration,
+        TimeSpan opacityDuration,
+        Easing transformEasing,
+        Easing opacityEasing) =>
     [
+        new TransformOperationsTransition
+        {
+            Property = Visual.RenderTransformProperty,
+            Duration = duration,
+            Easing = transformEasing,
+        },
         new DoubleTransition
         {
             Property = Visual.OpacityProperty,
-            Duration = duration,
-            Easing = easing,
+            Duration = opacityDuration,
+            Easing = opacityEasing,
         },
     ];
 
@@ -568,6 +672,36 @@ public static class CupertinoFlyoutTransition
     {
         private TransitionSession? _session;
         private Control? _watchedAnchor;
+        private bool _completing;
+
+        public void SetOpen(bool value)
+        {
+            if (value)
+            {
+                if ((owner.PlacementTarget ?? owner.TemplatedParent as Control) is { } sourceAnchor)
+                    ConfigureTopLevelMenuPopup(owner, sourceAnchor);
+
+                if (_session?.IsClosing == true)
+                {
+                    _session.Dispose();
+                    _session = _watchedAnchor is { } anchor && owner.Child is { } presenter
+                        ? CreateSession(anchor, presenter, owner.Placement, CompleteClose)
+                        : null;
+                }
+
+                if (!owner.IsOpen)
+                    owner.Open();
+                return;
+            }
+
+            if (!owner.IsOpen || _completing)
+                return;
+
+            if (CupertinoAccessibility.ReduceMotion || _session is null)
+                CompleteClose();
+            else
+                _session.Close();
+        }
 
         public void Opened(object? sender, EventArgs args)
         {
@@ -575,7 +709,7 @@ public static class CupertinoFlyoutTransition
             var anchor = owner.PlacementTarget ?? owner.TemplatedParent as Control;
             if (anchor is not null && owner.Child is { } presenter)
             {
-                _session = CreateSession(anchor, presenter, owner.Placement, owner.Close);
+                _session = CreateSession(anchor, presenter, owner.Placement, CompleteClose);
                 _watchedAnchor = anchor;
                 anchor.DetachedFromVisualTree += OnAnchorDetached;
             }
@@ -588,10 +722,28 @@ public static class CupertinoFlyoutTransition
             _watchedAnchor = null;
             _session?.Dispose();
             _session = null;
+
+            if (!_completing && GetIsOpen(owner))
+                owner.SetCurrentValue(IsOpenProperty, false);
         }
 
-        private void OnAnchorDetached(object? sender, VisualTreeAttachmentEventArgs args) =>
+        private void OnAnchorDetached(object? sender, VisualTreeAttachmentEventArgs args)
+        {
+            _completing = true;
+            owner.SetCurrentValue(IsOpenProperty, false);
             owner.Close();
+            _completing = false;
+        }
+
+        private void CompleteClose()
+        {
+            if (!owner.IsOpen)
+                return;
+
+            _completing = true;
+            owner.Close();
+            _completing = false;
+        }
     }
 
     internal sealed class TransitionSession : IDisposable
@@ -615,8 +767,11 @@ public static class CupertinoFlyoutTransition
         private readonly Transitions? _contentTransitions;
         private readonly GlassValues? _glassValues;
         private readonly BoxShadows? _borderShadow;
+        private readonly MotionProfile _profile;
         private bool _closing;
         private bool _disposed;
+
+        internal bool IsClosing => _closing;
 
         internal TransitionSession(
             ActiveSession active,
@@ -627,7 +782,8 @@ public static class CupertinoFlyoutTransition
             GlassSurface? glass,
             TransformOperations collapsedMaterialTransform,
             RelativePoint collapsedMaterialOrigin,
-            Action closeOwner)
+            Action closeOwner,
+            MotionProfile profile)
         {
             _active = active;
             _root = root;
@@ -648,6 +804,7 @@ public static class CupertinoFlyoutTransition
             _contentTransitions = content.Transitions;
             _glassValues = glass is null ? null : new GlassValues(glass);
             _borderShadow = (material as Border)?.BoxShadow;
+            _profile = profile;
         }
 
         public void Open()
@@ -660,7 +817,14 @@ public static class CupertinoFlyoutTransition
 
             _material.RenderTransformOrigin = _collapsedMaterialOrigin;
             _material.RenderTransform = _collapsedMaterialTransform;
-            _material.Opacity = Math.Min(_materialOpacity, 0.12);
+            _content.RenderTransformOrigin = _collapsedMaterialOrigin;
+            _content.RenderTransform = _collapsedMaterialTransform;
+            _material.Opacity = Math.Min(_materialOpacity, _profile switch
+            {
+                MotionProfile.Menu => 0.78,
+                MotionProfile.Popover => 0.30,
+                _ => 0.12,
+            });
             _content.Opacity = 0;
             SetCompactGlass();
             SetCompactBorderShadow();
@@ -671,22 +835,38 @@ public static class CupertinoFlyoutTransition
                 if (_disposed || _closing)
                     return;
 
+                var duration = TimeSpan.FromMilliseconds(_profile switch
+                {
+                    MotionProfile.Menu => 450,
+                    MotionProfile.Popover => 450,
+                    _ => 300,
+                });
+                var opacityDuration = TimeSpan.FromMilliseconds(_profile switch
+                {
+                    MotionProfile.Menu => 210,
+                    MotionProfile.Popover => 170,
+                    _ => 160,
+                });
                 var easing = new Cupertino.Animation.UnderdampedSpringEasing
                 {
-                    DampingRatio = 0.8,
-                    OmegaDuration = 12.0,
+                    DampingRatio = _profile == MotionProfile.Menu ? 0.75 : 0.8,
+                    OmegaDuration = _profile == MotionProfile.Menu ? 7.0 : 7.5,
                 };
                 _material.Transitions = _glass is null
                     ? _material is Border
-                        ? CreateBorderMaterialTransitions(TimeSpan.FromMilliseconds(300), easing)
-                        : CreatePlainMaterialTransitions(TimeSpan.FromMilliseconds(300), easing)
-                    : CreateMaterialTransitions(TimeSpan.FromMilliseconds(300), easing);
+                        ? CreateBorderMaterialTransitions(
+                            duration, opacityDuration, easing, new SineEaseOut())
+                        : CreatePlainMaterialTransitions(
+                            duration, opacityDuration, easing, new SineEaseOut())
+                    : CreateMaterialTransitions(
+                        duration, opacityDuration, easing, new SineEaseOut());
                 _content.Transitions = CreateContentTransitions(
-                    TimeSpan.FromMilliseconds(90), new QuadraticEaseOut());
+                    duration, opacityDuration, easing, new SineEaseOut());
                 RestoreGlassValues();
                 RestoreBorderShadow();
                 _material.RenderTransform = ExpandedTransform;
                 _material.Opacity = _materialOpacity;
+                _content.RenderTransform = ExpandedTransform;
                 _content.Opacity = _contentOpacity;
             });
         }
@@ -699,14 +879,36 @@ public static class CupertinoFlyoutTransition
             _closing = true;
             _panel.IsHitTestVisible = false;
             _glass?.Pulse();
-            var easing = new QuadraticEaseIn();
+            var duration = TimeSpan.FromMilliseconds(_profile switch
+            {
+                MotionProfile.Menu => 230,
+                MotionProfile.Popover => 190,
+                _ => 200,
+            });
+            var opacityDuration = TimeSpan.FromMilliseconds(_profile switch
+            {
+                MotionProfile.Menu => 190,
+                MotionProfile.Popover => 160,
+                _ => 160,
+            });
+            Easing easing = _profile is MotionProfile.Menu or MotionProfile.Popover
+                ? new SineEaseIn()
+                : new QuadraticEaseIn();
             _material.Transitions = _glass is null
                 ? _material is Border
-                    ? CreateBorderMaterialTransitions(TimeSpan.FromMilliseconds(200), easing)
-                    : CreatePlainMaterialTransitions(TimeSpan.FromMilliseconds(200), easing)
-                : CreateMaterialTransitions(TimeSpan.FromMilliseconds(200), easing);
-            _content.Transitions = CreateContentTransitions(TimeSpan.FromMilliseconds(150), easing);
+                    ? CreateBorderMaterialTransitions(
+                        duration, opacityDuration, easing, new SineEaseOut())
+                    : CreatePlainMaterialTransitions(
+                        duration, opacityDuration, easing, new SineEaseOut())
+                : CreateMaterialTransitions(
+                    duration, opacityDuration, easing, new SineEaseOut());
+            _content.Transitions = CreateContentTransitions(
+                duration, opacityDuration, easing,
+                _profile is MotionProfile.Menu or MotionProfile.Popover
+                    ? new SineEaseIn()
+                    : easing);
             _material.RenderTransform = _collapsedMaterialTransform;
+            _content.RenderTransform = _collapsedMaterialTransform;
             _content.Opacity = 0;
             SetCompactGlass();
             SetCompactBorderShadow();
@@ -715,13 +917,13 @@ public static class CupertinoFlyoutTransition
             {
                 if (!_disposed)
                     _material.Opacity = 0;
-            }, TimeSpan.FromMilliseconds(40));
+            }, TimeSpan.FromMilliseconds(_profile == MotionProfile.Popover ? 35 : 65));
 
             DispatcherTimer.RunOnce(() =>
             {
                 if (!_disposed)
                     FinishClose();
-            }, TimeSpan.FromMilliseconds(220));
+            }, duration + TimeSpan.FromMilliseconds(20));
         }
 
         public void Dispose()
@@ -771,7 +973,12 @@ public static class CupertinoFlyoutTransition
             _glass.Saturation = 1 + (values.Saturation - 1) * 0.45;
             _glass.RefractionStrength = values.RefractionStrength * 0.35;
             _glass.DepthEffect = values.DepthEffect * 0.5;
-            _glass.ShadowOpacity = 0;
+            _glass.ShadowOpacity = values.ShadowOpacity * (_profile switch
+            {
+                MotionProfile.Menu => 0.75,
+                MotionProfile.Popover => 0.55,
+                _ => 0.35,
+            });
             _glass.ShadowBlur = values.ShadowBlur * 0.45;
             _glass.ShadowOffset = values.ShadowOffset * 0.35;
         }

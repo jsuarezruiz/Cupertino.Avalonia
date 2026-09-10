@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.iOS;
 using Avalonia.Platform;
+using Avalonia.Styling;
 using Foundation;
 using UIKit;
 
@@ -9,14 +10,33 @@ namespace Cupertino.Gallery;
 internal sealed class UiKitHost : NativeControlHost
 {
     private readonly Func<UIView> _create;
+    private UIView? _view;
 
-    public UiKitHost(Func<UIView> create) => _create = create;
+    public UiKitHost(Func<UIView> create)
+    {
+        _create = create;
+        ActualThemeVariantChanged += (_, _) => UpdateAppearance();
+    }
 
-    protected override IPlatformHandle CreateNativeControlCore(IPlatformHandle parent) =>
-        new UIViewControlHandle(_create());
+    protected override IPlatformHandle CreateNativeControlCore(IPlatformHandle parent)
+    {
+        var view = _view = _create();
+        UpdateAppearance();
+        return new UIViewControlHandle(view);
+    }
+
+    private void UpdateAppearance()
+    {
+        // Compare both columns in the gallery's selected appearance, even when
+        // it differs from the device setting.
+        if (_view is { } view)
+            view.OverrideUserInterfaceStyle = ActualThemeVariant == ThemeVariant.Dark
+                ? UIUserInterfaceStyle.Dark : UIUserInterfaceStyle.Light;
+    }
 
     protected override void DestroyNativeControlCore(IPlatformHandle control)
     {
+        _view = null;
         if (control is UIViewControlHandle handle)
             handle.Destroy();
         else
@@ -28,6 +48,8 @@ internal static class NativeComparisonHosts
 {
     public static void Register()
     {
+        if (Environment.GetEnvironmentVariable("GALLERY_VERIFY_FONTS") == "1")
+            Avalonia.Threading.DispatcherTimer.RunOnce(TypographyVerification.Run, TimeSpan.FromSeconds(4));
         NativeComparison.CreateNativeControl = kind => kind switch
         {
             "switch" => new UiKitHost(() =>
@@ -36,7 +58,7 @@ internal static class NativeComparisonHosts
                 view.On = true;
                 return view;
             })
-            { Width = 51, Height = 31 },
+            { Width = 63, Height = 28 },
 
             "slider" => new UiKitHost(() =>
             {
@@ -155,6 +177,44 @@ internal static class NativeComparisonHosts
                 Locale = new NSLocale("en_US"),
             })
             { Width = 120, Height = 36 },
+
+            "motion-menu" => new UiKitHost(() =>
+            {
+                var configuration = OperatingSystem.IsIOSVersionAtLeast(26)
+                    ? UIButtonConfiguration.GlassButtonConfiguration
+                    : UIButtonConfiguration.PlainButtonConfiguration;
+                configuration.Title = "File";
+                var button = UIButton.GetButton(configuration, null);
+                var nothing = (UIActionHandler)(_ => { });
+                button.Menu = UIMenu.Create(
+                [
+                    UIAction.Create("New", null, null, nothing),
+                    UIAction.Create("Open…", null, null, nothing),
+                    UIMenu.Create("", null, null, UIMenuOptions.DisplayInline,
+                    [
+                        UIAction.Create("Close", null, null, nothing),
+                    ]),
+                ]);
+                button.ShowsMenuAsPrimaryAction = true;
+                return button;
+            })
+            { Width = 72, Height = 44 },
+
+            "motion-date" => new UiKitHost(() =>
+            {
+                var view = new UIDatePicker
+                {
+                    PreferredDatePickerStyle = UIDatePickerStyle.Compact,
+                    Mode = UIDatePickerMode.Date,
+                    Locale = new NSLocale("en_US"),
+                };
+                var value = new NSDateComponents { Year = 2026, Month = 9, Day = 10 };
+                var date = NSCalendar.CurrentCalendar.DateFromComponents(value);
+                if (date is not null)
+                    view.Date = date;
+                return view;
+            })
+            { Width = 140, Height = 44 },
 
             "time" => new UiKitHost(() =>
             {

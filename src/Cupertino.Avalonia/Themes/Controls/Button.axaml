@@ -9,7 +9,7 @@
     <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
     <Setter Property="FontWeight" Value="Medium" />
     <Setter Property="Padding" Value="14,7" />
-    <Setter Property="MinHeight" Value="34.3" />
+    <Setter Property="MinHeight" Value="36" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="ClipToBounds" Value="False" />
@@ -26,14 +26,15 @@
           <controls:GlassSurface x:Name="GlassBg"
                                  CornerRadius="999"
                                  BlurRadius="12"
-                                 GlassThickness="5"
+                                 GlassThickness="1"
                                  RefractionStrength="7"
                                  ChromaticAberration="0.2"
                                  DepthEffect="0.25"
                                  Saturation="0.65"
                                  LightIntensity="0.15"
                                  FresnelStrength="0.30"
-                                 ShadowOpacity="0.13" ShadowBlur="9" ShadowOffset="2"
+                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
+                                 ShadowContactWeight="0"
                                  Tint="{DynamicResource CupertinoGlassButtonTint}">
             <controls:GlassSurface.Transitions>
               <Transitions>
@@ -45,6 +46,10 @@
                   CornerRadius="999"
                   IsVisible="False"
                   Background="{DynamicResource CupertinoBorderedFillBrush}" />
+          <!-- The resting prominent material has a thin luminous rim. -->
+          <Border x:Name="ProminentRim" CornerRadius="999" IsVisible="False"
+                  BorderThickness="0.667" IsHitTestVisible="False"
+                  BorderBrush="{DynamicResource CupertinoProminentRimBrush}" />
           <ContentPresenter x:Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}"
                             ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -82,6 +87,9 @@
       <Setter Property="Foreground" Value="{DynamicResource CupertinoProminentForegroundBrush}" />
       <Setter Property="FontWeight" Value="Normal" />
     </Style>
+    <Style Selector="^.prominent /template/ Border#ProminentRim">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^.prominent /template/ controls|GlassSurface#GlassBg">
       <Setter Property="IsAdaptive" Value="False" />
       <Setter Property="Tint" Value="{DynamicResource CupertinoProminentTint}" />
@@ -90,8 +98,10 @@
       <Setter Property="DepthEffect" Value="0.12" />
       <Setter Property="LightIntensity" Value="0.15" />
       <Setter Property="FresnelStrength" Value="0.18" />
-      <Setter Property="ShadowOpacity" Value="0.06" />
-      <Setter Property="ShadowBlur" Value="6" />
+      <Setter Property="GlassThickness" Value="1" />
+      <Setter Property="ShadowContactWeight" Value="0" />
+      <Setter Property="ShadowOpacity" Value="0.1" />
+      <Setter Property="ShadowBlur" Value="24" />
       <Setter Property="ShadowOffset" Value="1" />
     </Style>
     <Style Selector="^.prominent:pressed">

@@ -55,7 +55,7 @@ public partial class AppDelegate : AvaloniaAppDelegate<IosApp>
 
         // Register before the shell builds its catalogue.
         NativeComparisonHosts.Register();
-        return base.CustomizeAppBuilder(builder);
+        return base.CustomizeAppBuilder(builder).UseCupertinoSystemFont();
     }
 
     private void PlayImpact(UIImpactFeedbackStyle style)

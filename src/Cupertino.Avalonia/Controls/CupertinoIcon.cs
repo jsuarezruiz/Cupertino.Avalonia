@@ -26,6 +26,8 @@ public class CupertinoIcon : Control
         ["house"] = new("CupertinoHouseGeometry", 24, false, 2.0,
                         "CupertinoHouseDetailsGeometry"),
         ["house.fill"] = new("CupertinoHouseFillGeometry", 24, true),
+        ["house.tab.fill"] = new("CupertinoHouseTabRoofGeometry", 24, false, 2.15,
+                                 "CupertinoHouseTabBodyGeometry"),
         ["circle.half"] = new("CupertinoCircleHalfGeometry", 24, true),
         ["sparkle"] = new("CupertinoSparkleGeometry", 24, true),
         ["gear"] = new("CupertinoGearGeometry", 24, true),
