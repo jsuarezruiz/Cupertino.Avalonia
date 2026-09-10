@@ -4,7 +4,7 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 ## [Unreleased]
 
-## [0.1.0-preview.1]
+## [0.1.0-preview]
 
 Initial public preview of the iOS 26 design system, including Cupertino control themes, typography, colour, motion, custom controls, icons, and the Liquid Glass material.
 
