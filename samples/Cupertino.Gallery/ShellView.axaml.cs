@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.VisualTree;
 using Cupertino.Controls;
 using Cupertino.Gallery.Pages;
 
@@ -150,8 +151,6 @@ public partial class ShellView : UserControl
         _wideDetailNav.TrailingContent = MakeActions(_wideDetailNav, showSource: true, showSettings: false);
         _compactNav.NavigationCompleted += (_, _) => UpdateCompactSelection();
 
-        SizeChanged += (_, e) => UpdateAdaptiveLayout(e.NewSize.Width);
-
         var args = Environment.GetCommandLineArgs();
         var pageArg = Array.IndexOf(args, "--page");
         var requested = pageArg >= 0 && pageArg + 1 < args.Length
@@ -159,6 +158,7 @@ public partial class ShellView : UserControl
             : Environment.GetEnvironmentVariable("GALLERY_PAGE");
         if (requested is not null)
         {
+            var scrollTo = RequestedScroll(args);
             var wanted = entries.FirstOrDefault(
                 e => string.Equals(e.Title, requested, StringComparison.OrdinalIgnoreCase));
             if (wanted is not null)
@@ -167,14 +167,32 @@ public partial class ShellView : UserControl
                 void OpenOnce(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
                 {
                     Loaded -= OpenOnce;
-                    OpenEntry(wanted, attachCaptureState: true);
+                    OpenEntry(wanted, attachCaptureState: true, scrollTo: scrollTo);
                 }
                 Loaded += OpenOnce;
             }
         }
     }
 
-    private void OpenEntry(CatalogEntry entry, bool attachCaptureState = false)
+    protected override Avalonia.Size ArrangeOverride(Avalonia.Size finalSize)
+    {
+        UpdateAdaptiveLayout(finalSize.Width);
+        return base.ArrangeOverride(finalSize);
+    }
+
+    private static double RequestedScroll(string[] args)
+    {
+        var index = Array.IndexOf(args, "--scroll");
+        var text = index >= 0 && index + 1 < args.Length
+            ? args[index + 1]
+            : Environment.GetEnvironmentVariable("GALLERY_SCROLL");
+        return double.TryParse(text, System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture, out var value)
+                ? value
+                : 0;
+    }
+
+    private void OpenEntry(CatalogEntry entry, bool attachCaptureState = false, double scrollTo = 0)
     {
         _currentEntry = entry;
         _showingSettings = false;
@@ -186,6 +204,34 @@ public partial class ShellView : UserControl
             ShowWideDetail(entry.Title, content);
         else
             _compactNav.TryPush("catalog", entry.Title, content, entry);
+
+        if (scrollTo != 0)
+            ScrollAfterLayout(content, scrollTo);
+    }
+
+    // Negative scrolls to the end; reapplied while the page extent settles.
+    private static void ScrollAfterLayout(Control content, double scrollTo)
+    {
+        var attempts = 0;
+
+        void Apply()
+        {
+            var scroll = content.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+            if (scroll is not null)
+            {
+                var bottom = Math.Max(0, scroll.Extent.Height - scroll.Viewport.Height);
+                var target = scrollTo < 0 ? bottom : Math.Min(scrollTo, bottom);
+                if (scroll.Offset.Y != target)
+                    scroll.Offset = new Avalonia.Vector(0, target);
+            }
+
+            if (++attempts < 12)
+                Avalonia.Threading.DispatcherTimer.RunOnce(
+                    Apply, TimeSpan.FromMilliseconds(100), Avalonia.Threading.DispatcherPriority.Loaded);
+        }
+
+        Avalonia.Threading.DispatcherTimer.RunOnce(
+            Apply, TimeSpan.FromMilliseconds(400), Avalonia.Threading.DispatcherPriority.Loaded);
     }
 
     private void OpenSettings()
@@ -325,23 +371,10 @@ public partial class ShellView : UserControl
         {
             Height = 44,
             CornerRadius = new Avalonia.CornerRadius(22),
-            BlurRadius = 18,
-            GlassThickness = 1,
-            Saturation = 1,
-            RefractionStrength = 0,
-            ChromaticAberration = 0,
-            DepthEffect = 0,
-            LightIntensity = 0.25,
-            FresnelStrength = 0,
-            Magnification = 1,
-            ShadowOpacity = 0.10,
-            ShadowBlur = 24,
-            ShadowOffset = 2,
-            ShadowContactWeight = 0,
             Child = actions,
         };
-        capsule.Bind(GlassSurface.TintProperty,
-            this.GetResourceObservable("CupertinoBarButtonTint"));
+        capsule.Bind(Avalonia.StyledElement.ThemeProperty,
+            capsule.GetResourceObservable("CupertinoBarCapsule"));
 
         if (source is not null)
         {

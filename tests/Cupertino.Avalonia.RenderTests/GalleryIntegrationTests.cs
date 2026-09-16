@@ -77,12 +77,17 @@ public class GalleryIntegrationTests
 
                 // Scroll the page itself; nested lists keep their own positions.
                 var scroll = page.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
-                if (scroll is not null && scroll.Extent.Height > scroll.Viewport.Height)
+                if (scroll is not null)
                 {
-                    scroll.ScrollToEnd();
-                    window.UpdateLayout();
-                    Capture(window, page.GetType().Name, dark, width, rtl, "bottom");
-                    Assert.True(scroll.Offset.Y > 0, entry.Title);
+                    Assert.True(scroll.Extent.Width <= scroll.Viewport.Width + 0.5,
+                        $"{entry.Title} horizontally overflows: extent {scroll.Extent.Width:F1}, viewport {scroll.Viewport.Width:F1}");
+                    if (scroll.Extent.Height > scroll.Viewport.Height)
+                    {
+                        scroll.ScrollToEnd();
+                        window.UpdateLayout();
+                        Capture(window, page.GetType().Name, dark, width, rtl, "bottom");
+                        Assert.True(scroll.Offset.Y > 0, entry.Title);
+                    }
                 }
 
                 Assert.All(page.GetVisualDescendants(), visual =>
@@ -122,6 +127,53 @@ public class GalleryIntegrationTests
             CupertinoAccessibility.TextScaleFactor = oldScale;
             CupertinoAccessibility.ReduceMotion = oldMotion;
         }
+    }
+
+    [AvaloniaFact]
+    public void Wide_home_intro_wraps_inside_the_detail_viewport()
+    {
+        var shell = new ShellView();
+        var window = new Window { Width = 800, Height = 844, Content = shell };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var detail = shell.FindControl<CupertinoNavigationPage>("WideDetailNav")!;
+            var home = Assert.IsType<HomePage>(detail.CurrentContent);
+            var scroll = home.GetVisualDescendants().OfType<ScrollViewer>().First();
+            var intro = home.FindControl<TextBlock>("Intro")!;
+
+            Assert.Equal(ScrollBarVisibility.Disabled, scroll.HorizontalScrollBarVisibility);
+            Assert.Equal(TextWrapping.Wrap, intro.TextWrapping);
+            Assert.True(scroll.Extent.Width <= scroll.Viewport.Width + 0.5);
+            Assert.True(intro.Bounds.Height > intro.FontSize * 1.5,
+                $"intro stayed on one line at {intro.Bounds.Width:F1}×{intro.Bounds.Height:F1}");
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Wide_layout_keeps_the_catalog_column_at_its_designed_width()
+    {
+        var shell = new ShellView();
+        var window = new Window { Width = 1920, Height = 1080, Content = shell };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var wideLayout = shell.FindControl<Grid>("WideLayout")!;
+            var catalog = shell.FindControl<CupertinoNavigationPage>("WideCatalogNav")!;
+            var detail = shell.FindControl<CupertinoNavigationPage>("WideDetailNav")!;
+            Assert.Equal(1920, shell.Bounds.Width);
+            Assert.Equal(360, wideLayout.ColumnDefinitions[0].ActualWidth);
+            Assert.Equal(360, catalog.Bounds.Width);
+            Assert.Equal(1559, detail.Bounds.Width, 1);
+        }
+        finally { window.Close(); }
     }
 
     [AvaloniaFact]

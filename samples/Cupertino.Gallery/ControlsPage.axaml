@@ -10,7 +10,7 @@
                  Foreground="{DynamicResource CupertinoLabelBrush}"
                  Margin="20,0,20,2" />
       <TextBlock Text="Explore common controls and try their different states."
-                 FontSize="15" Margin="20,0,20,22"
+                 FontSize="15" Margin="20,0,20,22" TextWrapping="Wrap"
                  Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
 
       <cupertino:Section Header="BUTTON"

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -38,10 +36,9 @@ public partial class RootPage : UserControl
         if (!showHero)
             this.FindControl<Section>("SearchSection")!.Classes.Add("desktop-search-host");
         Refill(string.Empty);
-        this.FindControl<CupertinoDatePicker>("HighlightDate")!.SelectedDate =
-            DateTimeOffset.Now;
-        this.FindControl<CupertinoTimePicker>("HighlightTime")!.SelectedTime =
-            DateTimeOffset.Now.TimeOfDay;
+        var now = GalleryCaptureState.IsEnabled ? GalleryCaptureState.CaptureDateTime : DateTimeOffset.Now;
+        this.FindControl<CupertinoDatePicker>("HighlightDate")!.SelectedDate = now;
+        this.FindControl<CupertinoTimePicker>("HighlightTime")!.SelectedTime = now.TimeOfDay;
 
         var heroVersion = this.FindControl<TextBlock>("HeroVersion")!;
         heroVersion.IsVisible = VersionInfo.Library is not null;

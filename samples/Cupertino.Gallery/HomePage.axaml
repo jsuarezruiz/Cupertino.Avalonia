@@ -27,8 +27,9 @@
   <ScrollViewer>
     <StackPanel Margin="0,150,0,120">
 
-      <TextBlock Text="An iOS 26 design system for Avalonia: controls, typography, colour and motion."
-                 FontSize="15" Margin="20,0,20,22"
+      <TextBlock x:Name="Intro"
+                 Text="An iOS 26 design system for Avalonia: controls, typography, colour and motion."
+                 FontSize="15" Margin="20,0,20,22" TextWrapping="Wrap"
                  Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
 
       <cupertino:Section Header="MATERIAL"

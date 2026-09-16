@@ -26,6 +26,10 @@
       <Setter Property="Fill" Value="{DynamicResource CupertinoSeparatorBrush}" />
       <Setter Property="Margin" Value="16,0,0,0" />
     </Style>
+    <!-- Give wrapped page text a finite width. -->
+    <Style Selector="UserControl > ScrollViewer">
+      <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+    </Style>
   </UserControl.Styles>
 
   <Grid>

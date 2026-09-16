@@ -34,9 +34,9 @@ internal static class GalleryCaptureState
         applyOnce = (_, _) =>
         {
             content.Loaded -= applyOnce;
-            // Popup anchors need their final navigation-transition bounds.
+            // Wait past the 350 ms navigation transition for final popup anchor bounds.
             DispatcherTimer.RunOnce(captureState.ApplyGalleryCaptureState,
-                TimeSpan.FromMilliseconds(350), DispatcherPriority.Loaded);
+                TimeSpan.FromMilliseconds(450), DispatcherPriority.Loaded);
         };
         content.Loaded += applyOnce;
     }

@@ -35,7 +35,7 @@
       </cupertino:Section>
 
       <cupertino:Section Header="DURATION"
-                         Footer="Set Expiration to control how long a notification stays visible. TimeSpan.Zero keeps it open until dismissed. Hover over a banner to reveal its close button.">
+                         Footer="Set Expiration to control how long a notification stays visible. TimeSpan.Zero keeps it open until dismissed. Hover over a banner, or move keyboard focus into it, to reveal its close button.">
         <StackPanel>
         <Grid Classes="case" ColumnDefinitions="Auto,*">
           <TextBlock Classes="case" Text="Timing" />
