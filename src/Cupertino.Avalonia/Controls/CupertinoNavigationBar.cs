@@ -39,31 +39,31 @@ public class CupertinoNavigationBar : TemplatedControl
         AvaloniaProperty.Register<CupertinoNavigationBar, object?>(nameof(TrailingContent));
 
     /// <summary>
-    /// Gets or sets whether the large title is enabled.
+    /// Identifies the <see cref="IsLargeTitle"/> property.
     /// </summary>
     public static readonly StyledProperty<bool> IsLargeTitleProperty =
         AvaloniaProperty.Register<CupertinoNavigationBar, bool>(nameof(IsLargeTitle), true);
 
     /// <summary>
-    /// Gets or sets the scroller that collapses the title.
+    /// Identifies the <see cref="Scroller"/> property.
     /// </summary>
     public static readonly StyledProperty<ScrollViewer?> ScrollerProperty =
         AvaloniaProperty.Register<CupertinoNavigationBar, ScrollViewer?>(nameof(Scroller));
 
     /// <summary>
-    /// Gets or sets collapse progress from 0 to 1.
+    /// Identifies the <see cref="CollapseProgress"/> property.
     /// </summary>
     public static readonly StyledProperty<double> CollapseProgressProperty =
         AvaloniaProperty.Register<CupertinoNavigationBar, double>(nameof(CollapseProgress));
 
     /// <summary>
-    /// Gets or sets the collapse distance.
+    /// Identifies the <see cref="CollapseDistance"/> property.
     /// </summary>
     public static readonly StyledProperty<double> CollapseDistanceProperty =
         AvaloniaProperty.Register<CupertinoNavigationBar, double>(nameof(CollapseDistance), 68.0);
 
     /// <summary>
-    /// The primary text displayed by this control.
+    /// The title shown in both the large and inline presentations.
     /// </summary>
     public string? Title { get => GetValue(TitleProperty); set => SetValue(TitleProperty, value); }
     /// <summary>
@@ -92,28 +92,28 @@ public class CupertinoNavigationBar : TemplatedControl
     public double CollapseDistance { get => GetValue(CollapseDistanceProperty); set => SetValue(CollapseDistanceProperty, value); }
 
     /// <summary>
-    /// Gets the large-title opacity.
+    /// Identifies the <see cref="LargeTitleOpacity"/> property.
     /// </summary>
     public static readonly DirectProperty<CupertinoNavigationBar, double> LargeTitleOpacityProperty =
         AvaloniaProperty.RegisterDirect<CupertinoNavigationBar, double>(
             nameof(LargeTitleOpacity), o => o.LargeTitleOpacity);
 
     /// <summary>
-    /// Gets the inline-title opacity.
+    /// Identifies the <see cref="InlineTitleOpacity"/> property.
     /// </summary>
     public static readonly DirectProperty<CupertinoNavigationBar, double> InlineTitleOpacityProperty =
         AvaloniaProperty.RegisterDirect<CupertinoNavigationBar, double>(
             nameof(InlineTitleOpacity), o => o.InlineTitleOpacity);
 
     /// <summary>
-    /// Gets the backdrop opacity.
+    /// Identifies the <see cref="BackdropOpacity"/> property.
     /// </summary>
     public static readonly DirectProperty<CupertinoNavigationBar, double> BackdropOpacityProperty =
         AvaloniaProperty.RegisterDirect<CupertinoNavigationBar, double>(
             nameof(BackdropOpacity), o => o.BackdropOpacity);
 
     /// <summary>
-    /// Gets the large-title offset.
+    /// Identifies the <see cref="LargeTitleOffset"/> property.
     /// </summary>
     public static readonly DirectProperty<CupertinoNavigationBar, double> LargeTitleOffsetProperty =
         AvaloniaProperty.RegisterDirect<CupertinoNavigationBar, double>(
@@ -168,6 +168,12 @@ public class CupertinoNavigationBar : TemplatedControl
     private IDisposable? _leadingBoundsSubscription;
     private IDisposable? _trailingBoundsSubscription;
     private Control? _inlineTitle;
+    private double _largeTitleOpacity = 1;
+    private double _inlineTitleOpacity;
+    private double _backdropOpacity;
+    private double _largeTitleOffset;
+    private (string Text, Typeface Typeface, double Size, double LetterSpacing, FlowDirection Direction)? _measuredTitle;
+    private double _measuredTitleWidth;
 
     internal Control? InlineTitle => _inlineTitle;
     private Control? _leading;
@@ -210,14 +216,7 @@ public class CupertinoNavigationBar : TemplatedControl
         var symmetric = Math.Max(TitleBaseMargin, Math.Max(leading, trailing) + TitleButtonGap);
 
         var rowWidth = (title.GetVisualParent() as Control)?.Bounds.Width ?? 0;
-        var wanted = new FormattedText(
-            title.Text ?? string.Empty,
-            System.Globalization.CultureInfo.CurrentCulture,
-            FlowDirection,
-            new Typeface(title.FontFamily, title.FontStyle, title.FontWeight),
-            title.FontSize, null).Width;
-        if (title.Text is { Length: > 1 })
-            wanted += (title.Text.Length - 1) * title.LetterSpacing;
+        var wanted = MeasureTitle(title);
 
         var staysCentered = rowWidth <= 0 || rowWidth - 2 * symmetric >= wanted;
         title.HorizontalAlignment = staysCentered
@@ -227,6 +226,32 @@ public class CupertinoNavigationBar : TemplatedControl
             ? new Thickness(symmetric, 0)
             : new Thickness(leading > 0 ? leading + TitleButtonGap : 0, 0,
                             trailing > 0 ? trailing + TitleButtonGap : 0, 0);
+    }
+
+    private double MeasureTitle(TextBlock title)
+    {
+        var text = title.Text ?? string.Empty;
+        var key = (text, new Typeface(title.FontFamily, title.FontStyle, title.FontWeight),
+                   title.FontSize, title.LetterSpacing, FlowDirection);
+        if (_measuredTitle == key)
+            return _measuredTitleWidth;
+
+        var width = new FormattedText(
+            text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection,
+            key.Item2, title.FontSize, null).Width;
+        if (text.Length > 1)
+            width += (text.Length - 1) * title.LetterSpacing;
+        _measuredTitle = key;
+        _measuredTitleWidth = width;
+        return width;
+    }
+
+    private void RaiseDerived(DirectProperty<CupertinoNavigationBar, double> property, ref double previous, double current)
+    {
+        var old = previous;
+        previous = current;
+        if (old != current)
+            RaisePropertyChanged(property, old, current);
     }
 
     /// <inheritdoc/>
@@ -240,10 +265,10 @@ public class CupertinoNavigationBar : TemplatedControl
         }
         else if (change.Property == CollapseProgressProperty || change.Property == IsLargeTitleProperty)
         {
-            RaisePropertyChanged(LargeTitleOpacityProperty, double.NaN, LargeTitleOpacity);
-            RaisePropertyChanged(InlineTitleOpacityProperty, double.NaN, InlineTitleOpacity);
-            RaisePropertyChanged(BackdropOpacityProperty, double.NaN, BackdropOpacity);
-            RaisePropertyChanged(LargeTitleOffsetProperty, double.NaN, LargeTitleOffset);
+            RaiseDerived(LargeTitleOpacityProperty, ref _largeTitleOpacity, LargeTitleOpacity);
+            RaiseDerived(InlineTitleOpacityProperty, ref _inlineTitleOpacity, InlineTitleOpacity);
+            RaiseDerived(BackdropOpacityProperty, ref _backdropOpacity, BackdropOpacity);
+            RaiseDerived(LargeTitleOffsetProperty, ref _largeTitleOffset, LargeTitleOffset);
         }
         else if (change.Property == TitleProperty)
         {

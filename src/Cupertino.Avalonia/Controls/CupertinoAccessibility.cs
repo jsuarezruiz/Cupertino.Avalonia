@@ -32,6 +32,10 @@ public interface ICupertinoAccessibilityProvider
 /// <summary>
 /// Controls accessibility behavior for the theme.
 /// </summary>
+/// <remarks>
+/// Every setter applies on the UI thread. Called from any other thread it posts the change
+/// and returns immediately, so a getter read straight afterwards still returns the old value.
+/// </remarks>
 public static class CupertinoAccessibility
 {
     private static bool _reduceTransparency;

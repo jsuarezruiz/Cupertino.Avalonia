@@ -11,7 +11,7 @@ namespace Cupertino.Controls;
 public class Section : HeaderedContentControl
 {
     /// <summary>
-    /// Gets or sets the footer content.
+    /// Identifies the <see cref="Footer"/> property.
     /// </summary>
     public static readonly StyledProperty<object?> FooterProperty =
         AvaloniaProperty.Register<Section, object?>(nameof(Footer));

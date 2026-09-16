@@ -21,9 +21,16 @@
                             Content="{TemplateBinding Content}"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center" />
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  Width="38.6" Height="38.6" CornerRadius="19.3"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
 
     <Style Selector="^:selected /template/ Ellipse#Disc">
       <Style.Animations>
@@ -89,9 +96,16 @@
                   IsVisible="False" />
           <ContentPresenter Content="{TemplateBinding Content}"
                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="18" Margin="2,1"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^:selected /template/ Border#Pill">
       <Setter Property="IsVisible" Value="True" />
     </Style>
@@ -121,9 +135,16 @@
           <ContentPresenter Content="{TemplateBinding Content}"
                             HorizontalContentAlignment="Left"
                             VerticalContentAlignment="Center" />
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="8" Margin="-6,-2"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^:pressed">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
@@ -140,9 +161,16 @@
           <ContentPresenter Content="{TemplateBinding Content}"
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center" />
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="18" Margin="4,0"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^:pressed">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
@@ -150,6 +178,12 @@
       <Setter Property="Opacity" Value="0.3" />
     </Style>
   </ControlTheme>
+
+  <!-- Compatibility aliases retained from the 0.1 preview. -->
+  <ControlTheme x:Key="CupertinoCalendarTitleButton" TargetType="Button"
+                BasedOn="{StaticResource CupertinoCalendarHeaderButton}" />
+  <ControlTheme x:Key="CupertinoCalendarChevron" TargetType="Button"
+                BasedOn="{StaticResource CupertinoCalendarPagingButton}" />
 
   <ControlTheme x:Key="{x:Type CalendarItem}" TargetType="CalendarItem">
     <Setter Property="DayTitleTemplate">
@@ -170,7 +204,8 @@
                       Theme="{StaticResource CupertinoCalendarHeaderButton}"
                       HorizontalAlignment="Left" />
               <Button x:Name="PART_PreviousButton" Grid.Column="1"
-                      Theme="{StaticResource CupertinoCalendarPagingButton}">
+                      Theme="{StaticResource CupertinoCalendarPagingButton}"
+                      AutomationProperties.Name="{DynamicResource CupertinoPreviousMonthText}">
                 <Path Data="{StaticResource CupertinoChevronLeftGeometry}"
                       Stroke="{DynamicResource CupertinoAccentBrush}"
                       StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
@@ -178,7 +213,8 @@
                       RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
               </Button>
               <Button x:Name="PART_NextButton" Grid.Column="2"
-                      Theme="{StaticResource CupertinoCalendarPagingButton}">
+                      Theme="{StaticResource CupertinoCalendarPagingButton}"
+                      AutomationProperties.Name="{DynamicResource CupertinoNextMonthText}">
                 <Path Data="{StaticResource CupertinoChevronRightGeometry}"
                       Stroke="{DynamicResource CupertinoAccentBrush}"
                       StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"

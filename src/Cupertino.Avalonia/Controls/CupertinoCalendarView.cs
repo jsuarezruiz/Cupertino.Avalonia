@@ -13,6 +13,10 @@ namespace Cupertino.Controls;
 /// <summary>
 /// Renders a month grid for compact date pickers.
 /// </summary>
+/// <remarks>
+/// Days are laid out on the proleptic Gregorian calendar. Weekday names, month names and the
+/// first day of the week follow the current culture; non-Gregorian calendar systems do not.
+/// </remarks>
 public class CupertinoMonthGrid : Control
 {
     /// <summary>
@@ -63,7 +67,7 @@ public class CupertinoMonthGrid : Control
     /// </summary>
     public static readonly StyledProperty<DayOfWeek> FirstDayOfWeekProperty =
         AvaloniaProperty.Register<CupertinoMonthGrid, DayOfWeek>(nameof(FirstDayOfWeek),
-            CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
+            DateMath.CultureFirstDayOfWeek);
 
     /// <summary>
     /// Identifies the <see cref="MinimumDate"/> property.
@@ -86,7 +90,7 @@ public class CupertinoMonthGrid : Control
     /// </summary>
     public DateTimeOffset? SelectedDate { get => GetValue(SelectedDateProperty); set => SetValue(SelectedDateProperty, value); }
     /// <summary>
-    /// The brush used to draw the text or indicator.
+    /// The text brush for enabled days that are neither selected nor today.
     /// </summary>
     public IBrush Foreground { get => GetValue(ForegroundProperty); set => SetValue(ForegroundProperty, value); }
     /// <summary>
@@ -106,7 +110,7 @@ public class CupertinoMonthGrid : Control
     /// </summary>
     public IBrush WeekdayBrush { get => GetValue(WeekdayBrushProperty); set => SetValue(WeekdayBrushProperty, value); }
     /// <summary>
-    /// The weekday in the first calendar column; defaults to the current culture when the control type is initialized.
+    /// The weekday in the first calendar column; each instance defaults to the current culture when it is created.
     /// </summary>
     public DayOfWeek FirstDayOfWeek { get => GetValue(FirstDayOfWeekProperty); set => SetValue(FirstDayOfWeekProperty, value); }
     /// <summary>
@@ -132,10 +136,10 @@ public class CupertinoMonthGrid : Control
 
     private readonly Rendering.FormattedTextCache _textCache = new();
     private DateTime? _poppingSelection;
-    private DateTime _popStart;
+    private long _popStart;
     private DateTime? _slideFromMonth;
     private int _slideDirection;
-    private DateTime _slideStart;
+    private long _slideStart;
     private DispatcherTimer? _animTimer;
 
     static CupertinoMonthGrid()
@@ -147,6 +151,15 @@ public class CupertinoMonthGrid : Control
                                           WeekdayBrushProperty, FirstDayOfWeekProperty,
                                           MinimumDateProperty, MaximumDateProperty, FlowDirectionProperty);
         FocusableProperty.OverrideDefaultValue<CupertinoMonthGrid>(true);
+    }
+
+    /// <summary>
+    /// Creates a month grid showing the current month.
+    /// </summary>
+    public CupertinoMonthGrid()
+    {
+        SetCurrentValue(DisplayMonthProperty, DateTime.Today);
+        SetCurrentValue(FirstDayOfWeekProperty, DateMath.CultureFirstDayOfWeek);
     }
 
     /// <summary>
@@ -165,7 +178,7 @@ public class CupertinoMonthGrid : Control
             change.NewValue is DateTimeOffset selected)
         {
             _poppingSelection = selected.Date;
-            _popStart = DateTime.UtcNow;
+            _popStart = MotionClock.Now;
             StartAnimTimer();
         }
         else if (change.Property == DisplayMonthProperty &&
@@ -175,7 +188,7 @@ public class CupertinoMonthGrid : Control
         {
             _slideFromMonth = new DateTime(oldMonth.Year, oldMonth.Month, 1);
             _slideDirection = newMonth > oldMonth ? 1 : -1;
-            _slideStart = DateTime.UtcNow;
+            _slideStart = MotionClock.Now;
             StartAnimTimer();
         }
     }
@@ -189,11 +202,11 @@ public class CupertinoMonthGrid : Control
 
     private void OnAnimTick(object? sender, EventArgs e)
     {
-        var now = DateTime.UtcNow;
+        var now = MotionClock.Now;
         var popDone = _poppingSelection is null ||
-                      (now - _popStart).TotalMilliseconds >= SelectionPopMs;
+                      now - _popStart >= SelectionPopMs;
         var slideDone = _slideFromMonth is null ||
-                        (now - _slideStart).TotalMilliseconds >= MonthSlideMs;
+                        now - _slideStart >= MonthSlideMs;
         if (popDone)
             _poppingSelection = null;
         if (slideDone)
@@ -201,6 +214,8 @@ public class CupertinoMonthGrid : Control
         if (popDone && slideDone)
             _animTimer?.Stop();
         InvalidateVisual();
+        // Keep surrounding glass in step with the animation.
+        GlassSurface.PulseBehind(this);
     }
 
     /// <inheritdoc/>
@@ -255,7 +270,7 @@ public class CupertinoMonthGrid : Control
         if (_slideFromMonth is { } fromMonth)
         {
             var t = Math.Clamp(
-                (DateTime.UtcNow - _slideStart).TotalMilliseconds / MonthSlideMs, 0, 1);
+                MotionClock.MillisecondsSince(_slideStart) / MonthSlideMs, 0, 1);
             var eased = 1 - Math.Pow(1 - t, 3);
             var width = Bounds.Width;
             var dayArea = new Rect(0, weekdayRow, width,
@@ -298,7 +313,7 @@ public class CupertinoMonthGrid : Control
                 if (_poppingSelection == date)
                 {
                     var t = Math.Clamp(
-                        (DateTime.UtcNow - _popStart).TotalMilliseconds / SelectionPopMs, 0, 1);
+                        MotionClock.MillisecondsSince(_popStart) / SelectionPopMs, 0, 1);
                     r *= 0.5 + 0.5 * (1 - (1 - t) * (1 - t));
                 }
                 context.DrawEllipse(SelectionBrush, null, new Point(cx, cy), r, r);
@@ -329,13 +344,10 @@ public class CupertinoMonthGrid : Control
         if (p.Y < WeekdayRowHeight)
             return null;
 
-        var visualCol = (int)(p.X / Cell);
+        var col = (int)(p.X / Cell);
         var row = (int)((p.Y - WeekdayRowHeight) / Cell);
-        if (visualCol is < 0 or > 6 || row < 0)
+        if (col is < 0 or > 6 || row < 0)
             return null;
-
-        // Avalonia already mirrors local coordinates in RTL.
-        var col = visualCol;
 
         var first = new DateTime(DisplayMonth.Year, DisplayMonth.Month, 1);
         var day = row * 7 + col - ColumnOf(first) + 1;
@@ -420,7 +432,7 @@ public class CupertinoCalendarView : TemplatedControl
         AvaloniaProperty.Register<CupertinoCalendarView, DateTime>(nameof(DisplayMonth), DateTime.Today);
 
     /// <summary>
-    /// Gets or sets whether month and year wheels are shown.
+    /// Identifies the <see cref="IsMonthPickerOpen"/> property.
     /// </summary>
     public static readonly StyledProperty<bool> IsMonthPickerOpenProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, bool>(nameof(IsMonthPickerOpen));
@@ -439,7 +451,7 @@ public class CupertinoCalendarView : TemplatedControl
     public bool IsMonthPickerOpen { get => GetValue(IsMonthPickerOpenProperty); set => SetValue(IsMonthPickerOpenProperty, value); }
 
     /// <summary>
-    /// Gets or sets the first available year.
+    /// Identifies the <see cref="MinYear"/> property.
     /// </summary>
     public static readonly StyledProperty<int> MinYearProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, int>(nameof(MinYear), 1900);
@@ -467,7 +479,7 @@ public class CupertinoCalendarView : TemplatedControl
     /// </summary>
     public static readonly StyledProperty<DayOfWeek> FirstDayOfWeekProperty =
         AvaloniaProperty.Register<CupertinoCalendarView, DayOfWeek>(nameof(FirstDayOfWeek),
-            CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
+            DateMath.CultureFirstDayOfWeek);
 
     /// <summary>
     /// The lowest year in the month picker and selectable calendar range, clamped to 1–9999; defaults to 1900.
@@ -486,7 +498,7 @@ public class CupertinoCalendarView : TemplatedControl
     /// </summary>
     public DateTimeOffset? MaximumDate { get => GetValue(MaximumDateProperty); set => SetValue(MaximumDateProperty, value); }
     /// <summary>
-    /// The weekday in the first calendar column; defaults to the current culture when the control type is initialized.
+    /// The weekday in the first calendar column; each instance defaults to the current culture when it is created.
     /// </summary>
     public DayOfWeek FirstDayOfWeek { get => GetValue(FirstDayOfWeekProperty); set => SetValue(FirstDayOfWeekProperty, value); }
 
@@ -494,6 +506,15 @@ public class CupertinoCalendarView : TemplatedControl
     /// Raised when a day is selected.
     /// </summary>
     public event EventHandler<DateTime>? DayPicked;
+
+    /// <summary>
+    /// Creates a calendar view showing the current month.
+    /// </summary>
+    public CupertinoCalendarView()
+    {
+        SetCurrentValue(DisplayMonthProperty, DateTime.Today);
+        SetCurrentValue(FirstDayOfWeekProperty, DateMath.CultureFirstDayOfWeek);
+    }
 
     private CupertinoMonthGrid? _grid;
     private TextBlock? _title;
@@ -707,25 +728,8 @@ public class CupertinoCalendarView : TemplatedControl
         return MonthFromOrdinal(month, value.Kind);
     }
 
-    private void NormalizeDateRange(AvaloniaProperty changedProperty)
-    {
-        if (MinimumDate is not { } minimum || MaximumDate is not { } maximum
-            || minimum.Date <= maximum.Date)
-            return;
-
-        _normalizingDateRange = true;
-        try
-        {
-            if (changedProperty == MinimumDateProperty)
-                SetCurrentValue(MaximumDateProperty, minimum);
-            else
-                SetCurrentValue(MinimumDateProperty, maximum);
-        }
-        finally
-        {
-            _normalizingDateRange = false;
-        }
-    }
+    private void NormalizeDateRange(AvaloniaProperty changedProperty) =>
+        DateRange.Normalize(this, changedProperty, MinimumDateProperty, MaximumDateProperty, ref _normalizingDateRange);
 
     private void UpdateDateConstraints()
     {
@@ -767,22 +771,10 @@ public class CupertinoCalendarView : TemplatedControl
             minimum = maximum;
 
         if (selected.Date < minimum)
-            return DateAtOffset(minimum, selected.Offset);
+            return DateMath.AtOffset(minimum, selected.Offset);
         if (selected.Date > maximum)
-            return DateAtOffset(maximum, selected.Offset);
+            return DateMath.AtOffset(maximum, selected.Offset);
         return selected;
-    }
-
-    private static DateTimeOffset DateAtOffset(DateTime date, TimeSpan preferredOffset)
-    {
-        try
-        {
-            return new DateTimeOffset(date, preferredOffset);
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            return new DateTimeOffset(date, TimeSpan.Zero);
-        }
     }
 
     private (DateTime Minimum, DateTime Maximum) EffectiveMonthRange()

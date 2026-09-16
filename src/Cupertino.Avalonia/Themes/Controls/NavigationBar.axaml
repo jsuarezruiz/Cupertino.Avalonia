@@ -14,13 +14,7 @@
     <Setter Property="Template">
       <ControlTemplate>
         <controls:GlassSurface CornerRadius="22" ClipToBounds="False"
-                        BlurRadius="18" GlassThickness="1" Saturation="1"
-                        RefractionStrength="0" ChromaticAberration="0"
-                        DepthEffect="0" LightIntensity="0.25"
-                        FresnelStrength="0" Magnification="1"
-                        Tint="{DynamicResource CupertinoBarButtonTint}"
-                        ShadowOpacity="0.1" ShadowBlur="24"
-                        ShadowOffset="2" ShadowContactWeight="0">
+                               Theme="{StaticResource CupertinoBarCapsule}">
           <ContentPresenter Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}"
                             ContentTemplate="{TemplateBinding ContentTemplate}"

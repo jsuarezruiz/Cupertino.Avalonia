@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Media;
 
 namespace Cupertino.Controls;
 
@@ -21,6 +19,7 @@ public class CupertinoToolbar : ItemsControl
 {
     private Grid? _groups;
     private ItemsSourceView? _itemsView;
+    private readonly List<IDisposable> _capsuleBindings = new();
 
     /// <summary>
     /// Creates a CupertinoToolbar with its default settings.
@@ -69,6 +68,9 @@ public class CupertinoToolbar : ItemsControl
                 row.Children.Clear();
         _groups.Children.Clear();
         _groups.ColumnDefinitions.Clear();
+        foreach (var binding in _capsuleBindings)
+            binding.Dispose();
+        _capsuleBindings.Clear();
     }
 
     private void BuildGroups()
@@ -108,23 +110,10 @@ public class CupertinoToolbar : ItemsControl
             {
                 MinHeight = 48,
                 CornerRadius = new CornerRadius(24),
-                BlurRadius = 18,
-                GlassThickness = 1,
-                Saturation = 1,
-                RefractionStrength = 0,
-                ChromaticAberration = 0,
-                DepthEffect = 0,
-                LightIntensity = 0.25,
-                FresnelStrength = 0,
-                Magnification = 1,
-                ShadowOpacity = 0.10,
-                ShadowBlur = 24,
-                ShadowOffset = 2,
-                ShadowContactWeight = 0,
                 Child = row,
             };
-            capsule.Bind(GlassSurface.TintProperty,
-                this.GetResourceObservable("CupertinoBarButtonTint"));
+            _capsuleBindings.Add(capsule.Bind(StyledElement.ThemeProperty,
+                capsule.GetResourceObservable("CupertinoBarCapsule")));
             _groups.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
             Grid.SetColumn(capsule, column++);
             _groups.Children.Add(capsule);

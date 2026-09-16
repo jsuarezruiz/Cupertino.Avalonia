@@ -5,7 +5,8 @@
 
   <ControlTheme x:Key="{x:Type notifications:NotificationCard}"
                 TargetType="notifications:NotificationCard">
-    <Setter Property="Width" Value="350" />
+    <Setter Property="MaxWidth" Value="350" />
+    <Setter Property="HorizontalAlignment" Value="Stretch" />
     <!-- Preserve DataType matching when custom controls are shown. -->
     <Setter Property="ContentTemplate">
       <DataTemplate>
@@ -41,7 +42,6 @@
               <Button x:Name="Close" Grid.Column="2"
                       Classes="plain" MinHeight="0" Padding="4"
                       Margin="8,0,0,0" VerticalAlignment="Top"
-                      IsVisible="False"
                       notifications:NotificationCard.CloseOnClick="True">
                 <Path Data="{StaticResource CupertinoXMarkGeometry}"
                       Stroke="{DynamicResource CupertinoSecondaryLabelBrush}"
@@ -87,8 +87,15 @@
       </Style.Animations>
     </Style>
 
+    <!-- Hidden visually but still reachable by keyboard. -->
+    <Style Selector="^ /template/ Button#Close">
+      <Setter Property="Opacity" Value="0" />
+    </Style>
     <Style Selector="^:pointerover /template/ Button#Close">
-      <Setter Property="IsVisible" Value="True" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="^:focus-within /template/ Button#Close">
+      <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="^[NotificationType=Success] /template/ Ellipse#TypeDot">
       <Setter Property="Fill" Value="{DynamicResource CupertinoSuccessBrush}" />
@@ -139,4 +146,3 @@
   </ControlTheme>
 
 </ResourceDictionary>
-

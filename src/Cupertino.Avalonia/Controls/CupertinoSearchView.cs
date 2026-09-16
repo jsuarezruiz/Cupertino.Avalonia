@@ -4,10 +4,10 @@ using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
-using Avalonia.VisualTree;
 
 namespace Cupertino.Controls;
 
@@ -93,9 +93,10 @@ public class CupertinoSearchView : TemplatedControl
     /// Identifies the <see cref="EmptyContent"/> property.
     /// </summary>
     public static readonly StyledProperty<object?> EmptyContentProperty =
-        AvaloniaProperty.Register<CupertinoSearchView, object?>(nameof(EmptyContent), "No Results");
+        AvaloniaProperty.Register<CupertinoSearchView, object?>(nameof(EmptyContent));
 
-    private ObservableCollection<object> _filteredItems = new();
+    private readonly ObservableCollection<object> _filteredItems = new();
+    private IEnumerable? _filteredSource;
     private readonly List<(object? Value, bool Matches)> _sourceEntries = new();
     /// <summary>
     /// Identifies the <see cref="FilteredItems"/> property.
@@ -137,11 +138,11 @@ public class CupertinoSearchView : TemplatedControl
     /// </summary>
     public IDataTemplate? ItemTemplate { get => GetValue(ItemTemplateProperty); set => SetValue(ItemTemplateProperty, value); }
     /// <summary>
-    /// Content displayed when no results match the current query and scope.
+    /// Content displayed when no results match the current query and scope; null shows the CupertinoSearchEmptyText resource.
     /// </summary>
     public object? EmptyContent { get => GetValue(EmptyContentProperty); set => SetValue(EmptyContentProperty, value); }
     /// <summary>
-    /// The current results in source order, including duplicates. Collection notifications report incremental changes; query changes replace this list.
+    /// The current results in source order, including duplicates. The collection instance is stable; query, scope and source changes update it in place.
     /// </summary>
     public IReadOnlyList<object> FilteredItems => _filteredItems;
 
@@ -186,6 +187,8 @@ public class CupertinoSearchView : TemplatedControl
     private TextBox? _field;
     private TabStrip? _scopeStrip;
     private ListBox? _results;
+    private ContentPresenter? _empty;
+    private IDisposable? _emptyBinding;
     private INotifyCollectionChanged? _observableSource;
     private INotifyCollectionChanged? _observableScopes;
     private bool _isAttached;
@@ -217,6 +220,8 @@ public class CupertinoSearchView : TemplatedControl
         _field = e.NameScope.Find<TextBox>("PART_Field");
         _scopeStrip = e.NameScope.Find<TabStrip>("PART_Scopes");
         _results = e.NameScope.Find<ListBox>("PART_Results");
+        _empty = e.NameScope.Find<ContentPresenter>("PART_Empty");
+        UpdateEmptyContent();
 
         if (e.NameScope.Find<Button>("PART_CompactButton") is { } compact)
             compact.Click += (_, _) => SetExpanded(true);
@@ -356,11 +361,13 @@ public class CupertinoSearchView : TemplatedControl
         else if (change.Property == IsExpandedProperty || change.Property == DisplayModeProperty)
         {
             UpdatePseudoClasses();
-            if (IsExpanded)
+            if (change.Property == IsExpandedProperty && IsExpanded)
                 FocusField();
         }
         else if (change.Property == ItemTemplateProperty && _results is not null)
             _results.ItemTemplate = ItemTemplate;
+        else if (change.Property == EmptyContentProperty)
+            UpdateEmptyContent();
         else if (change.Property == SelectedItemProperty && _results is not null && !_syncing)
             _results.SelectedItem = SelectedItem;
     }
@@ -382,9 +389,10 @@ public class CupertinoSearchView : TemplatedControl
         }
 
         var selected = SelectedItem;
-        var preserveSelection = selected is not null && e.OldItems?.Contains(selected) == true;
+        var selectionWasRemoved = selected is not null && e.OldItems is { } removedItems
+            && IndexOfSelectedInstance(removedItems, selected) >= 0;
         var wasSyncing = _syncing;
-        if (preserveSelection)
+        if (selectionWasRemoved)
             _syncing = true;
         try
         {
@@ -410,10 +418,12 @@ public class CupertinoSearchView : TemplatedControl
                         _filteredItems.Insert(filteredIndex++, entry.Value!);
                 }
             }
-            if (preserveSelection)
+            if (selectionWasRemoved)
             {
-                // Another equal-valued result may remain after removing a duplicate.
-                if (!_filteredItems.Contains(selected!))
+                // Replace can swap in an equal instance; select the one present.
+                if (TryFindFilteredSelection(selected!, out var replacement))
+                    SetCurrentValue(SelectedItemProperty, replacement);
+                else
                     SetCurrentValue(SelectedItemProperty, null);
                 if (_results is not null)
                     _results.SelectedItem = SelectedItem;
@@ -473,6 +483,40 @@ public class CupertinoSearchView : TemplatedControl
             if (_sourceEntries[i].Matches)
                 ++count;
         return count;
+    }
+
+    private static int IndexOfSelectedInstance(System.Collections.IList items, object selected)
+    {
+        for (var i = 0; i < items.Count; ++i)
+            if (ReferenceEquals(items[i], selected))
+                return i;
+        if (selected is ValueType)
+            for (var i = 0; i < items.Count; ++i)
+                if (Equals(items[i], selected))
+                    return i;
+        return -1;
+    }
+
+    private bool TryFindFilteredSelection(object selected, out object? replacement)
+    {
+        foreach (var item in _filteredItems)
+        {
+            if (ReferenceEquals(item, selected))
+            {
+                replacement = item;
+                return true;
+            }
+        }
+        foreach (var item in _filteredItems)
+        {
+            if (Equals(item, selected))
+            {
+                replacement = item;
+                return true;
+            }
+        }
+        replacement = null;
+        return false;
     }
 
     private (object? Value, bool Matches) CreateEntry(object? value, string query) =>
@@ -552,26 +596,97 @@ public class CupertinoSearchView : TemplatedControl
 
     private void ApplyFilter()
     {
-        var oldItems = _filteredItems;
-        var filteredItems = new ObservableCollection<object>();
-        _sourceEntries.Clear();
         var query = (Text ?? string.Empty).Trim();
+        var values = new List<object?>();
         if (ItemsSource is not null)
-        {
             foreach (var value in ItemsSource)
+                values.Add(value);
+
+        var selected = SelectedItem;
+        var wasSyncing = _syncing;
+        _syncing = true;
+        try
+        {
+            if (ReferenceEquals(_filteredSource, ItemsSource) && SameValues(values))
+                UpdateMatchesInPlace(values, query);
+            else
+                RebuildEntries(values, query);
+            _filteredSource = ItemsSource;
+
+            if (selected is not null)
             {
-                var entry = CreateEntry(value, query);
-                _sourceEntries.Add(entry);
-                if (entry.Matches)
-                    filteredItems.Add(value!);
+                if (TryFindFilteredSelection(selected, out var replacement))
+                {
+                    if (!ReferenceEquals(selected, replacement))
+                        SetCurrentValue(SelectedItemProperty, replacement);
+                }
+                else
+                    SetCurrentValue(SelectedItemProperty, null);
+            }
+            if (_results is not null)
+            {
+                if (!ReferenceEquals(_results.ItemsSource, _filteredItems))
+                    _results.ItemsSource = _filteredItems;
+                _results.SelectedItem = SelectedItem;
             }
         }
-
-        _filteredItems = filteredItems;
-        RaisePropertyChanged(FilteredItemsProperty, oldItems, _filteredItems);
-        if (_results is not null)
-            _results.ItemsSource = _filteredItems;
+        finally
+        {
+            _syncing = wasSyncing;
+        }
         PseudoClasses.Set(":empty", _filteredItems.Count == 0);
+    }
+
+    private bool SameValues(List<object?> values)
+    {
+        if (values.Count != _sourceEntries.Count)
+            return false;
+        for (var i = 0; i < values.Count; ++i)
+            if (!Equals(values[i], _sourceEntries[i].Value))
+                return false;
+        return true;
+    }
+
+    // Re-evaluate every entry and apply only the match transitions to the results.
+    private void UpdateMatchesInPlace(List<object?> values, string query)
+    {
+        var filteredIndex = 0;
+        for (var i = 0; i < values.Count; ++i)
+        {
+            var previous = _sourceEntries[i];
+            var wasMatch = previous.Matches;
+            var entry = CreateEntry(values[i], query);
+            _sourceEntries[i] = entry;
+            if (wasMatch && !entry.Matches)
+                _filteredItems.RemoveAt(filteredIndex);
+            else if (!wasMatch && entry.Matches)
+                _filteredItems.Insert(filteredIndex++, entry.Value!);
+            else if (entry.Matches)
+            {
+                // Equal but a different reference: swap in the new instance.
+                if (!ReferenceEquals(previous.Value, entry.Value)
+                    && previous.Value is not ValueType && entry.Value is not ValueType)
+                {
+                    _filteredItems[filteredIndex] = entry.Value!;
+                    if (ReferenceEquals(SelectedItem, previous.Value))
+                        SetCurrentValue(SelectedItemProperty, entry.Value);
+                }
+                ++filteredIndex;
+            }
+        }
+    }
+
+    private void RebuildEntries(List<object?> values, string query)
+    {
+        _sourceEntries.Clear();
+        _filteredItems.Clear();
+        foreach (var value in values)
+        {
+            var entry = CreateEntry(value, query);
+            _sourceEntries.Add(entry);
+            if (entry.Matches)
+                _filteredItems.Add(value!);
+        }
     }
 
     private bool DefaultMatch(object item, string query)
@@ -580,6 +695,19 @@ public class CupertinoSearchView : TemplatedControl
             return true;
         var text = SearchTextSelector is { } selector ? selector(item) : item.ToString();
         return text?.Contains(query, StringComparison.CurrentCultureIgnoreCase) == true;
+    }
+
+    private void UpdateEmptyContent()
+    {
+        _emptyBinding?.Dispose();
+        _emptyBinding = null;
+        if (_empty is null)
+            return;
+        if (EmptyContent is { } content)
+            _empty.Content = content;
+        else
+            _emptyBinding = _empty.Bind(ContentPresenter.ContentProperty,
+                                        _empty.GetResourceObservable("CupertinoSearchEmptyText"));
     }
 
     private void UpdatePseudoClasses()

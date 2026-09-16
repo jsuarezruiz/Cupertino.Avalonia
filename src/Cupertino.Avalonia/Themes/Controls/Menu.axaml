@@ -15,6 +15,10 @@
           <ContentPresenter Content="{TemplateBinding Header}"
                             Margin="{TemplateBinding Padding}"
                             VerticalAlignment="Center" />
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="6" Margin="0"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
           <Popup x:Name="PART_Popup"
                  ShouldUseOverlayLayer="True"
                  controls:CupertinoFlyoutTransition.IsEnabled="True"
@@ -23,12 +27,9 @@
                  Placement="BottomEdgeAlignedLeft">
             <Panel Classes="cupertino-popover source-transition" Margin="18,6,18,18">
               <Grid MinWidth="180">
-                <controls:GlassSurface Classes="source-transition-material" CornerRadius="12"
-                                       BlurRadius="28" Saturation="1.8"
-                                       GlassThickness="0.35" RefractionStrength="0.10"
-                                       ChromaticAberration="0" DepthEffect="0.25"
-                                       IsAdaptive="True"
-                                       ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+                <controls:GlassSurface Classes="source-transition-material"
+                                       Theme="{StaticResource CupertinoPopoverSurface}"
+                                       CornerRadius="12" />
                 <Border Classes="source-transition-content" CornerRadius="12" ClipToBounds="True">
                   <ItemsPresenter Name="PART_ItemsPresenter"
                                   ItemsPanel="{TemplateBinding ItemsPanel}"
@@ -40,6 +41,9 @@
         </Panel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^:pointerover /template/ Border#Chrome">
       <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowHoverBrush}" />
     </Style>

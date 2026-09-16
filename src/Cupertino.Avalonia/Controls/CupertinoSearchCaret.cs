@@ -41,14 +41,15 @@ public sealed class CupertinoSearchCaret : Control
     /// </summary>
     public CupertinoSearchCaret()
     {
-        _blinkTimer = new DispatcherTimer(
-            TimeSpan.FromMilliseconds(500),
-            DispatcherPriority.Render,
-            (_, _) =>
-            {
-                _blinkOn = !_blinkOn;
-                Opacity = _blinkOn ? 1 : 0;
-            });
+        _blinkTimer = new DispatcherTimer(DispatcherPriority.Render)
+        {
+            Interval = TimeSpan.FromMilliseconds(500),
+        };
+        _blinkTimer.Tick += (_, _) =>
+        {
+            _blinkOn = !_blinkOn;
+            Opacity = _blinkOn ? 1 : 0;
+        };
 
         Transitions =
         [

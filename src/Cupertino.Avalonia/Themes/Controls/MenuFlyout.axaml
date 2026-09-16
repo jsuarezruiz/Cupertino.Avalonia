@@ -35,6 +35,10 @@
                   Width="16" Height="16" Stretch="None"
                   Margin="8,0,0,0" VerticalAlignment="Center" />
           </Grid>
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="8" Margin="4,2"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
           <Popup x:Name="PART_Popup"
                  controls:CupertinoFlyoutTransition.IsEnabled="True"
                  controls:CupertinoFlyoutTransition.IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
@@ -42,13 +46,10 @@
                  Placement="RightEdgeAlignedTop">
             <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
               <Grid x:Name="PopupLayout" MinWidth="220">
-                <controls:GlassSurface Classes="source-transition-material" CornerRadius="26"
-                                       BlurRadius="36" Saturation="1.8"
-                                       Tint="{DynamicResource CupertinoPopoverTint}"
-                                       GlassThickness="0.35" RefractionStrength="0.10"
-                                       ChromaticAberration="0" DepthEffect="0.25"
-                                       IsAdaptive="True"
-                                       ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+                <controls:GlassSurface Classes="source-transition-material"
+                                       Theme="{StaticResource CupertinoPopoverSurface}"
+                                       CornerRadius="26" BlurRadius="36"
+                                       Tint="{DynamicResource CupertinoPopoverTint}" />
                 <Border Classes="source-transition-content" CornerRadius="26" ClipToBounds="True">
                   <ItemsPresenter Name="PART_ItemsPresenter"
                                   ItemsPanel="{TemplateBinding ItemsPanel}"
@@ -61,6 +62,9 @@
       </ControlTemplate>
     </Setter>
 
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^:empty /template/ Path#SubChevron">
       <Setter Property="IsVisible" Value="False" />
     </Style>
@@ -104,13 +108,10 @@
       <ControlTemplate>
         <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
           <Grid MinWidth="220">
-            <controls:GlassSurface Classes="source-transition-material" CornerRadius="26"
-                                     BlurRadius="36" Saturation="1.8"
-                                     Tint="{DynamicResource CupertinoPopoverTint}"
-                                     GlassThickness="0.35" RefractionStrength="0.10"
-                                     ChromaticAberration="0" DepthEffect="0.25"
-                                     IsAdaptive="True"
-                                     ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+            <controls:GlassSurface Classes="source-transition-material"
+                                     Theme="{StaticResource CupertinoPopoverSurface}"
+                                     CornerRadius="26" BlurRadius="36"
+                                     Tint="{DynamicResource CupertinoPopoverTint}" />
             <Border Classes="source-transition-content" CornerRadius="26" ClipToBounds="True">
               <ItemsPresenter Name="PART_ItemsPresenter"
                               ItemsPanel="{TemplateBinding ItemsPanel}"

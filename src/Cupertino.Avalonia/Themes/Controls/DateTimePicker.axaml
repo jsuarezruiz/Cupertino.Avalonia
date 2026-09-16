@@ -5,82 +5,11 @@
 
   <!-- Overlay-hosted pickers can sample the application backdrop. -->
 
-  <ControlTheme x:Key="CupertinoPickerFieldButton" TargetType="Button">
-    <Setter Property="Background" Value="{DynamicResource CupertinoPickerFieldBrush}" />
-    <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
-    <Setter Property="FontSize" Value="{DynamicResource CupertinoFontSize17}" />
+  <ControlTheme x:Key="CupertinoPickerFieldButton" TargetType="Button"
+                BasedOn="{StaticResource CupertinoPickerCapsule}">
     <Setter Property="Height" Value="36" />
     <Setter Property="Padding" Value="12,0" />
     <Setter Property="CornerRadius" Value="999" />
-    <Setter Property="FocusAdorner" Value="{x:Null}" />
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Panel>
-          <Border x:Name="Capsule"
-                Background="{TemplateBinding Background}"
-                CornerRadius="{TemplateBinding CornerRadius}"
-                Padding="{TemplateBinding Padding}">
-          <ContentPresenter Content="{TemplateBinding Content}"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center" />
-          </Border>
-          <!-- The focus ring must not add padding or change the capsule size. -->
-          <Border x:Name="FocusRing" IsHitTestVisible="False"
-                  CornerRadius="999" Margin="-2" BorderThickness="2"
-                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}" Opacity="0" />
-        </Panel>
-      </ControlTemplate>
-    </Setter>
-    <Style Selector="^:pressed">
-      <Setter Property="Opacity" Value="0.55" />
-    </Style>
-    <Style Selector="^:focus-visible /template/ Border#FocusRing">
-      <Setter Property="Opacity" Value="1" />
-    </Style>
-    <Style Selector="^:disabled">
-      <Setter Property="Opacity" Value="0.4" />
-    </Style>
-  </ControlTheme>
-
-  <ControlTheme x:Key="CupertinoCalendarTitleButton" TargetType="Button">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="Padding" Value="0" />
-    <Setter Property="FocusAdorner" Value="{x:Null}" />
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Panel Background="Transparent">
-          <ContentPresenter Content="{TemplateBinding Content}"
-                            HorizontalContentAlignment="Left"
-                            VerticalContentAlignment="Center" />
-        </Panel>
-      </ControlTemplate>
-    </Setter>
-    <Style Selector="^:pressed">
-      <Setter Property="Opacity" Value="0.4" />
-    </Style>
-  </ControlTheme>
-
-  <ControlTheme x:Key="CupertinoCalendarChevron" TargetType="Button">
-    <Setter Property="Background" Value="Transparent" />
-    <Setter Property="Foreground" Value="{DynamicResource CupertinoAccentBrush}" />
-    <Setter Property="Width" Value="45.7" />
-    <Setter Property="Height" Value="36" />
-    <Setter Property="FocusAdorner" Value="{x:Null}" />
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Panel Background="Transparent">
-          <ContentPresenter Content="{TemplateBinding Content}"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center" />
-        </Panel>
-      </ControlTemplate>
-    </Setter>
-    <Style Selector="^:pressed">
-      <Setter Property="Opacity" Value="0.4" />
-    </Style>
-    <Style Selector="^:disabled">
-      <Setter Property="Opacity" Value="0.3" />
-    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type controls:CupertinoCalendarView}" TargetType="controls:CupertinoCalendarView">
@@ -89,7 +18,8 @@
         <StackPanel Margin="16,12,16,16">
           <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,6">
             <Button x:Name="PART_TitleButton" Grid.Column="0"
-                    Theme="{StaticResource CupertinoCalendarTitleButton}"
+                    Theme="{StaticResource CupertinoCalendarHeaderButton}"
+                    AutomationProperties.Name="{Binding #PART_Title.Text}"
                     HorizontalAlignment="Left">
               <StackPanel Orientation="Horizontal" Spacing="6">
                 <TextBlock x:Name="PART_Title"
@@ -112,7 +42,8 @@
               </StackPanel>
             </Button>
             <Button Grid.Column="1" x:Name="PART_PreviousButton"
-                    Theme="{StaticResource CupertinoCalendarChevron}">
+                    Theme="{StaticResource CupertinoCalendarPagingButton}"
+                    AutomationProperties.Name="{DynamicResource CupertinoPreviousMonthText}">
               <Path Data="{StaticResource CupertinoChevronLeftGeometry}"
                     Stroke="{DynamicResource CupertinoLabelBrush}"
                     StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
@@ -120,7 +51,8 @@
                     RenderTransformOrigin="50%,50%" RenderTransform="scale(1.35)" />
             </Button>
             <Button Grid.Column="2" x:Name="PART_NextButton"
-                    Theme="{StaticResource CupertinoCalendarChevron}">
+                    Theme="{StaticResource CupertinoCalendarPagingButton}"
+                    AutomationProperties.Name="{DynamicResource CupertinoNextMonthText}">
               <Path Data="{StaticResource CupertinoChevronRightGeometry}"
                     Stroke="{DynamicResource CupertinoLabelBrush}"
                     StrokeThickness="2.5" StrokeLineCap="Round" StrokeJoin="Round"
@@ -187,7 +119,8 @@
         <Grid>
           <Button x:Name="PART_FlyoutButton"
                   Theme="{StaticResource CupertinoPickerFieldButton}"
-                  Content="{TemplateBinding DisplayText}" />
+                  Content="{TemplateBinding DisplayText}"
+                  AutomationProperties.Name="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}" />
           <controls:CupertinoCalendarView x:Name="PART_InlineCalendar" IsVisible="False" />
         </Grid>
       </ControlTemplate>
@@ -211,7 +144,8 @@
       <ControlTemplate>
         <Grid>
           <Button x:Name="PART_FlyoutButton"
-                  Theme="{StaticResource CupertinoPickerFieldButton}">
+                  Theme="{StaticResource CupertinoPickerFieldButton}"
+                  AutomationProperties.Name="{Binding DisplayText, RelativeSource={RelativeSource TemplatedParent}}">
             <TextBlock Text="{TemplateBinding DisplayText}" FontFeatures="tnum" />
           </Button>
           <ContentControl x:Name="PART_InlineHost" IsVisible="False" />

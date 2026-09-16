@@ -36,7 +36,65 @@ internal static class AppleCoreText
         double X,
         double Y);
 
-    internal static List<NativeGlyph>? Shape(
+    private readonly record struct ShapeKey(string Text, double Size, FontWeight Weight, bool Italic, bool TabularNumbers);
+
+    private const int CacheCapacity = 1024;
+    private static readonly Dictionary<ShapeKey, NativeGlyph[]?> Cache = new();
+    private static readonly Queue<ShapeKey> CacheOrder = new();
+    private static readonly object CacheLock = new();
+
+    // Fast path for re-shaping the last run without allocating a key string.
+    private static ShapeKey _recentKey;
+    private static NativeGlyph[]? _recentValue;
+    private static bool _hasRecent;
+
+    internal static IReadOnlyList<NativeGlyph>? Shape(
+        ReadOnlySpan<char> text,
+        double size,
+        FontWeight weight,
+        bool italic,
+        bool tabularNumbers)
+    {
+        lock (CacheLock)
+        {
+            if (_hasRecent
+                && _recentKey.Size == size && _recentKey.Weight == weight
+                && _recentKey.Italic == italic && _recentKey.TabularNumbers == tabularNumbers
+                && text.SequenceEqual(_recentKey.Text))
+                return _recentValue;
+        }
+
+        var key = new ShapeKey(text.ToString(), size, weight, italic, tabularNumbers);
+        lock (CacheLock)
+        {
+            if (Cache.TryGetValue(key, out var cached))
+            {
+                Remember(key, cached);
+                return cached;
+            }
+        }
+
+        var shaped = ShapeUncached(key.Text, size, weight, italic, tabularNumbers)?.ToArray();
+        lock (CacheLock)
+        {
+            // FIFO eviction.
+            while (CacheOrder.Count >= CacheCapacity)
+                Cache.Remove(CacheOrder.Dequeue());
+            if (Cache.TryAdd(key, shaped))
+                CacheOrder.Enqueue(key);
+            Remember(key, shaped);
+        }
+        return shaped;
+    }
+
+    private static void Remember(ShapeKey key, NativeGlyph[]? value)
+    {
+        _recentKey = key;
+        _recentValue = value;
+        _hasRecent = true;
+    }
+
+    private static List<NativeGlyph>? ShapeUncached(
         string text,
         double size,
         FontWeight weight,
@@ -51,20 +109,31 @@ internal static class AppleCoreText
         if (IsMobile && italic)
             return null;
 
-        var selector = tabularNumbers ? MonospacedDigitFontSelector : SystemFontSelector;
-        var font = SendFont(FontClass, selector, size, ToNativeWeight(weight));
-        if (font == IntPtr.Zero)
-            return null;
-
-        if (italic)
+        // .NET threads have no autorelease pool for the font calls.
+        var pool = AutoreleasePoolPush();
+        IntPtr font;
+        try
         {
-            var manager = Send(FontManagerClass, SharedFontManagerSelector);
-            var converted = SendConvertFont(manager, ConvertFontSelector, font, 1);
-            if (converted != IntPtr.Zero)
-                font = converted;
+            var selector = tabularNumbers ? MonospacedDigitFontSelector : SystemFontSelector;
+            font = SendFont(FontClass, selector, size, ToNativeWeight(weight));
+            if (font == IntPtr.Zero)
+                return null;
+
+            if (italic)
+            {
+                var manager = Send(FontManagerClass, SharedFontManagerSelector);
+                var converted = SendConvertFont(manager, ConvertFontSelector, font, 1);
+                if (converted != IntPtr.Zero)
+                    font = converted;
+            }
+
+            CFRetain(font);
+        }
+        finally
+        {
+            AutoreleasePoolPop(pool);
         }
 
-        CFRetain(font);
         IntPtr value = IntPtr.Zero;
         IntPtr attributes = IntPtr.Zero;
         IntPtr attributed = IntPtr.Zero;
@@ -163,6 +232,18 @@ internal static class AppleCoreText
         ? MobileSend(receiver, selector)
         : MacSend(receiver, selector);
 
+    private static IntPtr AutoreleasePoolPush() => IsMobile
+        ? MobilePoolPush()
+        : MacPoolPush();
+
+    private static void AutoreleasePoolPop(IntPtr pool)
+    {
+        if (IsMobile)
+            MobilePoolPop(pool);
+        else
+            MacPoolPop(pool);
+    }
+
     private static IntPtr SendFont(
         IntPtr receiver,
         IntPtr selector,
@@ -207,6 +288,18 @@ internal static class AppleCoreText
         BestFitMapping = false, ThrowOnUnmappableChar = true)]
     private static extern IntPtr MobileGetSelector(
         [MarshalAs(UnmanagedType.LPUTF8Str)] string name);
+
+    [DllImport(MacObjectiveC, EntryPoint = "objc_autoreleasePoolPush")]
+    private static extern IntPtr MacPoolPush();
+
+    [DllImport(MobileObjectiveC, EntryPoint = "objc_autoreleasePoolPush")]
+    private static extern IntPtr MobilePoolPush();
+
+    [DllImport(MacObjectiveC, EntryPoint = "objc_autoreleasePoolPop")]
+    private static extern void MacPoolPop(IntPtr pool);
+
+    [DllImport(MobileObjectiveC, EntryPoint = "objc_autoreleasePoolPop")]
+    private static extern void MobilePoolPop(IntPtr pool);
 
     [DllImport(MacObjectiveC, EntryPoint = "objc_msgSend")]
     private static extern IntPtr MacSend(IntPtr receiver, IntPtr selector);

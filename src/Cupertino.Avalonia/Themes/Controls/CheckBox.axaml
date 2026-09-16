@@ -31,7 +31,7 @@
             </Ellipse>
             <Path x:Name="Check"
                   Data="{StaticResource CupertinoCheckmarkGeometry}"
-                  Stroke="White" StrokeThickness="2" StrokeLineCap="Round"
+                  Stroke="{DynamicResource CupertinoLabelOnGlassBrush}" StrokeThickness="2" StrokeLineCap="Round"
                   Width="16" Height="16" Stretch="None"
                   HorizontalAlignment="Center" VerticalAlignment="Center"
                   Opacity="0">
@@ -43,7 +43,7 @@
             </Path>
             <Border x:Name="Dash"
                     Height="2" Width="10" CornerRadius="1"
-                    Background="White"
+                    Background="{DynamicResource CupertinoLabelOnGlassBrush}"
                     HorizontalAlignment="Center" VerticalAlignment="Center"
                     IsVisible="False" />
             <Border x:Name="FocusRing"
@@ -123,7 +123,7 @@
               </Ellipse.Transitions>
             </Ellipse>
             <Ellipse x:Name="Dot"
-                     Fill="White" Width="8" Height="8"
+                     Fill="{DynamicResource CupertinoLabelOnGlassBrush}" Width="8" Height="8"
                      HorizontalAlignment="Center" VerticalAlignment="Center"
                      Opacity="0">
               <Ellipse.Transitions>

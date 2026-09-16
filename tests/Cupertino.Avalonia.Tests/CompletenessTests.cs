@@ -356,7 +356,7 @@ public class PickerCompletenessTests
             var host = Assert.IsAssignableFrom<Panel>(overlay.Children[^1]);
             var panel = Assert.IsType<Grid>(host.Children[^1]);
             var glass = Assert.IsType<GlassSurface>(panel.Children[0]);
-            var content = Assert.IsType<Border>(panel.Children[1]);
+            var content = Assert.IsAssignableFrom<Border>(panel.Children[1]);
             var transform = glass.RenderTransform!.Value;
 
             Assert.Equal(anchor.Bounds.Width / panel.Bounds.Width, transform.M11, 3);

@@ -33,19 +33,19 @@ public static class SliderInteraction
         AvaloniaProperty.RegisterAttached<Slider, bool>("IsEnabled", typeof(SliderInteraction));
 
     /// <summary>
-    /// Gets or sets the held rail clip.
+    /// Identifies the <see cref="GetRailClip"/> attached setting, the rail clip shown while the thumb is held.
     /// </summary>
     public static readonly AttachedProperty<Geometry?> RailClipProperty =
         AvaloniaProperty.RegisterAttached<Thumb, Geometry?>("RailClip", typeof(SliderInteraction));
 
     /// <summary>
-    /// Gets or sets the upper held-lens rim brush.
+    /// Identifies the <see cref="GetRimTopBrush"/> attached setting, the upper rim brush of the held lens.
     /// </summary>
     public static readonly AttachedProperty<IBrush?> RimTopBrushProperty =
         AvaloniaProperty.RegisterAttached<Thumb, IBrush?>("RimTopBrush", typeof(SliderInteraction));
 
     /// <summary>
-    /// Gets or sets the lower held-lens rim brush.
+    /// Identifies the <see cref="GetRimBottomBrush"/> attached setting, the lower rim brush of the held lens.
     /// </summary>
     public static readonly AttachedProperty<IBrush?> RimBottomBrushProperty =
         AvaloniaProperty.RegisterAttached<Thumb, IBrush?>("RimBottomBrush", typeof(SliderInteraction));
@@ -158,6 +158,8 @@ public static class SliderInteraction
 
         var value = e.GetNewValue<double>();
         UpdateRailClip(slider);
+        if (slider.GetValue(ThumbProperty)?.Classes.Contains(ActiveClass) != true)
+            return;
         if (value <= slider.Minimum || value >= slider.Maximum)
             CupertinoHaptics.Play(HapticFeedback.ImpactLight);
         else if (slider.TickFrequency > 0 && slider.IsSnapToTickEnabled)

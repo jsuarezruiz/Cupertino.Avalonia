@@ -133,6 +133,8 @@ public class EveryControlRenderTests
         ["DateTimePicker"] = () => new CupertinoDateTimePicker
         {
             SelectedDateTime = new DateTimeOffset(2026, 8, 3, 9, 41, 0, TimeSpan.Zero),
+            // Pinned so the reference image does not depend on the host's date pattern.
+            DateFormat = "d MMM yyyy",
         },
     };
 

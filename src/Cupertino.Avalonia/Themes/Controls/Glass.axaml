@@ -1,0 +1,55 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+  <!-- Shared glass materials. Later themes reference these through StaticResource. -->
+
+  <ControlTheme x:Key="CupertinoGlassButtonSurface" TargetType="controls:GlassSurface">
+    <Setter Property="CornerRadius" Value="999" />
+    <Setter Property="BlurRadius" Value="12" />
+    <Setter Property="GlassThickness" Value="1" />
+    <Setter Property="RefractionStrength" Value="7" />
+    <Setter Property="ChromaticAberration" Value="0.2" />
+    <Setter Property="DepthEffect" Value="0.25" />
+    <Setter Property="Saturation" Value="0.65" />
+    <Setter Property="LightIntensity" Value="0.15" />
+    <Setter Property="FresnelStrength" Value="0.30" />
+    <Setter Property="ShadowOpacity" Value="0.1" />
+    <Setter Property="ShadowBlur" Value="24" />
+    <Setter Property="ShadowOffset" Value="2" />
+    <Setter Property="ShadowContactWeight" Value="0" />
+    <Setter Property="Tint" Value="{DynamicResource CupertinoGlassButtonTint}" />
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoPopoverSurface" TargetType="controls:GlassSurface">
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="BlurRadius" Value="28" />
+    <Setter Property="Saturation" Value="1.8" />
+    <Setter Property="GlassThickness" Value="0.35" />
+    <Setter Property="RefractionStrength" Value="0.10" />
+    <Setter Property="ChromaticAberration" Value="0" />
+    <Setter Property="DepthEffect" Value="0.25" />
+    <Setter Property="IsAdaptive" Value="True" />
+    <Setter Property="ShadowOpacity" Value="0.14" />
+    <Setter Property="ShadowBlur" Value="18" />
+    <Setter Property="ShadowOffset" Value="6" />
+  </ControlTheme>
+
+  <ControlTheme x:Key="CupertinoBarCapsule" TargetType="controls:GlassSurface">
+    <Setter Property="BlurRadius" Value="18" />
+    <Setter Property="GlassThickness" Value="1" />
+    <Setter Property="Saturation" Value="1" />
+    <Setter Property="RefractionStrength" Value="0" />
+    <Setter Property="ChromaticAberration" Value="0" />
+    <Setter Property="DepthEffect" Value="0" />
+    <Setter Property="LightIntensity" Value="0.25" />
+    <Setter Property="FresnelStrength" Value="0" />
+    <Setter Property="Magnification" Value="1" />
+    <Setter Property="ShadowOpacity" Value="0.10" />
+    <Setter Property="ShadowBlur" Value="24" />
+    <Setter Property="ShadowOffset" Value="2" />
+    <Setter Property="ShadowContactWeight" Value="0" />
+    <Setter Property="Tint" Value="{DynamicResource CupertinoBarButtonTint}" />
+  </ControlTheme>
+
+</ResourceDictionary>

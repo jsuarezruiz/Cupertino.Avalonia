@@ -1,5 +1,7 @@
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -111,6 +113,9 @@ public class CupertinoPageControl : Control
     }
 
     /// <inheritdoc/>
+    protected override AutomationPeer OnCreateAutomationPeer() => new CupertinoPageControlAutomationPeer(this);
+
+    /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize)
     {
         var count = Math.Max(0, NumberOfPages);
@@ -153,7 +158,11 @@ public class CupertinoPageControl : Control
         {
             if (CoerceCurrentPage(raise: false))
                 return;
-            AutomationProperties.SetHelpText(this, $"{CurrentPage + 1} of {Math.Max(1, NumberOfPages)}");
+            var format = this.TryFindResource("CupertinoPageControlFormat", out var value) && value is string text
+                ? text
+                : "{0} of {1}";
+            AutomationProperties.SetHelpText(this, string.Format(
+                System.Globalization.CultureInfo.CurrentCulture, format, CurrentPage + 1, Math.Max(1, NumberOfPages)));
             CurrentPageChanged?.Invoke(this, EventArgs.Empty);
         }
     }
@@ -243,5 +252,40 @@ public class CupertinoPageControl : Control
             return;
         SetCurrentValue(CurrentPageProperty, next);
         e.Handled = true;
+    }
+}
+
+internal sealed class CupertinoPageControlAutomationPeer : ControlAutomationPeer, IRangeValueProvider
+{
+    public CupertinoPageControlAutomationPeer(CupertinoPageControl owner) : base(owner)
+    {
+    }
+
+    private new CupertinoPageControl Owner => (CupertinoPageControl)base.Owner;
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Slider;
+
+    protected override bool IsContentElementCore() => true;
+
+    protected override bool IsControlElementCore() => true;
+
+    public bool IsReadOnly => !Owner.IsEffectivelyEnabled;
+
+    public double Minimum => 0;
+
+    public double Maximum => Math.Max(0, Owner.NumberOfPages - 1);
+
+    public double Value => Owner.CurrentPage;
+
+    public double SmallChange => 1;
+
+    public double LargeChange => 1;
+
+    public void SetValue(double value)
+    {
+        if (IsReadOnly)
+            return;
+        Owner.SetCurrentValue(CupertinoPageControl.CurrentPageProperty,
+            (int)Math.Clamp(Math.Round(value), Minimum, Maximum));
     }
 }

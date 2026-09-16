@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Animation;
-using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -69,7 +68,7 @@ public class DialogAction
     }
 
     /// <summary>
-    /// The primary text displayed by this control.
+    /// The button label.
     /// </summary>
     public string Title { get; }
 
@@ -146,7 +145,7 @@ public class Dialog : ContentControl
             nameof(Actions), defaultValue: Array.Empty<DialogAction>());
 
     /// <summary>
-    /// The primary text displayed by this control.
+    /// The bold heading at the top of the dialog.
     /// </summary>
     public string? Title
     {
@@ -202,7 +201,7 @@ public class Dialog : ContentControl
     }
 
     /// <summary>
-    /// Shows an alert and returns the selected action.
+    /// Shows an alert and returns the selected action. Without actions, one default action labelled from the CupertinoDialogDefaultActionText resource is shown.
     /// </summary>
     public static Task<DialogAction?> ShowAsync(
         Visual owner,
@@ -216,7 +215,7 @@ public class Dialog : ContentControl
             Message = message,
             Actions = actions.Length > 0
                 ? actions
-                : new[] { new DialogAction("OK") },
+                : new[] { new DialogAction(DefaultActionText(owner)) },
             // Stack three or more actions to preserve label space.
             ActionsLayout = actions.Length > 2
                 ? DialogActionsLayout.Stack
@@ -224,6 +223,13 @@ public class Dialog : ContentControl
         };
         return dialog.ShowAsync(owner);
     }
+
+    private static string DefaultActionText(Visual owner) =>
+        owner is IResourceHost host
+        && host.TryFindResource("CupertinoDialogDefaultActionText", out var value)
+        && value is string text
+            ? text
+            : "OK";
 
     /// <summary>
     /// Shows an action sheet and returns the selected action.

@@ -18,13 +18,24 @@ public static class CupertinoPopover
 
     private const double EdgeMargin = 24;
 
+    private sealed class PopoverContentHost : Border
+    {
+        public Action? MeasureInvalidatedCallback;
+
+        protected override void OnMeasureInvalidated()
+        {
+            base.OnMeasureInvalidated();
+            MeasureInvalidatedCallback?.Invoke();
+        }
+    }
+
     private sealed class Session
     {
         public OverlayLayer Layer = null!;
         public Panel Host = null!;
         public Control Dismisser = null!;
         public Control Panel = null!;
-        public Control ContentHost = null!;
+        public PopoverContentHost ContentHost = null!;
         public Rect TargetBounds;
         public CupertinoFlyoutTransition.TransitionSession? Motion;
         public IDisposable? SizeSubscription;
@@ -35,6 +46,11 @@ public static class CupertinoPopover
         public Action? OnClosed;
         public bool Closing;
         public bool Closed;
+        // Sticky, so a resize does not flip the popover across the anchor.
+        public bool? PlacedAbove;
+        // Measuring mid-layout (bounds callback) jitters; cached until content changes.
+        public Size? MeasuredSize;
+        public bool RepositionQueued;
     }
 
     private static readonly Dictionary<Control, Session> Open = new();
@@ -73,7 +89,7 @@ public static class CupertinoPopover
         glass.Bind(GlassSurface.TintProperty,
             glass.GetResourceObservable("CupertinoPopoverTint"));
 
-        var contentHost = new Border
+        var contentHost = new PopoverContentHost
         {
             Child = content,
             CornerRadius = new CornerRadius(cornerRadius),
@@ -111,6 +127,22 @@ public static class CupertinoPopover
             Root = root,
         };
         Open[anchor] = session;
+
+        contentHost.MeasureInvalidatedCallback = () =>
+        {
+            if (session.Closed || session.Closing || session.RepositionQueued)
+                return;
+
+            session.RepositionQueued = true;
+            Dispatcher.UIThread.Post(() =>
+            {
+                session.RepositionQueued = false;
+                if (session.Closed || session.Closing)
+                    return;
+                session.MeasuredSize = null;
+                Position(anchor, session, session.Layer.Bounds);
+            }, DispatcherPriority.Loaded);
+        };
 
         KeyboardNavigation.SetTabNavigation(host, KeyboardNavigationMode.Cycle);
         session.KeyDownHandler = (_, e) =>
@@ -172,30 +204,50 @@ public static class CupertinoPopover
         if (origin is not { } p)
             return;
 
-        panel.Measure(new Size(layerBounds.Width, layerBounds.Height));
-        var size = panel.DesiredSize;
+        var horizontalMargin = Math.Min(EdgeMargin, layerBounds.Width / 2);
+        var verticalMargin = Math.Min(EdgeMargin, layerBounds.Height / 2);
+        var maximumWidth = Math.Max(0, layerBounds.Width - horizontalMargin * 2);
+        var maximumHeight = Math.Max(0, layerBounds.Height - verticalMargin * 2);
+        panel.MaxWidth = maximumWidth;
+        panel.MaxHeight = maximumHeight;
 
-        var x = Math.Clamp(p.X, EdgeMargin, Math.Max(EdgeMargin, layerBounds.Width - size.Width - EdgeMargin));
+        if (session.MeasuredSize is not { } measured)
+        {
+            panel.Measure(new Size(maximumWidth, maximumHeight));
+            measured = panel.DesiredSize;
+            session.MeasuredSize = measured;
+        }
+        var size = new Size(
+            Math.Min(measured.Width, maximumWidth),
+            Math.Min(measured.Height, maximumHeight));
+
+        var x = Math.Clamp(p.X, horizontalMargin,
+            Math.Max(horizontalMargin, layerBounds.Width - size.Width - horizontalMargin));
 
         // Prefer the side with more room.
         var below = p.Y + anchor.Bounds.Height + AnchorGap;
         var above = p.Y - AnchorGap - size.Height;
-        var roomBelow = layerBounds.Height - below - EdgeMargin;
-        var roomAbove = p.Y - AnchorGap - EdgeMargin;
+        var roomBelow = layerBounds.Height - below - verticalMargin;
+        var roomAbove = p.Y - AnchorGap - verticalMargin;
         var fitsBelow = roomBelow >= size.Height;
         var fitsAbove = roomAbove >= size.Height;
 
-        double y;
-        if (fitsAbove && (!fitsBelow || roomAbove > roomBelow))
-            y = above;
+        bool placeAbove;
+        if (session.PlacedAbove is { } previous && (previous ? fitsAbove : fitsBelow))
+            placeAbove = previous;
+        else if (fitsAbove && fitsBelow)
+            placeAbove = roomAbove > roomBelow;
         else if (fitsBelow)
-            y = below;
+            placeAbove = false;
         else if (fitsAbove)
-            y = above;
+            placeAbove = true;
         else
-            y = roomAbove > roomBelow
-                ? EdgeMargin
-                : Math.Max(EdgeMargin, layerBounds.Height - size.Height - EdgeMargin);
+            placeAbove = roomAbove > roomBelow;
+        session.PlacedAbove = placeAbove;
+
+        var y = placeAbove
+            ? (fitsAbove ? above : verticalMargin)
+            : (fitsBelow ? below : Math.Max(verticalMargin, layerBounds.Height - size.Height - verticalMargin));
 
         panel.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left;
         panel.VerticalAlignment = Avalonia.Layout.VerticalAlignment.Top;
@@ -226,8 +278,12 @@ public static class CupertinoPopover
 
     internal static void Reposition(Control anchor)
     {
-        if (Open.TryGetValue(anchor, out var session))
-            Position(anchor, session, session.Layer.Bounds);
+        if (!Open.TryGetValue(anchor, out var session))
+            return;
+
+        // Content changed; window resizes keep the cached size.
+        session.MeasuredSize = null;
+        Position(anchor, session, session.Layer.Bounds);
     }
 
     private static void CloseCore(Control anchor, Session session, bool animate)
@@ -264,6 +320,7 @@ public static class CupertinoPopover
         session.Motion = null;
         session.SizeSubscription?.Dispose();
         session.SizeSubscription = null;
+        session.ContentHost.MeasureInvalidatedCallback = null;
         if (session.AnchorDetachedHandler is { } handler)
         {
             anchor.DetachedFromVisualTree -= handler;

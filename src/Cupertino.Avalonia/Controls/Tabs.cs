@@ -1,4 +1,3 @@
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -32,7 +31,7 @@ public static class Tabs
         AvaloniaProperty.RegisterAttached<Control, DetachedState?>("OwnerDetachedState", typeof(Tabs));
 
     /// <summary>
-    /// Gets or sets the badge value; negative shows a dot and null hides it.
+    /// Identifies the <see cref="GetBadgeValue"/> attached setting; negative shows a dot and null hides it.
     /// </summary>
     public static readonly AttachedProperty<int?> BadgeValueProperty =
         AvaloniaProperty.RegisterAttached<Control, int?>("BadgeValue", typeof(Tabs));

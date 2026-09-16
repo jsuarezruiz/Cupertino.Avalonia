@@ -29,6 +29,7 @@
               <Button x:Name="PART_Button"
                       Classes="plain" MinHeight="0"
                       Background="Transparent" Padding="0"
+                      AutomationProperties.Name="{Binding #PART_TextBox.Text}"
                       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                       FocusAdorner="{x:Null}" />
             </Panel>
@@ -38,13 +39,10 @@
                  Placement="BottomEdgeAlignedLeft">
             <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
               <Grid>
-                <controls:GlassSurface Classes="source-transition-material" CornerRadius="14"
-                                       BlurRadius="36" Saturation="1.8"
-                                       Tint="{DynamicResource CupertinoPopoverTint}"
-                                       GlassThickness="0.35" RefractionStrength="0.10"
-                                       ChromaticAberration="0" DepthEffect="0.25"
-                                       IsAdaptive="True"
-                                       ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+                <controls:GlassSurface Classes="source-transition-material"
+                                       Theme="{StaticResource CupertinoPopoverSurface}"
+                                       BlurRadius="36"
+                                       Tint="{DynamicResource CupertinoPopoverTint}" />
                 <Border Classes="source-transition-content" CornerRadius="14" ClipToBounds="True">
                   <Calendar x:Name="PART_Calendar" Background="Transparent" />
                 </Border>
@@ -60,4 +58,3 @@
   </ControlTheme>
 
 </ResourceDictionary>
-

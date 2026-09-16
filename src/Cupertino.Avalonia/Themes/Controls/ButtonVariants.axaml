@@ -27,14 +27,7 @@
       <ControlTemplate>
         <Panel ClipToBounds="False">
           <controls:GlassSurface x:Name="GlassBg"
-                                 CornerRadius="999"
-                                 BlurRadius="12" GlassThickness="1"
-                                 RefractionStrength="7" ChromaticAberration="0.2"
-                                 DepthEffect="0.25" Saturation="0.65"
-                                 LightIntensity="0.15" FresnelStrength="0.30"
-                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
-                                 ShadowContactWeight="0"
-                                 Tint="{DynamicResource CupertinoGlassButtonTint}" />
+                                 Theme="{StaticResource CupertinoGlassButtonSurface}" />
           <ContentPresenter x:Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}"
                             ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -95,14 +88,7 @@
       <ControlTemplate>
         <Panel ClipToBounds="False">
           <controls:GlassSurface x:Name="GlassBg"
-                                 CornerRadius="999"
-                                 BlurRadius="12" GlassThickness="1"
-                                 RefractionStrength="7" ChromaticAberration="0.2"
-                                 DepthEffect="0.25" Saturation="0.65"
-                                 LightIntensity="0.15" FresnelStrength="0.30"
-                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
-                                 ShadowContactWeight="0"
-                                 Tint="{DynamicResource CupertinoGlassButtonTint}" />
+                                 Theme="{StaticResource CupertinoGlassButtonSurface}" />
           <ContentPresenter x:Name="PART_ContentPresenter"
                             Content="{TemplateBinding Content}"
                             ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -126,7 +112,7 @@
       <Setter Property="LightIntensity" Value="0.5" />
     </Style>
     <Style Selector="^:checked">
-      <Setter Property="Foreground" Value="White" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoProminentForegroundBrush}" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
@@ -202,14 +188,7 @@
       <ControlTemplate>
         <Panel ClipToBounds="False">
           <controls:GlassSurface x:Name="GlassBg"
-                                 CornerRadius="999"
-                                 BlurRadius="12" GlassThickness="1"
-                                 RefractionStrength="7" ChromaticAberration="0.2"
-                                 DepthEffect="0.25" Saturation="0.65"
-                                 LightIntensity="0.15" FresnelStrength="0.30"
-                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
-                                 ShadowContactWeight="0"
-                                 Tint="{DynamicResource CupertinoGlassButtonTint}" />
+                                 Theme="{StaticResource CupertinoGlassButtonSurface}" />
           <!-- Names are required by inherited selectors. -->
           <Border x:Name="FlatBg"
                   CornerRadius="999"
@@ -292,14 +271,7 @@
       <ControlTemplate>
         <Panel ClipToBounds="False">
           <controls:GlassSurface x:Name="GlassBg"
-                                 CornerRadius="999"
-                                 BlurRadius="12" GlassThickness="1"
-                                 RefractionStrength="7" ChromaticAberration="0.2"
-                                 DepthEffect="0.25" Saturation="0.65"
-                                 LightIntensity="0.15" FresnelStrength="0.30"
-                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
-                                 ShadowContactWeight="0"
-                                 Tint="{DynamicResource CupertinoGlassButtonTint}" />
+                                 Theme="{StaticResource CupertinoGlassButtonSurface}" />
           <Border CornerRadius="999" ClipToBounds="True">
             <Grid ColumnDefinitions="*,0.5,Auto">
               <Button x:Name="PART_PrimaryButton" Grid.Column="0"
@@ -319,9 +291,16 @@
               </Button>
             </Grid>
           </Border>
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="999" Margin="-4"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^:disabled">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
@@ -330,7 +309,7 @@
   <ControlTheme x:Key="CupertinoToggleSplitButton" TargetType="ToggleSplitButton"
                 BasedOn="{StaticResource CupertinoSplitButton}">
     <Style Selector="^:checked">
-      <Setter Property="Foreground" Value="White" />
+      <Setter Property="Foreground" Value="{DynamicResource CupertinoProminentForegroundBrush}" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
     <Style Selector="^:checked /template/ controls|GlassSurface#GlassBg">

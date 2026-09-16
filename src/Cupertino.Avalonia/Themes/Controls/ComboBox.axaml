@@ -101,11 +101,7 @@
                  PlacementTarget="{TemplateBinding}"
                  IsLightDismissEnabled="True">
             <Panel Classes="cupertino-popover" Margin="18,10,18,18">
-              <controls:GlassSurface CornerRadius="14"
-                                     BlurRadius="28" Saturation="1.8"
-                                     GlassThickness="0.35" RefractionStrength="0.10"
-                                     ChromaticAberration="0" DepthEffect="0.25"
-                                     IsAdaptive="True"
+              <controls:GlassSurface Theme="{StaticResource CupertinoPopoverSurface}"
                                      ShadowOpacity="0.20" ShadowBlur="30" ShadowOffset="10"
                                      MinWidth="220">
                 <Border CornerRadius="14" ClipToBounds="True">

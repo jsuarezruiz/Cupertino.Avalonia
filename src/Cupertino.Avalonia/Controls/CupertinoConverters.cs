@@ -12,17 +12,17 @@ public static class CupertinoConverters
     /// Converts a weekday name to its first character.
     /// </summary>
     public static readonly IValueConverter DayInitial =
-        new FuncValueConverter<string?, string>(s =>
-            string.IsNullOrEmpty(s) ? string.Empty : s![..1].ToUpper(CultureInfo.CurrentCulture));
+        new FuncValueConverter<string?, string>(FirstLetter);
 
-    /// <summary>
-    /// Converts a day-title column to its uppercase abbreviated weekday name, assuming the culture's first day of week.
-    /// </summary>
-    public static readonly IValueConverter DayColumnAbbreviation =
-        new FuncValueConverter<int, string>(column =>
-        {
-            var format = CultureInfo.CurrentCulture.DateTimeFormat;
-            var day = ((int)format.FirstDayOfWeek + column) % 7;
-            return format.AbbreviatedDayNames[day].ToUpper(CultureInfo.CurrentCulture);
-        });
+    // Take the first text element so surrogate pairs and combining marks stay whole.
+    private static string FirstLetter(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return string.Empty;
+
+        var enumerator = StringInfo.GetTextElementEnumerator(value);
+        return enumerator.MoveNext()
+            ? ((string)enumerator.Current).ToUpper(CultureInfo.CurrentCulture)
+            : string.Empty;
+    }
 }

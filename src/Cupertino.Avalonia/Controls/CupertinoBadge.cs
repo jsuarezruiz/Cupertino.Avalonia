@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -61,6 +62,25 @@ public class CupertinoBadge : TemplatedControl
     private void UpdateFromValue(int value)
     {
         PseudoClasses.Set(":dot", value < 0);
-        Text = value < 0 ? "" : value > 99 ? "99+" : value.ToString(CultureInfo.InvariantCulture);
+        Text = value < 0 ? "" : FormatCount(Math.Min(value, 99)) + (value > 99 ? "+" : "");
+    }
+
+    private static string FormatCount(int value)
+    {
+        var culture = CultureInfo.CurrentCulture;
+        var formatted = value.ToString(culture);
+        var digits = culture.NumberFormat.NativeDigits;
+        if (digits.Length != 10 || digits.SelectMany(static digit => digit).SequenceEqual("0123456789"))
+            return formatted;
+
+        var localized = new StringBuilder(formatted.Length);
+        foreach (var character in formatted)
+        {
+            if (character is >= '0' and <= '9')
+                localized.Append(digits[character - '0']);
+            else
+                localized.Append(character);
+        }
+        return localized.ToString();
     }
 }

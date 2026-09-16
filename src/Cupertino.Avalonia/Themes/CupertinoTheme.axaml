@@ -27,9 +27,6 @@
           <SolidColorBrush x:Key="CupertinoGroupedBackgroundBrush" Color="#F2F2F7" />
           <SolidColorBrush x:Key="CupertinoCardBrush" Color="#FFFFFFFF" />
           <Color x:Key="CupertinoSheetTint">#E6F6F6F8</Color>
-          <SolidColorBrush x:Key="CupertinoSliderThumbDragBrush" Color="#B3FFFFFF" />
-          <SolidColorBrush x:Key="CupertinoSliderThumbDragAccentBrush" Color="#FF0E91FF" />
-          <SolidColorBrush x:Key="CupertinoSliderThumbDragRemainderBrush" Color="#FFE1E2E1" />
           <SolidColorBrush x:Key="CupertinoSliderThumbDragBaseBrush" Color="#FFF7F7F7" />
           <Color x:Key="CupertinoNavigationBarTint">#FFF2F2F7</Color>
           <Color x:Key="CupertinoBarButtonTint">#C2FFFFFF</Color>
@@ -113,9 +110,6 @@
           <SolidColorBrush x:Key="CupertinoGroupedBackgroundBrush" Color="#FF000000" />
           <SolidColorBrush x:Key="CupertinoCardBrush" Color="#FF1C1C1E" />
           <Color x:Key="CupertinoSheetTint">#E61C1C1E</Color>
-          <SolidColorBrush x:Key="CupertinoSliderThumbDragBrush" Color="#B32C2C2E" />
-          <SolidColorBrush x:Key="CupertinoSliderThumbDragAccentBrush" Color="#FF188BFF" />
-          <SolidColorBrush x:Key="CupertinoSliderThumbDragRemainderBrush" Color="#FF464648" />
           <SolidColorBrush x:Key="CupertinoSliderThumbDragBaseBrush" Color="#FF2C2C2E" />
           <Color x:Key="CupertinoNavigationBarTint">#FF000000</Color>
           <Color x:Key="CupertinoBarButtonTint">#C21A1A1C</Color>
@@ -181,10 +175,21 @@
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
 
+      <x:String x:Key="CupertinoPickerPlaceholderText">Select</x:String>
+      <x:String x:Key="CupertinoDurationFormat">{0} hr {1} min</x:String>
+      <x:String x:Key="CupertinoSearchPlaceholderText">Search</x:String>
+      <x:String x:Key="CupertinoSearchCancelText">Cancel</x:String>
+      <x:String x:Key="CupertinoSearchEmptyText">No Results</x:String>
+      <x:String x:Key="CupertinoDialogDefaultActionText">OK</x:String>
+      <x:String x:Key="CupertinoPageControlFormat">{0} of {1}</x:String>
+      <x:String x:Key="CupertinoPreviousMonthText">Previous month</x:String>
+      <x:String x:Key="CupertinoNextMonthText">Next month</x:String>
+
       <ResourceDictionary.MergedDictionaries>
         <!-- Shared prerequisites. Keep these first because later themes use
              their named resources through StaticResource. -->
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Icons.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Glass.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Knob.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Button.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TextBox.axaml" />
@@ -197,9 +202,9 @@
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CheckBox.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ColorPicker.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ComboBox.axaml" />
+        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Pickers.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/DateTimePicker.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/NumericUpDown.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Pickers.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Slider.axaml" />
         <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ToggleSwitch.axaml" />
 

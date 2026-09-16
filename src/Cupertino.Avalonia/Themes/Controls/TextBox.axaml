@@ -27,7 +27,7 @@
           <Ellipse x:Name="ClearDisc"
                    Fill="{DynamicResource CupertinoTertiaryLabelBrush}" />
           <Path Data="{StaticResource CupertinoXMarkGeometry}"
-                Stroke="White" StrokeThickness="1.6" StrokeLineCap="Round"
+                Stroke="{DynamicResource CupertinoLabelOnGlassBrush}" StrokeThickness="1.6" StrokeLineCap="Round"
                 Width="16" Height="16" Stretch="None"
                 RenderTransform="scale(0.62)"
                 HorizontalAlignment="Center" VerticalAlignment="Center" />

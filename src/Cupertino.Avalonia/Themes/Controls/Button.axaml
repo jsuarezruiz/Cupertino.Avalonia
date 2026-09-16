@@ -24,18 +24,7 @@
       <ControlTemplate>
         <Panel ClipToBounds="False">
           <controls:GlassSurface x:Name="GlassBg"
-                                 CornerRadius="999"
-                                 BlurRadius="12"
-                                 GlassThickness="1"
-                                 RefractionStrength="7"
-                                 ChromaticAberration="0.2"
-                                 DepthEffect="0.25"
-                                 Saturation="0.65"
-                                 LightIntensity="0.15"
-                                 FresnelStrength="0.30"
-                                 ShadowOpacity="0.1" ShadowBlur="24" ShadowOffset="2"
-                                 ShadowContactWeight="0"
-                                 Tint="{DynamicResource CupertinoGlassButtonTint}">
+                                 Theme="{StaticResource CupertinoGlassButtonSurface}">
             <controls:GlassSurface.Transitions>
               <Transitions>
                 <ColorTransition Property="Tint" Duration="{motion:MotionDuration 130}" />

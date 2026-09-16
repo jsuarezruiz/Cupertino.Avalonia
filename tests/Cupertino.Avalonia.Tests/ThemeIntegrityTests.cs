@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Animation;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
@@ -70,6 +71,20 @@ public class ThemeIntegrityTests
                 $"Resource '{key}' does not resolve in {variantName}.");
             Assert.NotNull(value);
         }
+    }
+
+    [AvaloniaTheory]
+    [InlineData("CupertinoCalendarChevron")]
+    [InlineData("CupertinoCalendarTitleButton")]
+    [InlineData("CupertinoKnobPressedBrush")]
+    [InlineData("CupertinoTabPillBorderBrush")]
+    public void Version_0_1_theme_resource_keys_remain_available(string key)
+    {
+        var window = NewWindow(ThemeVariant.Light);
+
+        Assert.True(window.TryFindResource(key, ThemeVariant.Light, out var value),
+            $"Compatibility resource '{key}' does not resolve.");
+        Assert.NotNull(value);
     }
 
     [AvaloniaTheory]
@@ -226,6 +241,68 @@ public class ThemeIntegrityTests
         Assert.False(placeholder.IsVisible);
         Assert.True(content.IsVisible);
         Assert.Equal("Medium", content.Content);
+    }
+
+    [AvaloniaFact]
+    public void Picker_and_calendar_buttons_expose_accessible_names()
+    {
+        var window = NewWindow(ThemeVariant.Light);
+        var selected = new DateTimeOffset(2026, 9, 15, 0, 0, 0, TimeSpan.Zero);
+        var time = new CupertinoTimePicker { SelectedTime = new TimeSpan(9, 30, 0) };
+        var date = new CupertinoDatePicker { SelectedDate = selected };
+        var calendar = new CupertinoCalendarView();
+        var calendarDatePicker = new CalendarDatePicker { SelectedDate = selected.Date };
+        var stockDate = new DatePicker { SelectedDate = selected };
+        var stockTime = new TimePicker { SelectedTime = new TimeSpan(9, 30, 0) };
+
+        window.Content = new StackPanel
+        {
+            Children = { time, date, calendar, calendarDatePicker, stockDate, stockTime },
+        };
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal("Previous month", PartName(calendar, "PART_PreviousButton"));
+        Assert.Equal("Next month", PartName(calendar, "PART_NextButton"));
+
+        var title = calendar.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "PART_Title");
+        Assert.Equal(title.Text, PartName(calendar, "PART_TitleButton"));
+        Assert.Equal(time.DisplayText, PartName(time, "PART_FlyoutButton"));
+        Assert.Equal(date.DisplayText, PartName(date, "PART_FlyoutButton"));
+
+        // Stock pickers are named from their value.
+        Assert.False(string.IsNullOrWhiteSpace(PartName(stockDate, "PART_FlyoutButton")));
+        Assert.False(string.IsNullOrWhiteSpace(PartName(stockTime, "PART_FlyoutButton")));
+        Assert.False(string.IsNullOrWhiteSpace(PartName(calendarDatePicker, "PART_Button")));
+    }
+
+    private static string PartName(Control owner, string partName) =>
+        AutomationProperties.GetName(
+            owner.GetVisualDescendants().OfType<Button>().Single(button => button.Name == partName))
+        ?? string.Empty;
+
+    [AvaloniaTheory]
+    [InlineData("Light")]
+    [InlineData("Dark")]
+    public void Slider_drag_rail_layers_share_one_gradient_resource(string variantName)
+    {
+        var variant = variantName == "Dark" ? ThemeVariant.Dark : ThemeVariant.Light;
+        var window = NewWindow(variant);
+        var slider = new Slider { Width = 200, Value = 40 };
+        window.Content = slider;
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.True(slider.TryFindResource("CupertinoSliderDragRailBrush", variant, out var resource));
+        var rail = Assert.IsType<LinearGradientBrush>(resource);
+        Assert.Equal(5, rail.GradientStops.Count);
+
+        var dragRail = slider.GetVisualDescendants().OfType<Grid>().Single(g => g.Name == "ThumbDragRail");
+        var layers = dragRail.GetVisualDescendants().OfType<Border>()
+            .Where(b => ReferenceEquals(b.Background, rail)).ToArray();
+        Assert.Equal(3, layers.Length);
     }
 
     [AvaloniaFact]

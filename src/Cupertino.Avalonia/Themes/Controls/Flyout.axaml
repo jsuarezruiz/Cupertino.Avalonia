@@ -8,13 +8,10 @@
       <ControlTemplate>
         <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
           <Grid MinWidth="220">
-            <controls:GlassSurface Classes="source-transition-material" CornerRadius="26"
-                                     BlurRadius="36" Saturation="1.8"
-                                     Tint="{DynamicResource CupertinoContextMenuTint}"
-                                     GlassThickness="0.35" RefractionStrength="0.10"
-                                     ChromaticAberration="0" DepthEffect="0.25"
-                                     IsAdaptive="True"
-                                     ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+            <controls:GlassSurface Classes="source-transition-material"
+                                   Theme="{StaticResource CupertinoPopoverSurface}"
+                                   CornerRadius="26" BlurRadius="36"
+                                   Tint="{DynamicResource CupertinoContextMenuTint}" />
             <Border Classes="source-transition-content" CornerRadius="26" ClipToBounds="True">
               <ItemsPresenter Name="PART_ItemsPresenter"
                               ItemsPanel="{TemplateBinding ItemsPanel}"
@@ -34,12 +31,8 @@
       <ControlTemplate>
         <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
           <Grid>
-            <controls:GlassSurface Classes="source-transition-material" CornerRadius="14"
-                                     BlurRadius="28" Saturation="1.8"
-                                     GlassThickness="0.35" RefractionStrength="0.10"
-                                     ChromaticAberration="0" DepthEffect="0.25"
-                                     IsAdaptive="True"
-                                     ShadowOpacity="0.14" ShadowBlur="18" ShadowOffset="6" />
+            <controls:GlassSurface Classes="source-transition-material"
+                                   Theme="{StaticResource CupertinoPopoverSurface}" />
             <Border Classes="source-transition-content" CornerRadius="14" ClipToBounds="True">
               <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">

@@ -761,6 +761,32 @@ public class CalendarTests
         Assert.True(BackdropLuminanceSampler.TryIsDark(tabs, presenter, out var isDark));
         Assert.False(isDark);
     }
+
+    // Red and blue luma differ, so a swapped channel order fails.
+    [Theory]
+    [InlineData(true, 255, 0, 0, 0.2126)]
+    [InlineData(true, 0, 0, 255, 0.0722)]
+    [InlineData(false, 255, 0, 0, 0.2126)]
+    [InlineData(false, 0, 0, 255, 0.0722)]
+    public void Sample_luma_follows_the_buffer_channel_order(
+        bool rgba, byte red, byte green, byte blue, double expected)
+    {
+        var format = rgba
+            ? global::Avalonia.Platform.PixelFormat.Rgba8888
+            : global::Avalonia.Platform.PixelFormat.Bgra8888;
+        const int size = 32;
+        const int rowBytes = size * 4;
+        var bytes = new byte[rowBytes * size];
+        for (var i = 0; i < bytes.Length; i += 4)
+        {
+            bytes[i + (rgba ? 0 : 2)] = red;
+            bytes[i + 1] = green;
+            bytes[i + (rgba ? 2 : 0)] = blue;
+            bytes[i + 3] = 255;
+        }
+
+        Assert.Equal(expected, BackdropLuminanceSampler.AverageLuma(bytes, rowBytes, format, 0), 3);
+    }
 }
 
 public class HapticTests : IDisposable
@@ -792,8 +818,103 @@ public class HapticTests : IDisposable
         _played.Clear();
         sw.IsChecked = true;
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        Assert.DoesNotContain(HapticFeedback.ImpactLight, _played);
+
+        var centre = sw.TranslatePoint(new Point(sw.Bounds.Width / 2, sw.Bounds.Height / 2), window)!.Value;
+        window.MouseDown(centre, MouseButton.Left);
+        window.MouseUp(centre, MouseButton.Left);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        Assert.False(sw.IsChecked);
+        Assert.Contains(HapticFeedback.ImpactLight, _played);
+    }
+
+    [AvaloniaFact]
+    public void An_unrelated_key_does_not_arm_switch_haptics()
+    {
+        var sw = new ToggleSwitch();
+        var window = new Window { Width = 300, Height = 200, Content = sw };
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        try
+        {
+            _played.Clear();
+            sw.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.A });
+            sw.IsChecked = true;
+
+            Assert.DoesNotContain(HapticFeedback.ImpactLight, _played);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void A_secondary_pointer_does_not_arm_switch_haptics()
+    {
+        var sw = new ToggleSwitch();
+        var window = new Window { Width = 300, Height = 200, Content = sw };
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        try
+        {
+            var centre = sw.TranslatePoint(
+                new Point(sw.Bounds.Width / 2, sw.Bounds.Height / 2), window)!.Value;
+            window.MouseDown(centre, MouseButton.Right);
+            _played.Clear();
+            sw.IsChecked = true;
+            window.MouseUp(centre, MouseButton.Right);
+
+            Assert.DoesNotContain(HapticFeedback.ImpactLight, _played);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Detaching_a_switch_cancels_pending_user_haptics()
+    {
+        var sw = new ToggleSwitch();
+        var window = new Window { Width = 300, Height = 200, Content = sw };
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        try
+        {
+            sw.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.Space });
+            window.Content = null;
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            _played.Clear();
+            sw.IsChecked = true;
+
+            Assert.DoesNotContain(HapticFeedback.ImpactLight, _played);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void A_slider_only_clicks_at_its_ends_while_the_thumb_is_held()
+    {
+        var slider = new Slider { Width = 200, Minimum = 0, Maximum = 100, Value = 50 };
+        var window = new Window { Width = 300, Height = 200, Content = slider };
+        window.Show();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        _played.Clear();
+        slider.Value = 100;
+        slider.Value = 0;
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        Assert.Empty(_played);
+
+        var thumb = slider.GetVisualDescendants().OfType<Thumb>().Single();
+        var centre = thumb.TranslatePoint(new Point(thumb.Bounds.Width / 2, thumb.Bounds.Height / 2), window)!.Value;
+        window.MouseDown(centre, MouseButton.Left);
+        slider.Value = 100;
+        window.MouseUp(centre, MouseButton.Left);
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
 
         Assert.Contains(HapticFeedback.ImpactLight, _played);
+        Assert.DoesNotContain(SliderInteraction.ActiveClass, thumb.Classes);
     }
 
     [AvaloniaFact]
@@ -932,6 +1053,23 @@ public class NavigationBarTests
         Assert.Equal(0.0, bar.LargeTitleOpacity, 3);
         Assert.Equal(1.0, bar.InlineTitleOpacity, 3);
         Assert.Equal(1.0, bar.BackdropOpacity, 3);
+    }
+
+    [AvaloniaFact]
+    public void A_direct_collapse_notifies_the_large_title_binding()
+    {
+        var bar = new CupertinoNavigationBar();
+        var notifications = 0;
+        bar.PropertyChanged += (_, change) =>
+        {
+            if (change.Property == CupertinoNavigationBar.LargeTitleOpacityProperty)
+                notifications++;
+        };
+
+        bar.CollapseProgress = 1;
+
+        Assert.Equal(0, bar.LargeTitleOpacity);
+        Assert.Equal(1, notifications);
     }
 
     [AvaloniaFact]
@@ -1766,6 +1904,48 @@ public class CalendarThemeTests
 
         var disc = selected!.GetVisualDescendants().OfType<global::Avalonia.Controls.Shapes.Ellipse>().Single(e => e.Name == "Disc");
         Assert.True(disc.IsVisible, "the selected day must carry the accent disc");
+    }
+}
+
+public class NotificationThemeTests
+{
+    [AvaloniaFact]
+    public void Notification_close_button_is_reachable_by_keyboard_while_visually_hidden()
+    {
+        var previousMotion = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = true;
+        var before = new Button { Content = "Before" };
+        var card = new global::Avalonia.Controls.Notifications.NotificationCard
+        {
+            Content = "Message",
+        };
+        var window = new Window
+        {
+            Width = 400,
+            Height = 300,
+            Content = new StackPanel { Children = { before, card } },
+        };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var close = card.GetVisualDescendants().OfType<Button>().Single(button => button.Name == "Close");
+            Assert.True(close.IsEffectivelyVisible);
+            Assert.Equal(0, close.Opacity);
+
+            before.Focus();
+            window.KeyPress(Key.Tab, RawInputModifiers.None, PhysicalKey.Tab, null);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.True(close.IsFocused);
+            Assert.Equal(1, close.Opacity);
+        }
+        finally
+        {
+            window.Close();
+            CupertinoAccessibility.ReduceMotion = previousMotion;
+        }
     }
 }
 

@@ -13,6 +13,10 @@ internal sealed class AppleSystemTextShaper(ITextShaperImpl fallback) : ITextSha
     public ITextShaperTypeface CreateTypeface(GlyphTypeface glyphTypeface) =>
         fallback.CreateTypeface(glyphTypeface);
 
+    // macOS reports the UI alias as "System Font"; installed SF Pro keeps fallback metrics.
+    internal static bool IsAppleSystemFamily(string family) =>
+        family is ".AppleSystemUIFont" or "System Font";
+
     public ShapedBuffer ShapeText(ReadOnlyMemory<char> text, TextShaperOptions options)
     {
         var shaped = fallback.ShapeText(text, options);
@@ -32,14 +36,14 @@ internal sealed class AppleSystemTextShaper(ITextShaperImpl fallback) : ITextSha
                 break;
             }
         }
-        if (text.IsEmpty || platform.FamilyName != ".AppleSystemUIFont"
+        if (text.IsEmpty || !IsAppleSystemFamily(platform.FamilyName)
             || platform.Stretch != FontStretch.Normal
             || (options.FontFeatures is { Count: > 0 } && !tabularNumbers)
             || text.Span.Contains('\t'))
             return shaped;
 
         var native = AppleCoreText.Shape(
-            text.ToString(), options.FontRenderingEmSize, platform.Weight,
+            text.Span, options.FontRenderingEmSize, platform.Weight,
             platform.Style == FontStyle.Italic, tabularNumbers);
         if (native is null || native.Count != shaped.Length)
             return shaped;

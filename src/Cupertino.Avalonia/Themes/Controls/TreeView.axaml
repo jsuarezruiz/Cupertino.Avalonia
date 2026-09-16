@@ -85,9 +85,16 @@
               </Transitions>
             </Path.Transitions>
           </Path>
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="12" Margin="0"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^:checked /template/ Path#Glyph">
       <Setter Property="RenderTransform" Value="rotate(90deg)" />
     </Style>

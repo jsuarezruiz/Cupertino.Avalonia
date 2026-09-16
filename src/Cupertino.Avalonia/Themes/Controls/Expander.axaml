@@ -94,9 +94,16 @@
           <ContentPresenter Content="{TemplateBinding Content}"
                             VerticalContentAlignment="Center"
                             HorizontalContentAlignment="Stretch" />
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="8" Margin="2"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2" IsVisible="False" />
         </Panel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^:focus-visible /template/ Border#FocusRing">
+      <Setter Property="IsVisible" Value="True" />
+    </Style>
     <Style Selector="^:pressed /template/ Border#Row">
       <Setter Property="Background" Value="{DynamicResource CupertinoRowPressedBrush}" />
     </Style>

@@ -73,8 +73,11 @@ public static class SwitchInteraction
     /// <inheritdoc cref="OffTintProperty"/>
     public static Color GetOffTint(ToggleSwitch element) => element.GetValue(OffTintProperty);
 
-    private static void OnCheckedChanged(object? sender, RoutedEventArgs e) =>
-        CupertinoHaptics.Play(HapticFeedback.ImpactLight);
+    private static void OnCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        if (sender is ToggleSwitch sw && sw.GetValue(StateProperty)?.IsUserToggling == true)
+            CupertinoHaptics.Play(HapticFeedback.ImpactLight);
+    }
 
     private static void OnIsEnabledChanged(ToggleSwitch sw, bool enabled)
     {
@@ -145,6 +148,8 @@ public static class SwitchInteraction
     private sealed class TrackingState : IDisposable
     {
         private bool _observingAccessibility;
+        private readonly IBrush? _originalTrackBackground;
+        private readonly Transitions? _originalKnobTransitions;
 
         public TrackingState(ToggleSwitch sw, Panel knobs, Panel travelCanvas, Border track)
         {
@@ -152,6 +157,8 @@ public static class SwitchInteraction
             Knobs = knobs;
             TravelCanvas = travelCanvas;
             Track = track;
+            _originalTrackBackground = track.Background;
+            _originalKnobTransitions = knobs.Transitions;
             Track.Background = TrackBrush;
 
             PressTransitions = CreateTransitions(
@@ -170,6 +177,31 @@ public static class SwitchInteraction
                 RoutingStrategies.Tunnel, handledEventsToo: true);
             Switch.AddHandler(InputElement.PointerReleasedEvent, OnSwitchPointerReleased,
                 RoutingStrategies.Tunnel, handledEventsToo: true);
+            Switch.AddHandler(InputElement.PointerCaptureLostEvent, OnSwitchPointerCaptureLost,
+                RoutingStrategies.Bubble, handledEventsToo: true);
+            Switch.AddHandler(InputElement.KeyDownEvent, OnSwitchKeyDown,
+                RoutingStrategies.Tunnel, handledEventsToo: true);
+            Switch.AddHandler(InputElement.KeyUpEvent, OnSwitchKeyUp,
+                RoutingStrategies.Tunnel, handledEventsToo: true);
+        }
+
+        public bool IsUserToggling { get; private set; }
+
+        private void BeginUserToggle() => IsUserToggling = true;
+
+        private void EndUserToggle() =>
+            Dispatcher.UIThread.Post(() => IsUserToggling = false, DispatcherPriority.Input);
+
+        private void OnSwitchKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+                BeginUserToggle();
+        }
+
+        private void OnSwitchKeyUp(object? sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+                EndUserToggle();
         }
 
         public ToggleSwitch Switch { get; }
@@ -210,8 +242,15 @@ public static class SwitchInteraction
             Switch.DetachedFromVisualTree -= OnDetached;
             Switch.RemoveHandler(InputElement.PointerPressedEvent, OnSwitchPointerPressed);
             Switch.RemoveHandler(InputElement.PointerReleasedEvent, OnSwitchPointerReleased);
+            Switch.RemoveHandler(InputElement.PointerCaptureLostEvent, OnSwitchPointerCaptureLost);
+            Switch.RemoveHandler(InputElement.KeyDownEvent, OnSwitchKeyDown);
+            Switch.RemoveHandler(InputElement.KeyUpEvent, OnSwitchKeyUp);
             Switch.Classes.Remove(ReleasingClass);
+            IsUserToggling = false;
             Subscription?.Dispose();
+            if (ReferenceEquals(Track.Background, TrackBrush))
+                Track.Background = _originalTrackBackground;
+            Knobs.Transitions = _originalKnobTransitions;
         }
 
         private void OnAttached(object? sender, VisualTreeAttachmentEventArgs e) => ObserveAccessibility();
@@ -220,6 +259,7 @@ public static class SwitchInteraction
         {
             ReleaseTimer.Stop();
             Switch.Classes.Remove(ReleasingClass);
+            IsUserToggling = false;
             StopObservingAccessibility();
         }
 
@@ -252,6 +292,9 @@ public static class SwitchInteraction
 
         private void OnSwitchPointerPressed(object? sender, PointerPressedEventArgs e)
         {
+            if (!e.GetCurrentPoint(Switch).Properties.IsLeftButtonPressed)
+                return;
+            BeginUserToggle();
             Knobs.Transitions = CupertinoAccessibility.ReduceMotion ? null : PressTransitions;
             ReleaseTimer.Stop();
             Switch.Classes.Remove(ReleasingClass);
@@ -259,6 +302,9 @@ public static class SwitchInteraction
 
         private void OnSwitchPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
+            if (!IsUserToggling)
+                return;
+            EndUserToggle();
             // Preserve release material through spring travel.
             Knobs.Transitions = CupertinoAccessibility.ReduceMotion ? null : ReleaseTransitions;
             if (CupertinoAccessibility.ReduceMotion)
@@ -271,6 +317,9 @@ public static class SwitchInteraction
             ReleaseTimer.Stop();
             ReleaseTimer.Start();
         }
+
+        private void OnSwitchPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e) =>
+            IsUserToggling = false;
 
         private void OnReleaseTimerTick(object? sender, EventArgs e)
         {

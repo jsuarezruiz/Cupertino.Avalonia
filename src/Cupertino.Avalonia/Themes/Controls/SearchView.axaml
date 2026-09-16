@@ -19,12 +19,13 @@
               <Path Data="{DynamicResource CupertinoSearchGeometry}" Width="18" Height="18"
                     Stretch="Uniform" Stroke="{DynamicResource CupertinoSecondaryLabelBrush}"
                     StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
-              <TextBox Name="PART_Field" Grid.Column="1" PlaceholderText="Search"
+              <TextBox Name="PART_Field" Grid.Column="1"
+                       PlaceholderText="{DynamicResource CupertinoSearchPlaceholderText}"
                        Background="Transparent" BorderThickness="0" Padding="0"
                        FontSize="{DynamicResource CupertinoFontSize17}"
                        VerticalContentAlignment="Center" />
               <Button Name="PART_CancelButton" Grid.Column="2" Classes="plain"
-                      Content="Cancel" Padding="12,0" IsVisible="False"
+                      Content="{DynamicResource CupertinoSearchCancelText}" Padding="12,0" IsVisible="False"
                       Foreground="{DynamicResource CupertinoAccentBrush}" />
               <Button Name="PART_CompactButton" Grid.ColumnSpan="3" Classes="plain"
                       Background="Transparent" HorizontalAlignment="Stretch"
@@ -36,7 +37,7 @@
                     HorizontalAlignment="Stretch" />
           <Grid Grid.Row="2">
             <ListBox Name="PART_Results" Background="Transparent" />
-            <ContentPresenter Name="PART_Empty" Content="{TemplateBinding EmptyContent}"
+            <ContentPresenter Name="PART_Empty"
                               IsVisible="False" HorizontalAlignment="Center"
                               Margin="16,24" Foreground="{DynamicResource CupertinoSecondaryLabelBrush}" />
           </Grid>
@@ -47,8 +48,6 @@
       <Setter Property="Transitions">
         <Transitions><DoubleTransition Property="MaxWidth" Duration="{motion:MotionDuration 280}" /></Transitions>
       </Setter>
-    </Style>
-    <Style Selector="^:collapsible /template/ controls|GlassSurface#PART_SearchSurface">
       <Setter Property="MaxWidth" Value="44" />
       <Setter Property="HorizontalAlignment" Value="Right" />
     </Style>

@@ -323,133 +323,61 @@ public static class CupertinoFlyoutTransition
             : new Rect(targetBounds.Center, default(Size));
     }
 
-    private static Transitions CreateMaterialTransitions(
-        TimeSpan duration,
-        TimeSpan opacityDuration,
-        Easing transformEasing,
-        Easing opacityEasing) =>
+    private static readonly AvaloniaProperty<double>[] GlassMaterialProperties =
     [
-        new TransformOperationsTransition
-        {
-            Property = Visual.RenderTransformProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
-        {
-            Property = Visual.OpacityProperty,
-            Duration = opacityDuration,
-            Easing = opacityEasing,
-        },
-        new DoubleTransition
-        {
-            Property = GlassSurface.BlurRadiusProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
-        {
-            Property = GlassSurface.SaturationProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
-        {
-            Property = GlassSurface.RefractionStrengthProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
-        {
-            Property = GlassSurface.DepthEffectProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
-        {
-            Property = GlassSurface.ShadowOpacityProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
-        {
-            Property = GlassSurface.ShadowBlurProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
-        {
-            Property = GlassSurface.ShadowOffsetProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
+        GlassSurface.BlurRadiusProperty,
+        GlassSurface.SaturationProperty,
+        GlassSurface.RefractionStrengthProperty,
+        GlassSurface.DepthEffectProperty,
+        GlassSurface.ShadowOpacityProperty,
+        GlassSurface.ShadowBlurProperty,
+        GlassSurface.ShadowOffsetProperty,
     ];
 
-    private static Transitions CreatePlainMaterialTransitions(
+    // Transform and opacity always animate; glass and border materials add their own properties.
+    private static Transitions CreateTransitions(
+        Control target,
         TimeSpan duration,
         TimeSpan opacityDuration,
         Easing transformEasing,
-        Easing opacityEasing) =>
-    [
-        new TransformOperationsTransition
+        Easing opacityEasing)
+    {
+        var transitions = new Transitions
         {
-            Property = Visual.RenderTransformProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
+            new TransformOperationsTransition
+            {
+                Property = Visual.RenderTransformProperty,
+                Duration = duration,
+                Easing = transformEasing,
+            },
+            new DoubleTransition
+            {
+                Property = Visual.OpacityProperty,
+                Duration = opacityDuration,
+                Easing = opacityEasing,
+            },
+        };
+        if (target is GlassSurface)
         {
-            Property = Visual.OpacityProperty,
-            Duration = opacityDuration,
-            Easing = opacityEasing,
-        },
-    ];
-
-    private static Transitions CreateBorderMaterialTransitions(
-        TimeSpan duration,
-        TimeSpan opacityDuration,
-        Easing transformEasing,
-        Easing opacityEasing) =>
-    [
-        new TransformOperationsTransition
+            foreach (var property in GlassMaterialProperties)
+                transitions.Add(new DoubleTransition
+                {
+                    Property = property,
+                    Duration = duration,
+                    Easing = transformEasing,
+                });
+        }
+        else if (target is Border)
         {
-            Property = Visual.RenderTransformProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
-        {
-            Property = Visual.OpacityProperty,
-            Duration = opacityDuration,
-            Easing = opacityEasing,
-        },
-        new BoxShadowsTransition
-        {
-            Property = Border.BoxShadowProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-    ];
-
-    private static Transitions CreateContentTransitions(
-        TimeSpan duration,
-        TimeSpan opacityDuration,
-        Easing transformEasing,
-        Easing opacityEasing) =>
-    [
-        new TransformOperationsTransition
-        {
-            Property = Visual.RenderTransformProperty,
-            Duration = duration,
-            Easing = transformEasing,
-        },
-        new DoubleTransition
-        {
-            Property = Visual.OpacityProperty,
-            Duration = opacityDuration,
-            Easing = opacityEasing,
-        },
-    ];
+            transitions.Add(new BoxShadowsTransition
+            {
+                Property = Border.BoxShadowProperty,
+                Duration = duration,
+                Easing = transformEasing,
+            });
+        }
+        return transitions;
+    }
 
     private sealed class FlyoutState(PopupFlyoutBase owner)
     {
@@ -476,6 +404,7 @@ public static class CupertinoFlyoutTransition
             _session = owner.Target is { } anchor && owner.Popup.Child is { } presenter
                 ? CreateSession(anchor, presenter, owner.Popup.Placement, CompleteClose)
                 : null;
+            UnwatchAnchor();
             if (owner.Target is { } watched)
             {
                 _watchedAnchor = watched;
@@ -541,6 +470,7 @@ public static class CupertinoFlyoutTransition
         private Popup? _popup;
         private Border? _scrim;
         private OverlayLayer? _scrimLayer;
+        private IDisposable? _scrimSize;
 
         public void Opening(object? sender, CancelEventArgs args)
         {
@@ -560,6 +490,7 @@ public static class CupertinoFlyoutTransition
             s_active = new WeakReference<ContextMenuState>(this);
 
             _session?.Dispose();
+            UnwatchAnchor();
             if (owner.Parent is Popup popup && popup.PlacementTarget is { } anchor)
             {
                 _popup = popup;
@@ -621,6 +552,12 @@ public static class CupertinoFlyoutTransition
             };
             scrim.Bind(Border.BackgroundProperty,
                 scrim.GetResourceObservable("CupertinoContextMenuScrimBrush"));
+            _scrimSize = layer.GetObservable(Visual.BoundsProperty).Subscribe(
+                new AnonymousObserver<Rect>(bounds =>
+                {
+                    scrim.Width = bounds.Width;
+                    scrim.Height = bounds.Height;
+                }));
             if (!CupertinoAccessibility.ReduceMotion)
                 scrim.Transitions =
                 [
@@ -642,6 +579,8 @@ public static class CupertinoFlyoutTransition
 
         private void RemoveScrim()
         {
+            _scrimSize?.Dispose();
+            _scrimSize = null;
             if (_scrim is { } scrim)
                 _scrimLayer?.Children.Remove(scrim);
             _scrim = null;
@@ -706,6 +645,9 @@ public static class CupertinoFlyoutTransition
         public void Opened(object? sender, EventArgs args)
         {
             _session?.Dispose();
+            if (_watchedAnchor is { } previous)
+                previous.DetachedFromVisualTree -= OnAnchorDetached;
+            _watchedAnchor = null;
             var anchor = owner.PlacementTarget ?? owner.TemplatedParent as Control;
             if (anchor is not null && owner.Child is { } presenter)
             {
@@ -852,16 +794,10 @@ public static class CupertinoFlyoutTransition
                     DampingRatio = _profile == MotionProfile.Menu ? 0.75 : 0.8,
                     OmegaDuration = _profile == MotionProfile.Menu ? 7.0 : 7.5,
                 };
-                _material.Transitions = _glass is null
-                    ? _material is Border
-                        ? CreateBorderMaterialTransitions(
-                            duration, opacityDuration, easing, new SineEaseOut())
-                        : CreatePlainMaterialTransitions(
-                            duration, opacityDuration, easing, new SineEaseOut())
-                    : CreateMaterialTransitions(
-                        duration, opacityDuration, easing, new SineEaseOut());
-                _content.Transitions = CreateContentTransitions(
-                    duration, opacityDuration, easing, new SineEaseOut());
+                _material.Transitions = CreateTransitions(
+                    _material, duration, opacityDuration, easing, new SineEaseOut());
+                _content.Transitions = CreateTransitions(
+                    _content, duration, opacityDuration, easing, new SineEaseOut());
                 RestoreGlassValues();
                 RestoreBorderShadow();
                 _material.RenderTransform = ExpandedTransform;
@@ -894,16 +830,10 @@ public static class CupertinoFlyoutTransition
             Easing easing = _profile is MotionProfile.Menu or MotionProfile.Popover
                 ? new SineEaseIn()
                 : new QuadraticEaseIn();
-            _material.Transitions = _glass is null
-                ? _material is Border
-                    ? CreateBorderMaterialTransitions(
-                        duration, opacityDuration, easing, new SineEaseOut())
-                    : CreatePlainMaterialTransitions(
-                        duration, opacityDuration, easing, new SineEaseOut())
-                : CreateMaterialTransitions(
-                    duration, opacityDuration, easing, new SineEaseOut());
-            _content.Transitions = CreateContentTransitions(
-                duration, opacityDuration, easing,
+            _material.Transitions = CreateTransitions(
+                _material, duration, opacityDuration, easing, new SineEaseOut());
+            _content.Transitions = CreateTransitions(
+                _content, duration, opacityDuration, easing,
                 _profile is MotionProfile.Menu or MotionProfile.Popover
                     ? new SineEaseIn()
                     : easing);

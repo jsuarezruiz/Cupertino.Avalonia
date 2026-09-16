@@ -10,6 +10,10 @@ namespace Cupertino.Themes;
 /// <summary>
 /// The Cupertino theme for Avalonia. Add it after the base theme.
 /// </summary>
+/// <remarks>
+/// Installs process-wide Cupertino transitions for every flyout and context menu. They are
+/// not removed with the theme.
+/// </remarks>
 public class CupertinoTheme : Styles
 {
     /// <summary>
@@ -39,8 +43,6 @@ public class CupertinoTheme : Styles
 
     private static readonly Color LightBlue = Color.FromRgb(0x00, 0x88, 0xFF);
     private static readonly Color DarkBlue = Color.FromRgb(0x00, 0x91, 0xFF);
-
-    private static readonly Color LightTabBlue = Color.FromRgb(0x00, 0x88, 0xFF);
 
     /// <summary>
     /// Creates a CupertinoTheme with its default settings.
@@ -82,10 +84,11 @@ public class CupertinoTheme : Styles
 
     private static FontFamily ResolveSystemFont()
     {
+        // CoreText's systemFontOfSize: face first, independent of SF Pro installs.
         string[] candidates =
         [
-            "SF Pro Text", "SF Pro Display", "SF Pro",
             ".AppleSystemUIFont",
+            "SF Pro Text", "SF Pro Display", "SF Pro",
             "Helvetica Neue", "Segoe UI", "Roboto", "Inter",
         ];
 
@@ -144,7 +147,7 @@ public class CupertinoTheme : Styles
             variant["CupertinoTabAccentBrush"] = new SolidColorBrush(
                 variantKey != ThemeVariant.Light ? hue
                 : accent is { } a ? Color.FromRgb((byte)(a.R * 0.85), (byte)(a.G * 0.85), (byte)(a.B * 0.85))
-                : LightTabBlue);
+                : LightBlue);
         }
     }
 }

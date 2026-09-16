@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using Avalonia;
-using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
@@ -32,7 +31,7 @@ public sealed class NavigationEntry
     /// </summary>
     public string Route { get; }
     /// <summary>
-    /// The primary text displayed by this control.
+    /// The title shown in the navigation bar while this entry is on top.
     /// </summary>
     public string Title { get; }
     /// <summary>
@@ -128,7 +127,7 @@ public sealed class CupertinoNavigationCompletedEventArgs : EventArgs
 /// A captured route identifier, display title, and application-owned parameter.
 /// </summary>
 /// <param name="Route">The application-defined route identifier; route lookup uses ordinal, case-sensitive comparison.</param>
-/// <param name="Title">The primary text displayed by this control.</param>
+/// <param name="Title">The title shown in the navigation bar while this entry is on top.</param>
 /// <param name="Parameter">An optional application-owned route parameter. State capture retains the object reference rather than serializing it.</param>
 public sealed record CupertinoNavigationStateEntry(string Route, string Title, object? Parameter);
 /// <summary>
@@ -157,7 +156,7 @@ public class CupertinoNavigationPage : TemplatedControl
         AvaloniaProperty.Register<CupertinoNavigationPage, string?>(nameof(RootTitle));
 
     /// <summary>
-    /// Gets or sets the leading content shown at the root.
+    /// Identifies the <see cref="LeadingContent"/> property.
     /// </summary>
     public static readonly StyledProperty<object?> LeadingContentProperty =
         AvaloniaProperty.Register<CupertinoNavigationPage, object?>(nameof(LeadingContent));
@@ -177,7 +176,7 @@ public class CupertinoNavigationPage : TemplatedControl
     /// </summary>
     public string? RootTitle { get => GetValue(RootTitleProperty); set => SetValue(RootTitleProperty, value); }
     /// <summary>
-    /// Content displayed before the title in the navigation bar.
+    /// Content displayed before the title in the navigation bar while the root is shown.
     /// </summary>
     public object? LeadingContent { get => GetValue(LeadingContentProperty); set => SetValue(LeadingContentProperty, value); }
     /// <summary>
@@ -194,7 +193,7 @@ public class CupertinoNavigationPage : TemplatedControl
     private const double FlickVelocity = 10;
 
     /// <summary>
-    /// Gets or sets whether edge-swipe navigation is enabled.
+    /// Identifies the <see cref="IsBackGestureEnabled"/> property.
     /// </summary>
     public static readonly StyledProperty<bool> IsBackGestureEnabledProperty =
         AvaloniaProperty.Register<CupertinoNavigationPage, bool>(nameof(IsBackGestureEnabled), true);
@@ -209,6 +208,10 @@ public class CupertinoNavigationPage : TemplatedControl
     }
 
     private readonly List<NavigationEntry> _stack = new();
+    private readonly IReadOnlyList<NavigationEntry> _stackView;
+    private readonly Dictionary<Control, IDisposable> _hostBindings = new();
+    private IDisposable? _chevronBinding;
+    private IDisposable? _backHostBinding;
     private CupertinoNavigationBar? _bar;
     private Panel? _host;
     private Button? _back;
@@ -243,7 +246,15 @@ public class CupertinoNavigationPage : TemplatedControl
     /// <summary>
     /// The current route entries in push order, excluding the root; this view reflects subsequent navigation changes.
     /// </summary>
-    public IReadOnlyList<NavigationEntry> Stack => _stack;
+    public IReadOnlyList<NavigationEntry> Stack => _stackView;
+
+    /// <summary>
+    /// Creates a navigation page with an empty stack.
+    /// </summary>
+    public CupertinoNavigationPage()
+    {
+        _stackView = _stack.AsReadOnly();
+    }
     /// <summary>
     /// The top route entry, or null while showing the root.
     /// </summary>
@@ -255,7 +266,7 @@ public class CupertinoNavigationPage : TemplatedControl
     public Control? CurrentContent => _stack.Count > 0 ? _stack[^1].Content : RootContent;
 
     /// <summary>
-    /// Raised after navigation completes.
+    /// Raised synchronously when the stack changes, before any visual transition starts.
     /// </summary>
     public event EventHandler? Navigated;
     /// <summary>
@@ -301,7 +312,8 @@ public class CupertinoNavigationPage : TemplatedControl
             RenderTransformOrigin = RelativePoint.Center,
             RenderTransform = TransformOperations.Parse("scale(1.5)"),
         };
-        _backChevron.Bind(Avalonia.Controls.Shapes.Shape.StrokeProperty,
+        _chevronBinding?.Dispose();
+        _chevronBinding = _backChevron.Bind(Avalonia.Controls.Shapes.Shape.StrokeProperty,
                      this.GetResourceObservable("CupertinoBarForegroundBrush"));
         UpdateDirectionChrome();
 
@@ -319,23 +331,12 @@ public class CupertinoNavigationPage : TemplatedControl
         {
             Height = 44,
             CornerRadius = new CornerRadius(22),
-            BlurRadius = 18,
-            GlassThickness = 1,
-            Saturation = 1,
-            RefractionStrength = 0,
-            ChromaticAberration = 0,
-            DepthEffect = 0,
-            LightIntensity = 0.25,
-            FresnelStrength = 0,
-            Magnification = 1,
-            ShadowOpacity = 0.10,
-            ShadowBlur = 24,
-            ShadowOffset = 2,
-            ShadowContactWeight = 0,
             Child = _back,
             IsVisible = false,
         };
-        _backHost.Bind(GlassSurface.TintProperty, this.GetResourceObservable("CupertinoBarButtonTint"));
+        _backHostBinding?.Dispose();
+        _backHostBinding = _backHost.Bind(StyledElement.ThemeProperty,
+                                          _backHost.GetResourceObservable("CupertinoBarCapsule"));
         _back.PropertyChanged += (_, e) =>
         {
             if (e.Property == IsVisibleProperty && _backHost is not null)
@@ -476,7 +477,7 @@ public class CupertinoNavigationPage : TemplatedControl
     private Border Backed(Control content)
     {
         var border = new Border { Child = content };
-        border.Bind(Border.BackgroundProperty,
+        _hostBindings[border] = border.Bind(Border.BackgroundProperty,
                     this.GetResourceObservable("CupertinoGroupedBackgroundBrush"));
         return border;
     }
@@ -488,6 +489,8 @@ public class CupertinoNavigationPage : TemplatedControl
         _host?.Children.Remove(host);
         if (host is Border border)
             border.Child = null;
+        if (_hostBindings.Remove(host, out var binding))
+            binding.Dispose();
     }
 
     private void ShowOnly(Control page)
@@ -498,8 +501,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (page.GetVisualParent() is Panel previous && !ReferenceEquals(previous, _host))
             previous.Children.Remove(page);
         _host.Children.Clear();
-        if (!_host.Children.Contains(page))
-            _host.Children.Add(page);
+        _host.Children.Add(page);
     }
 
     /// <summary>
@@ -515,6 +517,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (_host is null || _dragging)
             return false;
 
+        _dragArmed = false;
         // Complete active transitions before mutating the stack.
         CompleteActiveTransition();
 
@@ -531,7 +534,7 @@ public class CupertinoNavigationPage : TemplatedControl
         {
             // Navigation callbacks can cancel or throw before ownership transfers.
             if (!accepted)
-                ((Border)entry.Host).Child = null;
+                ReleaseRetiredHost(entry.Host);
         }
         _stack.Add(entry);
 
@@ -556,7 +559,7 @@ public class CupertinoNavigationPage : TemplatedControl
             ResetBarChrome();
             _barTitle = _bar?.InlineTitle;
             _titleInverted = false;
-            _titleSlide = DirectionSign * 48;
+            _titleSlide = 48;
             _fadeBackWithDepth = _stack.Count == 1;
 
             AddTransitionChrome(entry.Host, behind);
@@ -586,6 +589,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (_host is null || _dragging)
             return false;
 
+        _dragArmed = false;
         CompleteActiveTransition();
         if (_stack.Count == 0)
             return false;
@@ -615,7 +619,7 @@ public class CupertinoNavigationPage : TemplatedControl
             ResetBarChrome(keepBackDeferral: true);
             _barTitle = _bar?.InlineTitle;
             _titleInverted = true;
-            _titleSlide = -DirectionSign * 48;
+            _titleSlide = -48;
             _fadeBackWithDepth = _hideBackOnFinish;
 
             AddTransitionChrome(front, behind);
@@ -642,6 +646,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (_host is null || _dragging)
             return false;
 
+        _dragArmed = false;
         CompleteActiveTransition();
         if (_stack.Count == 0 || _rootHost is not { } root)
             return false;
@@ -682,7 +687,7 @@ public class CupertinoNavigationPage : TemplatedControl
             ResetBarChrome();
             _barTitle = _bar?.InlineTitle;
             _titleInverted = true;
-            _titleSlide = -DirectionSign * 48;
+            _titleSlide = -48;
             _fadeBackWithDepth = true;
             _hideBackOnFinish = true;
 
@@ -705,6 +710,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (_host is null || _dragging || string.IsNullOrWhiteSpace(route))
             return false;
 
+        _dragArmed = false;
         CompleteActiveTransition();
         var index = _stack.FindLastIndex(entry => string.Equals(entry.Route, route, StringComparison.Ordinal));
         if (index < 0)
@@ -752,6 +758,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (_host is null || _dragging)
             return false;
 
+        _dragArmed = false;
         CompleteActiveTransition();
 
         var rebuilt = new List<NavigationEntry>(state.Entries.Count);
@@ -830,9 +837,10 @@ public class CupertinoNavigationPage : TemplatedControl
         Navigated?.Invoke(this, EventArgs.Empty);
     }
 
-    private double HostWidth => Bounds.Width > 0 ? Bounds.Width : 402;
-    // Avalonia mirrors local coordinates in RTL; keep transition math logical.
-    private const double DirectionSign = 1;
+    // Used only before the first layout pass; matches a 402 pt iPhone viewport.
+    private const double FallbackHostWidth = 402;
+
+    private double HostWidth => Bounds.Width > 0 ? Bounds.Width : FallbackHostWidth;
 
     private void UpdateDirectionChrome()
     {
@@ -865,8 +873,8 @@ public class CupertinoNavigationPage : TemplatedControl
     private void SetDepthProgress(Control front, Control behind, double depth)
     {
         var w = HostWidth;
-        front.RenderTransform = Translate(DirectionSign * (1 - depth) * w);
-        behind.RenderTransform = Translate(-DirectionSign * w * ParallaxFraction * depth);
+        front.RenderTransform = Translate((1 - depth) * w);
+        behind.RenderTransform = Translate(-w * ParallaxFraction * depth);
         if (_scrim is not null)
             _scrim.Opacity = ScrimPeak * depth;
         if (_edgeShadow is not null)
@@ -933,6 +941,11 @@ public class CupertinoNavigationPage : TemplatedControl
 
     private void FinishTransition(Control keep, Control drop)
     {
+        RemoveTransitionChrome(keep, drop, release: true);
+    }
+
+    private void RemoveTransitionChrome(Control keep, Control drop, bool release)
+    {
         if (_host is null)
             return;
         if (_scrim is not null)
@@ -940,7 +953,8 @@ public class CupertinoNavigationPage : TemplatedControl
         if (_edgeShadow is not null)
             _host.Children.Remove(_edgeShadow);
         _host.Children.Remove(drop);
-        ReleaseRetiredHost(drop);
+        if (release)
+            ReleaseRetiredHost(drop);
         drop.RenderTransform = null;
         keep.RenderTransform = null;
         ResetBarChrome();
@@ -960,7 +974,7 @@ public class CupertinoNavigationPage : TemplatedControl
 
         var duration = Math.Max(120, 350 * Math.Abs(to - from));
         var easing = new Animation.CriticallyDampedEasing { OmegaDuration = 8.4 };
-        var started = DateTime.UtcNow;
+        var started = MotionClock.Now;
 
         var driver = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _driver = driver;
@@ -971,9 +985,10 @@ public class CupertinoNavigationPage : TemplatedControl
         };
         driver.Tick += (_, _) =>
         {
-            var t = (DateTime.UtcNow - started).TotalMilliseconds / duration;
+            var t = MotionClock.MillisecondsSince(started) / duration;
             if (t >= 1 || CupertinoAccessibility.ReduceMotion)
             {
+                driver.Stop();
                 if (ReferenceEquals(_driver, driver))
                     CompleteActiveTransition();
                 return;
@@ -1049,7 +1064,7 @@ public class CupertinoNavigationPage : TemplatedControl
         ResetBarChrome();
         _barTitle = _bar?.InlineTitle;
         _titleInverted = false;
-        _titleSlide = DirectionSign * 48;
+        _titleSlide = 48;
         _fadeBackWithDepth = _stack.Count == 1;
 
         AddTransitionChrome(_dragFront, behind);
@@ -1081,19 +1096,8 @@ public class CupertinoNavigationPage : TemplatedControl
         }
         else
         {
-            RunTransition(front, behind, _dragProgress, 1, () =>
-            {
-                if (_host is null)
-                    return;
-                if (_scrim is not null)
-                    _host.Children.Remove(_scrim);
-                if (_edgeShadow is not null)
-                    _host.Children.Remove(_edgeShadow);
-                _host.Children.Remove(behind);
-                behind.RenderTransform = null;
-                front.RenderTransform = null;
-                ResetBarChrome();
-            });
+            RunTransition(front, behind, _dragProgress, 1,
+                          () => RemoveTransitionChrome(keep: front, drop: behind, release: false));
         }
         e.Handled = true;
     }
@@ -1121,19 +1125,7 @@ public class CupertinoNavigationPage : TemplatedControl
         _dragFront = null;
         _dragBehind = null;
 
-        void Cleanup()
-        {
-            if (_host is null)
-                return;
-            if (_scrim is not null)
-                _host.Children.Remove(_scrim);
-            if (_edgeShadow is not null)
-                _host.Children.Remove(_edgeShadow);
-            _host.Children.Remove(behind);
-            behind.RenderTransform = null;
-            front.RenderTransform = null;
-            ResetBarChrome();
-        }
+        void Cleanup() => RemoveTransitionChrome(keep: front, drop: behind, release: false);
 
         if (animate && this.IsAttachedToVisualTree() && !CupertinoAccessibility.ReduceMotion)
             RunTransition(front, behind, _dragProgress, 1, Cleanup);

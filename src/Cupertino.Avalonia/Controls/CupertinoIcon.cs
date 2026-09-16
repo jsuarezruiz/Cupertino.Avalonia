@@ -97,11 +97,10 @@ public class CupertinoIcon : Control
         AvaloniaProperty.Register<CupertinoIcon, IBrush?>(nameof(Foreground));
 
     /// <summary>
-    /// Gets or sets the output-space stroke thickness, or NaN for the authored weight.
+    /// Identifies the <see cref="StrokeThickness"/> property.
     /// </summary>
     public static readonly StyledProperty<double> StrokeThicknessProperty =
         AvaloniaProperty.Register<CupertinoIcon, double>(nameof(StrokeThickness), double.NaN);
-
 
     /// <summary>
     /// The named icon to render from the built-in glyph catalogue.
@@ -112,11 +111,11 @@ public class CupertinoIcon : Control
     /// </summary>
     public double Size { get => GetValue(SizeProperty); set => SetValue(SizeProperty, value); }
     /// <summary>
-    /// The brush used to draw the text or indicator.
+    /// The brush used to fill or stroke the glyph.
     /// </summary>
     public IBrush? Foreground { get => GetValue(ForegroundProperty); set => SetValue(ForegroundProperty, value); }
     /// <summary>
-    /// The icon stroke width in logical pixels.
+    /// The output stroke width in logical pixels, or NaN for the authored weight.
     /// </summary>
     public double StrokeThickness { get => GetValue(StrokeThicknessProperty); set => SetValue(StrokeThicknessProperty, value); }
 
@@ -136,8 +135,23 @@ public class CupertinoIcon : Control
                   Avalonia.Data.BindingPriority.Style);
     }
 
+    private Pen? _pen;
+    private IBrush? _penBrush;
+    private double _penThickness;
+
     /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize) => new(Size, Size);
+
+    private Pen StrokePen(IBrush brush, double thickness)
+    {
+        if (_pen is null || !ReferenceEquals(_penBrush, brush) || _penThickness != thickness)
+        {
+            _pen = new Pen(brush, thickness) { LineCap = PenLineCap.Round, LineJoin = PenLineJoin.Round };
+            _penBrush = brush;
+            _penThickness = thickness;
+        }
+        return _pen;
+    }
 
     /// <inheritdoc/>
     public override void Render(DrawingContext context)
@@ -160,9 +174,7 @@ public class CupertinoIcon : Control
                 var stroke = double.IsNaN(StrokeThickness)
                     ? spec.Stroke
                     : StrokeThickness * spec.Box / Size;
-                context.DrawGeometry(null,
-                    new Pen(brush, stroke) { LineCap = PenLineCap.Round, LineJoin = PenLineJoin.Round },
-                    geometry);
+                context.DrawGeometry(null, StrokePen(brush, stroke), geometry);
             }
 
             // Paint solid details after the outline.

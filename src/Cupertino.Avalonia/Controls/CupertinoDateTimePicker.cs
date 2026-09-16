@@ -62,7 +62,7 @@ public class CupertinoDateTimePicker : TemplatedControl
     /// </summary>
     public DateTimeOffset? Maximum { get => GetValue(MaximumProperty); set => SetValue(MaximumProperty, value); }
     /// <summary>
-    /// The date label format string, or null to use d MMM yyyy with the current culture.
+    /// The date label format string, or null to use an abbreviated month in the current culture's date-field order.
     /// </summary>
     public string? DateFormat { get => GetValue(DateFormatProperty); set => SetValue(DateFormatProperty, value); }
     /// <summary>
@@ -107,32 +107,39 @@ public class CupertinoDateTimePicker : TemplatedControl
         {
             if (_date is not null)
             {
-                // Replace old bounds before selection, using its local calendar.
-                _date.MinimumDate = null;
-                _date.MaximumDate = null;
-                _date.MinimumDate = SelectedDateTime is { } selectedMinimum
+                var minimumDate = SelectedDateTime is { } selectedMinimum
                     ? AtOffset(Minimum, selectedMinimum.Offset) : Minimum;
-                _date.MaximumDate = SelectedDateTime is { } selectedMaximum
+                var maximumDate = SelectedDateTime is { } selectedMaximum
                     ? AtOffset(Maximum, selectedMaximum.Offset) : Maximum;
-                _date.SelectedDate = SelectedDateTime;
-                _date.DateFormat = DateFormat;
+                if (_date.MinimumDate != minimumDate || _date.MaximumDate != maximumDate)
+                {
+                    // Replace old bounds before selection, using its local calendar.
+                    _date.MinimumDate = null;
+                    _date.MaximumDate = null;
+                    _date.MinimumDate = minimumDate;
+                    _date.MaximumDate = maximumDate;
+                }
+                if (_date.SelectedDate != SelectedDateTime)
+                    _date.SelectedDate = SelectedDateTime;
+                if (_date.DateFormat != DateFormat)
+                    _date.DateFormat = DateFormat;
             }
             if (_time is not null)
             {
-                _time.ClockIdentifier = ClockIdentifier;
-                _time.MinuteIncrement = MinuteIncrement;
+                if (_time.ClockIdentifier != ClockIdentifier)
+                    _time.ClockIdentifier = ClockIdentifier;
+                if (_time.MinuteIncrement != MinuteIncrement)
+                    _time.MinuteIncrement = MinuteIncrement;
+                TimeSpan? minimumTime = null, maximumTime = null;
                 if (SelectedDateTime is { } selected)
-                {
-                    var (minimum, maximum) = GetTimeBounds(selected);
-                    _time.MinimumTime = minimum;
-                    _time.MaximumTime = maximum;
-                }
-                else
-                {
-                    _time.MinimumTime = null;
-                    _time.MaximumTime = null;
-                }
-                _time.SelectedTime = SelectedDateTime?.TimeOfDay;
+                    (minimumTime, maximumTime) = GetTimeBounds(selected);
+                if (_time.MinimumTime != minimumTime)
+                    _time.MinimumTime = minimumTime;
+                if (_time.MaximumTime != maximumTime)
+                    _time.MaximumTime = maximumTime;
+                var time = SelectedDateTime?.TimeOfDay;
+                if (_time.SelectedTime != time)
+                    _time.SelectedTime = time;
             }
         }
         finally { _syncing = false; }
@@ -233,5 +240,5 @@ public class CupertinoDateTimePicker : TemplatedControl
         return (TimeSpan.FromTicks(Math.Min(minimum, maximum)), TimeSpan.FromTicks(maximum));
     }
 
-    private int EffectiveMinuteIncrement => Math.Clamp(MinuteIncrement, 1, 59);
+    private int EffectiveMinuteIncrement => DateMath.ClampMinuteIncrement(MinuteIncrement);
 }

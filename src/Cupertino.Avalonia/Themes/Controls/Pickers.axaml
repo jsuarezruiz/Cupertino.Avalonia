@@ -19,8 +19,8 @@
                               HorizontalContentAlignment="Center"
                               VerticalContentAlignment="Center" />
           </Border>
-          <Border x:Name="FocusRing"
-                  CornerRadius="19" Margin="-2"
+          <Border x:Name="FocusRing" IsHitTestVisible="False"
+                  CornerRadius="999" Margin="-2"
                   BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
                   BorderThickness="2" Opacity="0" />
         </Panel>
@@ -46,7 +46,8 @@
       <ControlTemplate>
         <Panel>
           <Button x:Name="PART_FlyoutButton"
-                  Theme="{StaticResource CupertinoPickerCapsule}">
+                  Theme="{StaticResource CupertinoPickerCapsule}"
+                  AutomationProperties.Name="{Binding SelectedDate, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:d}'}">
             <Grid x:Name="PART_ButtonContentGrid" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto">
               <TextBlock x:Name="PART_DayTextBlock" Grid.Column="0" />
               <Rectangle x:Name="PART_FirstSpacer" Grid.Column="1" Width="6" Fill="Transparent" />
@@ -83,7 +84,8 @@
       <ControlTemplate>
         <Panel>
           <Button x:Name="PART_FlyoutButton"
-                  Theme="{StaticResource CupertinoPickerCapsule}">
+                  Theme="{StaticResource CupertinoPickerCapsule}"
+                  AutomationProperties.Name="{Binding SelectedTime, RelativeSource={RelativeSource TemplatedParent}, StringFormat='{}{0:t}'}">
             <Grid x:Name="PART_FlyoutButtonContentGrid" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
               <Border x:Name="PART_FirstPickerHost" Grid.Column="0">
                 <TextBlock x:Name="PART_HourTextBlock" />

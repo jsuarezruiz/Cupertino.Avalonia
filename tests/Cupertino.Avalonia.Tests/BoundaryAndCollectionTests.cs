@@ -1,7 +1,10 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -72,6 +75,65 @@ public class BoundaryAndCollectionTests
             window.Close();
             CupertinoAccessibility.ReduceMotion = previousMotion;
         }
+    }
+
+    [AvaloniaFact]
+    public void Open_popover_repositions_when_its_content_height_changes()
+    {
+        var previousMotion = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = true;
+        var anchor = new Button { Width = 80, Height = 36 };
+        Canvas.SetLeft(anchor, 200);
+        Canvas.SetTop(anchor, 700);
+        var canvas = new Canvas { Children = { anchor } };
+        var content = new Border { Width = 160, Height = 100 };
+        var window = new Window { Width = 500, Height = 800, Content = canvas };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            CupertinoPopover.Show(anchor, content, 20, null);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var layer = OverlayLayer.GetOverlayLayer(anchor)!;
+            var glass = layer.GetVisualDescendants().OfType<GlassSurface>().Single();
+            var panel = Assert.IsAssignableFrom<Control>(glass.GetVisualParent());
+            var initialHeight = panel.Bounds.Height;
+
+            content.Height = 260;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+
+            var panelOrigin = panel.TranslatePoint(default, window)!.Value;
+            var anchorOrigin = anchor.TranslatePoint(default, window)!.Value;
+            Assert.True(panel.Bounds.Height > initialHeight);
+            Assert.True(panelOrigin.Y + panel.Bounds.Height <= anchorOrigin.Y - 7);
+        }
+        finally
+        {
+            CupertinoPopover.CloseImmediately(anchor);
+            window.Close();
+            CupertinoAccessibility.ReduceMotion = previousMotion;
+        }
+    }
+
+    [Fact]
+    public void Disabled_page_control_rejects_automation_value_changes()
+    {
+        var control = new CupertinoPageControl
+        {
+            NumberOfPages = 5,
+            CurrentPage = 1,
+            IsEnabled = false,
+        };
+        var peer = new CupertinoPageControlAutomationPeer(control);
+
+        peer.SetValue(4);
+
+        Assert.True(peer.IsReadOnly);
+        Assert.Equal(1, control.CurrentPage);
     }
 
     [AvaloniaFact]
@@ -268,5 +330,39 @@ public class BoundaryAndCollectionTests
                 Items.Insert(newIndex + i, moved[i]);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, moved, newIndex, oldIndex));
         }
+    }
+}
+
+public class DatePickerFormatTests
+{
+    [Theory]
+    [InlineData("en-US", "Aug 3, 2026")]
+    [InlineData("en-GB", "3 Aug 2026")]
+    [InlineData("es-ES", "3 ago 2026")]
+    [InlineData("ja-JP", "2026 8月 3")]
+    public void Default_date_format_follows_the_culture_field_order(string culture, string expected)
+    {
+        var previous = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+            var picker = new CupertinoDatePicker
+            {
+                SelectedDate = new DateTimeOffset(2026, 8, 3, 0, 0, 0, TimeSpan.Zero),
+            };
+            Assert.Equal(expected, picker.DisplayText);
+        }
+        finally { CultureInfo.CurrentCulture = previous; }
+    }
+
+    [AvaloniaFact]
+    public void Explicit_date_format_overrides_the_culture_default()
+    {
+        var picker = new CupertinoDatePicker
+        {
+            SelectedDate = new DateTimeOffset(2026, 8, 3, 0, 0, 0, TimeSpan.Zero),
+            DateFormat = "yyyy-MM-dd",
+        };
+        Assert.Equal("2026-08-03", picker.DisplayText);
     }
 }
