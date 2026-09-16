@@ -12,7 +12,7 @@ namespace Cupertino.Controls;
 public class CupertinoActivityIndicator : Control
 {
     /// <summary>
-    /// Spin and show; false hides it, as <c>hidesWhenStopped</c> does.
+    /// Identifies the <see cref="IsActive"/> property.
     /// </summary>
     public static readonly StyledProperty<bool> IsActiveProperty =
         AvaloniaProperty.Register<CupertinoActivityIndicator, bool>(nameof(IsActive), true);
@@ -25,14 +25,14 @@ public class CupertinoActivityIndicator : Control
             nameof(Foreground), Brushes.Gray);
 
     /// <summary>
-    /// Fraction of spokes shown while arming; 1 spins normally.
+    /// Identifies the <see cref="SweepFraction"/> property.
     /// </summary>
     public static readonly StyledProperty<double> SweepFractionProperty =
         AvaloniaProperty.Register<CupertinoActivityIndicator, double>(
             nameof(SweepFraction), 1.0, coerce: (_, v) => Math.Clamp(v, 0, 1));
 
     /// <summary>
-    /// Whether the indicator is visible and advances its animation while attached.
+    /// Whether the indicator spins and is shown; false hides it, as <c>hidesWhenStopped</c> does.
     /// </summary>
     public bool IsActive { get => GetValue(IsActiveProperty); set => SetValue(IsActiveProperty, value); }
     /// <summary>
@@ -86,21 +86,33 @@ public class CupertinoActivityIndicator : Control
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        WatchAncestors();
+        UpdateTimer();
+    }
+
+    // IsEffectivelyVisible has no change notification, so watch each ancestor.
+    private void WatchAncestors()
+    {
+        UnwatchAncestors();
         foreach (var ancestor in this.GetVisualAncestors())
         {
             ancestor.PropertyChanged += OnAncestorPropertyChanged;
             _visibilityAncestors.Add(ancestor);
         }
-        UpdateTimer();
+    }
+
+    private void UnwatchAncestors()
+    {
+        foreach (var ancestor in _visibilityAncestors)
+            ancestor.PropertyChanged -= OnAncestorPropertyChanged;
+        _visibilityAncestors.Clear();
     }
 
     /// <inheritdoc/>
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
-        foreach (var ancestor in _visibilityAncestors)
-            ancestor.PropertyChanged -= OnAncestorPropertyChanged;
-        _visibilityAncestors.Clear();
+        UnwatchAncestors();
         // Stop offscreen render ticks.
         _timer?.Stop();
         _timer = null;
@@ -110,13 +122,15 @@ public class CupertinoActivityIndicator : Control
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property == IsActiveProperty || change.Property == IsVisibleProperty)
+        if (change.Property == IsActiveProperty || change.Property == IsVisibleProperty
+            || change.Property == SweepFractionProperty)
             UpdateTimer();
     }
 
     private void UpdateTimer()
     {
-        var shouldRun = IsActive && IsEffectivelyVisible && TopLevel.GetTopLevel(this) is not null;
+        var shouldRun = IsActive && SweepFraction >= 1 && IsEffectivelyVisible
+                        && TopLevel.GetTopLevel(this) is not null;
 
         if (!shouldRun)
         {
@@ -130,6 +144,7 @@ public class CupertinoActivityIndicator : Control
                                        {
                                            _step = (_step + 1) % Spokes;
                                            InvalidateVisual();
+                                           GlassSurface.PulseBehind(this);
                                        });
         _timer.Start();
     }

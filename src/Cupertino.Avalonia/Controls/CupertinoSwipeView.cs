@@ -1,10 +1,8 @@
-using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 
@@ -66,12 +64,19 @@ public class CupertinoSwipeView : ContentControl
     private double _settleVelocity;
     private double _dragVelocity;
     private double _lastDragX;
-    private DateTime _lastDragMove;
+    private long _lastDragMove;
     private double _leadingNaturalWidth = double.NaN;
     private double _trailingNaturalWidth = double.NaN;
+    private long _lastSettleTick;
 
     // Only one row can remain open.
-    private static CupertinoSwipeView? s_open;
+    private static WeakReference<CupertinoSwipeView>? s_openRow;
+
+    private static CupertinoSwipeView? s_open
+    {
+        get => s_openRow is not null && s_openRow.TryGetTarget(out var row) ? row : null;
+        set => s_openRow = value is null ? null : new WeakReference<CupertinoSwipeView>(value);
+    }
 
     /// <summary>
     /// Creates a CupertinoSwipeView with its default settings.
@@ -184,13 +189,11 @@ public class CupertinoSwipeView : ContentControl
 
     private double LeadingWidth => NaturalWidth(_leading, ref _leadingNaturalWidth, Bounds.Height);
     private double TrailingWidth => NaturalWidth(_trailing, ref _trailingNaturalWidth, Bounds.Height);
-    // Avalonia already mirrors pointer and child coordinates in RTL.
-    private const double DirectionSign = 1;
 
     private void ApplyPosition(double logicalPosition)
     {
         _position = logicalPosition;
-        _shift.X = logicalPosition * DirectionSign;
+        _shift.X = logicalPosition;
     }
 
     private void UpdateDirectionHosts()
@@ -289,13 +292,15 @@ public class CupertinoSwipeView : ContentControl
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            return;
         _pressed = true;
         _dragging = false;
         _press = e.GetPosition(this);
         _rawPosition = _openAt;
         _dragVelocity = 0;
         _lastDragX = _position;
-        _lastDragMove = DateTime.UtcNow;
+        _lastDragMove = MotionClock.Now;
         _settle.Stop();
     }
 
@@ -307,7 +312,7 @@ public class CupertinoSwipeView : ContentControl
             return;
 
         var p = e.GetPosition(this);
-        var dx = (p.X - _press.X) * DirectionSign;
+        var dx = p.X - _press.X;
         if (!_dragging)
         {
             if (Math.Abs(dx) < DragThreshold || Math.Abs(dx) < Math.Abs(p.Y - _press.Y))
@@ -329,8 +334,8 @@ public class CupertinoSwipeView : ContentControl
         if (Math.Abs(x) > reach)
             x = Math.Sign(x) * (reach + (Math.Abs(x) - reach) * 0.55);
 
-        var now = DateTime.UtcNow;
-        var dt = (now - _lastDragMove).TotalSeconds;
+        var now = MotionClock.Now;
+        var dt = (now - _lastDragMove) / 1000.0;
         if (dt > 0.001)
             _dragVelocity = _dragVelocity * 0.7 + (x - _lastDragX) / dt * 0.3;
         _lastDragX = x;
@@ -428,7 +433,7 @@ public class CupertinoSwipeView : ContentControl
         }
         else
         {
-            _settle.Start();
+            StartSettleTimer();
         }
         // First measures can run while the host is hidden; re-check once laid out.
         if (target != 0)
@@ -454,14 +459,22 @@ public class CupertinoSwipeView : ContentControl
         }
         else
         {
-            _settle.Start();
+            StartSettleTimer();
         }
+    }
+
+    private void StartSettleTimer()
+    {
+        _lastSettleTick = MotionClock.Now;
+        _settle.Start();
     }
 
     private void OnSettleTick(object? sender, EventArgs e)
     {
         // Critically damped spring carrying the release velocity.
-        const double dt = 0.016;
+        var now = MotionClock.Now;
+        var dt = Math.Clamp((now - _lastSettleTick) / 1000.0, 0.001, 0.05);
+        _lastSettleTick = now;
         var d = _position - _target;
         var accel = -SettleOmega * SettleOmega * d - 2 * SettleOmega * _settleVelocity;
         _settleVelocity += accel * dt;

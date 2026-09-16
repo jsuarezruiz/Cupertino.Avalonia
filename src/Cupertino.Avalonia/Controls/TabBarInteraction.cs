@@ -1,4 +1,3 @@
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -18,6 +17,7 @@ namespace Cupertino.Controls;
 /// </summary>
 public static class TabBarInteraction
 {
+    // Measured on iOS 26 at a 402 pt viewport.
     private const double DragThreshold = 3;
     private const double SnapMilliseconds = 320;
     private const double BottomLensOverflow = 3;
@@ -37,7 +37,8 @@ public static class TabBarInteraction
         AvaloniaProperty.RegisterAttached<TemplatedControl, bool>("IsEnabled", typeof(TabBarInteraction));
 
     /// <summary>
-    /// Uses segmented-control motion.
+    /// Identifies the <see cref="GetIsSegmented"/> attached setting, which selects segmented-control motion.
+    /// Changing it rebuilds the interaction state and cancels any gesture in flight.
     /// </summary>
     public static readonly AttachedProperty<bool> IsSegmentedProperty =
         AvaloniaProperty.RegisterAttached<TemplatedControl, bool>("IsSegmented", typeof(TabBarInteraction));
@@ -54,6 +55,16 @@ public static class TabBarInteraction
             c.ClearValue(StateProperty);
             if (e.GetNewValue<bool>())
                 c.TemplateApplied += OnTemplateApplied;
+        });
+
+        // The motion model is fixed per state, so rebuild it.
+        IsSegmentedProperty.Changed.AddClassHandler<TemplatedControl>((c, _) =>
+        {
+            if (c.GetValue(StateProperty) is not { } state)
+                return;
+            var (indicator, presenter) = state.TemplateParts;
+            state.Dispose();
+            c.SetValue(StateProperty, new State(c, indicator, presenter));
         });
     }
 
@@ -97,6 +108,11 @@ public static class TabBarInteraction
         private readonly DispatcherTimer _travel;
         private readonly Dictionary<Control, (double Width, IDisposable? Subscription)> _itemWidthOverrides = new();
         private readonly HashSet<Control> _observedItems = new();
+        private readonly Dictionary<Control, ContentPresenter?> _contentPresenters = new();
+        private IBrush? _wipeAccent;
+        private IBrush? _wipeLabel;
+        private bool _wipeLabelIsDark;
+        private long _lastTick;
         private TopLevel? _releaseRoot;
         private EventHandler<PointerReleasedEventArgs>? _releaseHandler;
 
@@ -114,6 +130,9 @@ public static class TabBarInteraction
 
         private readonly bool _segmented;
         private bool _disposed;
+
+        internal (Control Indicator, ItemsPresenter Presenter) TemplateParts =>
+            (_indicator, _presenter);
 
         public State(TemplatedControl owner, Control indicator, ItemsPresenter presenter)
         {
@@ -237,6 +256,7 @@ public static class TabBarInteraction
 
         private void OnContainerPrepared(object? sender, ContainerPreparedEventArgs e)
         {
+            _contentPresenters.Remove(e.Container);
             UpdateBottomGeometry();
         }
 
@@ -292,8 +312,12 @@ public static class TabBarInteraction
         private Rect ContentBoundsOf(Control item, Rect cell)
         {
             var host = _indicator.Parent as Visual ?? _presenter;
-            var presenter = item.GetVisualDescendants().OfType<ContentPresenter>()
-                .FirstOrDefault(c => c.Name == "PART_ContentPresenter");
+            if (!_contentPresenters.TryGetValue(item, out var presenter) || presenter?.IsAttachedToVisualTree() != true)
+            {
+                presenter = item.GetVisualDescendants().OfType<ContentPresenter>()
+                    .FirstOrDefault(c => c.Name == "PART_ContentPresenter");
+                _contentPresenters[item] = presenter;
+            }
             if (presenter?.Child is { } content && content.Bounds.Width > 0
                 && content.TranslatePoint(default, host) is { } p)
                 return new Rect(p.X, p.Y, content.Bounds.Width, content.Bounds.Height);
@@ -349,12 +373,22 @@ public static class TabBarInteraction
             _settleTo = target.X;
             _settleT = 0;
             _settleStretch = TabBarMotionModel.DragWidthScale(_velocity, _segmented);
+            _lastTick = MotionClock.Now;
             _settle.Start();
+        }
+
+        private double ElapsedMilliseconds()
+        {
+            var now = MotionClock.Now;
+            var elapsed = Math.Clamp(now - _lastTick, 1, 50);
+            _lastTick = now;
+            return elapsed;
         }
 
         private void OnSettleTick(object? sender, EventArgs e)
         {
-            _settleT += 16 / SnapMilliseconds;
+            var elapsed = ElapsedMilliseconds();
+            _settleT += elapsed / SnapMilliseconds;
             if (_settleT >= 1)
             {
                 _settleT = 1;
@@ -367,7 +401,7 @@ public static class TabBarInteraction
             var norm = 1 - (1 + 8.4) * Math.Exp(-8.4);
             var p = (1 - (1 + w) * Math.Exp(-w)) / norm;
             Canvas.SetLeft(_indicator, _settleFrom + (_settleTo - _settleFrom) * p);
-            RampPhase(16);
+            RampPhase(elapsed);
             SetStretch(1 + (_settleStretch - 1) * (1 - p),
                        1 + (HeightScale - 1) * (1 - p));   // settle follows a drag
             var settleX = _settleFrom + (_settleTo - _settleFrom) * p;
@@ -386,8 +420,6 @@ public static class TabBarInteraction
         private int _hideGen;
         private GlassSurface? _segLens;
         private Border? _segFill;
-
-        // The template namescope does not expose the lens; use the indicator tree.
         private double _fillPhase = 1;
 
         private void RampPhase(double dtMs)
@@ -404,6 +436,7 @@ public static class TabBarInteraction
             SetLensPhase(fill, 1 - fill);
         }
 
+        // The template namescope does not expose the lens; use the indicator tree.
         private void SetLensPhase(double fill, double lens)
         {
             if (!_segmented)
@@ -510,6 +543,7 @@ public static class TabBarInteraction
             _indicator.Width = from.Width;
             Canvas.SetLeft(_indicator, from.X);
             Canvas.SetTop(_indicator, from.Y);
+            _lastTick = MotionClock.Now;
             _travel.Start();
         }
 
@@ -517,7 +551,7 @@ public static class TabBarInteraction
 
         private void OnTravelTick(object? sender, EventArgs e)
         {
-            _travelT += 16 / _travelDuration;
+            _travelT += ElapsedMilliseconds() / _travelDuration;
             if (_travelT >= 1)
             {
                 _travel.Stop();
@@ -610,6 +644,8 @@ public static class TabBarInteraction
 
         private void EndDragVisual()
         {
+            _wipeAccent = null;
+            _wipeLabel = null;
             if (_segmented && _indicator.IsVisible && !CupertinoAccessibility.ReduceMotion)
             {
                 SetLensPhase(1, 0);
@@ -653,8 +689,14 @@ public static class TabBarInteraction
         {
             if (_segmented)
                 return;
-            var accent = Brush("CupertinoAccentBrush", Colors.DodgerBlue);
-            var label = LabelBrushForBackdrop();
+            if (_wipeAccent is null || _wipeLabel is null || _wipeLabelIsDark != _backdropIsDark)
+            {
+                _wipeAccent = Brush("CupertinoAccentBrush", Colors.DodgerBlue);
+                _wipeLabel = LabelBrushForBackdrop();
+                _wipeLabelIsDark = _backdropIsDark;
+            }
+            var accent = _wipeAccent;
+            var label = _wipeLabel;
 
             // Preserve header bindings by setting the item foreground.
             foreach (var item in Items)
@@ -871,7 +913,6 @@ public static class TabBarInteraction
                 return;
             }
             _dragging = false;
-            // Clear state before capture-loss callbacks.
             _capturedPointer = null;
             e.Pointer.Capture(null);
 
@@ -1005,6 +1046,7 @@ public static class TabBarInteraction
             foreach (var widthOverride in _itemWidthOverrides.Values)
                 widthOverride.Subscription?.Dispose();
             _itemWidthOverrides.Clear();
+            _contentPresenters.Clear();
         }
     }
 }

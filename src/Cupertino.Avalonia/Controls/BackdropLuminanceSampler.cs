@@ -1,4 +1,3 @@
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -52,37 +51,28 @@ internal static class BackdropLuminanceSampler
             using (var drawingContext = renderTarget.CreateDrawingContext())
                 drawingContext.DrawRectangle(brush, null, new Rect(0, 0, SampleSize, SampleSize));
 
-            using var buffer = new WriteableBitmap(
-                new PixelSize(SampleSize, SampleSize), new Vector(96, 96),
-                PixelFormat.Bgra8888, AlphaFormat.Premul);
-            using var frameBuffer = buffer.Lock();
-            renderTarget.CopyPixels(
-                new PixelRect(0, 0, SampleSize, SampleSize), frameBuffer.Address,
-                frameBuffer.RowBytes * SampleSize, frameBuffer.RowBytes);
-
-            var bytes = new byte[frameBuffer.RowBytes * SampleSize];
-            System.Runtime.InteropServices.Marshal.Copy(
-                frameBuffer.Address, bytes, 0, bytes.Length);
-
-            var backgroundLuma = BackgroundLuma(owner);
-            double sum = 0;
-            var count = 0;
-            for (var y = 0; y < SampleSize; y++)
-                for (var x = 0; x < SampleSize; x++)
-                {
-                    var offset = y * frameBuffer.RowBytes + x * 4;
-                    var alpha = bytes[offset + 3] / 255.0;
-                    sum += (0.0722 * bytes[offset]
-                            + 0.7152 * bytes[offset + 1]
-                            + 0.2126 * bytes[offset + 2]) / 255.0
-                           + (1 - alpha) * backgroundLuma;
-                    count++;
-                }
-
-            if (count == 0)
+            // CopyPixels uses the target's channel order, which varies by backend.
+            var format = renderTarget.Format ?? PixelFormat.Rgba8888;
+            if (format != PixelFormat.Rgba8888 && format != PixelFormat.Bgra8888)
                 return false;
 
-            var materialLuma = sum / count;
+            const int rowBytes = SampleSize * 4;
+            var bytes = new byte[rowBytes * SampleSize];
+            var pinned = System.Runtime.InteropServices.GCHandle.Alloc(
+                bytes, System.Runtime.InteropServices.GCHandleType.Pinned);
+            try
+            {
+                renderTarget.CopyPixels(
+                    new PixelRect(0, 0, SampleSize, SampleSize), pinned.AddrOfPinnedObject(),
+                    bytes.Length, rowBytes);
+            }
+            finally
+            {
+                pinned.Free();
+            }
+
+            var backgroundLuma = BackgroundLuma(owner);
+            var materialLuma = AverageLuma(bytes, rowBytes, format, backgroundLuma);
             if (owner.TryFindResource("CupertinoTabBarTint", owner.ActualThemeVariant, out var resource)
                 && resource is Color tint)
             {
@@ -100,6 +90,27 @@ internal static class BackdropLuminanceSampler
         {
             return false;
         }
+    }
+
+    // Rec. 709 luma over the sample, composited onto the page behind any transparency.
+    internal static double AverageLuma(
+        ReadOnlySpan<byte> bytes, int rowBytes, PixelFormat format, double backgroundLuma)
+    {
+        var redOffset = format == PixelFormat.Rgba8888 ? 0 : 2;
+        var blueOffset = 2 - redOffset;
+        double sum = 0;
+        for (var y = 0; y < SampleSize; y++)
+            for (var x = 0; x < SampleSize; x++)
+            {
+                var offset = y * rowBytes + x * 4;
+                var alpha = bytes[offset + 3] / 255.0;
+                sum += (0.2126 * bytes[offset + redOffset]
+                        + 0.7152 * bytes[offset + 1]
+                        + 0.0722 * bytes[offset + blueOffset]) / 255.0
+                       + (1 - alpha) * backgroundLuma;
+            }
+
+        return sum / (SampleSize * SampleSize);
     }
 
     private static double BackgroundLuma(Visual visual)

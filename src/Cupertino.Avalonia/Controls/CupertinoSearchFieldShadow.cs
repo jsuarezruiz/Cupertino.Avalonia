@@ -2,7 +2,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
-using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using Avalonia.VisualTree;
@@ -248,38 +247,90 @@ public sealed class CupertinoSearchFieldShadow : Control
                 (float)_surface.Bottom));
             var scale = matrix.ScaleX > 0.001f ? matrix.ScaleX : 1f;
 
-            var surfaceRect = deviceRect;
-            deviceRect.Offset(0, (float)_offset * scale);
-            using var paint = new SKPaint
-            {
-                Color = new SKColor(
-                    0,
-                    0,
-                    0,
-                    (byte)Math.Clamp(Math.Round(_opacity * 255), 0, 255)),
-                IsAntialias = true,
-                MaskFilter = SKMaskFilter.CreateBlur(
-                    SKBlurStyle.Normal,
-                    Math.Max(0.5f, (float)_sigma * scale)),
-            };
+            // Rasterize offscreen: a blur mask drawn on the macOS canvas can keep the
+            // pre-full-screen render target size.
+            var padding = MathF.Ceiling((float)_sigma * scale * 3f)
+                + MathF.Ceiling(Math.Abs((float)_offset) * scale) + 2f;
+            var width = MathF.Ceiling(deviceRect.Width) + padding * 2 + 1;
+            var height = MathF.Ceiling(deviceRect.Height) + padding * 2 + 1;
+            var offscreen = float.IsFinite(width) && float.IsFinite(height)
+                && width >= 1 && height >= 1 && width <= 8192 && height <= 8192
+                && matrix.SkewX == 0 && matrix.SkewY == 0
+                && matrix.Persp0 == 0 && matrix.Persp1 == 0 && matrix.Persp2 == 1
+                ? CreateSurface(lease.GrContext, (int)width, (int)height)
+                : null;
 
-            canvas.Save();
-            canvas.SetMatrix(SKMatrix.Identity);
-            // Exclude the translucent interior so the shadow cannot darken it.
-            var separation = 0.75f * scale;
-            var keepOut = SKRect.Inflate(surfaceRect, separation, separation);
-            using (var clip = new SKRoundRect(
-                       keepOut,
-                       Math.Max(0, (float)_cornerRadius * scale + separation)))
+            using (offscreen)
             {
-                canvas.ClipRoundRect(clip, SKClipOperation.Difference, true);
+                var pad = (int)padding;
+                // Whole device pixels avoid resampling.
+                var originX = MathF.Floor(deviceRect.Left) - pad;
+                var originY = MathF.Floor(deviceRect.Top) - pad;
+                var target = offscreen?.Canvas ?? canvas;
+
+                var surfaceRect = deviceRect;
+                if (offscreen is not null)
+                    surfaceRect.Offset(-originX, -originY);
+                var shadowRect = surfaceRect;
+                shadowRect.Offset(0, (float)_offset * scale);
+
+                using var paint = new SKPaint
+                {
+                    Color = new SKColor(
+                        0,
+                        0,
+                        0,
+                        (byte)Math.Clamp(Math.Round(_opacity * 255), 0, 255)),
+                    IsAntialias = true,
+                    MaskFilter = SKMaskFilter.CreateBlur(
+                        SKBlurStyle.Normal,
+                        Math.Max(0.5f, (float)_sigma * scale)),
+                };
+
+                if (offscreen is null)
+                {
+                    target.Save();
+                    target.SetMatrix(SKMatrix.Identity);
+                }
+                else
+                {
+                    target.Clear(SKColors.Transparent);
+                    target.Save();
+                }
+
+                // Exclude the translucent interior so the shadow cannot darken it.
+                var separation = 0.75f * scale;
+                var keepOut = SKRect.Inflate(surfaceRect, separation, separation);
+                using (var clip = new SKRoundRect(
+                           keepOut,
+                           Math.Max(0, (float)_cornerRadius * scale + separation)))
+                {
+                    target.ClipRoundRect(clip, SKClipOperation.Difference, true);
+                }
+                target.DrawRoundRect(
+                    shadowRect,
+                    (float)_cornerRadius * scale,
+                    (float)_cornerRadius * scale,
+                    paint);
+                target.Restore();
+
+                if (offscreen is null)
+                    return;
+
+                using var image = offscreen.Snapshot();
+                canvas.Save();
+                canvas.SetMatrix(SKMatrix.Identity);
+                canvas.DrawImage(image, originX, originY);
+                canvas.Restore();
             }
-            canvas.DrawRoundRect(
-                deviceRect,
-                (float)_cornerRadius * scale,
-                (float)_cornerRadius * scale,
-                paint);
-            canvas.Restore();
+        }
+
+        private static SKSurface? CreateSurface(GRContext? grContext, int width, int height)
+        {
+            var info = new SKImageInfo(width, height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+            return grContext is not null
+                ? SKSurface.Create(grContext, true, info) ?? SKSurface.Create(grContext, false, info)
+                : SKSurface.Create(info);
         }
     }
 }

@@ -8,8 +8,10 @@ namespace Cupertino.Rendering;
 /// <remarks>Refraction adapted from KaranocaVe/LiquidGlassAvaloniaUI; lighting from whynotmake-it/flutter_liquid_glass. Both MIT.</remarks>
 internal static class LiquidGlassShader
 {
-    private const string Source = """
+    private const string SourceHead = """
         uniform shader uBlurred;
+        uniform shader uLuma;         // 1x1 average backdrop luminance, used when uLumaMode is 1
+        uniform float  uLumaMode;     // 0 = sample nine points here, 1 = read uLuma
 
         uniform float2 uOrigin;       // device px: top-left of the surface rect on the canvas
         uniform float2 uSize;         // device px: surface size
@@ -60,31 +62,9 @@ internal static class LiquidGlassShader
             return 1.0 - sqrt(1.0 - x * x);
         }
 
-        // Clamp to the padded capture to avoid edge streaks.
-        float2 clampCoord(float2 p) {
-            return clamp(p, float2(1.0 - uPad), uSize - 1.0 + uPad);
-        }
+        """;
 
-        float lumaAt(float2 p) {
-            half4 c = uBlurred.eval(clampCoord(p));
-            return dot(float3(c.rgb), float3(0.2126, 0.7152, 0.0722));
-        }
-
-        // Approximate backdrop luminance without a CPU readback.
-        float backdropLuma() {
-            float l = 0.0;
-            l += lumaAt(uSize * float2(0.15, 0.15));
-            l += lumaAt(uSize * float2(0.50, 0.15));
-            l += lumaAt(uSize * float2(0.85, 0.15));
-            l += lumaAt(uSize * float2(0.15, 0.50));
-            l += lumaAt(uSize * float2(0.50, 0.50));
-            l += lumaAt(uSize * float2(0.85, 0.50));
-            l += lumaAt(uSize * float2(0.15, 0.85));
-            l += lumaAt(uSize * float2(0.50, 0.85));
-            l += lumaAt(uSize * float2(0.85, 0.85));
-            return l / 9.0;
-        }
-
+    private const string SourceMain = """
         half4 main(float2 coord) {
             float2 local = coord - uOrigin;
             float2 halfSize = uSize * 0.5;
@@ -129,7 +109,9 @@ internal static class LiquidGlassShader
             float3 color = float3(bg.rgb);
 
             // Adapt clear glass for contrast without altering tinted surfaces.
-            float luma = uAdaptive > 0.5 ? backdropLuma() : 0.5;
+            float luma = uAdaptive > 0.5
+                ? (uLumaMode > 0.5 ? float(uLuma.eval(float2(0.5, 0.5)).r) : backdropLuma())
+                : 0.5;
             float clearness = 1.0 - smoothstep(0.35, 0.85, uTint.a);
             float adapt = (uAdaptive > 0.5) ? clearness : 0.0;
             float k = uTint.a * 1.8;
@@ -166,35 +148,88 @@ internal static class LiquidGlassShader
         }
         """;
 
-    private static readonly Lazy<SKRuntimeEffect?> LazyEffect = new(() =>
+    // Shared by both effects.
+    private const string LumaSampler = """
+        // Clamp to the padded capture to avoid edge streaks.
+        float2 clampCoord(float2 p) {
+            return clamp(p, float2(1.0 - uPad), uSize - 1.0 + uPad);
+        }
+
+        float lumaAt(float2 p) {
+            half4 c = uBlurred.eval(clampCoord(p));
+            return dot(float3(c.rgb), float3(0.2126, 0.7152, 0.0722));
+        }
+
+        // Approximate backdrop luminance without a CPU readback.
+        float backdropLuma() {
+            float l = 0.0;
+            l += lumaAt(uSize * float2(0.15, 0.15));
+            l += lumaAt(uSize * float2(0.50, 0.15));
+            l += lumaAt(uSize * float2(0.85, 0.15));
+            l += lumaAt(uSize * float2(0.15, 0.50));
+            l += lumaAt(uSize * float2(0.50, 0.50));
+            l += lumaAt(uSize * float2(0.85, 0.50));
+            l += lumaAt(uSize * float2(0.15, 0.85));
+            l += lumaAt(uSize * float2(0.50, 0.85));
+            l += lumaAt(uSize * float2(0.85, 0.85));
+            return l / 9.0;
+        }
+        """;
+
+    private const string LumaHead = """
+        uniform shader uBlurred;
+        uniform float2 uSize;
+        uniform float  uPad;
+        """;
+
+    private const string LumaMain = """
+        half4 main(float2 coord) {
+            float l = backdropLuma();
+            return half4(half(l), half(l), half(l), 1.0);
+        }
+        """;
+
+    private static readonly string Source = SourceHead + LumaSampler + SourceMain;
+
+    private static readonly string LumaSource = LumaHead + LumaSampler + LumaMain;
+
+    private static readonly Lazy<(SKRuntimeEffect? Effect, string? Error)> LazyEffect =
+        new(() => Compile(Source));
+
+    private static readonly Lazy<(SKRuntimeEffect? Effect, string? Error)> LazyLumaEffect =
+        new(() => Compile(LumaSource));
+
+    private static (SKRuntimeEffect? Effect, string? Error) Compile(string source)
     {
         try
         {
-            var effect = SKRuntimeEffect.CreateShader(Source, out var errors);
-            if (effect is null)
-                CompileError = errors ?? "unknown error";
-            return effect;
+            var effect = SKRuntimeEffect.CreateShader(source, out var errors);
+            return (effect, effect is null ? errors ?? "unknown error" : null);
         }
         catch (Exception ex)
         {
             // Unsupported backends use the fallback renderer.
-            CompileError = ex.Message;
-            return null;
+            return (null, ex.Message);
         }
-    });
+    }
+
+    /// <summary>
+    /// Gets the one-texel luminance effect, or null when unsupported.
+    /// </summary>
+    public static SKRuntimeEffect? LumaEffect => LazyLumaEffect.Value.Effect;
 
     /// <summary>
     /// Gets the effect, or null when unsupported.
     /// </summary>
-    public static SKRuntimeEffect? Effect => LazyEffect.Value;
+    public static SKRuntimeEffect? Effect => LazyEffect.Value.Effect;
 
     /// <summary>
-    /// Gets the compile error, if any.
+    /// Gets the glass effect's compile error, if any.
     /// </summary>
-    public static string? CompileError { get; private set; }
+    public static string? CompileError => LazyEffect.Value.Error;
 
     /// <summary>
     /// Gets whether the full glass pipeline is available.
     /// </summary>
-    public static bool IsSupported => LazyEffect.Value is not null;
+    public static bool IsSupported => LazyEffect.Value.Effect is not null;
 }

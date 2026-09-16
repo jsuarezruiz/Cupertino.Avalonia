@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -8,7 +6,6 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using System.Linq;
 
 namespace Cupertino.Controls;
 
@@ -85,6 +82,8 @@ public static class CupertinoSheet
         private bool _tornDown;
         private IPointer? _activePointer;
         private Point? _pendingPress;
+        private long _lastTick;
+        private GlassSurface? _frost;
 
         public Task Completion => _done.Task;
 
@@ -124,7 +123,7 @@ public static class CupertinoSheet
             }, DispatcherPriority.Loaded);
             ResizeRoot();
 
-            _presenter.Height = Math.Max(0, HostHeight - MediumTopGeometry - FloatInset);
+            _presenter.Height = Math.Max(0, HostHeight - MediumTop - FloatInset);
 
             _scrim.PointerPressed += OnScrimPressed;
             _presenter.AddHandler(InputElement.PointerPressedEvent, OnSheetPressed,
@@ -147,14 +146,28 @@ public static class CupertinoSheet
                 return;
             }
             SetY(HostHeight);
-            _timer.Start();
+            StartTimer();
         }
 
         private double HostHeight => _hostSize.Height;
         private double LargeTop =>
             (_host.InsetsManager?.SafeAreaPadding.Top ?? 0) + LargeTopGap;
         private double MediumTop => HostHeight * MediumTopFraction;
-        private double MediumTopGeometry => HostHeight * MediumTopFraction;
+
+        private void StartTimer()
+        {
+            _lastTick = MotionClock.Now;
+            _timer.Start();
+        }
+
+        private void AnimateTo(double target)
+        {
+            _target = target;
+            if (CupertinoAccessibility.ReduceMotion)
+                SetY(target);
+            else
+                StartTimer();
+        }
 
         private void ResizeRoot()
         {
@@ -201,17 +214,19 @@ public static class CupertinoSheet
             if (!wasAnimating || CupertinoAccessibility.ReduceMotion)
                 SetY(_target);
             else
-                _timer.Start();
+                StartTimer();
         }
 
         private void SetY(double y)
         {
             _y = y;
             _translate.Y = y;
+            _frost ??= _presenter.GetVisualDescendants().OfType<GlassSurface>().FirstOrDefault();
+            _frost?.Pulse();
             // Interpolate from an inset card to a full-bleed sheet.
             if (!_dismissing)
             {
-                var geom = MediumTopGeometry;
+                var geom = MediumTop;
                 var p = Math.Clamp((geom - y) / Math.Max(1, geom - LargeTop), 0, 1);
                 var inset = FloatInset * (1 - p);
                 _presenter.Margin = new Thickness(inset, 0, inset, 0);
@@ -225,8 +240,11 @@ public static class CupertinoSheet
 
         private void OnTick(object? sender, EventArgs e)
         {
+            var now = MotionClock.Now;
+            var elapsed = Math.Clamp(now - _lastTick, 1, 50);
+            _lastTick = now;
             SetY(CupertinoAccessibility.ReduceMotion ? _target :
-                _y + (_target - _y) * (1 - Math.Exp(-16.0 / Tau)));
+                _y + (_target - _y) * (1 - Math.Exp(-elapsed / Tau)));
             if (Math.Abs(_y - _target) < 0.5)
             {
                 SetY(_target);
@@ -311,14 +329,7 @@ public static class CupertinoSheet
                 Dismiss();
                 return;
             }
-            _target = _detents == SheetDetents.MediumAndLarge
-                && Math.Abs(biased - MediumTop) < Math.Abs(biased - LargeTop)
-                    ? MediumTop
-                    : LargeTop;
-            if (CupertinoAccessibility.ReduceMotion)
-                SetY(_target);
-            else
-                _timer.Start();
+            SettleToNearest(biased);
         }
 
         private void OnSheetCaptureLost(object? sender, PointerCaptureLostEventArgs e)
@@ -331,17 +342,11 @@ public static class CupertinoSheet
             SettleToNearest(_y);
         }
 
-        private void SettleToNearest(double position)
-        {
-            _target = _detents == SheetDetents.MediumAndLarge
-                && Math.Abs(position - MediumTop) < Math.Abs(position - LargeTop)
-                    ? MediumTop
-                    : LargeTop;
-            if (CupertinoAccessibility.ReduceMotion)
-                SetY(_target);
-            else
-                _timer.Start();
-        }
+        private void SettleToNearest(double position) =>
+            AnimateTo(_detents == SheetDetents.MediumAndLarge
+                      && Math.Abs(position - MediumTop) < Math.Abs(position - LargeTop)
+                ? MediumTop
+                : LargeTop);
 
         private double MediumTopIfAny() =>
             _detents == SheetDetents.MediumAndLarge ? MediumTop : LargeTop;
@@ -351,14 +356,9 @@ public static class CupertinoSheet
             if (_tornDown || _dismissing)
                 return;
             _dismissing = true;
-            _target = HostHeight + 40;
+            AnimateTo(HostHeight + 40);
             if (CupertinoAccessibility.ReduceMotion)
-            {
-                SetY(_target);
                 Teardown();
-                return;
-            }
-            _timer.Start();
         }
 
         private void Teardown()

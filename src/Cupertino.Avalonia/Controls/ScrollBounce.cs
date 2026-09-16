@@ -1,4 +1,3 @@
-using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -60,7 +59,8 @@ public sealed class ScrollBounce
         private ITransform? _originalTransform;
         private ITransform? _appliedTransform;
         private double _pull;
-        private DateTime _lastWheel;
+        private long _lastWheel;
+        private long _lastTick;
 
         public State(ScrollViewer viewer)
         {
@@ -114,17 +114,21 @@ public sealed class ScrollBounce
                 return;
             }
 
-            _lastWheel = DateTime.UtcNow;
+            _lastWheel = MotionClock.Now;
             Apply();
+            _lastTick = MotionClock.Now;
             _timer.Start();
         }
 
         private void OnTick(object? sender, EventArgs e)
         {
-            if ((DateTime.UtcNow - _lastWheel).TotalMilliseconds < IdleMs)
+            var now = MotionClock.Now;
+            var elapsed = Math.Clamp(now - _lastTick, 1, 50) / 1000.0;
+            _lastTick = now;
+            if (MotionClock.MillisecondsSince(_lastWheel) < IdleMs)
                 return;
 
-            _pull *= Math.Exp(-DecayRate * 0.016);
+            _pull *= Math.Exp(-DecayRate * elapsed);
             if (Math.Abs(Rubber(_pull)) < 0.4)
             {
                 _pull = 0;

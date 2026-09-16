@@ -1,11 +1,12 @@
 using System.Collections.Specialized;
 using Avalonia;
+using Avalonia.Automation.Peers;
+using Avalonia.Automation.Provider;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 
 namespace Cupertino.Controls;
 
@@ -15,16 +16,18 @@ namespace Cupertino.Controls;
 public class CupertinoWheel : Control
 {
     /// <summary>
-    /// Gets or sets the cylinder radius.
+    /// Identifies the <see cref="Radius"/> property.
     /// </summary>
     public static readonly StyledProperty<double> RadiusProperty =
-        AvaloniaProperty.Register<CupertinoWheel, double>(nameof(Radius), 86.0);
+        AvaloniaProperty.Register<CupertinoWheel, double>(
+            nameof(Radius), 86.0, coerce: (_, value) => Normalize(value, 86.0));
 
     /// <summary>
-    /// Gets or sets the row arc length.
+    /// Identifies the <see cref="ItemHeight"/> property.
     /// </summary>
     public static readonly StyledProperty<double> ItemHeightProperty =
-        AvaloniaProperty.Register<CupertinoWheel, double>(nameof(ItemHeight), 32.0);
+        AvaloniaProperty.Register<CupertinoWheel, double>(
+            nameof(ItemHeight), 32.0, coerce: (_, value) => Normalize(value, 32.0));
 
     /// <summary>
     /// Identifies the <see cref="Items"/> property.
@@ -40,7 +43,7 @@ public class CupertinoWheel : Control
             nameof(SelectedIndex), defaultBindingMode: Avalonia.Data.BindingMode.TwoWay);
 
     /// <summary>
-    /// Gets or sets whether the wheel wraps.
+    /// Identifies the <see cref="ShouldLoop"/> property.
     /// </summary>
     public static readonly StyledProperty<bool> ShouldLoopProperty =
         AvaloniaProperty.Register<CupertinoWheel, bool>(nameof(ShouldLoop), true);
@@ -49,7 +52,8 @@ public class CupertinoWheel : Control
     /// Identifies the <see cref="FontSize"/> property.
     /// </summary>
     public static readonly StyledProperty<double> FontSizeProperty =
-        AvaloniaProperty.Register<CupertinoWheel, double>(nameof(FontSize), 23.0);
+        AvaloniaProperty.Register<CupertinoWheel, double>(
+            nameof(FontSize), 23.0, coerce: (_, value) => Normalize(value, 23.0));
 
     /// <summary>
     /// Identifies the <see cref="Foreground"/> property.
@@ -112,8 +116,9 @@ public class CupertinoWheel : Control
     private double _pressY;
     private double _travelled;
     private double _velocity;
-    private DateTime _lastMove;
+    private long _lastMove;
     private DispatcherTimer? _timer;
+    private long _lastSettleTick;
     private double _settleTo;
     private double _springVel;
     private bool _settling;
@@ -145,28 +150,12 @@ public class CupertinoWheel : Control
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property == ItemsProperty || change.Property == FontSizeProperty ||
+        if (change.Property == FontSizeProperty ||
             change.Property == TextElement.FontFamilyProperty || change.Property == FlowDirectionProperty)
         {
             _measuredWidth = null;
             _textCache.Clear();
             InvalidateMeasure();
-        }
-
-        if (change.Property == RadiusProperty || change.Property == ItemHeightProperty
-            || change.Property == FontSizeProperty)
-        {
-            var property = (StyledProperty<double>)change.Property;
-            var value = GetValue(property);
-            var fallback = property == RadiusProperty ? 86.0 : property == ItemHeightProperty ? 32.0 : 23.0;
-            var normalized = double.IsFinite(value) && value > 0
-                ? Math.Clamp(value, 1.0, 1000.0)
-                : fallback;
-            if (value != normalized)
-            {
-                SetCurrentValue(property, normalized);
-                return;
-            }
         }
 
         // An external selection supersedes any gesture or spring still in flight.
@@ -180,12 +169,7 @@ public class CupertinoWheel : Control
             }
             if (!_committingSelection)
             {
-                _timer?.Stop();
-                _settling = false;
-                _dragging = false;
-                var pointer = _capturedPointer;
-                _capturedPointer = null;
-                pointer?.Capture(null);
+                CancelGesture();
                 _offset = normalized;
                 InvalidateVisual();
             }
@@ -196,6 +180,8 @@ public class CupertinoWheel : Control
             {
                 DisconnectItems();
                 ConnectItems();
+                _measuredWidth = null;
+                _textCache.Clear();
             }
             _timer?.Stop();
             _settling = false;
@@ -207,6 +193,9 @@ public class CupertinoWheel : Control
             InvalidateVisual();
         }
     }
+
+    /// <inheritdoc/>
+    protected override AutomationPeer OnCreateAutomationPeer() => new CupertinoWheelAutomationPeer(this);
 
     /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -223,12 +212,7 @@ public class CupertinoWheel : Control
         DisconnectItems();
         _textCache.Clear();
         _measuredWidth = null;
-        _timer?.Stop();
-        _settling = false;
-        _dragging = false;
-        var pointer = _capturedPointer;
-        _capturedPointer = null;
-        pointer?.Capture(null);
+        CancelGesture();
         _offset = NormalizeIndex(SelectedIndex);
         InvalidateVisual();
         base.OnDetachedFromVisualTree(e);
@@ -254,12 +238,7 @@ public class CupertinoWheel : Control
     {
         _measuredWidth = null;
         _textCache.Clear();
-        _timer?.Stop();
-        _settling = false;
-        _dragging = false;
-        var pointer = _capturedPointer;
-        _capturedPointer = null;
-        pointer?.Capture(null);
+        CancelGesture();
         var normalized = NormalizeIndex(SelectedIndex);
         if (normalized != SelectedIndex)
             SetCurrentValue(SelectedIndexProperty, normalized);
@@ -386,6 +365,22 @@ public class CupertinoWheel : Control
         return Math.Clamp(offset, 0, Items.Count - 1);
     }
 
+    private void CancelGesture()
+    {
+        _timer?.Stop();
+        _settling = false;
+        _dragging = false;
+        var pointer = _capturedPointer;
+        _capturedPointer = null;
+        pointer?.Capture(null);
+    }
+
+    // A 0.3 blend at 60 Hz.
+    private const double VelocitySmoothingSeconds = 0.047;
+
+    private static double Normalize(double value, double fallback) =>
+        double.IsFinite(value) && value > 0 ? Math.Clamp(value, 1.0, 1000.0) : fallback;
+
     private int NormalizeIndex(int index)
     {
         if (Items is not { Count: > 0 } items)
@@ -409,7 +404,7 @@ public class CupertinoWheel : Control
         _lastY = e.GetPosition(this).Y;
         _pressY = _lastY;
         _travelled = 0;
-        _lastMove = DateTime.UtcNow;
+        _lastMove = MotionClock.Now;
         e.PreventGestureRecognition();
         e.Pointer.Capture(this);
         _capturedPointer = e.Pointer;
@@ -446,8 +441,8 @@ public class CupertinoWheel : Control
 
         var y = e.GetPosition(this).Y;
         var dy = y - _lastY;
-        var now = DateTime.UtcNow;
-        var dt = (now - _lastMove).TotalSeconds;
+        var now = MotionClock.Now;
+        var dt = (now - _lastMove) / 1000.0;
 
         // Map linear drag distance to cylinder rotation.
         var dRows = -dy / ItemHeight;
@@ -457,13 +452,16 @@ public class CupertinoWheel : Control
 
         if (dt > 0.001)
         {
+            // Frame-rate independent smoothing.
             var instant = dRows / dt;
-            _velocity = _velocity * 0.7 + instant * 0.3;
+            var alpha = 1 - Math.Exp(-dt / VelocitySmoothingSeconds);
+            _velocity = _velocity * (1 - alpha) + instant * alpha;
         }
 
         _lastY = y;
         _lastMove = now;
         InvalidateVisual();
+        GlassSurface.PulseBehind(this);
         e.Handled = true;
     }
 
@@ -487,7 +485,7 @@ public class CupertinoWheel : Control
         }
 
         // Ignore stale velocity.
-        if ((DateTime.UtcNow - _lastMove).TotalMilliseconds > 80)
+        if (MotionClock.MillisecondsSince(_lastMove) > 80)
             _velocity = 0;
 
         var projected = _offset + _velocity * 0.25;
@@ -547,6 +545,7 @@ public class CupertinoWheel : Control
 
         _timer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(16),
                                        DispatcherPriority.Render, OnSettleTick);
+        _lastSettleTick = MotionClock.Now;
         _timer.Start();
     }
 
@@ -577,7 +576,9 @@ public class CupertinoWheel : Control
             _springVel = 0;
         }
         // Critically damped spring carrying the release velocity.
-        const double dt = 0.016;
+        var now = MotionClock.Now;
+        var dt = Math.Clamp((now - _lastSettleTick) / 1000.0, 0.001, 0.05);
+        _lastSettleTick = now;
         const double omega = 10.0;
         var d = _offset - _settleTo;
         var accel = -omega * omega * d - 2 * omega * _springVel;
@@ -585,6 +586,8 @@ public class CupertinoWheel : Control
         _offset += _springVel * dt;
         Tick();
         InvalidateVisual();
+        // Keep surrounding glass in step with the spring.
+        GlassSurface.PulseBehind(this);
 
         if (Math.Abs(_offset - _settleTo) < 0.005 && Math.Abs(_springVel) < 0.02)
         {
@@ -598,4 +601,35 @@ public class CupertinoWheel : Control
         }
     }
 
+}
+
+internal sealed class CupertinoWheelAutomationPeer : ControlAutomationPeer, IValueProvider
+{
+    public CupertinoWheelAutomationPeer(CupertinoWheel owner) : base(owner)
+    {
+    }
+
+    private new CupertinoWheel Owner => (CupertinoWheel)base.Owner;
+
+    protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Spinner;
+
+    protected override bool IsContentElementCore() => true;
+
+    protected override bool IsControlElementCore() => true;
+
+    public bool IsReadOnly => !Owner.IsEffectivelyEnabled;
+
+    public string? Value =>
+        Owner.Items is { Count: > 0 } items && Owner.SelectedIndex >= 0 && Owner.SelectedIndex < items.Count
+            ? items[Owner.SelectedIndex]
+            : null;
+
+    public void SetValue(string? value)
+    {
+        if (IsReadOnly || Owner.Items is not { } items)
+            return;
+        var index = items.IndexOf(value ?? string.Empty);
+        if (index >= 0)
+            Owner.SetCurrentValue(CupertinoWheel.SelectedIndexProperty, index);
+    }
 }

@@ -1,11 +1,12 @@
-using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Reactive;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace Cupertino.Controls;
 
@@ -75,6 +76,8 @@ public static class RefreshInteraction
         private readonly ITransform? _originalContentTransform;
         private IDisposable? _stateWatch;
         private RefreshVisualizer? _visualizer;
+        private CupertinoActivityIndicator? _spinner;
+        private long _lastTick;
         private ITransform? _originalVisualizerTransform;
         private Thickness _originalVisualizerMargin;
         private double _originalVisualizerHeight;
@@ -192,8 +195,14 @@ public static class RefreshInteraction
             }
             else
             {
-                _timer.Start();
+                StartTimer();
             }
+        }
+
+        private void StartTimer()
+        {
+            _lastTick = MotionClock.Now;
+            _timer.Start();
         }
 
         private ScrollViewer? FindScroller()
@@ -202,7 +211,7 @@ public static class RefreshInteraction
 
             static ScrollViewer? Find(Visual v)
             {
-                foreach (var child in Avalonia.VisualTree.VisualExtensions.GetVisualChildren(v))
+                foreach (var child in v.GetVisualChildren())
                 {
                     if (child is ScrollViewer s)
                         return s;
@@ -270,6 +279,7 @@ public static class RefreshInteraction
                 RestoreVisualizerPlacement(_visualizer);
             }
             _visualizer = found;
+            _spinner = null;
             if (found is null)
                 return;
 
@@ -313,12 +323,15 @@ public static class RefreshInteraction
                 _hold.Y = _holdTarget;
                 return;
             }
-            _timer.Start();
+            StartTimer();
         }
 
         private void OnTick(object? sender, EventArgs e)
         {
-            var k = 1 - Math.Exp(-SettleRate * 0.016);
+            var now = MotionClock.Now;
+            var elapsed = Math.Clamp(now - _lastTick, 1, 50) / 1000.0;
+            _lastTick = now;
+            var k = 1 - Math.Exp(-SettleRate * elapsed);
             _band.Y += (_bandTarget - _band.Y) * k;
             _hold.Y += (_holdTarget - _hold.Y) * k;
             if (Math.Abs(_band.Y - _bandTarget) < 0.5 && Math.Abs(_hold.Y - _holdTarget) < 0.5)
@@ -334,16 +347,9 @@ public static class RefreshInteraction
         {
             if (_visualizer is not { } visualizer)
                 return;
-            CupertinoActivityIndicator? spinner = null;
-            foreach (var descendant in Avalonia.VisualTree.VisualExtensions.GetVisualDescendants(visualizer))
-            {
-                if (descendant is CupertinoActivityIndicator found)
-                {
-                    spinner = found;
-                    break;
-                }
-            }
-            if (spinner is null)
+            if (_spinner is null || !_spinner.IsAttachedToVisualTree())
+                _spinner = FindSpinner(visualizer);
+            if (_spinner is not { } spinner)
                 return;
 
             spinner.SweepFraction =
@@ -354,12 +360,11 @@ public static class RefreshInteraction
         }
     }
 
-    private sealed class AnonymousObserver<T> : IObserver<T>
+    private static CupertinoActivityIndicator? FindSpinner(Visual visualizer)
     {
-        private readonly Action<T> _onNext;
-        public AnonymousObserver(Action<T> onNext) => _onNext = onNext;
-        public void OnNext(T value) => _onNext(value);
-        public void OnCompleted() { }
-        public void OnError(Exception error) { }
+        foreach (var descendant in visualizer.GetVisualDescendants())
+            if (descendant is CupertinoActivityIndicator found)
+                return found;
+        return null;
     }
 }
