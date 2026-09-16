@@ -66,6 +66,6 @@ Numeric settings are clamped to supported ranges; `NaN` and infinite values rese
 
 Large glass surfaces need more memory. If an effect exceeds the rendering limits or memory allocation fails, the control uses a tinted fill.
 
-Refraction supports moving a control and scaling it equally in both directions. Rotation, skew, reflection and unequal scaling use the tinted fallback. Without Skia, that fallback uses the top-left corner radius for all four corners.
+Refraction supports translating and scaling a control, including different horizontal and vertical scale factors. Rotation, skew, reflection and perspective use the tinted fallback. Without Skia, that fallback uses the top-left corner radius for all four corners.
 
 Each live frame samples and blurs the background again. Profile screens with several large glass controls on your target devices.

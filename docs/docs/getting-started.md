@@ -15,8 +15,10 @@ ms.date: 2026-08-27
 ## Install the package
 
 ```bash
-dotnet add package Cupertino.Avalonia
+dotnet add package Cupertino.Avalonia --prerelease
 ```
+
+The package is currently published as a preview, so the `--prerelease` flag is required until the first stable release.
 
 ## Register the theme
 

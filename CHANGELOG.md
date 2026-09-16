@@ -4,7 +4,34 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 ## [Unreleased]
 
-## [0.1.0-preview]
+### Added
+
+- Published the documentation and live gallery to GitHub Pages.
+- Added third-party licence notices to the package.
+
+### Changed
+
+- The package now requires Avalonia 12.x and declares trimming and AOT compatibility.
+- Default interface text can be overridden through theme resources.
+- Shared glass styles reduce duplication across buttons, bars, menus, flyouts and pickers.
+- Search results now update in place, preserving list state while filtering.
+- Expanded keyboard focus and screen-reader support across controls.
+
+### Fixed
+
+- Improved Liquid Glass accuracy, repainting, resource reuse and snapshot cleanup.
+- Fixed calendar and picker culture defaults, popup positioning and time rounding.
+- Picker and calendar buttons announce their value or purpose instead of a child element type name.
+- Gallery capture switches take effect while capturing, so `--scroll`, `--alert`, `--sheet`, `--hover` and `--noactions` shape the saved image.
+- Corrected animation timing, gesture handling and haptics.
+- Improved Apple system-font shaping, consistency and caching.
+- Fixed notification layout and keyboard access and several documentation examples.
+
+### Removed
+
+- Removed unused slider brushes and `CupertinoConverters.DayColumnAbbreviation`.
+
+## [0.1.0-preview] - 2026-09-10
 
 Initial public preview of the iOS 26 design system, including Cupertino control themes, typography, colour, motion, custom controls, icons, and the Liquid Glass material.
 

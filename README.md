@@ -2,7 +2,7 @@
 
 An iOS 26 design system for [Avalonia](https://avaloniaui.net): control themes, typography, colour, motion and icons, plus the controls iOS has and Avalonia does not.
 
-**[Try the live web gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)**. Explore the controls in your browser, with no installation required.
+**[Try the live web gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/)**. Explore the controls in your browser, with no installation required.
 
 ![Cupertino.Avalonia banner](images/cupertino-avalonia-banner.png)
 
@@ -20,7 +20,7 @@ An iOS 26 design system for [Avalonia](https://avaloniaui.net): control themes, 
 ## Install
 
 ```bash
-dotnet add package Cupertino.Avalonia
+dotnet add package Cupertino.Avalonia --prerelease
 ```
 
 ## Use
@@ -41,6 +41,19 @@ Your app supplies system accessibility preferences through `CupertinoAccessibili
 
 On Apple platforms, add `.UseCupertinoSystemFont()` to the app builder after selecting the platform. It preserves CoreText's native SF glyph advances while retaining Avalonia's shaping fallback for unsupported runs.
 
+```csharp
+AppBuilder.Configure<App>()
+    .UsePlatformDetect()
+    .UseCupertinoSystemFont();
+```
+
+On iOS, add it in the app delegate instead:
+
+```csharp
+protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
+    base.CustomizeAppBuilder(builder).UseCupertinoSystemFont();
+```
+
 ```xml
 <StackPanel xmlns:cupertino="https://cupertino.avaloniaui.net" Spacing="12">
   <Button Content="Continue" Classes="prominent" />
@@ -60,7 +73,7 @@ On Apple platforms, add `.UseCupertinoSystemFont()` to the app builder after sel
 
 ## The gallery
 
-**[Open the WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)** to try the controls, switch between light and dark appearances, and view sample code. Wide windows show the catalogue beside the selected sample; narrow windows use a single page with back navigation.
+**[Open the WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/)** to try the controls, switch between light and dark appearances, and view sample code. Wide windows show the catalogue beside the selected sample; narrow windows use a single page with back navigation.
 
 To run the web sample locally, install the .NET 10 SDK, then run these commands from the repository root:
 
@@ -204,11 +217,13 @@ The full documentation includes setup guides, design-system concepts, control ex
 * [Changelog](CHANGELOG.md)
 * [Release process](RELEASING.md)
 
-To build the NuGet and symbol packages locally, run:
+To build the NuGet and symbol packages locally from a clean working tree, run:
 
 ```bash
-ALLOW_DIRTY=1 ./build/pack-nuget.sh 0.1.0-preview.1
+./build/pack-nuget.sh 0.2.0-preview
 ```
+
+The script refuses to pack uncommitted changes so Source Link matches the packaged sources; set `ALLOW_DIRTY=1` only for throwaway local packages.
 
 ## Requirements
 
@@ -216,4 +231,4 @@ ALLOW_DIRTY=1 ./build/pack-nuget.sh 0.1.0-preview.1
 
 ## Licence
 
-MIT. The library includes its own vector icon set.
+MIT. The library includes its own vector icon set. The Liquid Glass shader adapts MIT-licensed work from [LiquidGlassAvaloniaUI](https://github.com/KaranocaVe/LiquidGlassAvaloniaUI) (refraction) and [flutter_liquid_glass](https://github.com/whynotmake-it/flutter_liquid_glass) (lighting); full notices are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

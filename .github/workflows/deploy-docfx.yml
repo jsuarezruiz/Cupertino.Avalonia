@@ -1,4 +1,4 @@
-name: Build documentation
+name: Publish documentation
 
 on:
   push:
@@ -14,6 +14,8 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: build-site
@@ -33,10 +35,13 @@ jobs:
             8.0.x
             10.0.x
 
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
       - name: Install DocFX
         run: dotnet tool install --global docfx --version 2.78.4
 
-      - name: Build documentation
+      - name: Publish documentation
         run: docfx docs/docfx.json --warningsAsErrors
 
       - name: Install WebAssembly tools
@@ -54,8 +59,17 @@ jobs:
         run: touch docs/_site/.nojekyll
 
       - name: Upload documentation and gallery
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-pages-artifact@v4
         with:
-          name: documentation-and-gallery
           path: docs/_site
-          if-no-files-found: error
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

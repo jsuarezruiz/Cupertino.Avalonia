@@ -44,7 +44,7 @@ Popovers move keyboard focus into their content, cycle focus with Tab and Shift+
 </StackPanel>
 ```
 
-Set `ClockIdentifier` to `12HourClock` or `24HourClock` when the design must override the current culture. Otherwise, leave it unset and let the picker follow the user’s locale.
+Set `ClockIdentifier` to `12HourClock` for an AM/PM wheel or `24HourClock` for a 24-hour wheel when the design must override the current culture; any other value also selects the 24-hour clock. Otherwise, leave it unset and let the picker follow the user’s locale.
 
 Date pickers treat `MinimumDate` and `MaximumDate` as local calendar dates. Their calendars expand to include the selection and any date bounds you set.
 

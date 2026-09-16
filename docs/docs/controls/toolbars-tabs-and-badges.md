@@ -35,7 +35,7 @@ Use toolbars for actions. Consecutive items share one glass capsule; `ToolbarSpa
 
 ## Tabs
 
-Use the themed `TabControl` or `TabStrip` for navigation between sections. Set the attached properties in `Tabs` to add an icon or badge.
+Use the themed `TabControl` or `TabStrip` for navigation between sections. Use the `Tabs` attached properties to add a badge (`Tabs.BadgeValue`), a trailing accessory (`Tabs.Accessory`), or to detach an item into that accessory (`Tabs.IsDetached`).
 
 Compact tab bars size themselves to their content. Let the theme size the tabs and selection indicator.
 

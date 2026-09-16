@@ -19,7 +19,8 @@ Use `Section` to group content, `CupertinoListCell` for list rows, and `Cupertin
     <cupertino:CupertinoListCell Title="Profile"
                                 Subtitle="Photo, name and contact details"
                                 AccessoryKind="Disclosure" />
-    <Rectangle Classes="hair" />
+    <Rectangle Height="0.5" Margin="16,0,0,0"
+               Fill="{DynamicResource CupertinoSeparatorBrush}" />
     <cupertino:CupertinoListCell Title="Sign out"
                                 IsDestructive="True"
                                 ShowsSeparator="False" />

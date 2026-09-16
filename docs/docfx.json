@@ -12,7 +12,8 @@
       ],
       "dest": "api",
       "properties": {
-        "Configuration": "Release"
+        "Configuration": "Release",
+        "NoWarn": "AVA3001"
       }
     }
   ],
