@@ -2,7 +2,7 @@
 
 An iOS 26 design system for [Avalonia](https://avaloniaui.net): control themes, typography, colour, motion and icons, plus the controls iOS has and Avalonia does not.
 
-**[Try the live web gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/)**. Explore the controls in your browser, with no installation required.
+**[Try the live web gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)**. Explore the controls in your browser, with no installation required.
 
 ![Cupertino.Avalonia banner](images/cupertino-avalonia-banner.png)
 
@@ -73,7 +73,7 @@ protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
 
 ## The gallery
 
-**[Open the WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/)** to try the controls, switch between light and dark appearances, and view sample code. Wide windows show the catalogue beside the selected sample; narrow windows use a single page with back navigation.
+**[Open the WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)** to try the controls, switch between light and dark appearances, and view sample code. Wide windows show the catalogue beside the selected sample; narrow windows use a single page with back navigation.
 
 To run the web sample locally, install the .NET 10 SDK, then run these commands from the repository root:
 
