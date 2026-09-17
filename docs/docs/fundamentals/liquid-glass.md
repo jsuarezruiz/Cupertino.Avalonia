@@ -64,8 +64,3 @@ The control refreshes briefly during input and layout changes. Set `IsLive="True
 
 Numeric settings are clamped to supported ranges; `NaN` and infinite values reset to the property defaults.
 
-Large glass surfaces need more memory. If an effect exceeds the rendering limits or memory allocation fails, the control uses a tinted fill.
-
-Refraction supports translating and scaling a control, including different horizontal and vertical scale factors. Rotation, skew, reflection and perspective use the tinted fallback. Without Skia, that fallback uses the top-left corner radius for all four corners.
-
-Each live frame samples and blurs the background again. Profile screens with several large glass controls on your target devices.
