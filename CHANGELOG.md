@@ -7,7 +7,7 @@ All notable changes to this project are recorded here. The format follows [Keep 
 ### Added
 
 - Published the documentation and live gallery to GitHub Pages.
-- Added third-party licence notices to the package.
+- Added third-party license notices to the package.
 
 ### Changed
 
@@ -33,7 +33,7 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 ## [0.1.0-preview] - 2026-09-10
 
-Initial public preview of the iOS 26 design system, including Cupertino control themes, typography, colour, motion, custom controls, icons, and the Liquid Glass material.
+Initial public preview of the iOS 26 design system, including Cupertino control themes, typography, color, motion, custom controls, icons, and the Liquid Glass material.
 
 ### Added
 

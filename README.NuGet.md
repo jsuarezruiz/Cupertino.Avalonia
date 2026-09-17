@@ -2,7 +2,7 @@
 
 ![Cupertino.Avalonia banner](https://raw.githubusercontent.com/jsuarezruiz/Cupertino.Avalonia/main/images/cupertino-avalonia-banner.png)
 
-An iOS 26 design system for Avalonia with control themes, custom controls, motion, typography, colour and Liquid Glass.
+An iOS 26 design system for Avalonia with control themes, custom controls, motion, typography, color and Liquid Glass.
 
 ## Install
 
@@ -56,9 +56,9 @@ protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
 }
 ```
 
-Explore the complete control catalogue in the [live gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/).
+Explore the complete control catalog in the [live gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/).
 
-## Licence
+## License
 
 MIT. The Liquid Glass shader adapts MIT-licensed work from [LiquidGlassAvaloniaUI](https://github.com/KaranocaVe/LiquidGlassAvaloniaUI) (refraction) and [flutter_liquid_glass](https://github.com/whynotmake-it/flutter_liquid_glass) (lighting); the notices ship in the package as `THIRD-PARTY-NOTICES.md`.
 

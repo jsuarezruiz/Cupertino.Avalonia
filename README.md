@@ -69,11 +69,11 @@ protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
 
 **Additional Cupertino controls.** Navigation stacks with back gestures, sheets, swipe actions, toolbars, badges, grouped list and form rows, search, page indicators, date and time editors, calendars, icons and Liquid Glass.
 
-**The design language.** Scalable text, right-to-left layouts, light and dark colours, motion curves, and glass that blurs and refracts the content behind it.
+**The design language.** Scalable text, right-to-left layouts, light and dark colors, motion curves, and glass that blurs and refracts the content behind it.
 
 ## The gallery
 
-**[Open the WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/)** to try the controls, switch between light and dark appearances, and view sample code. Wide windows show the catalogue beside the selected sample; narrow windows use a single page with back navigation.
+**[Open the WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/)** to try the controls, switch between light and dark appearances, and view sample code. Wide windows show the catalog beside the selected sample; narrow windows use a single page with back navigation.
 
 To run the web sample locally, install the .NET 10 SDK, then run these commands from the repository root:
 
@@ -84,7 +84,7 @@ dotnet run --project samples/Cupertino.Gallery.Browser
 
 Install `wasm-tools` once. Open the local URL printed in the terminal and keep the command running while testing. The sample must be built and served over HTTP; opening `wwwroot/index.html` directly will not run it.
 
-The shared catalogue lives in `samples/Cupertino.Gallery`. To run it on your desktop:
+The shared catalog lives in `samples/Cupertino.Gallery`. To run it on your desktop:
 
 ```bash
 dotnet run --project samples/Cupertino.Gallery.Desktop
@@ -99,7 +99,7 @@ Mobile heads are available at `samples/Cupertino.Gallery.iOS` and `samples/Cuper
 <table width="100%">
   <tr>
     <td align="center" width="25%" colspan="3"><a href="images/liquid-glass.png"><img src="images/liquid-glass.png" alt="Liquid Glass" width="100%"></a><br><sub>Liquid Glass</sub></td>
-    <td align="center" width="25%" colspan="3"><a href="images/colors.png"><img src="images/colors.png" alt="Colours" width="100%"></a><br><sub>Colours</sub></td>
+    <td align="center" width="25%" colspan="3"><a href="images/colors.png"><img src="images/colors.png" alt="Colors" width="100%"></a><br><sub>Colors</sub></td>
     <td align="center" width="25%" colspan="3"><a href="images/typography.png"><img src="images/typography.png" alt="Typography" width="100%"></a><br><sub>Typography</sub></td>
     <td align="center" width="25%" colspan="3"><a href="images/icons.png"><img src="images/icons.png" alt="Icons" width="100%"></a><br><sub>Icons</sub></td>
   </tr>

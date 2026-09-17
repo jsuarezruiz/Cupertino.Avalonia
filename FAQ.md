@@ -22,13 +22,13 @@ The controls aim for the appearance and interaction of iOS 26. Exact animation p
 
 ### Does it support dark mode?
 
-Yes. The theme includes light and dark colours and follows Avalonia's theme selection.
+Yes. The theme includes light and dark colors and follows Avalonia's theme selection.
 
 ### Does it support accessibility settings?
 
 Yes. Your app supplies reduced motion, reduced transparency and text scale through `CupertinoAccessibility.Provider` or its individual properties. System settings are not read automatically. See the [accessibility guide](docs/docs/fundamentals/accessibility-and-platforms.md) for setup.
 
-### Can I change the accent colour?
+### Can I change the accent color?
 
 Yes. Set `CupertinoTheme.Accent` to change buttons, focus rings and selection in both themes at runtime. Override `CupertinoAccentBrush` in a control's resources to change just that control and its children.
 
