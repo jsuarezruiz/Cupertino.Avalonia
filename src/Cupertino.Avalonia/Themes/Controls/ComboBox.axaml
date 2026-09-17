@@ -43,10 +43,10 @@
       <Setter Property="IsVisible" Value="True" />
     </Style>
     <Style Selector="^:pointerover /template/ Border#Row">
-      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowPointerOverBrush}" />
     </Style>
     <Style Selector="^:focus-visible /template/ Border#Row">
-      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowPointerOverBrush}" />
     </Style>
     <Style Selector="^:pressed /template/ Border#Row">
       <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowPressedBrush}" />

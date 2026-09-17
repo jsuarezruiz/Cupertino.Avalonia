@@ -68,6 +68,8 @@ public class CupertinoTheme : Styles
     private void ApplyTextScale()
     {
         var scale = CupertinoAccessibility.TextScaleFactor;
+        // Resolved sizes change with the scale, so cached shaped runs are no longer usable.
+        AppleCoreText.ClearCache();
         foreach (var baseline in new[] { 10d, 11d, 12d, 13d, 14d, 15d, 16d, 17d, 18d,
                                           20d, 22d, 24d, 28d, 34d, 35d })
             Resources[$"CupertinoFontSize{baseline:0}"] = baseline * scale;

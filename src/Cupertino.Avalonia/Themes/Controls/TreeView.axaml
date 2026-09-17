@@ -35,7 +35,7 @@
     </Setter>
 
     <Style Selector="^:pointerover /template/ Border#PART_Header">
-      <Setter Property="Background" Value="{DynamicResource CupertinoRowHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource CupertinoRowPointerOverBrush}" />
     </Style>
     <Style Selector="^:selected /template/ Border#PART_Header">
       <Setter Property="Background" Value="{DynamicResource CupertinoAccentSubtleBrush}" />

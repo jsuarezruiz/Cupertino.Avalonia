@@ -1,0 +1,26 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:Cupertino.Controls">
+
+  <ControlTheme x:Key="{x:Type ContextMenu}" TargetType="ContextMenu">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel Classes="cupertino-popover cupertino-source-transition" Margin="18,10,18,18">
+          <Grid MinWidth="220">
+            <controls:GlassSurface Classes="cupertino-source-transition-material"
+                                   Theme="{StaticResource CupertinoPopoverSurface}"
+                                   CornerRadius="26" BlurRadius="36"
+                                   Tint="{DynamicResource CupertinoContextMenuTint}" />
+            <Border Classes="cupertino-source-transition-content" CornerRadius="26" ClipToBounds="True">
+              <ItemsPresenter Name="PART_ItemsPresenter"
+                              ItemsPanel="{TemplateBinding ItemsPanel}"
+                              Margin="0,6" />
+            </Border>
+          </Grid>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+
+</ResourceDictionary>

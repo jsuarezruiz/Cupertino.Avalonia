@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:motion="clr-namespace:Cupertino.Animation">
 
-  <ControlTheme x:Key="CupertinoCheckBox" TargetType="CheckBox">
+  <ControlTheme x:Key="CupertinoRadioButton" TargetType="RadioButton">
     <Setter Property="Transitions">
       <Transitions>
         <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
@@ -29,23 +29,16 @@
                 </Transitions>
               </Ellipse.Transitions>
             </Ellipse>
-            <Path x:Name="Check"
-                  Data="{StaticResource CupertinoCheckmarkGeometry}"
-                  Stroke="{DynamicResource CupertinoLabelOnGlassBrush}" StrokeThickness="2" StrokeLineCap="Round"
-                  Width="16" Height="16" Stretch="None"
-                  HorizontalAlignment="Center" VerticalAlignment="Center"
-                  Opacity="0">
-              <Path.Transitions>
+            <Ellipse x:Name="Dot"
+                     Fill="{DynamicResource CupertinoLabelOnGlassBrush}" Width="8" Height="8"
+                     HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Opacity="0">
+              <Ellipse.Transitions>
                 <Transitions>
                   <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 120}" />
                 </Transitions>
-              </Path.Transitions>
-            </Path>
-            <Border x:Name="Dash"
-                    Height="2" Width="10" CornerRadius="1"
-                    Background="{DynamicResource CupertinoLabelOnGlassBrush}"
-                    HorizontalAlignment="Center" VerticalAlignment="Center"
-                    IsVisible="False" />
+              </Ellipse.Transitions>
+            </Ellipse>
             <Border x:Name="FocusRing"
                     CornerRadius="11" Margin="-3"
                     BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
@@ -64,23 +57,12 @@
     <Style Selector="^:checked /template/ Ellipse#Fill">
       <Setter Property="Opacity" Value="1" />
     </Style>
-    <Style Selector="^:checked /template/ Path#Check">
+    <Style Selector="^:checked /template/ Ellipse#Dot">
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="^:checked /template/ Ellipse#Ring">
       <Setter Property="Stroke" Value="Transparent" />
     </Style>
-
-    <Style Selector="^:indeterminate /template/ Ellipse#Fill">
-      <Setter Property="Opacity" Value="1" />
-    </Style>
-    <Style Selector="^:indeterminate /template/ Border#Dash">
-      <Setter Property="IsVisible" Value="True" />
-    </Style>
-    <Style Selector="^:indeterminate /template/ Ellipse#Ring">
-      <Setter Property="Stroke" Value="Transparent" />
-    </Style>
-
     <Style Selector="^:pointerover /template/ Ellipse#Ring">
       <Setter Property="Stroke" Value="{DynamicResource CupertinoSecondaryLabelBrush}" />
     </Style>
@@ -95,7 +77,7 @@
     </Style>
   </ControlTheme>
 
-  <ControlTheme x:Key="{x:Type CheckBox}" TargetType="CheckBox"
-                BasedOn="{StaticResource CupertinoCheckBox}" />
+  <ControlTheme x:Key="{x:Type RadioButton}" TargetType="RadioButton"
+                BasedOn="{StaticResource CupertinoRadioButton}" />
 
 </ResourceDictionary>

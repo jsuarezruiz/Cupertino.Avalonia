@@ -25,12 +25,12 @@
                  controls:CupertinoFlyoutTransition.IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
                  IsLightDismissEnabled="False"
                  Placement="BottomEdgeAlignedLeft">
-            <Panel Classes="cupertino-popover source-transition" Margin="18,6,18,18">
+            <Panel Classes="cupertino-popover cupertino-source-transition" Margin="18,6,18,18">
               <Grid MinWidth="180">
-                <controls:GlassSurface Classes="source-transition-material"
+                <controls:GlassSurface Classes="cupertino-source-transition-material"
                                        Theme="{StaticResource CupertinoPopoverSurface}"
                                        CornerRadius="12" />
-                <Border Classes="source-transition-content" CornerRadius="12" ClipToBounds="True">
+                <Border Classes="cupertino-source-transition-content" CornerRadius="12" ClipToBounds="True">
                   <ItemsPresenter Name="PART_ItemsPresenter"
                                   ItemsPanel="{TemplateBinding ItemsPanel}"
                                   Margin="0,6" />
@@ -45,7 +45,7 @@
       <Setter Property="IsVisible" Value="True" />
     </Style>
     <Style Selector="^:pointerover /template/ Border#Chrome">
-      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowPointerOverBrush}" />
     </Style>
     <Style Selector="^:open /template/ Border#Chrome">
       <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowPressedBrush}" />

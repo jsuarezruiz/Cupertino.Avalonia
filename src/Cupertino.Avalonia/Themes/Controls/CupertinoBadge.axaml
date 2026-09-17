@@ -35,10 +35,10 @@
       </Setter>
     </Style>
 
-    <Style Selector="^.tab-badge">
+    <Style Selector="^.cupertino-tab-badge">
       <Setter Property="RenderTransform" Value="translate(21px,-15px)" />
     </Style>
-    <Style Selector="^.tab-badge:dot">
+    <Style Selector="^.cupertino-tab-badge:dot">
       <Setter Property="MinWidth" Value="18" />
       <Setter Property="Height" Value="18" />
       <Setter Property="RenderTransform" Value="translate(17px,-15px)" />

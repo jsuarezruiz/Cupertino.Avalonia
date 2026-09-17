@@ -37,13 +37,13 @@
           <Popup x:Name="PART_Popup" IsLightDismissEnabled="True"
                  controls:CupertinoFlyoutTransition.IsEnabled="True"
                  Placement="BottomEdgeAlignedLeft">
-            <Panel Classes="cupertino-popover source-transition" Margin="18,10,18,18">
+            <Panel Classes="cupertino-popover cupertino-source-transition" Margin="18,10,18,18">
               <Grid>
-                <controls:GlassSurface Classes="source-transition-material"
+                <controls:GlassSurface Classes="cupertino-source-transition-material"
                                        Theme="{StaticResource CupertinoPopoverSurface}"
                                        BlurRadius="36"
                                        Tint="{DynamicResource CupertinoPopoverTint}" />
-                <Border Classes="source-transition-content" CornerRadius="14" ClipToBounds="True">
+                <Border Classes="cupertino-source-transition-content" CornerRadius="14" ClipToBounds="True">
                   <Calendar x:Name="PART_Calendar" Background="Transparent" />
                 </Border>
               </Grid>

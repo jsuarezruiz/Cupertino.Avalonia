@@ -43,7 +43,7 @@
 
     <!-- Scaling creates a composition seam, so pressed feedback uses a fill. -->
     <Style Selector="^:pointerover /template/ Border#Fill">
-      <Setter Property="Background" Value="{DynamicResource CupertinoDialogActionHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource CupertinoDialogActionPointerOverBrush}" />
     </Style>
     <Style Selector="^:pressed /template/ Border#Fill">
       <Setter Property="Background" Value="{DynamicResource CupertinoDialogActionPressedBrush}" />
@@ -56,21 +56,21 @@
     <Style Selector="^.destructive">
       <Setter Property="Foreground" Value="{DynamicResource CupertinoDangerBrush}" />
     </Style>
-    <Style Selector="^.cancel">
+    <Style Selector="^.cupertino-cancel">
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
-    <Style Selector="^.preferred">
+    <Style Selector="^.cupertino-preferred">
       <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelOnGlassBrush}" />
       <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
-    <Style Selector="^.preferred /template/ Border#Fill">
+    <Style Selector="^.cupertino-preferred /template/ Border#Fill">
       <Setter Property="Background" Value="{DynamicResource CupertinoAccentBrush}" />
     </Style>
-    <Style Selector="^.preferred:pointerover /template/ Border#Fill">
+    <Style Selector="^.cupertino-preferred:pointerover /template/ Border#Fill">
       <Setter Property="Background" Value="{DynamicResource CupertinoAccentBrush}" />
       <Setter Property="Opacity" Value="0.9" />
     </Style>
-    <Style Selector="^.preferred:pressed /template/ Border#Fill">
+    <Style Selector="^.cupertino-preferred:pressed /template/ Border#Fill">
       <Setter Property="Background" Value="{DynamicResource CupertinoAccentBrush}" />
       <Setter Property="Opacity" Value="0.75" />
     </Style>
@@ -122,8 +122,8 @@
                           Theme="{StaticResource CupertinoDialogAction}"
                           Margin="4,0"
                           Classes.destructive="{Binding IsDestructive}"
-                          Classes.cancel="{Binding IsCancel}"
-                          Classes.preferred="{Binding IsPreferred}"
+                          Classes.cupertino-cancel="{Binding IsCancel}"
+                          Classes.cupertino-preferred="{Binding IsPreferred}"
                           Command="{Binding $parent[controls:Dialog].InvokeActionCommand}"
                           CommandParameter="{Binding}">
                     <Button.ContentTemplate>

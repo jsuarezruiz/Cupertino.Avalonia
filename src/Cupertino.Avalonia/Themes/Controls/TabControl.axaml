@@ -13,8 +13,12 @@
     <Setter Property="DepthEffect" Value="0.06" />
     <Setter Property="Saturation" Value="1.1" />
     <Setter Property="LightIntensity" Value="0.6" />
-    <Setter Property="FresnelStrength" Value="0.55" />
-    <Setter Property="ShadowOpacity" Value="0.08" />
+    <Setter Property="FresnelStrength" Value="0.4" />
+    <!-- iOS 26 lights only the key-light edge while the pill is dragged. -->
+    <Setter Property="OppositeEdgeLight" Value="0" />
+    <Setter Property="RimLightFloor" Value="0.1" />
+    <!-- The iOS 26 pill casts no shadow while it travels. -->
+    <Setter Property="ShadowOpacity" Value="0" />
     <Setter Property="ShadowBlur" Value="5" />
     <Setter Property="ShadowOffset" Value="2" />
     <Setter Property="IsAdaptive" Value="False" />
@@ -57,7 +61,7 @@
     <Setter Property="ShadowOffset" Value="3" />
     <Setter Property="IsAdaptive" Value="False" />
     <Setter Property="Magnification" Value="1.18" />
-    <Setter Property="Tint" Value="{DynamicResource CupertinoTabPillTint}" />
+    <Setter Property="Tint" Value="{DynamicResource CupertinoTabPillColor}" />
   </ControlTheme>
 
   <ControlTheme x:Key="CupertinoBottomBarSurface" TargetType="controls:GlassSurface">
@@ -186,7 +190,7 @@
           <controls:GlassSurface x:Name="Lens"
                                  IsVisible="False"
                                  Theme="{StaticResource CupertinoBottomRestingLens}" />
-          <Border x:Name="Hover"
+          <Border x:Name="PointerOverPill"
                   CornerRadius="26.5"
                   Margin="7,4.5"
                   Opacity="0"
@@ -209,7 +213,7 @@
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center" />
           <controls:CupertinoBadge
-              Classes="tab-badge"
+              Classes="cupertino-tab-badge"
               IsVisible="{Binding (controls:Tabs.BadgeValue), RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"
               Value="{Binding (controls:Tabs.BadgeValue), RelativeSource={RelativeSource TemplatedParent}, TargetNullValue=-1}"
               HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -223,7 +227,7 @@
     <Style Selector="^.cupertino-two-item /template/ controls|GlassSurface#Lens">
       <Setter Property="Margin" Value="-4,4.5" />
     </Style>
-    <Style Selector="^.cupertino-two-item /template/ Border#Hover">
+    <Style Selector="^.cupertino-two-item /template/ Border#PointerOverPill">
       <Setter Property="Margin" Value="8,4.5" />
     </Style>
 
@@ -234,7 +238,7 @@
     <Style Selector="^:selected /template/ controls|GlassSurface#Lens">
       <Setter Property="IsVisible" Value="True" />
     </Style>
-    <Style Selector="^:pointerover:not(:selected) /template/ Border#Hover">
+    <Style Selector="^:pointerover:not(:selected) /template/ Border#PointerOverPill">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
     <Style Selector="^.cupertino-no-pill /template/ controls|GlassSurface#Lens">
@@ -361,7 +365,7 @@
       <Setter Property="Margin" Value="8,0" />
     </Style>
 
-    <Style Selector="^.bottom.has-accessory /template/ controls|GlassSurface#AccessoryHost">
+    <Style Selector="^.bottom.cupertino-has-accessory /template/ controls|GlassSurface#AccessoryHost">
       <Setter Property="IsVisible" Value="True" />
     </Style>
   </ControlTheme>
@@ -442,7 +446,7 @@
           <controls:GlassSurface x:Name="Lens"
                                  IsVisible="False"
                                  Theme="{StaticResource CupertinoBottomRestingLens}" />
-          <Border x:Name="Hover"
+          <Border x:Name="PointerOverPill"
                   CornerRadius="26.5"
                   Margin="7,4.5"
                   Opacity="0"
@@ -465,7 +469,7 @@
                             HorizontalContentAlignment="Center"
                             VerticalContentAlignment="Center" />
           <controls:CupertinoBadge
-              Classes="tab-badge"
+              Classes="cupertino-tab-badge"
               IsVisible="{Binding (controls:Tabs.BadgeValue), RelativeSource={RelativeSource TemplatedParent}, Converter={x:Static ObjectConverters.IsNotNull}}"
               Value="{Binding (controls:Tabs.BadgeValue), RelativeSource={RelativeSource TemplatedParent}, TargetNullValue=-1}"
               HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -479,7 +483,7 @@
     <Style Selector="^.cupertino-two-item /template/ controls|GlassSurface#Lens">
       <Setter Property="Margin" Value="-4,4.5" />
     </Style>
-    <Style Selector="^.cupertino-two-item /template/ Border#Hover">
+    <Style Selector="^.cupertino-two-item /template/ Border#PointerOverPill">
       <Setter Property="Margin" Value="8,4.5" />
     </Style>
 
@@ -490,7 +494,7 @@
     <Style Selector="^:selected /template/ controls|GlassSurface#Lens">
       <Setter Property="IsVisible" Value="True" />
     </Style>
-    <Style Selector="^:pointerover:not(:selected) /template/ Border#Hover">
+    <Style Selector="^:pointerover:not(:selected) /template/ Border#PointerOverPill">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
     <Style Selector="^.cupertino-no-pill /template/ controls|GlassSurface#Lens">
@@ -589,7 +593,7 @@
       <Setter Property="Margin" Value="8,0" />
     </Style>
 
-    <Style Selector="^.bottom.has-accessory /template/ controls|GlassSurface#AccessoryHost">
+    <Style Selector="^.bottom.cupertino-has-accessory /template/ controls|GlassSurface#AccessoryHost">
       <Setter Property="IsVisible" Value="True" />
     </Style>
 

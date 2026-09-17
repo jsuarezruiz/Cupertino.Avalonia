@@ -250,7 +250,7 @@
       </ControlTemplate>
     </Setter>
     <Style Selector="^:pointerover /template/ Border#Fill">
-      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowPointerOverBrush}" />
     </Style>
     <Style Selector="^:pressed /template/ Border#Fill">
       <Setter Property="Background" Value="{DynamicResource CupertinoMenuRowPressedBrush}" />

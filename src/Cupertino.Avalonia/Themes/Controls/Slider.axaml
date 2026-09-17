@@ -3,14 +3,6 @@
                     xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
 
-  <LinearGradientBrush x:Key="CupertinoSliderDragRailBrush" StartPoint="0%,0%" EndPoint="100%,0%">
-    <GradientStop Offset="0" Color="#FFE1E2E1" />
-    <GradientStop Offset="0.70" Color="#FFE1E2E1" />
-    <GradientStop Offset="0.80" Color="#FFDFE0DF" />
-    <GradientStop Offset="0.90" Color="#FFDCDCDA" />
-    <GradientStop Offset="1" Color="#FFD4D3D1" />
-  </LinearGradientBrush>
-
   <ControlTheme x:Key="CupertinoSliderRailHorizontal" TargetType="RepeatButton">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Focusable" Value="False" />
@@ -140,7 +132,7 @@
                   Clip="{TemplateBinding (controls:SliderInteraction.RailClip)}"
                   IsHitTestVisible="False">
               <Border Grid.ColumnSpan="2"
-                      Background="{StaticResource CupertinoSliderDragRailBrush}"
+                      Background="{DynamicResource CupertinoSliderDragRailBrush}"
                       CornerRadius="0" />
               <Border x:Name="ThumbDragAccentOuter"
                       Background="{TemplateBinding Foreground}"
@@ -152,7 +144,7 @@
                     Opacity="0.33"
                     RenderTransform="translate(0px,0.1075px)">
                 <Border Grid.ColumnSpan="2"
-                        Background="{StaticResource CupertinoSliderDragRailBrush}"
+                        Background="{DynamicResource CupertinoSliderDragRailBrush}"
                         CornerRadius="0" />
                 <Border x:Name="ThumbDragAccentSoft"
                         Background="{TemplateBinding Foreground}"
@@ -163,7 +155,7 @@
                     Height="1.67"
                     VerticalAlignment="Center">
                 <Border Grid.ColumnSpan="2"
-                        Background="{StaticResource CupertinoSliderDragRailBrush}"
+                        Background="{DynamicResource CupertinoSliderDragRailBrush}"
                         CornerRadius="0" />
                 <Border x:Name="ThumbDragAccentCore"
                         Background="{TemplateBinding Foreground}"

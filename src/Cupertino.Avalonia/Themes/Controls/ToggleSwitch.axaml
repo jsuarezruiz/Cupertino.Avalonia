@@ -177,6 +177,7 @@
     <Style Selector="^:pressed /template/ Grid#PART_MovingKnobs">
       <Setter Property="RenderTransform" Value="scale(1.3,1.45)" />
     </Style>
+    <!-- Avalonia's ToggleSwitch raises :dragging while the knob is dragged. -->
     <Style Selector="^:dragging /template/ Grid#PART_MovingKnobs">
       <Setter Property="RenderTransform" Value="scale(1.3,1.45)" />
     </Style>

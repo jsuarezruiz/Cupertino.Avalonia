@@ -47,7 +47,7 @@
     </Style>
 
     <Style Selector="^:pointerover /template/ Border#RowBackground">
-      <Setter Property="Background" Value="{DynamicResource CupertinoRowHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource CupertinoRowPointerOverBrush}" />
     </Style>
     <Style Selector="^:pressed /template/ Border#RowBackground">
       <Setter Property="Background" Value="{DynamicResource CupertinoRowPressedBrush}" />
