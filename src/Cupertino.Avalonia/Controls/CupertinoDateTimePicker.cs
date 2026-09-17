@@ -217,7 +217,7 @@ public class CupertinoDateTimePicker : TemplatedControl
             result = maximum;
 
         var (minimumTime, maximumTime) = GetTimeBounds(result);
-        var time = CupertinoTimePicker.NormalizeTimeValue(
+        var time = TimeMath.Normalize(
             result.TimeOfDay, EffectiveMinuteIncrement, minimumTime, maximumTime);
         result = new DateTimeOffset(result.Date + time, result.Offset);
 

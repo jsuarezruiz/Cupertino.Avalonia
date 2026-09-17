@@ -328,9 +328,7 @@ public static class RefreshInteraction
 
         private void OnTick(object? sender, EventArgs e)
         {
-            var now = MotionClock.Now;
-            var elapsed = Math.Clamp(now - _lastTick, 1, 50) / 1000.0;
-            _lastTick = now;
+            var elapsed = MotionClock.TakeElapsedSeconds(ref _lastTick);
             var k = 1 - Math.Exp(-SettleRate * elapsed);
             _band.Y += (_bandTarget - _band.Y) * k;
             _hold.Y += (_holdTarget - _hold.Y) * k;

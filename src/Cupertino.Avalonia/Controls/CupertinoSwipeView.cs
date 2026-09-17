@@ -5,6 +5,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Cupertino.Animation;
 
 namespace Cupertino.Controls;
 
@@ -98,6 +99,8 @@ public class CupertinoSwipeView : ContentControl
         if (_content is not null)
             _content.RenderTransform = _shift;
         UpdateDirectionHosts();
+        // Measure the action hosts once layout has settled instead of during the first drag.
+        Dispatcher.UIThread.Post(ResolveNaturalWidths, DispatcherPriority.Loaded);
         if (_openAt == 0)
         {
             ApplyPosition(0);
@@ -226,6 +229,7 @@ public class CupertinoSwipeView : ContentControl
             Dispatcher.UIThread.Post(() =>
             {
                 ResetNaturalWidths();
+                ResolveNaturalWidths();
                 if (_openAt == 0)
                     SetRevealed(_position);
                 else
@@ -234,6 +238,15 @@ public class CupertinoSwipeView : ContentControl
         }
     }
 
+    // Measure now so a later drag reads the cached widths instead of forcing a layout.
+    private void ResolveNaturalWidths()
+    {
+        if (Bounds.Height <= 0)
+            return;
+
+        NaturalWidth(_leading, ref _leadingNaturalWidth, Bounds.Height);
+        NaturalWidth(_trailing, ref _trailingNaturalWidth, Bounds.Height);
+    }
     private void ResetNaturalWidths()
     {
         _leadingNaturalWidth = double.NaN;
@@ -368,7 +381,11 @@ public class CupertinoSwipeView : ContentControl
             if (FindOutermostButton(host, trailing: x < 0) is { IsEffectivelyEnabled: true } button)
             {
                 CupertinoHaptics.Play(HapticFeedback.ImpactMedium);
-                new Avalonia.Automation.Peers.ButtonAutomationPeer(button).Invoke();
+                // Raise the click through automation so commands and handlers run, then release the peer.
+                var peer = new Avalonia.Automation.Peers.ButtonAutomationPeer(button);
+                peer.Invoke();
+                if (peer is IDisposable disposable)
+                    disposable.Dispose();
             }
             if (s_open == this)
                 s_open = null;
@@ -472,13 +489,12 @@ public class CupertinoSwipeView : ContentControl
     private void OnSettleTick(object? sender, EventArgs e)
     {
         // Critically damped spring carrying the release velocity.
-        var now = MotionClock.Now;
-        var dt = Math.Clamp((now - _lastSettleTick) / 1000.0, 0.001, 0.05);
-        _lastSettleTick = now;
-        var d = _position - _target;
-        var accel = -SettleOmega * SettleOmega * d - 2 * SettleOmega * _settleVelocity;
-        _settleVelocity += accel * dt;
-        ApplyPosition(_position + _settleVelocity * dt);
+        var dt = MotionClock.TakeElapsedSeconds(ref _lastSettleTick);
+        var position = _position;
+        var velocity = _settleVelocity;
+        MotionCurve.Step(ref position, ref velocity, _target, SettleOmega, dt);
+        _settleVelocity = velocity;
+        ApplyPosition(position);
         if (Math.Abs(_position - _target) < 0.5 && Math.Abs(_settleVelocity) < 4)
         {
             ApplyPosition(_target);

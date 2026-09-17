@@ -30,6 +30,11 @@ public static class CupertinoFlyoutTransition
     {
     }
 
+    // Class names the templates use to mark the parts the opening motion animates.
+    private const string PopoverClass = "cupertino-popover";
+    private const string MaterialClass = "cupertino-source-transition-material";
+    private const string ContentClass = "cupertino-source-transition-content";
+
     private static readonly TransformOperations ExpandedTransform =
         TransformOperations.Parse("scale(1,1) translate(0px,0px)");
 
@@ -178,7 +183,7 @@ public static class CupertinoFlyoutTransition
         var material = panel.GetVisualDescendants()
                            .OfType<Control>()
                            .FirstOrDefault(control =>
-                               control.Classes.Contains("source-transition-material"))
+                               control.Classes.Contains(MaterialClass))
                        ?? panel;
         var glass = material as GlassSurface;
         var content = FindContent(panel, glass);
@@ -290,11 +295,11 @@ public static class CupertinoFlyoutTransition
     }
 
     private static Control FindPopoverPanel(Control presenter) =>
-        presenter.Classes.Contains("cupertino-popover")
+        presenter.Classes.Contains(PopoverClass)
             ? presenter
             : presenter.GetVisualDescendants()
                 .OfType<Control>()
-                .FirstOrDefault(control => control.Classes.Contains("cupertino-popover"))
+                .FirstOrDefault(control => control.Classes.Contains(PopoverClass))
               ?? presenter;
 
     private static Control FindContent(Control panel, GlassSurface? glass)
@@ -304,7 +309,7 @@ public static class CupertinoFlyoutTransition
 
         return panel.GetVisualDescendants()
                    .OfType<Control>()
-                   .FirstOrDefault(control => control.Classes.Contains("source-transition-content"))
+                   .FirstOrDefault(control => control.Classes.Contains(ContentClass))
                ?? panel;
     }
 

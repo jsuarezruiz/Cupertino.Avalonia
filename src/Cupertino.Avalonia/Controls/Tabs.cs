@@ -44,7 +44,7 @@ public static class Tabs
             if (state is not null && !state.Owns(e.NewValue))
                 state.Dispose();
 
-            tabs.Classes.Set("has-accessory", e.NewValue is not null);
+            tabs.Classes.Set("cupertino-has-accessory", e.NewValue is not null);
             if (e.NewValue is null)
                 AttachFirstDetachedItem(tabs);
         });

@@ -144,6 +144,15 @@ public class CupertinoTimePicker : TemplatedControl
                                              CultureInfo.CurrentCulture)
         : Resource("CupertinoPickerPlaceholderText", "Select");
 
+    private CupertinoWheel? _hours, _minutes, _period;
+    private Button? _field;
+    private int _popoverVersion;
+    private ContentControl? _popoverBody;
+    private ContentControl? _inlineHost;
+    private bool _syncing;
+    private string _displayText = string.Empty;
+    private readonly List<IDisposable> _wheelBindings = new();
+
     private string Resource(string key, string fallback) =>
         this.TryFindResource(key, out var value) && value is string text ? text : fallback;
 
@@ -153,15 +162,6 @@ public class CupertinoTimePicker : TemplatedControl
     public static readonly DirectProperty<CupertinoTimePicker, string> DisplayTextProperty =
         AvaloniaProperty.RegisterDirect<CupertinoTimePicker, string>(
             nameof(DisplayText), o => o.DisplayText);
-
-    private CupertinoWheel? _hours, _minutes, _period;
-    private Button? _field;
-    private int _popoverVersion;
-    private ContentControl? _popoverBody;
-    private ContentControl? _inlineHost;
-    private bool _syncing;
-    private string _displayText = string.Empty;
-    private readonly List<IDisposable> _wheelBindings = new();
 
     /// <summary>
     /// Raised after the selected time changes and has been normalized to the current constraints.
@@ -306,6 +306,7 @@ public class CupertinoTimePicker : TemplatedControl
         _wheelBindings.Add(bar.Bind(Border.BackgroundProperty,
                  this.GetResourceObservable("CupertinoPickerHighlightBrush")));
 
+        // iOS 26 picker: a 242 x 245 surface holding a 216 pt wheel area under a 34 pt highlight band.
         var body = new Panel { Width = 242, Height = 245 };
         body.Children.Add(bar);
         body.Children.Add(new Panel { Height = 216, Children = { columns } });
@@ -474,7 +475,7 @@ public class CupertinoTimePicker : TemplatedControl
         {
             var maximum = EffectiveMaximumDuration;
             result = result > maximum ? maximum : result;
-            return NormalizeTimeValue(result, EffectiveMinuteIncrement,
+            return TimeMath.Normalize(result, EffectiveMinuteIncrement,
                                       TimeSpan.Zero, maximum);
         }
         result = TimeSpan.FromTicks(result.Ticks % TimeSpan.FromDays(1).Ticks);
@@ -482,48 +483,7 @@ public class CupertinoTimePicker : TemplatedControl
         var maximumTime = ClampTimeOfDay(MaximumTime ?? TimeSpan.FromDays(1) - TimeSpan.FromTicks(1));
         if (minimum > maximumTime)
             minimum = maximumTime;
-        return NormalizeTimeValue(result, EffectiveMinuteIncrement, minimum, maximumTime);
-    }
-
-    internal static TimeSpan NormalizeTimeValue(
-        TimeSpan value, int minuteIncrement, TimeSpan minimum, TimeSpan maximum)
-    {
-        var clamped = value < minimum ? minimum : value > maximum ? maximum : value;
-        var step = DateMath.ClampMinuteIncrement(minuteIncrement);
-        var lastMinute = 59 / step * step;
-
-        // Compare the rows either side; the next one can fall in the following hour.
-        var hour = (int)Math.Clamp(Math.Floor(clamped.TotalHours), 0, 23);
-        var minuteOfHour = clamped.TotalMinutes - hour * 60;
-        var lowerMinute = (int)Math.Floor(minuteOfHour / step) * step;
-        var previous = new TimeSpan(hour, lowerMinute, 0);
-        var next = NextRow(previous, step, lastMinute);
-        var nextValid = next is { } n && n >= minimum && n <= maximum;
-        var previousValid = previous >= minimum && previous <= maximum;
-        if (nextValid && previousValid)
-            // Ties settle on the lower row.
-            return Math.Abs((previous - clamped).Ticks) <= Math.Abs((next!.Value - clamped).Ticks)
-                ? previous
-                : next.Value;
-        if (nextValid)
-            return next!.Value;
-        if (previousValid)
-            return previous;
-
-        // A narrow range may contain no selectable row.
-        return clamped;
-    }
-
-    private static TimeSpan? NextRow(TimeSpan row, int step, int lastMinute)
-    {
-        var minute = row.Minutes + step;
-        var hour = row.Hours;
-        if (minute > lastMinute)
-        {
-            minute = 0;
-            hour++;
-        }
-        return hour > 23 ? null : new TimeSpan(hour, minute, 0);
+        return TimeMath.Normalize(result, EffectiveMinuteIncrement, minimum, maximumTime);
     }
 
     private static TimeSpan ClampTimeOfDay(TimeSpan value) =>

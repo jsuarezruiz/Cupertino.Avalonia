@@ -15,9 +15,6 @@ public class CriticallyDampedEasing : Easing
     /// <inheritdoc/>
     public override double Ease(double progress)
     {
-        var wd = OmegaDuration <= 0 ? 7.0 : OmegaDuration;
-        var norm = 1 - (1 + wd) * Math.Exp(-wd);
-        var x = wd * progress;
-        return (1 - (1 + x) * Math.Exp(-x)) / norm;
+        return MotionCurve.CriticallyDamped(progress, OmegaDuration <= 0 ? 7.0 : OmegaDuration);
     }
 }

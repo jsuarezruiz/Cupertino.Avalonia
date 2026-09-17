@@ -104,6 +104,14 @@ public class CupertinoDatePicker : TemplatedControl
     /// </summary>
     public DayOfWeek FirstDayOfWeek { get => GetValue(FirstDayOfWeekProperty); set => SetValue(FirstDayOfWeekProperty, value); }
 
+    private Button? _field;
+    private int _popoverVersion;
+    private CupertinoCalendarView? _calendar;
+    private CupertinoCalendarView? _inlineCalendar;
+    private bool _syncingCalendar;
+    private bool _normalizingDateRange;
+    private string _displayText = string.Empty;
+
     /// <summary>
     /// Creates a date picker with no selection.
     /// </summary>
@@ -143,14 +151,6 @@ public class CupertinoDatePicker : TemplatedControl
     public static readonly DirectProperty<CupertinoDatePicker, string> DisplayTextProperty =
         AvaloniaProperty.RegisterDirect<CupertinoDatePicker, string>(
             nameof(DisplayText), o => o.DisplayText);
-
-    private Button? _field;
-    private int _popoverVersion;
-    private CupertinoCalendarView? _calendar;
-    private CupertinoCalendarView? _inlineCalendar;
-    private bool _syncingCalendar;
-    private bool _normalizingDateRange;
-    private string _displayText = string.Empty;
 
     /// <summary>
     /// Raised after the selected date changes and has been coerced to the current bounds.
@@ -243,6 +243,18 @@ public class CupertinoDatePicker : TemplatedControl
             }
             SetCurrentValue(IsDropDownOpenProperty, false);
         });
+
+        if (!CupertinoPopover.IsOpen(_field))
+        {
+            // The popover layer was unavailable; do not leave the field looking open.
+            if (_calendar is not null)
+            {
+                _calendar.DayPicked -= OnDayPicked;
+                _calendar.PropertyChanged -= OnCalendarPropertyChanged;
+                _calendar = null;
+            }
+            SetCurrentValue(IsDropDownOpenProperty, false);
+        }
     }
 
     private void OnCalendarPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)

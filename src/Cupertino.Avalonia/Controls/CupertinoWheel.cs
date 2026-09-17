@@ -1,4 +1,5 @@
 using System.Collections.Specialized;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
@@ -7,6 +8,7 @@ using Avalonia.Controls.Documents;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Cupertino.Animation;
 
 namespace Cupertino.Controls;
 
@@ -106,13 +108,18 @@ public class CupertinoWheel : Control
     /// </summary>
     public event EventHandler? SelectionSettled;
 
-    // Integral offsets are settled rows.
+    // A 0.3 blend at 60 Hz.
+    private const double VelocitySmoothingSeconds = 0.047;
+    private const double SettleOmega = 10.0;
+    private const double PickerHeight = 216;   // Picker body height in the theme; caps the wheel
+
+    // Fractional row position; an integral value means the wheel rests on that row.
     private double _offset;
     private bool _dragging;
     private double _lastY;
     private readonly Rendering.FormattedTextCache _textCache = new();
     private double? _measuredWidth;
-    private (System.Globalization.CultureInfo Culture, FontFamily Family, double Size, FlowDirection Direction)? _measurementStyle;
+    private (CultureInfo Culture, FontFamily Family, double Size, FlowDirection Direction)? _measurementStyle;
     private double _pressY;
     private double _travelled;
     private double _velocity;
@@ -250,8 +257,8 @@ public class CupertinoWheel : Control
     /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize)
     {
-        var h = Math.Min(Radius * 2.0 + ItemHeight, 216.0);
-        var style = (System.Globalization.CultureInfo.CurrentCulture, TextElement.GetFontFamily(this), FontSize, FlowDirection);
+        var h = Math.Min(Radius * 2.0 + ItemHeight, PickerHeight);
+        var style = (CultureInfo.CurrentCulture, TextElement.GetFontFamily(this), FontSize, FlowDirection);
         if (_measurementStyle != style)
         {
             _measurementStyle = style;
@@ -270,7 +277,7 @@ public class CupertinoWheel : Control
     }
 
     private FormattedText Measure(string text) => _textCache.Get(
-        text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection,
+        text, CultureInfo.CurrentCulture, FlowDirection,
         new Typeface(TextElement.GetFontFamily(this)), FontSize, Foreground);
 
     /// <inheritdoc/>
@@ -374,10 +381,6 @@ public class CupertinoWheel : Control
         _capturedPointer = null;
         pointer?.Capture(null);
     }
-
-    // A 0.3 blend at 60 Hz.
-    private const double VelocitySmoothingSeconds = 0.047;
-
     private static double Normalize(double value, double fallback) =>
         double.IsFinite(value) && value > 0 ? Math.Clamp(value, 1.0, 1000.0) : fallback;
 
@@ -576,14 +579,8 @@ public class CupertinoWheel : Control
             _springVel = 0;
         }
         // Critically damped spring carrying the release velocity.
-        var now = MotionClock.Now;
-        var dt = Math.Clamp((now - _lastSettleTick) / 1000.0, 0.001, 0.05);
-        _lastSettleTick = now;
-        const double omega = 10.0;
-        var d = _offset - _settleTo;
-        var accel = -omega * omega * d - 2 * omega * _springVel;
-        _springVel += accel * dt;
-        _offset += _springVel * dt;
+        var dt = MotionClock.TakeElapsedSeconds(ref _lastSettleTick);
+        MotionCurve.Step(ref _offset, ref _springVel, _settleTo, SettleOmega, dt);
         Tick();
         InvalidateVisual();
         // Keep surrounding glass in step with the spring.

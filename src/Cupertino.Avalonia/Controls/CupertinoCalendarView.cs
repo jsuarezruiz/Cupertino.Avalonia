@@ -225,6 +225,8 @@ public class CupertinoMonthGrid : Control
         _animTimer?.Stop();
         _poppingSelection = null;
         _slideFromMonth = null;
+        // Formatted text and its brushes are rebuilt on demand; do not retain them while detached.
+        _textCache.Clear();
     }
 
     private int ColumnOf(DateTime date) => ((int)date.DayOfWeek - (int)FirstDayOfWeek + 7) % 7;
@@ -507,6 +509,14 @@ public class CupertinoCalendarView : TemplatedControl
     /// </summary>
     public event EventHandler<DateTime>? DayPicked;
 
+    private CupertinoMonthGrid? _grid;
+    private TextBlock? _title;
+    private CupertinoWheel? _monthWheel, _yearWheel;
+    private Button? _previousButton, _nextButton, _titleButton;
+    private bool _syncingWheels;
+    private bool _normalizingYearRange;
+    private bool _normalizingDateRange;
+
     /// <summary>
     /// Creates a calendar view showing the current month.
     /// </summary>
@@ -515,14 +525,6 @@ public class CupertinoCalendarView : TemplatedControl
         SetCurrentValue(DisplayMonthProperty, DateTime.Today);
         SetCurrentValue(FirstDayOfWeekProperty, DateMath.CultureFirstDayOfWeek);
     }
-
-    private CupertinoMonthGrid? _grid;
-    private TextBlock? _title;
-    private CupertinoWheel? _monthWheel, _yearWheel;
-    private Button? _previousButton, _nextButton, _titleButton;
-    private bool _syncingWheels;
-    private bool _normalizingYearRange;
-    private bool _normalizingDateRange;
 
     /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -760,11 +762,9 @@ public class CupertinoCalendarView : TemplatedControl
         var minimum = MinimumDate?.Date ?? minimumMonth;
         if (minimum < minimumMonth)
             minimum = minimumMonth;
-        var maximum = MaximumDate?.Date
-                      ?? new DateTime(maximumMonth.Year, maximumMonth.Month,
-                          DateTime.DaysInMonth(maximumMonth.Year, maximumMonth.Month));
         var maximumMonthEnd = new DateTime(maximumMonth.Year, maximumMonth.Month,
             DateTime.DaysInMonth(maximumMonth.Year, maximumMonth.Month));
+        var maximum = MaximumDate?.Date ?? maximumMonthEnd;
         if (maximum > maximumMonthEnd)
             maximum = maximumMonthEnd;
         if (minimum > maximum)

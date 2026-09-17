@@ -12,6 +12,12 @@ namespace Cupertino.Controls;
 /// </summary>
 public sealed class ScrollBounce
 {
+    // Wheel streams have no end event, so an idle gap ends the gesture.
+    private const double Resistance = 0.55;
+    private const double LineHeight = 50;
+    private const int IdleMs = 90;
+    private const double DecayRate = 12;
+
     private ScrollBounce()
     {
     }
@@ -24,13 +30,6 @@ public sealed class ScrollBounce
 
     private static readonly AttachedProperty<State?> StateProperty =
         AvaloniaProperty.RegisterAttached<ScrollBounce, ScrollViewer, State?>("State");
-
-    // Wheel streams have no end event, so an idle gap ends the gesture.
-    private const double Resistance = 0.55;
-    private const double LineHeight = 50;
-    private const int IdleMs = 90;
-    private const double DecayRate = 12;
-
     /// <inheritdoc cref="IsEnabledProperty"/>
     public static bool GetIsEnabled(ScrollViewer viewer) => viewer.GetValue(IsEnabledProperty);
     /// <inheritdoc cref="IsEnabledProperty"/>
@@ -122,9 +121,7 @@ public sealed class ScrollBounce
 
         private void OnTick(object? sender, EventArgs e)
         {
-            var now = MotionClock.Now;
-            var elapsed = Math.Clamp(now - _lastTick, 1, 50) / 1000.0;
-            _lastTick = now;
+            var elapsed = MotionClock.TakeElapsedSeconds(ref _lastTick);
             if (MotionClock.MillisecondsSince(_lastWheel) < IdleMs)
                 return;
 
