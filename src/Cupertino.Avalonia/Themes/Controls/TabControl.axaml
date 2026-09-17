@@ -14,9 +14,6 @@
     <Setter Property="Saturation" Value="1.1" />
     <Setter Property="LightIntensity" Value="0.6" />
     <Setter Property="FresnelStrength" Value="0.4" />
-    <!-- iOS 26 lights only the key-light edge while the pill is dragged. -->
-    <Setter Property="OppositeEdgeLight" Value="0" />
-    <Setter Property="RimLightFloor" Value="0.1" />
     <!-- The iOS 26 pill casts no shadow while it travels. -->
     <Setter Property="ShadowOpacity" Value="0" />
     <Setter Property="ShadowBlur" Value="5" />
