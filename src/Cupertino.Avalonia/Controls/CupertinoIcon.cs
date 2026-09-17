@@ -119,6 +119,14 @@ public class CupertinoIcon : Control
     /// </summary>
     public double StrokeThickness { get => GetValue(StrokeThicknessProperty); set => SetValue(StrokeThicknessProperty, value); }
 
+    private Pen? _pen;
+    private IBrush? _penBrush;
+    private double _penThickness;
+    private string? _geometryKey;
+    private Geometry? _geometry;
+    private string? _overlayKey;
+    private Geometry? _overlay;
+
     static CupertinoIcon()
     {
         AffectsRender<CupertinoIcon>(GlyphProperty, ForegroundProperty, StrokeThicknessProperty);
@@ -135,12 +143,40 @@ public class CupertinoIcon : Control
                   Avalonia.Data.BindingPriority.Style);
     }
 
-    private Pen? _pen;
-    private IBrush? _penBrush;
-    private double _penThickness;
-
     /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize) => new(Size, Size);
+
+    // Resource lookup walks the tree, so resolve each glyph once. A miss is not cached.
+    private Geometry? FindGeometry(in Spec spec)
+    {
+        if (_geometryKey == spec.Key && _geometry is not null)
+            return _geometry;
+
+        _geometryKey = spec.Key;
+        return _geometry = this.FindResource(spec.Key) as Geometry;
+    }
+
+    private Geometry? FindOverlay(string key)
+    {
+        if (_overlayKey == key && _overlay is not null)
+            return _overlay;
+
+        _overlayKey = key;
+        return _overlay = this.FindResource(key) as Geometry;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == GlyphProperty)
+        {
+            _geometryKey = null;
+            _geometry = null;
+            _overlayKey = null;
+            _overlay = null;
+        }
+    }
 
     private Pen StrokePen(IBrush brush, double thickness)
     {
@@ -157,7 +193,7 @@ public class CupertinoIcon : Control
     public override void Render(DrawingContext context)
     {
         if (Glyph is null || !Specs.TryGetValue(Glyph, out var spec)
-            || this.FindResource(spec.Key) is not Geometry geometry
+            || FindGeometry(spec) is not { } geometry
             || Foreground is not { } brush)
             return;
 
@@ -179,7 +215,7 @@ public class CupertinoIcon : Control
 
             // Paint solid details after the outline.
             if (spec.FillOverlayKey is { } overlayKey
-                && this.FindResource(overlayKey) is Geometry overlay)
+                && FindOverlay(overlayKey) is { } overlay)
                 context.DrawGeometry(brush, null, overlay);
         }
     }

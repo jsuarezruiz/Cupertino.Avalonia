@@ -267,7 +267,7 @@ public class ResourceLifecycleTests
         double minute, int increment, int expectedMinute)
     {
         var value = TimeSpan.FromHours(9) + TimeSpan.FromMinutes(minute);
-        var result = CupertinoTimePicker.NormalizeTimeValue(
+        var result = TimeMath.Normalize(
             value, increment, TimeSpan.Zero, TimeSpan.FromHours(24) - TimeSpan.FromTicks(1));
 
         Assert.Equal(TimeSpan.FromHours(9) + TimeSpan.FromMinutes(expectedMinute), result);

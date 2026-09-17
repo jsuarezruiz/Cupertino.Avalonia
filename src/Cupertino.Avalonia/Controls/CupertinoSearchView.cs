@@ -98,6 +98,8 @@ public class CupertinoSearchView : TemplatedControl
     private readonly ObservableCollection<object> _filteredItems = new();
     private IEnumerable? _filteredSource;
     private readonly List<(object? Value, bool Matches)> _sourceEntries = new();
+    // Reused between filter passes; a nested pass (from a user filter callback) gets its own copy.
+    private readonly List<object?> _sourceBuffer = new();
     /// <summary>
     /// Identifies the <see cref="FilteredItems"/> property.
     /// </summary>
@@ -110,7 +112,7 @@ public class CupertinoSearchView : TemplatedControl
     /// </summary>
     public IEnumerable? ItemsSource { get => GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
     /// <summary>
-    /// The search query. Changes synchronously filter the source on the UI thread using a trimmed query.
+    /// The search query. Assigning it refreshes the filtered results, ignoring surrounding whitespace.
     /// </summary>
     public string? Text { get => GetValue(TextProperty); set => SetValue(TextProperty, value); }
     /// <summary>
@@ -146,37 +148,38 @@ public class CupertinoSearchView : TemplatedControl
     /// </summary>
     public IReadOnlyList<object> FilteredItems => _filteredItems;
 
+    /// <summary>
+    /// Identifies the <see cref="Filter"/> property.
+    /// </summary>
+    public static readonly StyledProperty<Func<object, string, int, bool>?> FilterProperty =
+        AvaloniaProperty.Register<CupertinoSearchView, Func<object, string, int, bool>?>(nameof(Filter));
+
+    /// <summary>
+    /// Identifies the <see cref="SearchTextSelector"/> property.
+    /// </summary>
+    public static readonly StyledProperty<Func<object, string?>?> SearchTextSelectorProperty =
+        AvaloniaProperty.Register<CupertinoSearchView, Func<object, string?>?>(nameof(SearchTextSelector));
+
+    // Mirrored so a filter pass reads a field per item rather than a styled property.
     private Func<object, string, int, bool>? _filter;
     private Func<object, string?>? _searchTextSelector;
 
     /// <summary>
-    /// Gets or sets the custom item filter.
+    /// The custom item filter, or null to use the default match. Assignable from XAML.
     /// </summary>
     public Func<object, string, int, bool>? Filter
     {
-        get => _filter;
-        set
-        {
-            if (ReferenceEquals(_filter, value))
-                return;
-            _filter = value;
-            ApplyFilter();
-        }
+        get => GetValue(FilterProperty);
+        set => SetValue(FilterProperty, value);
     }
 
     /// <summary>
-    /// Gets or sets the text selector used by the default filter.
+    /// The text selector used by the default filter, or null for object.ToString. Assignable from XAML.
     /// </summary>
     public Func<object, string?>? SearchTextSelector
     {
-        get => _searchTextSelector;
-        set
-        {
-            if (ReferenceEquals(_searchTextSelector, value))
-                return;
-            _searchTextSelector = value;
-            ApplyFilter();
-        }
+        get => GetValue(SearchTextSelectorProperty);
+        set => SetValue(SearchTextSelectorProperty, value);
     }
 
     /// <summary>
@@ -370,6 +373,16 @@ public class CupertinoSearchView : TemplatedControl
             UpdateEmptyContent();
         else if (change.Property == SelectedItemProperty && _results is not null && !_syncing)
             _results.SelectedItem = SelectedItem;
+        else if (change.Property == FilterProperty)
+        {
+            _filter = Filter;
+            ApplyFilter();
+        }
+        else if (change.Property == SearchTextSelectorProperty)
+        {
+            _searchTextSelector = SearchTextSelector;
+            ApplyFilter();
+        }
     }
 
     private void OnSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -597,7 +610,8 @@ public class CupertinoSearchView : TemplatedControl
     private void ApplyFilter()
     {
         var query = (Text ?? string.Empty).Trim();
-        var values = new List<object?>();
+        var values = _syncing ? new List<object?>() : _sourceBuffer;
+        values.Clear();
         if (ItemsSource is not null)
             foreach (var value in ItemsSource)
                 values.Add(value);

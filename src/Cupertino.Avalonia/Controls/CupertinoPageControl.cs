@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Automation.Peers;
@@ -162,7 +163,7 @@ public class CupertinoPageControl : Control
                 ? text
                 : "{0} of {1}";
             AutomationProperties.SetHelpText(this, string.Format(
-                System.Globalization.CultureInfo.CurrentCulture, format, CurrentPage + 1, Math.Max(1, NumberOfPages)));
+                CultureInfo.CurrentCulture, format, CurrentPage + 1, Math.Max(1, NumberOfPages)));
             CurrentPageChanged?.Invoke(this, EventArgs.Empty);
         }
     }

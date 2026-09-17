@@ -1,9 +1,11 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using Cupertino.Animation;
 
 namespace Cupertino.Controls;
 
@@ -87,7 +89,7 @@ public class CupertinoNavigationBar : TemplatedControl
     /// </summary>
     public double CollapseProgress { get => GetValue(CollapseProgressProperty); set => SetValue(CollapseProgressProperty, value); }
     /// <summary>
-    /// The vertical scroll distance in logical pixels used to fully collapse the title.
+    /// The vertical scroll distance in logical pixels that maps to a fully collapsed bar.
     /// </summary>
     public double CollapseDistance { get => GetValue(CollapseDistanceProperty); set => SetValue(CollapseDistanceProperty, value); }
 
@@ -119,12 +121,27 @@ public class CupertinoNavigationBar : TemplatedControl
         AvaloniaProperty.RegisterDirect<CupertinoNavigationBar, double>(
             nameof(LargeTitleOffset), o => o.LargeTitleOffset);
 
-    // Title opacities hand over without overlap.
+    // Title opacities hand over without overlap. The breakpoints are the scroll offsets in points
+    // (16/20/32/36/48) divided by the default collapse distance of 68, because the samples are
+    // interpolated over normalized CollapseProgress.
     private static readonly (double Progress, double Opacity)[] LargeTitleSamples =
         [(0, 1), (16 / 68.0, 1), (20 / 68.0, 0.68), (32 / 68.0, 0.25), (36 / 68.0, 0), (1, 0)];
 
     private static readonly (double Progress, double Opacity)[] InlineTitleSamples =
         [(0, 0), (36 / 68.0, 0), (48 / 68.0, 0.51), (1, 1)];
+
+    private IDisposable? _scrollSubscription;
+    private IDisposable? _leadingBoundsSubscription;
+    private IDisposable? _trailingBoundsSubscription;
+    private Control? _inlineTitle;
+    private double _largeTitleOpacity = 1;
+    private double _inlineTitleOpacity;
+    private double _backdropOpacity;
+    private double _largeTitleOffset;
+    private (string Text, Typeface Typeface, double Size, double LetterSpacing, FlowDirection Direction)? _measuredTitle;
+    private double _measuredTitleWidth;
+    private Control? _leading;
+    private Control? _trailing;
 
     /// <summary>
     /// The computed opacity of the expanded title.
@@ -137,7 +154,7 @@ public class CupertinoNavigationBar : TemplatedControl
     /// <summary>
     /// The computed opacity of the bar backdrop.
     /// </summary>
-    public double BackdropOpacity => Smoothstep(0.0, 0.45, CollapseProgress);
+    public double BackdropOpacity => MotionCurve.Smoothstep(0.0, 0.45, CollapseProgress);
     /// <summary>
     /// The computed vertical translation of the expanded title, in logical pixels.
     /// </summary>
@@ -157,27 +174,7 @@ public class CupertinoNavigationBar : TemplatedControl
         }
         return samples[^1].Opacity;
     }
-
-    private static double Smoothstep(double a, double b, double x)
-    {
-        var t = Math.Clamp((x - a) / (b - a), 0, 1);
-        return t * t * (3 - 2 * t);
-    }
-
-    private IDisposable? _scrollSubscription;
-    private IDisposable? _leadingBoundsSubscription;
-    private IDisposable? _trailingBoundsSubscription;
-    private Control? _inlineTitle;
-    private double _largeTitleOpacity = 1;
-    private double _inlineTitleOpacity;
-    private double _backdropOpacity;
-    private double _largeTitleOffset;
-    private (string Text, Typeface Typeface, double Size, double LetterSpacing, FlowDirection Direction)? _measuredTitle;
-    private double _measuredTitleWidth;
-
     internal Control? InlineTitle => _inlineTitle;
-    private Control? _leading;
-    private Control? _trailing;
 
     /// <inheritdoc/>
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -237,7 +234,7 @@ public class CupertinoNavigationBar : TemplatedControl
             return _measuredTitleWidth;
 
         var width = new FormattedText(
-            text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection,
+            text, CultureInfo.CurrentCulture, FlowDirection,
             key.Item2, title.FontSize, null).Width;
         if (text.Length > 1)
             width += (text.Length - 1) * title.LetterSpacing;

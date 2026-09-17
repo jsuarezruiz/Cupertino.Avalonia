@@ -118,6 +118,7 @@ public class Dialog : ContentControl
     private OverlayLayer? _layer;
     private IDisposable? _sizeSubscription;
     private IInputElement? _previousFocus;
+    private ItemsControl? _actionsHost;
 
     /// <summary>
     /// Identifies the <see cref="Title"/> property.
@@ -291,7 +292,7 @@ public class Dialog : ContentControl
             {
                 Property = RenderTransformProperty,
                 Duration = CupertinoAccessibility.ReduceMotion ? TimeSpan.Zero : TimeSpan.FromMilliseconds(280),
-                Easing = new CriticallyDampedEasing { OmegaDuration = 8.4 },
+                Easing = new CriticallyDampedEasing { OmegaDuration = MotionCurve.StandardOmega },
             },
         ];
 
@@ -463,8 +464,6 @@ public class Dialog : ContentControl
             return;
         manager.Focus(previousFocus, NavigationMethod.Unspecified, KeyModifiers.None);
     }
-
-    private ItemsControl? _actionsHost;
 
     /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)

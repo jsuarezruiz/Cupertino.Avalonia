@@ -70,7 +70,7 @@ public class CupertinoBadge : TemplatedControl
         var culture = CultureInfo.CurrentCulture;
         var formatted = value.ToString(culture);
         var digits = culture.NumberFormat.NativeDigits;
-        if (digits.Length != 10 || digits.SelectMany(static digit => digit).SequenceEqual("0123456789"))
+        if (digits.Length != 10 || UsesAsciiDigits(digits))
             return formatted;
 
         var localized = new StringBuilder(formatted.Length);
@@ -82,5 +82,14 @@ public class CupertinoBadge : TemplatedControl
                 localized.Append(character);
         }
         return localized.ToString();
+    }
+
+    // The invariant ASCII digits need no translation.
+    private static bool UsesAsciiDigits(string[] digits)
+    {
+        for (var index = 0; index < digits.Length; index++)
+            if (digits[index].Length != 1 || digits[index][0] != (char)('0' + index))
+                return false;
+        return true;
     }
 }

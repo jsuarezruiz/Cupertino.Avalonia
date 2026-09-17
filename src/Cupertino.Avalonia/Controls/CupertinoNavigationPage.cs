@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -35,7 +36,7 @@ public sealed class NavigationEntry
     /// </summary>
     public string Title { get; }
     /// <summary>
-    /// The page owned by this entry. It remains parented while retained in the stack and is released when its removal transition completes.
+    /// The page owned by this entry; the navigation page manages its parent while the entry is in the stack.
     /// </summary>
     public Control Content { get; }
     /// <summary>
@@ -186,11 +187,14 @@ public class CupertinoNavigationPage : TemplatedControl
 
     // The outgoing page travels a third of the incoming page's distance.
     private const double ParallaxFraction = 1.0 / 3;
-    private const double ScrimPeak = 0.08;
-    private const double ShadowWidth = 24;
-    private const double EdgeGrabWidth = 22;
-    private const double DragThreshold = 3;
-    private const double FlickVelocity = 10;
+    private const double ScrimPeak = 0.08;      // Maximum dimming of the page being covered
+    private const double ShadowWidth = 24;      // Width of the shadow the incoming page casts
+    private const double EdgeGrabWidth = 22;    // How far from the edge a back swipe may start
+    private const double DragThreshold = 3;     // Points before a press becomes a drag
+    private const double FlickVelocity = 10;    // Points per move that count as a flick
+
+    // Used only before the first layout pass; matches a 402 pt iPhone viewport.
+    private const double FallbackHostWidth = 402;
 
     /// <summary>
     /// Identifies the <see cref="IsBackGestureEnabled"/> property.
@@ -233,6 +237,7 @@ public class CupertinoNavigationPage : TemplatedControl
     private double _titleSlide;
     private bool _fadeBackWithDepth;
     private bool _hideBackOnFinish;
+    private Control? _rootHost;
 
     /// <summary>
     /// Gets the number of pushed pages.
@@ -416,8 +421,6 @@ public class CupertinoNavigationPage : TemplatedControl
         }
     }
 
-    private Control? _rootHost;
-
     private void ShowRoot()
     {
         if (_host is null)
@@ -463,9 +466,9 @@ public class CupertinoNavigationPage : TemplatedControl
     }
 
     // Connect the page scroller to collapsing navigation chrome.
-    private void AttachScroller(Control page)
+    private void AttachScroller(Control? page)
     {
-        if (_bar is null)
+        if (_bar is null || page is null)
             return;
 
         Dispatcher.UIThread.Post(
@@ -670,7 +673,7 @@ public class CupertinoNavigationPage : TemplatedControl
         if (_back is not null && !animated)
             _back.IsVisible = false;
         UpdateLeading();
-        AttachScroller(RootContent!);
+        AttachScroller(RootContent);
         Navigated?.Invoke(this, EventArgs.Empty);
 
         if (!animated)
@@ -833,12 +836,9 @@ public class CupertinoNavigationPage : TemplatedControl
                 _back.IsVisible = false;
         }
         UpdateLeading();
-        AttachScroller(_stack.Count > 0 ? _stack[^1].Content : RootContent!);
+        AttachScroller(_stack.Count > 0 ? _stack[^1].Content : RootContent);
         Navigated?.Invoke(this, EventArgs.Empty);
     }
-
-    // Used only before the first layout pass; matches a 402 pt iPhone viewport.
-    private const double FallbackHostWidth = 402;
 
     private double HostWidth => Bounds.Width > 0 ? Bounds.Width : FallbackHostWidth;
 
@@ -867,7 +867,7 @@ public class CupertinoNavigationPage : TemplatedControl
 
     private static TransformOperations Translate(double x) =>
         TransformOperations.Parse(
-            $"translateX({x.ToString(System.Globalization.CultureInfo.InvariantCulture)}px)");
+            $"translateX({x.ToString(CultureInfo.InvariantCulture)}px)");
 
     // Depth: 0 is revealed; 1 is fully pushed.
     private void SetDepthProgress(Control front, Control behind, double depth)
@@ -973,7 +973,7 @@ public class CupertinoNavigationPage : TemplatedControl
         }
 
         var duration = Math.Max(120, 350 * Math.Abs(to - from));
-        var easing = new Animation.CriticallyDampedEasing { OmegaDuration = 8.4 };
+        var easing = new Animation.CriticallyDampedEasing { OmegaDuration = Animation.MotionCurve.StandardOmega };
         var started = MotionClock.Now;
 
         var driver = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
@@ -1044,8 +1044,11 @@ public class CupertinoNavigationPage : TemplatedControl
         }
 
         _dragVelocity = _dragVelocity * 0.7 + dx * 0.3;
+        if (_dragFront is not { } front || _dragBehind is not { } behind)
+            return;
+
         _dragProgress = Math.Clamp(1 - x / HostWidth, 0, 1);
-        SetDepthProgress(_dragFront!, _dragBehind!, _dragProgress);
+        SetDepthProgress(front, behind, _dragProgress);
         e.Pointer.Capture(_host);
         e.Handled = true;
     }

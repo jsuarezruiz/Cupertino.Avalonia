@@ -35,9 +35,20 @@ public static class MaskedPrompt
             m.Classes.Set("cupertino-prompt", false);
             return;
         }
-        var t = m.Text;
-        var empty = string.IsNullOrEmpty(t)
-            || t.All(c => c == m.PromptChar || !char.IsLetterOrDigit(c));
+        var text = m.Text;
+        var empty = string.IsNullOrEmpty(text) || IsMaskOnly(text, m.PromptChar);
         m.Classes.Set("cupertino-prompt", empty);
+    }
+
+    // A masked field reads as empty while it only holds prompt characters and separators.
+    private static bool IsMaskOnly(string text, char promptChar)
+    {
+        for (var index = 0; index < text.Length; index++)
+        {
+            var character = text[index];
+            if (character != promptChar && char.IsLetterOrDigit(character))
+                return false;
+        }
+        return true;
     }
 }

@@ -176,7 +176,7 @@ public static class CupertinoPopover
         host.Height = layer.Bounds.Height;
         layer.UpdateLayout();
         Position(anchor, session, layer.Bounds);
-        layer.UpdateLayout();
+        panel.UpdateLayout();
 
         session.Motion = CupertinoFlyoutTransition.CreateSession(
             anchor, panel, glass, contentHost, session.TargetBounds,
@@ -332,8 +332,7 @@ public static class CupertinoPopover
             session.KeyDownHandler = null;
         }
         session.Layer.Children.Remove(session.Host);
-        if (session.ContentHost is Border contentHost)
-            contentHost.Child = null;
+        session.ContentHost.Child = null;
         motion?.Dispose();
         if (Open.TryGetValue(anchor, out var current) && ReferenceEquals(current, session))
             Open.Remove(anchor);

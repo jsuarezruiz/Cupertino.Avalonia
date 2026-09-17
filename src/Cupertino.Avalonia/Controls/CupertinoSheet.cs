@@ -51,13 +51,13 @@ public static class CupertinoSheet
 
     private sealed class Session
     {
-        private const double Tau = 100;
-        private const double ScrimOpacity = 0.20;
-        private const double FloatInset = 8;
-        private const double LargeTopGap = 10;
-        private const double MediumTopFraction = 0.475;
-        private const double DismissVelocity = 900;
-        private const double DragSlop = 6;
+        private const double Tau = 100;                  // Settle time constant, milliseconds
+        private const double ScrimOpacity = 0.20;        // Dimming at the medium detent
+        private const double FloatInset = 8;             // Card inset at the medium detent
+        private const double LargeTopGap = 10;           // Gap below the safe area at the large detent
+        private const double MediumTopFraction = 0.475;  // Medium detent top, as a fraction of host height
+        private const double DismissVelocity = 900;      // Points per second that dismiss on release
+        private const double DragSlop = 6;               // Points before a body press becomes a drag
 
         private readonly OverlayLayer _layer;
         private readonly TopLevel _host;
@@ -240,9 +240,7 @@ public static class CupertinoSheet
 
         private void OnTick(object? sender, EventArgs e)
         {
-            var now = MotionClock.Now;
-            var elapsed = Math.Clamp(now - _lastTick, 1, 50);
-            _lastTick = now;
+            var elapsed = MotionClock.TakeElapsedMilliseconds(ref _lastTick);
             SetY(CupertinoAccessibility.ReduceMotion ? _target :
                 _y + (_target - _y) * (1 - Math.Exp(-elapsed / Tau)));
             if (Math.Abs(_y - _target) < 0.5)

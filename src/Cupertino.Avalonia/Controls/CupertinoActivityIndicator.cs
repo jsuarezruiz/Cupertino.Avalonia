@@ -75,10 +75,7 @@ public class CupertinoActivityIndicator : Control
     /// <inheritdoc/>
     protected override Size MeasureOverride(Size availableSize)
     {
-        var d = 20.0;
-        if (!double.IsNaN(Width))
-            d = Width;
-        else if (!double.IsInfinity(availableSize.Width)) d = Math.Min(availableSize.Width, d);
+        var d = double.IsNaN(Width) ? Math.Min(availableSize.Width, 20.0) : Width;
         return new Size(d, d);
     }
 
