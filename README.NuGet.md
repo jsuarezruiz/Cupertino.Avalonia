@@ -7,7 +7,7 @@ An iOS 26 design system for Avalonia with control themes, custom controls, motio
 ## Install
 
 ```bash
-dotnet add package Cupertino.Avalonia
+dotnet add package Cupertino.Avalonia --prerelease
 ```
 
 ## Use
@@ -24,17 +24,43 @@ Add `CupertinoTheme` after your base theme.
 </Application>
 ```
 
-Your app supplies system accessibility preferences through `CupertinoAccessibility`. See the [accessibility guide](https://jsuarezruiz.github.io/Cupertino.Avalonia/docs/fundamentals/accessibility-and-platforms.html) for setup.
+## Accessibility
 
-On Apple platforms, enable native CoreText advances when configuring the app so SF typography keeps its platform spacing:
+Cupertino.Avalonia does not read operating-system accessibility preferences automatically. After Avalonia initializes, update `CupertinoAccessibility.ReduceMotion`, `ReduceTransparency`, and `TextScaleFactor` with values supplied by your application. See the [accessibility guide](https://jsuarezruiz.github.io/Cupertino.Avalonia/docs/fundamentals/accessibility-and-platforms.html).
+
+## Apple system fonts
+
+On macOS, iOS and Mac Catalyst, enable CoreText positioning for Apple system fonts. Unsupported text runs continue to use Avalonia's original text shaper.
+
+For desktop applications, call `UseCupertinoSystemFont` after selecting the Avalonia platform:
 
 ```csharp
+using Avalonia;
+using Cupertino;
+
 AppBuilder.Configure<App>()
     .UsePlatformDetect()
     .UseCupertinoSystemFont();
 ```
 
-See the [gallery and screenshots](https://github.com/jsuarezruiz/Cupertino.Avalonia#the-gallery) for the complete control catalogue.
+For iOS applications, add it in the app delegate:
+
+```csharp
+using Avalonia;
+using Cupertino;
+
+protected override AppBuilder CustomizeAppBuilder(AppBuilder builder)
+{
+    return base.CustomizeAppBuilder(builder)
+        .UseCupertinoSystemFont();
+}
+```
+
+Explore the complete control catalogue in the [live gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/).
+
+## Licence
+
+MIT. The Liquid Glass shader adapts MIT-licensed work from [LiquidGlassAvaloniaUI](https://github.com/KaranocaVe/LiquidGlassAvaloniaUI) (refraction) and [flutter_liquid_glass](https://github.com/whynotmake-it/flutter_liquid_glass) (lighting); the notices ship in the package as `THIRD-PARTY-NOTICES.md`.
 
 ## Links
 
