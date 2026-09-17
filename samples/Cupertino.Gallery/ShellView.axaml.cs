@@ -34,7 +34,7 @@ public partial class ShellView : UserControl
     private const double WideDetailLargeTitleInset = 39;
 
     // Avoid running shaders on hidden pages.
-    private readonly IReadOnlyList<CatalogEntry> _entries =
+    private static readonly IReadOnlyList<CatalogEntry> DefaultEntries =
     [
         new("Button", "●", "#FF007AFF", () => new ButtonPage()),
         new("RepeatButton", "⟳", "#FF5856D6", () => new RepeatButtonPage()),
@@ -63,7 +63,7 @@ public partial class ShellView : UserControl
         new("ProgressBar", "▰", "#FF0A84FF", () => new ProgressBarPage()),
         new("RefreshContainer", "↻", "#FF32D74B", () => new RefreshContainerPage()),
         new("SwipeView", "⇆", "#FFFF3B30", () => new SwipeViewPage(), "Cupertino"),
-        new("Sheet", "▁", "#FF5E5CE6", () => new SheetPage(), "Cupertino"),
+        new("Sheet", "⎯", "#FF5E5CE6", () => new SheetPage(), "Cupertino"),
         new("Toolbar", "▬", "#FF30B0C7", () => new ToolbarPage(), "Cupertino"),
         new("Badge", "❶", "#FFE0483E", () => new BadgePage(), "Cupertino"),
         new("List & Search", "⌕", "#FF007AFF", () => new ListAndSearchPage(), "Cupertino"),
@@ -88,6 +88,11 @@ public partial class ShellView : UserControl
     ];
 
     private Avalonia.Controls.Platform.IInsetsManager? _insets;
+    /// <summary>
+    /// The catalog the gallery lists, for tests and capture tooling.
+    /// </summary>
+    public static IReadOnlyList<CatalogEntry> Entries => DefaultEntries;
+
     private readonly CupertinoNavigationPage _compactNav;
     private readonly CupertinoNavigationPage _wideCatalogNav;
     private readonly CupertinoNavigationPage _wideDetailNav;
@@ -128,9 +133,9 @@ public partial class ShellView : UserControl
         _wideDetailNav = this.FindControl<CupertinoNavigationPage>("WideDetailNav")!;
         _wideLayout = this.FindControl<Grid>("WideLayout")!;
 
-        var entries = _entries;
+        var entries = DefaultEntries;
         if (NativeComparison.IsAvailable)
-            entries = [.. _entries, new("Side by Side", "⇋", "#FF34AADC", () => new SideBySidePage(), "Showcases")];
+            entries = [.. DefaultEntries, new("Side by Side", "⇋", "#FF34AADC", () => new SideBySidePage(), "Showcases")];
         if (NativeComparison.IsAvailable
             && Environment.GetEnvironmentVariable("GALLERY_MOTION_CAPTURE") == "1")
             entries = [.. entries, new("Motion Verification", "◫", "#FF8E8E93", () => new MotionVerificationPage(), "Showcases")];
