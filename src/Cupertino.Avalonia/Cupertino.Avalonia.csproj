@@ -29,6 +29,8 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EnablePackageValidation>true</EnablePackageValidation>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <!-- Apple system-font integration wraps Avalonia's current text shaper. -->
@@ -39,19 +41,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="12.1.1" />
-    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="12.1.1" />
-    <PackageReference Include="Avalonia.Skia" Version="12.1.1" />
+    <PackageReference Include="Avalonia" Version="[12.1.1]" />
+    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="[12.1.1]" />
+    <PackageReference Include="Avalonia.Skia" Version="[12.1.1]" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="../../README.NuGet.md" Pack="true" PackagePath="README.md" />
     <None Include="../../samples/Cupertino.Gallery/Assets/AppIcon.png" Pack="true" PackagePath="package-icon.png" />
     <None Include="../../LICENSE" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="Cupertino.Avalonia.Tests" />
+    <InternalsVisibleTo Include="Cupertino.Avalonia.RenderTests" />
   </ItemGroup>
 
 </Project>
