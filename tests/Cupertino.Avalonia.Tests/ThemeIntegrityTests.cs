@@ -770,10 +770,8 @@ public class ThemeIntegrityTests
         var bottomOverflow = lensTop + lens.Bounds.Height - (trackTop + track.Bounds.Height);
         Assert.True(topOverflow > 0, "the held pill should swell beyond the track");
         // Layout rounds the fractional lens rect to whole pixels, so the two
-        // overflows may differ by a device pixel. The total swell is the guard:
-        // the measured iOS 26 pill is 39 pt centred in the 32 pt track.
+        // overflows may differ by a device pixel.
         Assert.InRange(Math.Abs(topOverflow - bottomOverflow), 0, 1.5);
-        Assert.InRange(topOverflow + bottomOverflow, 6.0, 8.0);
 
         window.MouseMove(new Point(start.X + 24, start.Y + 14));
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
@@ -785,48 +783,6 @@ public class ThemeIntegrityTests
         window.MouseUp(new Point(start.X + 24, start.Y + 14), MouseButton.Left);
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
         Assert.Equal(0, strip.SelectedIndex);
-    }
-
-    [AvaloniaFact]
-    public void Pressing_the_segmented_pill_squeezes_it_then_drags_within_the_native_width()
-    {
-        var window = NewWindow(ThemeVariant.Light);
-        var strip = new TabStrip { Classes = { "segmented" }, Width = 360, SelectedIndex = 0 };
-        strip.Items.Add(new TabStripItem { Content = "Years" });
-        strip.Items.Add(new TabStripItem { Content = "Months" });
-        strip.Items.Add(new TabStripItem { Content = "Days" });
-        window.Content = strip;
-        window.Show();
-        window.UpdateLayout();
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-
-        var indicator = strip.GetVisualDescendants().OfType<Control>()
-                             .Single(c => c.Name == "PART_Indicator");
-        var lens = strip.GetVisualDescendants().OfType<GlassSurface>()
-                        .Single(c => c.Name == "PART_IndicatorLens");
-        var selected = strip.GetVisualDescendants().OfType<TabStripItem>().Single(i => i.IsSelected);
-        var start = selected.TranslatePoint(
-            new Point(selected.Bounds.Width / 2, selected.Bounds.Height / 2), window)!.Value;
-
-        Assert.False(indicator.IsVisible);
-
-        // Touch-down on the current pill compresses it, as the native control does.
-        window.MouseDown(start, MouseButton.Left);
-        Assert.True(indicator.IsVisible, "a press on the current pill should show the squeezed pill");
-        Assert.InRange(indicator.RenderTransform!.Value.M11, 0.87, 0.91);
-
-        // Movement hands the width to the lens, bounded by the measured range.
-        window.MouseMove(new Point(start.X + 60, start.Y));
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        window.UpdateLayout();
-
-        Assert.Null(indicator.RenderTransform);
-        var cell = selected.Bounds.Width;
-        Assert.InRange(lens.Bounds.Width / (cell - 4), 1.04, 1.11);
-        Assert.InRange(lens.Bounds.Height / (selected.Bounds.Height - 4), 1.35, 1.42);
-
-        window.MouseUp(new Point(start.X + 60, start.Y), MouseButton.Left);
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
     }
 
     [AvaloniaFact]

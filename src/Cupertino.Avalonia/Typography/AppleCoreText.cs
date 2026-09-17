@@ -55,6 +55,7 @@ internal static class AppleCoreText
         bool italic,
         bool tabularNumbers)
     {
+        ShapeKey key;
         lock (CacheLock)
         {
             if (_hasRecent
@@ -62,11 +63,8 @@ internal static class AppleCoreText
                 && _recentKey.Italic == italic && _recentKey.TabularNumbers == tabularNumbers
                 && text.SequenceEqual(_recentKey.Text))
                 return _recentValue;
-        }
 
-        var key = new ShapeKey(text.ToString(), size, weight, italic, tabularNumbers);
-        lock (CacheLock)
-        {
+            key = new ShapeKey(text.ToString(), size, weight, italic, tabularNumbers);
             if (Cache.TryGetValue(key, out var cached))
             {
                 Remember(key, cached);
@@ -85,6 +83,18 @@ internal static class AppleCoreText
             Remember(key, shaped);
         }
         return shaped;
+    }
+
+    // Keys include the requested size, so a typography scale change makes every entry stale.
+    internal static void ClearCache()
+    {
+        lock (CacheLock)
+        {
+            Cache.Clear();
+            CacheOrder.Clear();
+            _hasRecent = false;
+            _recentValue = null;
+        }
     }
 
     private static void Remember(ShapeKey key, NativeGlyph[]? value)

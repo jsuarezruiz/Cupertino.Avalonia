@@ -1695,7 +1695,7 @@ public class ButtonInteractionTests
                 .First(control => control.Classes.Contains("cupertino-popover"));
             var glass = panel.GetVisualDescendants().OfType<GlassSurface>().Single();
             var content = panel.GetVisualDescendants().OfType<Border>()
-                .First(control => control.Classes.Contains("source-transition-content"));
+                .First(control => control.Classes.Contains("cupertino-source-transition-content"));
             var openingTransform = Assert.IsType<TransformOperations>(glass.RenderTransform);
 
             Assert.False(openingTransform.IsIdentity);
@@ -1765,9 +1765,9 @@ public class ButtonInteractionTests
             var panel = presenter.GetVisualDescendants().OfType<Panel>()
                 .First(control => control.Classes.Contains("cupertino-popover"));
             var material = panel.GetVisualDescendants().OfType<Border>()
-                .First(control => control.Classes.Contains("source-transition-material"));
+                .First(control => control.Classes.Contains("cupertino-source-transition-material"));
             var content = panel.GetVisualDescendants().OfType<Border>()
-                .First(control => control.Classes.Contains("source-transition-content"));
+                .First(control => control.Classes.Contains("cupertino-source-transition-content"));
 
             Assert.NotSame(material, content);
             Assert.False(Assert.IsType<TransformOperations>(material.RenderTransform).IsIdentity);
@@ -1823,7 +1823,7 @@ public class ButtonInteractionTests
             var panel = Assert.IsType<Panel>(popup.Child);
             var material = panel.GetVisualDescendants().OfType<GlassSurface>().Single();
             var content = panel.GetVisualDescendants().OfType<Border>()
-                .Single(control => control.Classes.Contains("source-transition-content"));
+                .Single(control => control.Classes.Contains("cupertino-source-transition-content"));
 
             Assert.False(Assert.IsType<TransformOperations>(material.RenderTransform).IsIdentity);
             Assert.InRange(content.Opacity, 0, 0.99);
