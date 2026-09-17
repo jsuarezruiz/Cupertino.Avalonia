@@ -1,10 +1,10 @@
 # Cupertino.Avalonia
 
-An iOS 26 design system for [Avalonia](https://avaloniaui.net): control themes, typography, colour, motion and icons, plus the controls iOS has and Avalonia does not.
-
-**[Try the live web gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)**. Explore the controls in your browser, with no installation required.
+An iOS 26 design system for [Avalonia](https://avaloniaui.net): control themes, typography, colors, motion and icons, plus the controls iOS has and Avalonia does not.
 
 ![Cupertino.Avalonia banner](images/cupertino-avalonia-banner.png)
+
+**[Try the live web gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)**. Explore the controls in your browser, with no installation required.
 
 <p align="center"><strong>Controls in action</strong><br>Fluid transitions, responsive effects and Liquid Glass in motion.</p>
 
