@@ -40,6 +40,13 @@
           "AppIcon.png"
         ],
         "dest": "assets"
+      },
+      {
+        "src": "styles",
+        "files": [
+          "main.css"
+        ],
+        "dest": "public"
       }
     ],
     "output": "_site",
@@ -51,6 +58,7 @@
       "_appName": "Cupertino.Avalonia",
       "_appTitle": "Cupertino.Avalonia documentation",
       "_appFaviconPath": "assets/AppIcon.png",
+      "_appLogoPath": "assets/AppIcon.png",
       "_enableSearch": true,
       "_disableContribution": false,
       "_gitContribute": {

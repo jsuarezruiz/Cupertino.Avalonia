@@ -1,0 +1,5 @@
+/* The template's default mark renders at 38pt; keep that height for the app icon. */
+.navbar-brand #logo {
+  height: 50px;
+  width: auto;
+}
