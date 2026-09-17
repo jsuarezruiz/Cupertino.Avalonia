@@ -27,3 +27,12 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Noto symbol fonts
+
+The gallery sample bundles three Noto fonts as symbol fallbacks, because Inter carries no symbol coverage and browser builds reach no system fonts: Noto Sans Symbols 2, Noto Sans Symbols and Noto Sans Math.
+
+Each font is licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org) and keeps its upstream copyright line:
+
+- Noto Sans Symbols 2 and Noto Sans Symbols: Copyright 2022 The Noto Project Authors.
+- Noto Sans Math: Copyright 2022 Google LLC. All Rights Reserved.

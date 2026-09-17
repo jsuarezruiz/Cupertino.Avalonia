@@ -4,7 +4,7 @@ An iOS 26 design system for [Avalonia](https://avaloniaui.net): control themes, 
 
 ![Cupertino.Avalonia banner](images/cupertino-avalonia-banner.png)
 
-**[Try the live web gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)**. Explore the controls in your browser, with no installation required.
+**[Try the live web gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/)**. Explore the controls in your browser, with no installation required.
 
 <p align="center"><strong>Controls in action</strong><br>Fluid transitions, responsive effects and Liquid Glass in motion.</p>
 
@@ -73,7 +73,7 @@ protected override AppBuilder CustomizeAppBuilder(AppBuilder builder) =>
 
 ## The gallery
 
-**[Open the WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/)** to try the controls, switch between light and dark appearances, and view sample code. Wide windows show the catalogue beside the selected sample; narrow windows use a single page with back navigation.
+**[Open the WebAssembly gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/)** to try the controls, switch between light and dark appearances, and view sample code. Wide windows show the catalogue beside the selected sample; narrow windows use a single page with back navigation.
 
 To run the web sample locally, install the .NET 10 SDK, then run these commands from the repository root:
 
@@ -211,8 +211,10 @@ Mobile heads are available at `samples/Cupertino.Gallery.iOS` and `samples/Cuper
 
 ## Documentation
 
-The full documentation includes setup guides, design-system concepts, control examples and generated API reference. Its source lives in [`docs`](docs/) and is built with DocFX.
+The full documentation includes setup guides, design-system concepts, control examples and generated API reference. Read it at **[jsuarezruiz.github.io/Cupertino.Avalonia](https://jsuarezruiz.github.io/Cupertino.Avalonia/)**, with its source in [`docs`](docs/) built with DocFX.
 
+* [Live documentation](https://jsuarezruiz.github.io/Cupertino.Avalonia/)
+* [Live gallery](https://jsuarezruiz.github.io/Cupertino.Avalonia/gallery/)
 * [FAQ](FAQ.md)
 * [Changelog](CHANGELOG.md)
 * [Release process](RELEASING.md)
