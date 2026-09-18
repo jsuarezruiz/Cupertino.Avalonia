@@ -135,6 +135,9 @@ public class CupertinoMonthGrid : Control
     private double WeekdayRowHeight => Cell * WeekdayRowRatio;
 
     private readonly Rendering.FormattedTextCache _textCache = new();
+    private FontFamily? _cachedFontFamily;
+    private Typeface _regularTypeface = new Typeface(FontFamily.Default);
+    private Typeface _boldTypeface = new Typeface(FontFamily.Default, FontStyle.Normal, FontWeight.SemiBold);
     private DateTime? _poppingSelection;
     private long _popStart;
     private DateTime? _slideFromMonth;
@@ -255,8 +258,17 @@ public class CupertinoMonthGrid : Control
         var colPitch = cell;
         var weekdayRow = cell * WeekdayRowRatio;
         var culture = CultureInfo.CurrentCulture;
-        var typeface = new Typeface(TextElement.GetFontFamily(this));
-        var bold = new Typeface(TextElement.GetFontFamily(this), FontStyle.Normal, FontWeight.SemiBold);
+        // Cache the typefaces: Render runs every animation tick and previously
+        // allocated two Typeface objects per frame.
+        var family = TextElement.GetFontFamily(this);
+        if (!Equals(family, _cachedFontFamily))
+        {
+            _cachedFontFamily = family;
+            _regularTypeface = new Typeface(family);
+            _boldTypeface = new Typeface(family, FontStyle.Normal, FontWeight.SemiBold);
+        }
+        var typeface = _regularTypeface;
+        var bold = _boldTypeface;
 
         var abbrev = culture.DateTimeFormat.AbbreviatedDayNames;
         for (var c = 0; c < 7; c++)

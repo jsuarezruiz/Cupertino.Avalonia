@@ -446,7 +446,10 @@ public class GlassSurface : Decorator
             _top = top;
             _clientSize = top.ClientSize;
             _scaling = top.RenderScaling;
-            _top.PointerMoved += OnActivity;
+            // Note: PointerMoved intentionally does not arm a pulse. Hover movement
+            // does not change backdrop pixels (hover tints repaint the glass itself
+            // through AffectsRender), and arming every surface on every mousemove
+            // kept the whole window repainting continuously on desktop browsers.
             _top.PointerPressed += OnActivity;
             _top.PointerReleased += OnActivity;
             _top.PointerWheelChanged += OnActivity;
@@ -572,7 +575,6 @@ public class GlassSurface : Decorator
             if (_disposed)
                 return;
             _disposed = true;
-            _top.PointerMoved -= OnActivity;
             _top.PointerPressed -= OnActivity;
             _top.PointerReleased -= OnActivity;
             _top.PointerWheelChanged -= OnActivity;

@@ -58,8 +58,8 @@
             </Panel>
           </Border>
 
-          <cupertino:GlassSurface CornerRadius="20" IsLive="True"
-                                  Width="236" Height="116"
+          <cupertino:GlassSurface CornerRadius="20"
+                                   Width="236" Height="116"
                                   BlurRadius="24" GlassThickness="11"
                                   RefractionStrength="18" ChromaticAberration="0.5"
                                   DepthEffect="0.28" Saturation="1.3"

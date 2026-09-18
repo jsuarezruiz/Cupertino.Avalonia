@@ -121,10 +121,12 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
     [ThreadStatic] private static SKRoundRect? _roundRect;
     [ThreadStatic] private static SKPoint[]? _corners;
     [ThreadStatic] private static float[]? _lumaSize;
-    [ThreadStatic] private static SKImageFilter? _cachedBlur;
-    [ThreadStatic] private static float _cachedBlurSigma;
-    [ThreadStatic] private static SKColorFilter? _cachedSaturation;
-    [ThreadStatic] private static float _cachedSaturationValue;
+    // Small quantized caches: pages mix several glass materials (button blur 12,
+    // hero 24, menu 36), so a single cached sigma thrashed and recreated the
+    // blur every glass every frame. Keys are quantized; entries are bounded.
+    [ThreadStatic] private static Dictionary<int, SKImageFilter>? _blurCache;
+    [ThreadStatic] private static Dictionary<int, SKColorFilter>? _saturationCache;
+    [ThreadStatic] private static Dictionary<int, SKMaskFilter>? _shadowMaskCache;
 
     private static float[] Pair(ref float[]? storage, float a, float b)
     {
@@ -144,31 +146,61 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         return array;
     }
 
-    // Cached by their scalar input.
+    // Cached by quantized scalar input; callers pass continuously-varying values
+    // (animation ticks, DPR scaling), so exact-float keys would never hit.
     private static SKImageFilter? BlurFilter(float sigma)
     {
         if (sigma <= 0.01f)
             return null;
-        if (_cachedBlur is null || _cachedBlurSigma != sigma)
+        var key = (int)MathF.Round(sigma * 4f);
+        var cache = _blurCache ??= new Dictionary<int, SKImageFilter>(16);
+        if (cache.TryGetValue(key, out var filter))
+            return filter;
+        if (cache.Count >= 24)
         {
-            _cachedBlur?.Dispose();
-            _cachedBlur = SKImageFilter.CreateBlur(sigma, sigma, SKShaderTileMode.Clamp);
-            _cachedBlurSigma = sigma;
+            foreach (var entry in cache.Values)
+                entry.Dispose();
+            cache.Clear();
         }
-        return _cachedBlur;
+        filter = SKImageFilter.CreateBlur(key / 4f, key / 4f, SKShaderTileMode.Clamp);
+        cache[key] = filter;
+        return filter;
     }
 
     private static SKColorFilter? SaturationFilter(float saturation)
     {
         if (Math.Abs(saturation - 1f) <= 0.001f)
             return null;
-        if (_cachedSaturation is null || _cachedSaturationValue != saturation)
+        var key = (int)MathF.Round(saturation * 100f);
+        var cache = _saturationCache ??= new Dictionary<int, SKColorFilter>(8);
+        if (cache.TryGetValue(key, out var filter))
+            return filter;
+        if (cache.Count >= 16)
         {
-            _cachedSaturation?.Dispose();
-            _cachedSaturation = SKColorFilter.CreateColorMatrix(CreateSaturationMatrix(saturation));
-            _cachedSaturationValue = saturation;
+            foreach (var entry in cache.Values)
+                entry.Dispose();
+            cache.Clear();
         }
-        return _cachedSaturation;
+        filter = SKColorFilter.CreateColorMatrix(CreateSaturationMatrix(key / 100f));
+        cache[key] = filter;
+        return filter;
+    }
+
+    private static SKMaskFilter ShadowMaskFilter(float radius)
+    {
+        var key = (int)MathF.Round(Math.Max(0.5f, radius) * 4f);
+        var cache = _shadowMaskCache ??= new Dictionary<int, SKMaskFilter>(16);
+        if (cache.TryGetValue(key, out var filter))
+            return filter;
+        if (cache.Count >= 24)
+        {
+            foreach (var entry in cache.Values)
+                entry.Dispose();
+            cache.Clear();
+        }
+        filter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, key / 4f);
+        cache[key] = filter;
+        return filter;
     }
 
     private readonly GlassParams _params;
@@ -447,7 +479,9 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
     {
         var rect = deviceRect;
         rect.Offset(0, offset * scale);
-        using var maskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, Math.Max(0.5f, blur * scale * 0.5f));
+        // Cached (owned by the cache; do not dispose): previously allocated per
+        // shadow layer per glass per frame.
+        var maskFilter = ShadowMaskFilter(blur * scale * 0.5f);
         using var paint = new SKPaint
         {
             Color = new SKColor(0, 0, 0, (byte)Math.Clamp(opacity * 255f, 0, 255)),

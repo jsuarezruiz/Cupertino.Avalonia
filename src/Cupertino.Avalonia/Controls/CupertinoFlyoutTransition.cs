@@ -328,18 +328,11 @@ public static class CupertinoFlyoutTransition
             : new Rect(targetBounds.Center, default(Size));
     }
 
-    private static readonly AvaloniaProperty<double>[] GlassMaterialProperties =
-    [
-        GlassSurface.BlurRadiusProperty,
-        GlassSurface.SaturationProperty,
-        GlassSurface.RefractionStrengthProperty,
-        GlassSurface.DepthEffectProperty,
-        GlassSurface.ShadowOpacityProperty,
-        GlassSurface.ShadowBlurProperty,
-        GlassSurface.ShadowOffsetProperty,
-    ];
-
-    // Transform and opacity always animate; glass and border materials add their own properties.
+    // Transform and opacity always animate. Glass material scalars (blur,
+    // saturation, refraction, shadow) intentionally do NOT animate: each tick
+    // would change the blur sigma and offscreen size, defeating the filter
+    // cache and reallocating the backdrop surface every frame (2 FPS on WebGL).
+    // The grow is carried by RenderTransform + Opacity, which compose on the GPU.
     private static Transitions CreateTransitions(
         Control target,
         TimeSpan duration,
@@ -362,17 +355,7 @@ public static class CupertinoFlyoutTransition
                 Easing = opacityEasing,
             },
         };
-        if (target is GlassSurface)
-        {
-            foreach (var property in GlassMaterialProperties)
-                transitions.Add(new DoubleTransition
-                {
-                    Property = property,
-                    Duration = duration,
-                    Easing = transformEasing,
-                });
-        }
-        else if (target is Border)
+        if (target is Border)
         {
             transitions.Add(new BoxShadowsTransition
             {
@@ -712,7 +695,6 @@ public static class CupertinoFlyoutTransition
         private readonly RelativePoint _contentTransformOrigin;
         private readonly Transitions? _materialTransitions;
         private readonly Transitions? _contentTransitions;
-        private readonly GlassValues? _glassValues;
         private readonly BoxShadows? _borderShadow;
         private readonly MotionProfile _profile;
         private bool _closing;
@@ -749,7 +731,6 @@ public static class CupertinoFlyoutTransition
             _contentTransformOrigin = content.RenderTransformOrigin;
             _materialTransitions = material.Transitions;
             _contentTransitions = content.Transitions;
-            _glassValues = glass is null ? null : new GlassValues(glass);
             _borderShadow = (material as Border)?.BoxShadow;
             _profile = profile;
         }
@@ -773,7 +754,6 @@ public static class CupertinoFlyoutTransition
                 _ => 0.12,
             });
             _content.Opacity = 0;
-            SetCompactGlass();
             SetCompactBorderShadow();
             _glass?.Pulse();
 
@@ -803,7 +783,6 @@ public static class CupertinoFlyoutTransition
                     _material, duration, opacityDuration, easing, new SineEaseOut());
                 _content.Transitions = CreateTransitions(
                     _content, duration, opacityDuration, easing, new SineEaseOut());
-                RestoreGlassValues();
                 RestoreBorderShadow();
                 _material.RenderTransform = ExpandedTransform;
                 _material.Opacity = _materialOpacity;
@@ -845,7 +824,6 @@ public static class CupertinoFlyoutTransition
             _material.RenderTransform = _collapsedMaterialTransform;
             _content.RenderTransform = _collapsedMaterialTransform;
             _content.Opacity = 0;
-            SetCompactGlass();
             SetCompactBorderShadow();
 
             DispatcherTimer.RunOnce(() =>
@@ -880,7 +858,6 @@ public static class CupertinoFlyoutTransition
             _content.RenderTransformOrigin = _contentTransformOrigin;
             _material.Transitions = _materialTransitions;
             _content.Transitions = _contentTransitions;
-            RestoreGlassValues();
             RestoreBorderShadow();
         }
 
@@ -899,43 +876,10 @@ public static class CupertinoFlyoutTransition
             Dispose();
         }
 
-        private void SetCompactGlass()
-        {
-            if (_glass is null || _glassValues is not { } values)
-                return;
-
-            _glass.BlurRadius = values.BlurRadius * 0.72;
-            _glass.Saturation = 1 + (values.Saturation - 1) * 0.45;
-            _glass.RefractionStrength = values.RefractionStrength * 0.35;
-            _glass.DepthEffect = values.DepthEffect * 0.5;
-            _glass.ShadowOpacity = values.ShadowOpacity * (_profile switch
-            {
-                MotionProfile.Menu => 0.75,
-                MotionProfile.Popover => 0.55,
-                _ => 0.35,
-            });
-            _glass.ShadowBlur = values.ShadowBlur * 0.45;
-            _glass.ShadowOffset = values.ShadowOffset * 0.35;
-        }
-
         private void SetCompactBorderShadow()
         {
             if (_material is Border border)
                 border.BoxShadow = CompactBorderShadow;
-        }
-
-        private void RestoreGlassValues()
-        {
-            if (_glass is null || _glassValues is not { } values)
-                return;
-
-            _glass.BlurRadius = values.BlurRadius;
-            _glass.Saturation = values.Saturation;
-            _glass.RefractionStrength = values.RefractionStrength;
-            _glass.DepthEffect = values.DepthEffect;
-            _glass.ShadowOpacity = values.ShadowOpacity;
-            _glass.ShadowBlur = values.ShadowBlur;
-            _glass.ShadowOffset = values.ShadowOffset;
         }
 
         private void RestoreBorderShadow()
@@ -949,27 +893,5 @@ public static class CupertinoFlyoutTransition
     internal sealed class ActiveSession
     {
         public TransitionSession? Session;
-    }
-
-    private readonly record struct GlassValues(
-        double BlurRadius,
-        double Saturation,
-        double RefractionStrength,
-        double DepthEffect,
-        double ShadowOpacity,
-        double ShadowBlur,
-        double ShadowOffset)
-    {
-        public GlassValues(GlassSurface glass)
-            : this(
-                glass.BlurRadius,
-                glass.Saturation,
-                glass.RefractionStrength,
-                glass.DepthEffect,
-                glass.ShadowOpacity,
-                glass.ShadowBlur,
-                glass.ShadowOffset)
-        {
-        }
     }
 }
