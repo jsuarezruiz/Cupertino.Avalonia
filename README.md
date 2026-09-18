@@ -219,14 +219,6 @@ The full documentation includes setup guides, design-system concepts, control ex
 * [Changelog](CHANGELOG.md)
 * [Release process](RELEASING.md)
 
-To build the NuGet and symbol packages locally from a clean working tree, run:
-
-```bash
-./build/pack-nuget.sh 0.2.0-preview
-```
-
-The script refuses to pack uncommitted changes so Source Link matches the packaged sources; set `ALLOW_DIRTY=1` only for throwaway local packages.
-
 ## Requirements
 
 .NET 8 or later and Avalonia 12.1.1. The themes support desktop, iOS, Android and Browser. Liquid Glass uses Skia through GPU or software rendering, with a flat fill when backdrop sampling is unavailable or Reduce Transparency is enabled.

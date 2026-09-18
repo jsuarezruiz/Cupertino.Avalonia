@@ -43,10 +43,12 @@ internal static class AppleCoreText
     private static readonly Queue<ShapeKey> CacheOrder = new();
     private static readonly object CacheLock = new();
 
-    // Fast path for re-shaping the last run without allocating a key string.
-    private static ShapeKey _recentKey;
-    private static NativeGlyph[]? _recentValue;
-    private static bool _hasRecent;
+    // Fast path for re-shaping recent runs without allocating a key string.
+    // Layout alternates across several runs, so a single entry missed often.
+    private const int RecentSlots = 8;
+    private static readonly ShapeKey[] RecentKeys = new ShapeKey[RecentSlots];
+    private static readonly NativeGlyph[]?[] RecentValues = new NativeGlyph[RecentSlots][];
+    private static int RecentCount;
 
     internal static IReadOnlyList<NativeGlyph>? Shape(
         ReadOnlySpan<char> text,
@@ -58,11 +60,14 @@ internal static class AppleCoreText
         ShapeKey key;
         lock (CacheLock)
         {
-            if (_hasRecent
-                && _recentKey.Size == size && _recentKey.Weight == weight
-                && _recentKey.Italic == italic && _recentKey.TabularNumbers == tabularNumbers
-                && text.SequenceEqual(_recentKey.Text))
-                return _recentValue;
+            for (var i = 0; i < RecentCount; i++)
+            {
+                ref var recent = ref RecentKeys[i];
+                if (recent.Size == size && recent.Weight == weight
+                    && recent.Italic == italic && recent.TabularNumbers == tabularNumbers
+                    && text.SequenceEqual(recent.Text))
+                    return RecentValues[i];
+            }
 
             key = new ShapeKey(text.ToString(), size, weight, italic, tabularNumbers);
             if (Cache.TryGetValue(key, out var cached))
@@ -92,16 +97,20 @@ internal static class AppleCoreText
         {
             Cache.Clear();
             CacheOrder.Clear();
-            _hasRecent = false;
-            _recentValue = null;
+            Array.Clear(RecentKeys);
+            Array.Clear(RecentValues);
+            RecentCount = 0;
         }
     }
 
     private static void Remember(ShapeKey key, NativeGlyph[]? value)
     {
-        _recentKey = key;
-        _recentValue = value;
-        _hasRecent = true;
+        var count = Math.Min(RecentCount, RecentSlots - 1);
+        Array.Copy(RecentKeys, 0, RecentKeys, 1, count);
+        Array.Copy(RecentValues, 0, RecentValues, 1, count);
+        RecentKeys[0] = key;
+        RecentValues[0] = value;
+        RecentCount = Math.Min(RecentCount + 1, RecentSlots);
     }
 
     private static List<NativeGlyph>? ShapeUncached(

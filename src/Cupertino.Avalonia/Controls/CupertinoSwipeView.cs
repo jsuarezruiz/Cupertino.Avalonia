@@ -285,6 +285,11 @@ public class CupertinoSwipeView : ContentControl
         }
     }
 
+    // One reusable scale per action host; SetRevealHint runs per drag move and
+    // settle tick and previously allocated a ScaleTransform each call.
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ContentPresenter, ScaleTransform>
+        RevealScales = new();
+
     // Actions materialise while the reveal grows, as UIKit's do.
     private static void SetRevealHint(ContentPresenter host, double t, bool trailing)
     {
@@ -298,7 +303,11 @@ public class CupertinoSwipeView : ContentControl
         host.Opacity = Math.Pow(t, 0.7);
         host.RenderTransformOrigin = new RelativePoint(trailing ? 1 : 0, 0.5, RelativeUnit.Relative);
         var scale = 0.8 + 0.2 * t;
-        host.RenderTransform = new ScaleTransform(scale, scale);
+        var transform = RevealScales.GetValue(host, static _ => new ScaleTransform());
+        transform.ScaleX = scale;
+        transform.ScaleY = scale;
+        if (!ReferenceEquals(host.RenderTransform, transform))
+            host.RenderTransform = transform;
     }
 
     /// <inheritdoc/>

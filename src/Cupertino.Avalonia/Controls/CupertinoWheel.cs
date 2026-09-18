@@ -118,6 +118,10 @@ public class CupertinoWheel : Control
     private bool _dragging;
     private double _lastY;
     private readonly Rendering.FormattedTextCache _textCache = new();
+    // Render redraws per animation tick; cache the typeface instead of
+    // allocating one per row per frame, as the calendar grid already does.
+    private FontFamily? _cachedFontFamily;
+    private Typeface _cachedTypeface = new(FontFamily.Default);
     private double? _measuredWidth;
     private (CultureInfo Culture, FontFamily Family, double Size, FlowDirection Direction)? _measurementStyle;
     private double _pressY;
@@ -276,9 +280,17 @@ public class CupertinoWheel : Control
         return new Size(Math.Min(_measuredWidth.Value, availableSize.Width), h);
     }
 
-    private FormattedText Measure(string text) => _textCache.Get(
-        text, CultureInfo.CurrentCulture, FlowDirection,
-        new Typeface(TextElement.GetFontFamily(this)), FontSize, Foreground);
+    private FormattedText Measure(string text)
+    {
+        var family = TextElement.GetFontFamily(this);
+        if (!Equals(family, _cachedFontFamily))
+        {
+            _cachedFontFamily = family;
+            _cachedTypeface = new Typeface(family);
+        }
+        return _textCache.Get(text, CultureInfo.CurrentCulture, FlowDirection,
+                              _cachedTypeface, FontSize, Foreground);
+    }
 
     /// <inheritdoc/>
     public override void Render(DrawingContext context)

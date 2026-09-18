@@ -37,6 +37,9 @@ jobs:
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          # Self-heals if the Pages site is ever disabled in repo settings.
+          enablement: true
 
       - name: Install DocFX
         run: dotnet tool install --global docfx --version 2.78.4

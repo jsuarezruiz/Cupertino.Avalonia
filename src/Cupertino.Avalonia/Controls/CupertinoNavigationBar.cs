@@ -138,7 +138,8 @@ public class CupertinoNavigationBar : TemplatedControl
     private double _inlineTitleOpacity;
     private double _backdropOpacity;
     private double _largeTitleOffset;
-    private (string Text, Typeface Typeface, double Size, double LetterSpacing, FlowDirection Direction)? _measuredTitle;
+    private (string Text, FontFamily? Family, FontStyle Style, FontWeight Weight, double Size,
+        double LetterSpacing, FlowDirection Direction)? _measuredTitle;
     private double _measuredTitleWidth;
     private Control? _leading;
     private Control? _trailing;
@@ -228,14 +229,17 @@ public class CupertinoNavigationBar : TemplatedControl
     private double MeasureTitle(TextBlock title)
     {
         var text = title.Text ?? string.Empty;
-        var key = (text, new Typeface(title.FontFamily, title.FontStyle, title.FontWeight),
+        // Runs on every leading/trailing bounds change; key on the raw components
+        // so a cache hit does not allocate a Typeface.
+        var key = (text, title.FontFamily, title.FontStyle, title.FontWeight,
                    title.FontSize, title.LetterSpacing, FlowDirection);
         if (_measuredTitle == key)
             return _measuredTitleWidth;
 
         var width = new FormattedText(
             text, CultureInfo.CurrentCulture, FlowDirection,
-            key.Item2, title.FontSize, null).Width;
+            new Typeface(title.FontFamily, title.FontStyle, title.FontWeight),
+            title.FontSize, null).Width;
         if (text.Length > 1)
             width += (text.Length - 1) * title.LetterSpacing;
         _measuredTitle = key;

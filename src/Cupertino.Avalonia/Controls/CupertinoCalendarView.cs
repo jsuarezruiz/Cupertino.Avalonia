@@ -138,6 +138,11 @@ public class CupertinoMonthGrid : Control
     private FontFamily? _cachedFontFamily;
     private Typeface _regularTypeface = new Typeface(FontFamily.Default);
     private Typeface _boldTypeface = new Typeface(FontFamily.Default, FontStyle.Normal, FontWeight.SemiBold);
+    // Weekday and day strings are rebuilt per frame otherwise; they only change
+    // with the culture.
+    private CultureInfo? _stringsCulture;
+    private string[]? _cachedWeekdays;
+    private string[]? _cachedDayNumbers;
     private DateTime? _poppingSelection;
     private long _popStart;
     private DateTime? _slideFromMonth;
@@ -270,11 +275,23 @@ public class CupertinoMonthGrid : Control
         var typeface = _regularTypeface;
         var bold = _boldTypeface;
 
-        var abbrev = culture.DateTimeFormat.AbbreviatedDayNames;
+        if (!Equals(culture, _stringsCulture))
+        {
+            _stringsCulture = culture;
+            var abbrev = culture.DateTimeFormat.AbbreviatedDayNames;
+            _cachedWeekdays = new string[7];
+            for (var i = 0; i < 7; i++)
+                _cachedWeekdays[i] = abbrev[i].ToUpper(culture);
+            _cachedDayNumbers = new string[31];
+            for (var d = 1; d <= 31; d++)
+                _cachedDayNumbers[d - 1] = d.ToString(culture);
+        }
+        var weekdays = _cachedWeekdays!;
+
         for (var c = 0; c < 7; c++)
         {
             var dow = (DayOfWeek)(((int)FirstDayOfWeek + c) % 7);
-            var ft = _textCache.Get(abbrev[(int)dow].ToUpper(culture), culture,
+            var ft = _textCache.Get(weekdays[(int)dow], culture,
                                        FlowDirection, typeface,
                                        cell * WeekdayFontRatio, WeekdayBrush);
             DrawText(context, ft, colPitch * (c + 0.5), weekdayRow / 2);
@@ -338,7 +355,7 @@ public class CupertinoMonthGrid : Control
                 : !isEnabled ? WeekdayBrush
                 : isToday ? AccentBrush : Foreground;
             var face = isSelected ? bold : typeface;
-            var ft = _textCache.Get(d.ToString(culture), culture, FlowDirection,
+            var ft = _textCache.Get(_cachedDayNumbers![d - 1], culture, FlowDirection,
                                        face, cell * DayFontRatio, brush);
             DrawText(context, ft, cx, cy);
         }

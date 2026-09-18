@@ -1273,7 +1273,7 @@ public class TabWipeExtentTests
     private static readonly IBrush Label = Brushes.Black;
 
     private static IBrush For(double itemX, double blobLeft, double blobRight) =>
-        TabLabelWipe.Create(itemX, 75, blobLeft, blobRight, Accent, Label);
+        TabLabelWipe.Apply(new object(), itemX, 75, blobLeft, blobRight, Accent, Label);
 
     [AvaloniaFact]
     public void An_item_the_blob_has_not_reached_is_not_tinted()

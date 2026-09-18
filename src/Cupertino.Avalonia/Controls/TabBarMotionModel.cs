@@ -14,6 +14,9 @@ internal static class TabBarMotionModel
     private const double ScrollTakeoverThreshold = 10.0;
     private const double LeadSpan = 0.67;
     private const double TrailDelay = 0.13;
+    // Declared before EdgeSeparation: its initializer calls Curve while this is still zero.
+    private const double CurveOmega = 7.0;
+    private static readonly double CurveNormalization = 1 - (1 + CurveOmega) * Math.Exp(-CurveOmega);
     private static readonly double EdgeSeparation = ComputeEdgeSeparation();
 
     internal static bool ShouldYieldToScroll(double dx, double dy, bool dragging)
@@ -29,7 +32,8 @@ internal static class TabBarMotionModel
         const double referenceDuration = 600;
         var t = elapsedMilliseconds * referenceDuration / SegmentedTravelMilliseconds;
         const double tau = 60;
-        var progress = 1 - (1 + t / tau) * Math.Exp(-t / tau);
+        var u = t / tau;
+        var progress = 1 - (1 + u) * Math.Exp(-u);
         var swell = 1 + 0.095 * Math.Clamp(hops, 1, 2.3);
 
         double widthScale;
@@ -108,10 +112,8 @@ internal static class TabBarMotionModel
             return 0;
         if (t >= 1)
             return 1;
-        const double omega = 7.0;
-        var normalization = 1 - (1 + omega) * Math.Exp(-omega);
-        var x = omega * t;
-        return (1 - (1 + x) * Math.Exp(-x)) / normalization;
+        var x = CurveOmega * t;
+        return (1 - (1 + x) * Math.Exp(-x)) / CurveNormalization;
     }
 
     private static double Smooth(double x)

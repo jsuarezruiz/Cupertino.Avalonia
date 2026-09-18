@@ -77,6 +77,10 @@ public static class RefreshInteraction
         private IDisposable? _stateWatch;
         private RefreshVisualizer? _visualizer;
         private CupertinoActivityIndicator? _spinner;
+        // The spinner realizes with the visualizer template, which can lag the
+        // first pull; a missed search retries briefly instead of per move.
+        private long _lastSpinnerSearch;
+        private const int SpinnerSearchIntervalMs = 50;
         private long _lastTick;
         private ITransform? _originalVisualizerTransform;
         private Thickness _originalVisualizerMargin;
@@ -280,6 +284,7 @@ public static class RefreshInteraction
             }
             _visualizer = found;
             _spinner = null;
+            _lastSpinnerSearch = 0;
             if (found is null)
                 return;
 
@@ -346,7 +351,14 @@ public static class RefreshInteraction
             if (_visualizer is not { } visualizer)
                 return;
             if (_spinner is null || !_spinner.IsAttachedToVisualTree())
-                _spinner = FindSpinner(visualizer);
+            {
+                // A found spinner that detached always re-searches immediately.
+                if (_spinner is not null || MotionClock.Now - _lastSpinnerSearch >= SpinnerSearchIntervalMs)
+                {
+                    _lastSpinnerSearch = MotionClock.Now;
+                    _spinner = FindSpinner(visualizer);
+                }
+            }
             if (_spinner is not { } spinner)
                 return;
 

@@ -84,6 +84,10 @@ public static class CupertinoSheet
         private Point? _pendingPress;
         private long _lastTick;
         private GlassSurface? _frost;
+        // Content realizes asynchronously, so a missed search retries briefly
+        // instead of walking the tree on every drag and settle frame.
+        private long _lastFrostSearch;
+        private const int FrostSearchIntervalMs = 50;
 
         public Task Completion => _done.Task;
 
@@ -221,7 +225,11 @@ public static class CupertinoSheet
         {
             _y = y;
             _translate.Y = y;
-            _frost ??= _presenter.GetVisualDescendants().OfType<GlassSurface>().FirstOrDefault();
+            if (_frost is null && MotionClock.Now - _lastFrostSearch >= FrostSearchIntervalMs)
+            {
+                _lastFrostSearch = MotionClock.Now;
+                _frost = _presenter.GetVisualDescendants().OfType<GlassSurface>().FirstOrDefault();
+            }
             _frost?.Pulse();
             // Interpolate from an inset card to a full-bleed sheet.
             if (!_dismissing)

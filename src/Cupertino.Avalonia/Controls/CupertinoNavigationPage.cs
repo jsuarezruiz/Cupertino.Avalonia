@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -223,6 +222,12 @@ public class CupertinoNavigationPage : TemplatedControl
     private GlassSurface? _backHost;
     private Border? _scrim;
     private Border? _edgeShadow;
+    // One owned translation per animated part, so transition ticks mutate X
+    // instead of parsing a transform string per frame.
+    private TranslateTransform? _frontTranslate;
+    private TranslateTransform? _behindTranslate;
+    private TranslateTransform? _edgeShadowTranslate;
+    private TranslateTransform? _titleTranslate;
     private DispatcherTimer? _driver;
     private Action? _transitionCompletion;
     private bool _dragArmed;
@@ -865,29 +870,36 @@ public class CupertinoNavigationPage : TemplatedControl
         },
     };
 
-    private static TransformOperations Translate(double x) =>
-        TransformOperations.Parse(
-            $"translateX({x.ToString(CultureInfo.InvariantCulture)}px)");
+    private static void ApplyTranslation(Control control, ref TranslateTransform? cached, double x)
+    {
+        if (cached is not null && ReferenceEquals(control.RenderTransform, cached))
+        {
+            cached.X = x;
+            return;
+        }
+        cached = new TranslateTransform(x, 0);
+        control.RenderTransform = cached;
+    }
 
     // Depth: 0 is revealed; 1 is fully pushed.
     private void SetDepthProgress(Control front, Control behind, double depth)
     {
         var w = HostWidth;
-        front.RenderTransform = Translate((1 - depth) * w);
-        behind.RenderTransform = Translate(-w * ParallaxFraction * depth);
+        ApplyTranslation(front, ref _frontTranslate, (1 - depth) * w);
+        ApplyTranslation(behind, ref _behindTranslate, -w * ParallaxFraction * depth);
         if (_scrim is not null)
             _scrim.Opacity = ScrimPeak * depth;
         if (_edgeShadow is not null)
         {
             _edgeShadow.Opacity = Math.Min(1, depth * 3);
-            _edgeShadow.RenderTransform = Translate((1 - depth) * w - ShadowWidth);
+            ApplyTranslation(_edgeShadow, ref _edgeShadowTranslate, (1 - depth) * w - ShadowWidth);
         }
 
         if (_barTitle is not null)
         {
             var p = _titleInverted ? 1 - depth : depth;
             _barTitle.Opacity = p;
-            _barTitle.RenderTransform = Translate(_titleSlide * (1 - p));
+            ApplyTranslation(_barTitle, ref _titleTranslate, _titleSlide * (1 - p));
         }
         if (_fadeBackWithDepth && _back is not null)
             _back.Opacity = depth;

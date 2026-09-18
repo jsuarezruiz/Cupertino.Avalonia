@@ -284,9 +284,17 @@ public static class SliderInteraction
         var clipLeft = left > 0 ? left : -railRadius;
         var clipRight = right > 0 ? thumbWidth - right : thumbWidth + railRadius;
 
+        // Mid-range dragging recomputes the same rect on every move; skip the
+        // geometry churn when nothing changed.
+        var clipRect = new Rect(clipLeft, 0, Math.Max(0, clipRight - clipLeft), railHeight);
+        if (thumb.GetValue(RailClipProperty) is RectangleGeometry existing
+            && existing.Rect == clipRect
+            && existing.RadiusX == railRadius && existing.RadiusY == railRadius)
+            return;
+
         thumb.SetValue(RailClipProperty, new RectangleGeometry
         {
-            Rect = new Rect(clipLeft, 0, Math.Max(0, clipRight - clipLeft), railHeight),
+            Rect = clipRect,
             RadiusX = railRadius,
             RadiusY = railRadius,
         });

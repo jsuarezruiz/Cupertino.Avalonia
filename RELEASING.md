@@ -25,3 +25,13 @@ Releases are published automatically via GitHub Actions when an annotated tag is
 - **Prereleases**: `vMAJOR.MINOR.PATCH-preview` or `vMAJOR.MINOR.PATCH-beta` (creates a prerelease on GitHub and NuGet).
 - **Stable**: `vMAJOR.MINOR.PATCH` (publishes a release marked as latest).
 
+## Local Validation Packages
+
+Releases are packed and published by CI, but you can build the NuGet and symbol packages locally from a clean working tree:
+
+```bash
+./build/pack-nuget.sh 0.2.0-preview
+```
+
+The script refuses to pack uncommitted changes so Source Link matches the packaged sources; set `ALLOW_DIRTY=1` only for throwaway local packages.
+

@@ -12,9 +12,19 @@ public class CriticallyDampedEasing : Easing
     /// </summary>
     public double OmegaDuration { get; set; } = 7.0;
 
+    // Ease runs every frame; the normalization only depends on the rate.
+    private double _cachedOmega;
+    private double _cachedNormalization = 1.0;
+
     /// <inheritdoc/>
     public override double Ease(double progress)
     {
-        return MotionCurve.CriticallyDamped(progress, OmegaDuration <= 0 ? 7.0 : OmegaDuration);
+        var omega = OmegaDuration <= 0 ? 7.0 : OmegaDuration;
+        if (omega != _cachedOmega)
+        {
+            _cachedOmega = omega;
+            _cachedNormalization = MotionCurve.Normalization(omega);
+        }
+        return MotionCurve.CriticallyDamped(progress, omega, _cachedNormalization);
     }
 }

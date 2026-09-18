@@ -112,6 +112,7 @@ public static class TabBarInteraction
         private IBrush? _wipeAccent;
         private IBrush? _wipeLabel;
         private bool _wipeLabelIsDark;
+        private readonly ScaleTransform _indicatorStretch = new();
         private long _lastTick;
         private TopLevel? _releaseRoot;
         private EventHandler<PointerReleasedEventArgs>? _releaseHandler;
@@ -706,8 +707,8 @@ public static class TabBarInteraction
                     continue;
 
                 var b = ContentBoundsOf(item, cell);
-                var brush = TabLabelWipe.Create(
-                    b.X, b.Width, blobLeft, blobRight, accent, label);
+                var brush = TabLabelWipe.Apply(
+                    item, b.X, b.Width, blobLeft, blobRight, accent, label);
                 item.SetCurrentValue(TemplatedControl.ForegroundProperty, brush);
             }
         }
@@ -788,9 +789,12 @@ public static class TabBarInteraction
                 SyncLens();
                 return;
             }
-            var inv = System.Globalization.CultureInfo.InvariantCulture;
-            _indicator.RenderTransform = Avalonia.Media.Transformation.TransformOperations
-                .Parse($"scaleX({scaleX.ToString(inv)}) scaleY({scaleY.ToString(inv)})");
+            // Runs per drag move and settle tick; mutate the cached transform
+            // instead of parsing a transform string per call.
+            if (!ReferenceEquals(_indicator.RenderTransform, _indicatorStretch))
+                _indicator.RenderTransform = _indicatorStretch;
+            _indicatorStretch.ScaleX = scaleX;
+            _indicatorStretch.ScaleY = scaleY;
         }
 
         private Rect SelectedItemRect()

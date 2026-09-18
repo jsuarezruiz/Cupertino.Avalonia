@@ -361,6 +361,9 @@ public class GlassSurface : Decorator
         _frozenBackdrop = new FrozenBackdrop();
     }
 
+    // Runs per pointer event and animation tick; reuse the dedup set across calls.
+    [ThreadStatic] private static HashSet<GlassSurface>? _pulsedScratch;
+
     /// <summary>
     /// Repaints the glass behind a control for the next few frames.
     /// </summary>
@@ -371,7 +374,8 @@ public class GlassSurface : Decorator
     public static void PulseBehind(Visual visual)
     {
         ArgumentNullException.ThrowIfNull(visual);
-        var pulsed = new HashSet<GlassSurface>();
+        var pulsed = _pulsedScratch ??= new HashSet<GlassSurface>();
+        pulsed.Clear();
         var branch = visual;
         while (branch.GetVisualParent() is { } parent)
         {
