@@ -125,8 +125,11 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
     // hero 24, menu 36), so a single cached sigma thrashed and recreated the
     // blur every glass every frame. Keys are quantized; entries are bounded.
     [ThreadStatic] private static Dictionary<int, SKImageFilter>? _blurCache;
+    [ThreadStatic] private static Queue<int>? _blurOrder;
     [ThreadStatic] private static Dictionary<int, SKColorFilter>? _saturationCache;
+    [ThreadStatic] private static Queue<int>? _saturationOrder;
     [ThreadStatic] private static Dictionary<int, SKMaskFilter>? _shadowMaskCache;
+    [ThreadStatic] private static Queue<int>? _shadowMaskOrder;
 
     private static float[] Pair(ref float[]? storage, float a, float b)
     {
@@ -146,6 +149,22 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         return array;
     }
 
+    // Evicts a single oldest entry instead of clearing the cache, so a burst
+    // of distinct inputs cannot make every subsequent lookup miss at once.
+    // Returned values are pure functions of their keys, so eviction policy
+    // never changes rendering output.
+    private static void EvictOldest<T>(Dictionary<int, T> cache, ref Queue<int>? order)
+        where T : IDisposable
+    {
+        order ??= new Queue<int>();
+        while (order.Count > 0)
+            if (cache.Remove(order.Dequeue(), out var evicted))
+            {
+                evicted.Dispose();
+                return;
+            }
+    }
+
     // Cached by quantized scalar input; callers pass continuously-varying values
     // (animation ticks, DPR scaling), so exact-float keys would never hit.
     private static SKImageFilter? BlurFilter(float sigma)
@@ -157,13 +176,10 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         if (cache.TryGetValue(key, out var filter))
             return filter;
         if (cache.Count >= 24)
-        {
-            foreach (var entry in cache.Values)
-                entry.Dispose();
-            cache.Clear();
-        }
+            EvictOldest(cache, ref _blurOrder);
         filter = SKImageFilter.CreateBlur(key / 4f, key / 4f, SKShaderTileMode.Clamp);
         cache[key] = filter;
+        (_blurOrder ??= new Queue<int>()).Enqueue(key);
         return filter;
     }
 
@@ -176,13 +192,10 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         if (cache.TryGetValue(key, out var filter))
             return filter;
         if (cache.Count >= 16)
-        {
-            foreach (var entry in cache.Values)
-                entry.Dispose();
-            cache.Clear();
-        }
+            EvictOldest(cache, ref _saturationOrder);
         filter = SKColorFilter.CreateColorMatrix(CreateSaturationMatrix(key / 100f));
         cache[key] = filter;
+        (_saturationOrder ??= new Queue<int>()).Enqueue(key);
         return filter;
     }
 
@@ -193,13 +206,10 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         if (cache.TryGetValue(key, out var filter))
             return filter;
         if (cache.Count >= 24)
-        {
-            foreach (var entry in cache.Values)
-                entry.Dispose();
-            cache.Clear();
-        }
+            EvictOldest(cache, ref _shadowMaskOrder);
         filter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, key / 4f);
         cache[key] = filter;
+        (_shadowMaskOrder ??= new Queue<int>()).Enqueue(key);
         return filter;
     }
 

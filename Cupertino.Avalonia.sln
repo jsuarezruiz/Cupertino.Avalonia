@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cupertino.Avalonia.RenderTe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5D20AA90-6969-D8BD-9DCD-8634F4692FDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cupertino.Gallery.SourceView", "samples\Cupertino.Gallery.SourceView\Cupertino.Gallery.SourceView.csproj", "{5D52DEC0-937D-4807-882C-108241DF158A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,11 +91,24 @@ Global
 		{B061AF25-B395-40B3-B4DE-C6F8A1F95957}.Release|x64.Build.0 = Release|Any CPU
 		{B061AF25-B395-40B3-B4DE-C6F8A1F95957}.Release|x86.ActiveCfg = Release|Any CPU
 		{B061AF25-B395-40B3-B4DE-C6F8A1F95957}.Release|x86.Build.0 = Release|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Debug|x64.Build.0 = Debug|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Debug|x86.Build.0 = Debug|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Release|x64.ActiveCfg = Release|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Release|x64.Build.0 = Release|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Release|x86.ActiveCfg = Release|Any CPU
+		{5D52DEC0-937D-4807-882C-108241DF158A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B061AF25-B395-40B3-B4DE-C6F8A1F95957} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{5D52DEC0-937D-4807-882C-108241DF158A} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
 	EndGlobalSection
 EndGlobal

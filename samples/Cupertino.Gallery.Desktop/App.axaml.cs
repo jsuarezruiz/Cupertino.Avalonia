@@ -15,6 +15,8 @@ public class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        ShellView.SourcePageFactory = static code => new Pages.SourcePage(code);
+
         if (Program.Static)
         {
             var style = new Style(x => x.Is<Cupertino.Controls.GlassSurface>());

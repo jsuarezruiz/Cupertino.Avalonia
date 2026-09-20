@@ -10,6 +10,8 @@ public class AndroidApp : Avalonia.Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        ShellView.SourcePageFactory = static code => new Pages.SourcePage(code);
+
         if (ApplicationLifetime is ISingleViewApplicationLifetime single)
             single.MainView = new ShellView();
 

@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cupertino.Gallery\Cupertino.Gallery.csproj" />
+    <ProjectReference Include="..\Cupertino.Gallery.SourceView\Cupertino.Gallery.SourceView.csproj" />
   </ItemGroup>
 
   <ItemGroup>

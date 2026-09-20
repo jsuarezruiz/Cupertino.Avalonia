@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="../../src/Cupertino.Avalonia/Cupertino.Avalonia.csproj" />
     <ProjectReference Include="../../samples/Cupertino.Gallery/Cupertino.Gallery.csproj" />
+    <ProjectReference Include="../../samples/Cupertino.Gallery.SourceView/Cupertino.Gallery.SourceView.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReferenceImages/**/*.png" CopyToOutputDirectory="PreserveNewest" />

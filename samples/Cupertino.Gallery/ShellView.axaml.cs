@@ -93,6 +93,13 @@ public partial class ShellView : UserControl
     /// </summary>
     public static IReadOnlyList<CatalogEntry> Entries => DefaultEntries;
 
+    /// <summary>
+    /// Builds the View-source page for highlighted XAML, or null to hide the action.
+    /// Hosts that ship the editor stack (desktop, mobile) set this; the browser
+    /// sample leaves it unset so its payload skips those dependencies.
+    /// </summary>
+    public static Func<string, Control>? SourcePageFactory { get; set; }
+
     private readonly CupertinoNavigationPage _compactNav;
     private readonly CupertinoNavigationPage _wideCatalogNav;
     private readonly CupertinoNavigationPage _wideDetailNav;
@@ -311,7 +318,7 @@ public partial class ShellView : UserControl
             _showingSettings = true;
             return;
         }
-        if (_compactNav.CurrentContent is SourcePage)
+        if (_compactNav.CurrentEntry?.Route == "source")
             return;
         if (_compactNav.CurrentEntry?.Parameter is CatalogEntry entry)
         {
@@ -347,11 +354,13 @@ public partial class ShellView : UserControl
             };
             source.Click += (_, _) =>
             {
+                if (SourcePageFactory is not { } factory)
+                    return;
                 if (SourceResourceFor(nav.CurrentContent) is not { } resource)
                     return;
                 using var stream = typeof(ShellView).Assembly.GetManifestResourceStream(resource)!;
                 using var reader = new System.IO.StreamReader(stream);
-                nav.TryPush("source", "Source", new SourcePage(reader.ReadToEnd()));
+                nav.TryPush("source", "Source", factory(reader.ReadToEnd()));
             };
             ToolTip.SetTip(source, "View source");
             Avalonia.Automation.AutomationProperties.SetName(source, "View source");
@@ -385,12 +394,22 @@ public partial class ShellView : UserControl
         {
             void UpdateSourceAction()
             {
-                source.IsVisible = SourceResourceFor(nav.CurrentContent) is not null;
+                source.IsVisible = SourcePageFactory is not null
+                    && SourceResourceFor(nav.CurrentContent) is not null;
                 if (!showSettings)
                     capsule.IsVisible = source.IsVisible;
             }
             nav.Navigated += (_, _) => UpdateSourceAction();
+            // Wide layout swaps detail content via RootContent, which does not
+            // raise Navigated; refresh the action then too.
+            nav.PropertyChanged += OnNavRootChanged;
             UpdateSourceAction();
+
+            void OnNavRootChanged(object? sender, Avalonia.AvaloniaPropertyChangedEventArgs e)
+            {
+                if (e.Property == CupertinoNavigationPage.RootContentProperty)
+                    UpdateSourceAction();
+            }
         }
 
         return capsule;

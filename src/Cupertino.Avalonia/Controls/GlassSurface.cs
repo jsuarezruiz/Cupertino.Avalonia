@@ -374,6 +374,14 @@ public class GlassSurface : Decorator
     public static void PulseBehind(Visual visual)
     {
         ArgumentNullException.ThrowIfNull(visual);
+        // Fast path: with no glass registered for this top level the walk below
+        // could pulse nothing. Animation ticks call this often (wheel settle,
+        // calendar, activity indicator), so skip the ancestor scan entirely.
+        if (TopLevel.GetTopLevel(visual) is not { } top
+            || !Coordinators.TryGetValue(top, out var coordinator)
+            || !coordinator.HasSurfaces)
+            return;
+
         var pulsed = _pulsedScratch ??= new HashSet<GlassSurface>();
         pulsed.Clear();
         var branch = visual;
@@ -440,6 +448,10 @@ public class GlassSurface : Decorator
         private readonly TopLevel _top;
         private readonly HashSet<GlassSurface> _surfaces = new();
         private readonly List<GlassSurface> _due = new();
+        // Cached once per coordinator: RequestFrame and the per-frame prune run
+        // often enough that the closure and predicate allocations showed up.
+        private readonly Action<TimeSpan> _onFrame;
+        private readonly Predicate<GlassSurface> _isDetached;
         private bool _framePending;
         private bool _disposed;
         private Size _clientSize;
@@ -448,6 +460,8 @@ public class GlassSurface : Decorator
         public TopLevelPulseCoordinator(TopLevel top)
         {
             _top = top;
+            _onFrame = OnFrame;
+            _isDetached = IsDetached;
             _clientSize = top.ClientSize;
             _scaling = top.RenderScaling;
             // Note: PointerMoved intentionally does not arm a pulse. Hover movement
@@ -461,6 +475,8 @@ public class GlassSurface : Decorator
         }
 
         public void Add(GlassSurface surface) => _surfaces.Add(surface);
+
+        internal bool HasSurfaces => _surfaces.Count != 0;
 
         public void Remove(GlassSurface surface)
         {
@@ -536,42 +552,46 @@ public class GlassSurface : Decorator
                 return;
 
             _framePending = true;
-            _top.RequestAnimationFrame(_ =>
+            _top.RequestAnimationFrame(_onFrame);
+        }
+
+        private bool IsDetached(GlassSurface surface) =>
+            !surface.IsAttachedToVisualTree() || TopLevel.GetTopLevel(surface) != _top;
+
+        private void OnFrame(TimeSpan _)
+        {
+            _framePending = false;
+            if (_disposed || CupertinoAccessibility.ReduceTransparency)
+                return;
+
+            _surfaces.RemoveWhere(_isDetached);
+            if (_surfaces.Count == 0)
             {
-                _framePending = false;
-                if (_disposed || CupertinoAccessibility.ReduceTransparency)
-                    return;
+                Dispose();
+                Coordinators.Remove(_top);
+                return;
+            }
 
-                _surfaces.RemoveWhere(surface =>
-                    !surface.IsAttachedToVisualTree() || TopLevel.GetTopLevel(surface) != _top);
-                if (_surfaces.Count == 0)
-                {
-                    Dispose();
-                    Coordinators.Remove(_top);
-                    return;
-                }
+            var now = MotionClock.Now;
+            _due.Clear();
+            foreach (var surface in _surfaces)
+            {
+                if (surface.IsBackdropFrozen || !surface.IsEffectivelyVisible
+                    || (!surface.IsLive && now >= surface._pulseUntil))
+                    continue;
 
-                var now = MotionClock.Now;
+                _due.Add(surface);
+            }
+            if (_due.Count > 0)
+            {
+                // Repaint the backdrop before sampling; invalidating only the
+                // glass can leave previously rendered glass in retained pixels.
+                _top.InvalidateVisual();
+                foreach (var surface in _due)
+                    surface.InvalidateVisual();
                 _due.Clear();
-                foreach (var surface in _surfaces)
-                {
-                    if (surface.IsBackdropFrozen || !surface.IsEffectivelyVisible
-                        || (!surface.IsLive && now >= surface._pulseUntil))
-                        continue;
-
-                    _due.Add(surface);
-                }
-                if (_due.Count > 0)
-                {
-                    // Repaint the backdrop before sampling; invalidating only the
-                    // glass can leave previously rendered glass in retained pixels.
-                    _top.InvalidateVisual();
-                    foreach (var surface in _due)
-                        surface.InvalidateVisual();
-                    _due.Clear();
-                    RequestFrame();
-                }
-            });
+                RequestFrame();
+            }
         }
 
         private void Dispose()
