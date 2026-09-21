@@ -81,16 +81,38 @@ public class DialogTests
         };
         _ = dialog.ShowAsync(window);
         window.UpdateLayout();
-        await Task.Delay(30);
-        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
 
-        var focused = window.FocusManager?.GetFocusedElement();
+        // The open transition moves focus on its own schedule; a fixed sleep
+        // flakes on loaded runners, so poll until focus lands inside the dialog.
+        var focused = await WaitForFocusAsync(
+            window,
+            e => e is Visual v && dialog.GetVisualDescendants().Prepend(dialog).Contains(v),
+            TimeSpan.FromSeconds(2));
         Assert.Contains(focused as Visual, dialog.GetVisualDescendants().Prepend(dialog));
 
         dialog.Close(null);
-        await Task.Delay(180);
+        var restored = await WaitForFocusAsync(
+            window,
+            e => ReferenceEquals(e, owner),
+            TimeSpan.FromSeconds(2));
+        Assert.Same(owner, restored);
+    }
+
+    private static async Task<IInputElement?> WaitForFocusAsync(
+        Window window, Func<IInputElement?, bool> matches, TimeSpan timeout)
+    {
+        var start = DateTime.UtcNow;
+        while (DateTime.UtcNow - start < timeout)
+        {
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var focused = window.FocusManager?.GetFocusedElement();
+            if (matches(focused))
+                return focused;
+            await Task.Delay(20);
+        }
+
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
-        Assert.Same(owner, window.FocusManager?.GetFocusedElement());
+        return window.FocusManager?.GetFocusedElement();
     }
 
     [AvaloniaFact]
