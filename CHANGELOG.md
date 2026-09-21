@@ -4,6 +4,8 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 ## [Unreleased]
 
+## [0.2.0-preview] - 2026-09-21
+
 ### Added
 
 - Published the documentation and live gallery to GitHub Pages.
@@ -16,10 +18,14 @@ All notable changes to this project are recorded here. The format follows [Keep 
 - Shared glass styles reduce duplication across buttons, bars, menus, flyouts and pickers.
 - Search results now update in place, preserving list state while filtering.
 - Expanded keyboard focus and screen-reader support across controls.
+- The browser gallery no longer ships the source-view editor stack, cutting its download payload; desktop and mobile keep the View-source action.
 
 ### Fixed
 
 - Improved Liquid Glass accuracy, repainting, resource reuse and snapshot cleanup.
+- Cut idle glass repainting in the browser gallery: no repaint on pointer move, static heroes are not live.
+- Reduced per-frame allocations across controls and animations.
+- Gallery View-source action now appears at any window width on desktop and mobile.
 - Fixed calendar and picker culture defaults, popup positioning and time rounding.
 - Picker and calendar buttons announce their value or purpose instead of a child element type name.
 - Gallery capture switches take effect while capturing, so `--scroll`, `--alert`, `--sheet`, `--hover` and `--noactions` shape the saved image.
