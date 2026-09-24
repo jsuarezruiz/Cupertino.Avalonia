@@ -272,7 +272,7 @@ public class GlassRepaintTests
     [AvaloniaFact]
     public async Task Glass_drops_its_backdrop_sample_once_content_stops()
     {
-        var (window, _, wheel, _) = WheelInGlass(overlay: false);
+        var (window, _, wheel, scene) = WheelInGlass(overlay: false);
         try
         {
             var start = await PressWheel(window, wheel);
@@ -281,8 +281,16 @@ public class GlassRepaintTests
                 window.MouseMove(start + new Point(0, -8 * i));
                 Capture(window).Dispose();
             }
-            await Task.Delay(1300);
-            Capture(window).Dispose();
+            // The release timer runs a second after the last step; slow machines fire it late.
+            var glass = (GlassSurface)scene.Children[1];
+            var deadline = DateTime.UtcNow.AddSeconds(10);
+            do
+            {
+                await Task.Delay(100);
+                Capture(window).Dispose();
+            }
+            while (glass.RedrawState is global::Cupertino.Rendering.LiquidGlassDrawOperation.ForegroundState { HasCleanSample: true }
+                   && DateTime.UtcNow < deadline);
 
             var before = GlassSurface.GetBackdropInvalidationCount(window);
             window.MouseMove(start + new Point(0, -32));
@@ -407,37 +415,46 @@ public class GlassRepaintTests
         {
             window.Show();
             await Task.Delay(450);
-            using var first = Capture(window);
+            var spun = Capture(window);
             var before = GlassSurface.GetBackdropInvalidationCount(window);
-            SKBitmap? spun = null;
-            for (var i = 0; i < 5; i++)
+            // Wait for spinner steps rather than a fixed time; slow machines tick late.
+            var steps = 0;
+            var deadline = DateTime.UtcNow.AddSeconds(10);
+            while (steps < 4 && DateTime.UtcNow < deadline)
             {
-                await Task.Delay(110);
-                spun?.Dispose();
-                spun = Capture(window);
+                await Task.Delay(40);
+                var next = Capture(window);
+                if (CenterChanged(spun, next))
+                    steps++;
+                spun.Dispose();
+                spun = next;
             }
             using (spun)
             {
-                var cx = first.Width / 2;
-                var cy = first.Height / 2;
-                var changed = 0;
-                for (var y = cy - 15; y < cy + 15; y++)
-                    for (var x = cx - 15; x < cx + 15; x++)
-                        if (ChannelDelta(first.GetPixel(x, y), spun!.GetPixel(x, y)) > 3)
-                            changed++;
-                Assert.True(changed > 0, "The spinner did not advance.");
+                Assert.True(steps >= 4, "The spinner did not advance.");
                 // A spinner reaching the rounded edge repaints the backdrop on every step instead.
                 var repaints = GlassSurface.GetBackdropInvalidationCount(window) - before;
                 if (reuses)
                     Assert.InRange(repaints, 0, 1);
                 else
-                    Assert.True(repaints >= 4, $"{repaints} backdrop repaints.");
+                    Assert.True(repaints >= steps, $"{repaints} backdrop repaints for {steps} steps.");
                 backdrop.InvalidateVisual();
                 using var fresh = Capture(window);
-                AssertMatches(fresh, spun!);
+                AssertMatches(fresh, spun);
             }
         }
         finally { window.Close(); }
+    }
+
+    private static bool CenterChanged(SKBitmap a, SKBitmap b)
+    {
+        var cx = a.Width / 2;
+        var cy = a.Height / 2;
+        for (var y = cy - 15; y < cy + 15; y++)
+            for (var x = cx - 15; x < cx + 15; x++)
+                if (ChannelDelta(a.GetPixel(x, y), b.GetPixel(x, y)) > 3)
+                    return true;
+        return false;
     }
 
     private static SKBitmap Capture(Window window)

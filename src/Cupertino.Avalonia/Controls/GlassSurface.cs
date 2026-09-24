@@ -480,6 +480,8 @@ public class GlassSurface : Decorator
     private void OnSampleRelease(object? sender, EventArgs e)
     {
         _sampleRelease!.Stop();
+        // The timer and the clock can disagree by a few milliseconds; end the window explicitly.
+        _foregroundAt = long.MinValue;
         if (_foreground is { HasCleanSample: true })
             InvalidateVisual();
     }
