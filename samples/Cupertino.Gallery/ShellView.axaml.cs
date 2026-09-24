@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -107,6 +106,7 @@ public partial class ShellView : UserControl
     private CatalogEntry? _currentEntry;
     private bool _showingSettings;
     private bool _isWide;
+    private readonly IReadOnlyList<CatalogEntry> _entries;
 
     protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
     {
@@ -147,16 +147,7 @@ public partial class ShellView : UserControl
             && Environment.GetEnvironmentVariable("GALLERY_MOTION_CAPTURE") == "1")
             entries = [.. entries, new("Motion Verification", "◫", "#FF8E8E93", () => new MotionVerificationPage(), "Showcases")];
 
-        var compactRoot = new RootPage(entries);
-        compactRoot.EntryChosen += (_, entry) => OpenEntry(entry);
-        compactRoot.SettingsChosen += (_, _) => OpenSettings();
-        _compactNav.RootContent = compactRoot;
-
-        var wideRoot = new RootPage(entries, showHero: false);
-        wideRoot.EntryChosen += (_, entry) => OpenEntry(entry);
-        wideRoot.SettingsChosen += (_, _) => OpenSettings();
-        _wideCatalogNav.RootContent = wideRoot;
-        _wideDetailNav.RootContent = new HomePage();
+        _entries = entries;
 
         _compactNav.TrailingContent = MakeActions(_compactNav, showSource: true, showSettings: true);
         _wideCatalogNav.TrailingContent = MakeActions(_wideCatalogNav, showSource: false, showSettings: true);
@@ -275,9 +266,23 @@ public partial class ShellView : UserControl
         _wideDetailNav.RootContent = content;
     }
 
+    // Each layout builds its catalog on first use.
+    private void EnsureCatalogRoot(bool wide)
+    {
+        var nav = wide ? _wideCatalogNav : _compactNav;
+        if (nav.RootContent is RootPage)
+            return;
+
+        var root = new RootPage(_entries, showHero: !wide);
+        root.EntryChosen += (_, entry) => OpenEntry(entry);
+        root.SettingsChosen += (_, _) => OpenSettings();
+        nav.RootContent = root;
+    }
+
     private void UpdateAdaptiveLayout(double width)
     {
         var useWideLayout = width >= WideLayoutBreakpoint;
+        EnsureCatalogRoot(useWideLayout);
         if (_isWide == useWideLayout)
             return;
 

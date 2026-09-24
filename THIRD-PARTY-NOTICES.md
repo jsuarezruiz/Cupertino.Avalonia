@@ -30,7 +30,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ## Noto symbol fonts
 
-The gallery sample bundles three Noto fonts as symbol fallbacks, because Inter carries no symbol coverage and browser builds reach no system fonts: Noto Sans Symbols 2, Noto Sans Symbols and Noto Sans Math.
+The gallery sample bundles three Noto fonts as symbol fallbacks, because Inter carries no symbol coverage and browser builds reach no system fonts: Noto Sans Symbols 2, Noto Sans Symbols and Noto Sans Math. They are subset to the Unicode blocks the gallery uses: Latin, General Punctuation, arrows, mathematical operators and symbols, technical symbols, enclosed alphanumerics, geometric shapes, miscellaneous symbols, dingbats and pictographs.
 
 Each font is licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org) and keeps its upstream copyright line:
 

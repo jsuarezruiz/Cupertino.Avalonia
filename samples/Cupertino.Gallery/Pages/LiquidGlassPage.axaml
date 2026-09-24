@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:cupertino="https://cupertino.avaloniaui.net"
-             xmlns:local="using:Cupertino.Gallery"
              x:Class="Cupertino.Gallery.Pages.LiquidGlassPage">
 
   <UserControl.Styles>
@@ -45,7 +44,7 @@
               </Border.Background>
             </Border>
           </Border>
-          <cupertino:GlassSurface CornerRadius="20" IsLive="True"
+          <cupertino:GlassSurface CornerRadius="20"
                                   Width="200" Height="100"
                                   BlurRadius="24" GlassThickness="11"
                                   RefractionStrength="18" ChromaticAberration="0.5"
@@ -71,7 +70,7 @@
               </Border.Background>
             </Border>
           </Border>
-          <cupertino:GlassSurface CornerRadius="20" IsLive="True"
+          <cupertino:GlassSurface CornerRadius="20"
                                   Width="200" Height="100"
                                   BlurRadius="30" GlassThickness="3"
                                   RefractionStrength="3" ChromaticAberration="0"
@@ -114,7 +113,7 @@
                            Margin="0,0,12,8" />
               </Panel>
             </Border>
-            <cupertino:GlassSurface x:Name="Play" IsLive="True"
+            <cupertino:GlassSurface x:Name="Play"
                                     CornerRadius="20" Width="220" Height="110"
                                     BlurRadius="{Binding #BlurDial.Value}"
                                     GlassThickness="{Binding #ThicknessDial.Value}"
