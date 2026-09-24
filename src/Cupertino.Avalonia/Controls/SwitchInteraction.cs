@@ -177,8 +177,6 @@ public static class SwitchInteraction
                 RoutingStrategies.Tunnel, handledEventsToo: true);
             Switch.AddHandler(InputElement.PointerReleasedEvent, OnSwitchPointerReleased,
                 RoutingStrategies.Tunnel, handledEventsToo: true);
-            Switch.AddHandler(InputElement.PointerCaptureLostEvent, OnSwitchPointerCaptureLost,
-                RoutingStrategies.Bubble, handledEventsToo: true);
             Switch.AddHandler(InputElement.KeyDownEvent, OnSwitchKeyDown,
                 RoutingStrategies.Tunnel, handledEventsToo: true);
             Switch.AddHandler(InputElement.KeyUpEvent, OnSwitchKeyUp,
@@ -242,7 +240,6 @@ public static class SwitchInteraction
             Switch.DetachedFromVisualTree -= OnDetached;
             Switch.RemoveHandler(InputElement.PointerPressedEvent, OnSwitchPointerPressed);
             Switch.RemoveHandler(InputElement.PointerReleasedEvent, OnSwitchPointerReleased);
-            Switch.RemoveHandler(InputElement.PointerCaptureLostEvent, OnSwitchPointerCaptureLost);
             Switch.RemoveHandler(InputElement.KeyDownEvent, OnSwitchKeyDown);
             Switch.RemoveHandler(InputElement.KeyUpEvent, OnSwitchKeyUp);
             Switch.Classes.Remove(ReleasingClass);
@@ -295,6 +292,7 @@ public static class SwitchInteraction
             if (!e.GetCurrentPoint(Switch).Properties.IsLeftButtonPressed)
                 return;
             BeginUserToggle();
+            PointerCaptureWatch.OnLost(e.Pointer, () => IsUserToggling = false);
             Knobs.Transitions = CupertinoAccessibility.ReduceMotion ? null : PressTransitions;
             ReleaseTimer.Stop();
             Switch.Classes.Remove(ReleasingClass);
@@ -317,9 +315,6 @@ public static class SwitchInteraction
             ReleaseTimer.Stop();
             ReleaseTimer.Start();
         }
-
-        private void OnSwitchPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e) =>
-            IsUserToggling = false;
 
         private void OnReleaseTimerTick(object? sender, EventArgs e)
         {

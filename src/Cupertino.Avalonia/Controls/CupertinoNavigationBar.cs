@@ -228,9 +228,7 @@ public class CupertinoNavigationBar : TemplatedControl
 
     private double MeasureTitle(TextBlock title)
     {
-        var text = title.Text ?? string.Empty;
-        // Runs on every leading/trailing bounds change; key on the raw components
-        // so a cache hit does not allocate a Typeface.
+        var text = Title ?? string.Empty;
         var key = (text, title.FontFamily, title.FontStyle, title.FontWeight,
                    title.FontSize, title.LetterSpacing, FlowDirection);
         if (_measuredTitle == key)
@@ -262,6 +260,8 @@ public class CupertinoNavigationBar : TemplatedControl
 
         if (change.Property == ScrollerProperty)
         {
+            if (change.OldValue is not null && change.NewValue is null)
+                SetCurrentValue(CollapseProgressProperty, 0.0);
             ConnectScroller();
         }
         else if (change.Property == CollapseProgressProperty || change.Property == IsLargeTitleProperty)

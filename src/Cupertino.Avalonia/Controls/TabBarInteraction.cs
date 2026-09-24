@@ -151,7 +151,7 @@ public static class TabBarInteraction
             owner.AddHandler(InputElement.PointerMovedEvent, OnMoved, RoutingStrategies.Tunnel);
             owner.AddHandler(InputElement.PointerReleasedEvent, OnReleased, RoutingStrategies.Tunnel);
             owner.AddHandler(InputElement.PointerCaptureLostEvent, OnCaptureLost,
-                             RoutingStrategies.Bubble, handledEventsToo: true);
+                             RoutingStrategies.Direct, handledEventsToo: true);
             owner.DetachedFromVisualTree += OnDetached;
 
             if (owner is SelectingItemsControl sic)
@@ -516,7 +516,6 @@ public static class TabBarInteraction
             Canvas.SetTop(_segLens, top + 2 + (h - lh) / 2);
         }
         private int _lastIndex;
-        private double _prevCentre;
 
         private void StartTravel(Rect from, Rect to)
         {
@@ -529,10 +528,10 @@ public static class TabBarInteraction
                 return;
             }
 
+            _settle.Stop();
             _travelFrom = from;
             _travelTo = to;
             _travelT = 0;
-            _prevCentre = from.Center.X;
 
             var hops = Math.Abs(to.Center.X - from.Center.X) / Math.Max(1, to.Width);
             _travelHops = hops;
@@ -575,7 +574,6 @@ public static class TabBarInteraction
                 _indicator.Width = width;
                 SetStretch(1, 1 + 0.35 * lens);
                 SetLensPhase(fill, lens);
-                SyncLens();
                 return;
             }
 
@@ -659,6 +657,8 @@ public static class TabBarInteraction
             }
             else
             {
+                if (_segmented)
+                    SetLensPhase(1, 0);
                 _indicator.IsVisible = false;
             }
             if (_indicator is GlassSurface glass)
@@ -944,8 +944,11 @@ public static class TabBarInteraction
                 if (real >= 0)
                 {
                     targetIndex = real;
+                    var changed = real != _lastIndex;
                     _lastIndex = real;
                     sic.SelectedIndex = real;
+                    if (changed)
+                        ScheduleBackdropSample();
                 }
             }
 

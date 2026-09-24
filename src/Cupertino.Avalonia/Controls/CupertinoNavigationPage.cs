@@ -376,7 +376,7 @@ public class CupertinoNavigationPage : TemplatedControl
         host.AddHandler(PointerMovedEvent, OnHostMoved, RoutingStrategies.Tunnel);
         host.AddHandler(PointerReleasedEvent, OnHostReleased, RoutingStrategies.Tunnel);
         host.AddHandler(PointerCaptureLostEvent, OnHostCaptureLost,
-                        RoutingStrategies.Bubble, handledEventsToo: true);
+                        RoutingStrategies.Direct, handledEventsToo: true);
     }
 
     private void RemoveHostHandlers(Panel? host)
@@ -503,7 +503,7 @@ public class CupertinoNavigationPage : TemplatedControl
 
     private void ShowOnly(Control page)
     {
-        if (_host is null)
+        if (_host is null || _host.Children is [var only] && ReferenceEquals(only, page))
             return;
 
         if (page.GetVisualParent() is Panel previous && !ReferenceEquals(previous, _host))
@@ -986,7 +986,8 @@ public class CupertinoNavigationPage : TemplatedControl
 
         var duration = Math.Max(120, 350 * Math.Abs(to - from));
         var easing = new Animation.CriticallyDampedEasing { OmegaDuration = Animation.MotionCurve.StandardOmega };
-        var started = MotionClock.Now;
+        // The clock starts on the first tick, after the incoming page's layout.
+        long? started = null;
 
         var driver = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(16) };
         _driver = driver;
@@ -997,7 +998,8 @@ public class CupertinoNavigationPage : TemplatedControl
         };
         driver.Tick += (_, _) =>
         {
-            var t = MotionClock.MillisecondsSince(started) / duration;
+            started ??= MotionClock.Now;
+            var t = MotionClock.MillisecondsSince(started.Value) / duration;
             if (t >= 1 || CupertinoAccessibility.ReduceMotion)
             {
                 driver.Stop();

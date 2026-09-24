@@ -137,7 +137,7 @@ public static class CupertinoSheet
             _presenter.AddHandler(InputElement.PointerReleasedEvent, OnSheetReleased,
                 Avalonia.Interactivity.RoutingStrategies.Tunnel);
             _presenter.AddHandler(InputElement.PointerCaptureLostEvent, OnSheetCaptureLost,
-                Avalonia.Interactivity.RoutingStrategies.Bubble, handledEventsToo: true);
+                Avalonia.Interactivity.RoutingStrategies.Direct, handledEventsToo: true);
             _root.DetachedFromVisualTree += OnRootDetached;
             _host.PropertyChanged += OnHostPropertyChanged;
             _timer.Tick += OnTick;
@@ -362,6 +362,14 @@ public static class CupertinoSheet
             if (_tornDown || _dismissing)
                 return;
             _dismissing = true;
+            _presenter.IsHitTestVisible = false;
+            _pendingPress = null;
+            if (_dragging)
+            {
+                _dragging = false;
+                _activePointer?.Capture(null);
+                _activePointer = null;
+            }
             AnimateTo(HostHeight + 40);
             if (CupertinoAccessibility.ReduceMotion)
                 Teardown();

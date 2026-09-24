@@ -194,7 +194,7 @@ public static class CupertinoFlyoutTransition
         var targetBounds = new Rect(point, panel.Bounds.Size);
         var anchorBounds = GetAnchorBounds(anchor, root, targetBounds, placement);
         return StartSession(
-            root, anchor, panel, material, content, glass,
+            root, panel, material, content, glass,
             anchorBounds, targetBounds, closeOwner,
             IsTopLevelMenuItem(anchor) ? MotionProfile.Menu : MotionProfile.Standard);
     }
@@ -217,14 +217,13 @@ public static class CupertinoFlyoutTransition
             targetBounds = new Rect(targetPoint, panel.Bounds.Size);
 
         return StartSession(
-            root, anchor, panel, material, content, material as GlassSurface,
+            root, panel, material, content, material as GlassSurface,
             new Rect(point, anchor.Bounds.Size), targetBounds, closeOwner,
             MotionProfile.Popover);
     }
 
     private static TransitionSession StartSession(
         TopLevel root,
-        Control anchor,
         Control panel,
         Control material,
         Control content,
@@ -381,8 +380,12 @@ public static class CupertinoFlyoutTransition
             if (CupertinoAccessibility.ReduceMotion || owner.Popup.Child is not { } presenter)
                 return;
 
-            _preparedPresenter = presenter;
-            _preparedOpacity = presenter.Opacity;
+            if (!ReferenceEquals(_preparedPresenter, presenter))
+            {
+                RestorePreparedPresenter();
+                _preparedPresenter = presenter;
+                _preparedOpacity = presenter.Opacity;
+            }
             presenter.Opacity = 0;
         }
 
@@ -462,10 +465,12 @@ public static class CupertinoFlyoutTransition
 
         public void Opening(object? sender, CancelEventArgs args)
         {
-            if (CupertinoAccessibility.ReduceMotion)
+            if (args.Cancel || CupertinoAccessibility.ReduceMotion)
                 return;
 
-            _preparedOpacity = owner.Opacity;
+            // A cancelled opening never raises Opened, so keep the opacity saved before it.
+            if (!_prepared)
+                _preparedOpacity = owner.Opacity;
             _prepared = true;
             owner.Opacity = 0;
         }
@@ -793,7 +798,13 @@ public static class CupertinoFlyoutTransition
 
         public void Close()
         {
-            if (_disposed || _closing)
+            // Reduce Motion disposes the session when it opens; the owner must still close.
+            if (_disposed)
+            {
+                _closeOwner();
+                return;
+            }
+            if (_closing)
                 return;
 
             _closing = true;

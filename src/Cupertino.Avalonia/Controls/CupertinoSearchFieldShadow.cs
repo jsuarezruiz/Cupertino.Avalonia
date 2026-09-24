@@ -245,7 +245,7 @@ public sealed class CupertinoSearchFieldShadow : Control
                 (float)_surface.Y,
                 (float)_surface.Right,
                 (float)_surface.Bottom));
-            var scale = matrix.ScaleX > 0.001f ? matrix.ScaleX : 1f;
+            var scale = matrix.ScaleY > 0.001f ? matrix.ScaleY : 1f;
 
             // Rasterize offscreen: a blur mask drawn on the macOS canvas can keep the
             // pre-full-screen render target size.
@@ -274,17 +274,19 @@ public sealed class CupertinoSearchFieldShadow : Control
                 var shadowRect = surfaceRect;
                 shadowRect.Offset(0, (float)_offset * scale);
 
+                var visualOpacity = Math.Clamp(lease.CurrentOpacity, 0, 1);
+                using var maskFilter = SKMaskFilter.CreateBlur(
+                    SKBlurStyle.Normal,
+                    Math.Max(0.5f, (float)_sigma * scale));
                 using var paint = new SKPaint
                 {
                     Color = new SKColor(
                         0,
                         0,
                         0,
-                        (byte)Math.Clamp(Math.Round(_opacity * 255), 0, 255)),
+                        (byte)Math.Clamp(Math.Round(_opacity * visualOpacity * 255), 0, 255)),
                     IsAntialias = true,
-                    MaskFilter = SKMaskFilter.CreateBlur(
-                        SKBlurStyle.Normal,
-                        Math.Max(0.5f, (float)_sigma * scale)),
+                    MaskFilter = maskFilter,
                 };
 
                 if (offscreen is null)

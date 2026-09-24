@@ -156,6 +156,7 @@ public static class Tabs
             _glyph = glyph;
 
             _owner.SelectionChanged += OnSelectionChanged;
+            _owner.ActualThemeVariantChanged += OnThemeChanged;
             _button.Click += OnClick;
             _item.DetachedFromLogicalTree += OnItemDetached;
             SyncSelection();
@@ -175,6 +176,8 @@ public static class Tabs
 
         private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e) => SyncSelection();
 
+        private void OnThemeChanged(object? sender, EventArgs e) => SyncSelection();
+
         private void OnClick(object? sender, RoutedEventArgs e) =>
             _owner.SelectedItem = ReferenceEquals(_owner.SelectedItem, _item) && _lastOther is not null
                 ? _lastOther
@@ -190,6 +193,7 @@ public static class Tabs
                 return;
             _disposed = true;
             _owner.SelectionChanged -= OnSelectionChanged;
+            _owner.ActualThemeVariantChanged -= OnThemeChanged;
             _button.Click -= OnClick;
             _item.DetachedFromLogicalTree -= OnItemDetached;
             if (ReferenceEquals(_owner.GetValue(OwnerDetachedStateProperty), this))

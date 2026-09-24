@@ -1,4 +1,3 @@
-using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -122,7 +121,7 @@ public class CupertinoDatePicker : TemplatedControl
     /// Text shown on the capsule. The empty-selection text comes from the CupertinoPickerPlaceholderText resource.
     /// </summary>
     public string DisplayText => SelectedDate is { } d
-        ? d.ToString(DateFormat ?? DefaultDateFormat, CultureInfo.CurrentCulture)
+        ? d.ToString(DateFormat ?? DefaultDateFormat, DateMath.GregorianCulture)
         : Resource("CupertinoPickerPlaceholderText", "Select");
 
     private string Resource(string key, string fallback) =>
@@ -133,7 +132,7 @@ public class CupertinoDatePicker : TemplatedControl
     {
         get
         {
-            var pattern = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+            var pattern = DateMath.GregorianCulture.DateTimeFormat.ShortDatePattern;
             var day = pattern.IndexOf('d', StringComparison.Ordinal);
             var month = pattern.IndexOf('M', StringComparison.Ordinal);
             var year = pattern.IndexOf('y', StringComparison.Ordinal);

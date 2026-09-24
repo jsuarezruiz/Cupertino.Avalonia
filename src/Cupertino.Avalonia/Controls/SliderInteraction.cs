@@ -26,6 +26,8 @@ public static class SliderInteraction
     /// </summary>
     public const string AtMaximumClass = "cupertino-at-maximum";
 
+    private const string HeldReadyClass = "cupertino-held-ready";
+
     /// <summary>
     /// Identifies the <see cref="GetIsEnabled"/> attached setting.
     /// </summary>
@@ -68,7 +70,6 @@ public static class SliderInteraction
             slider.RemoveHandler(InputElement.PointerReleasedEvent, (EventHandler<PointerReleasedEventArgs>)OnReleased);
             slider.PropertyChanged -= OnSliderPropertyChanged;
             slider.SizeChanged -= OnSliderSizeChanged;
-            slider.RemoveHandler(InputElement.PointerCaptureLostEvent, (EventHandler<PointerCaptureLostEventArgs>)OnCaptureLost);
             DisarmTopLevelRelease(slider);
 
             if (slider.GetValue(ThumbProperty) is { } oldThumb)
@@ -89,7 +90,6 @@ public static class SliderInteraction
                 slider.AddHandler(InputElement.PointerReleasedEvent, OnReleased, RoutingStrategies.Tunnel, handledEventsToo: true);
                 slider.PropertyChanged += OnSliderPropertyChanged;
                 slider.SizeChanged += OnSliderSizeChanged;
-                slider.AddHandler(InputElement.PointerCaptureLostEvent, OnCaptureLost, RoutingStrategies.Bubble, handledEventsToo: true);
             }
         });
     }
@@ -127,13 +127,17 @@ public static class SliderInteraction
         UpdateRailClip(slider);
         SetActive(slider, true);
         ArmTopLevelRelease(slider);
+        PointerCaptureWatch.OnLost(e.Pointer, () => Deactivate(slider));
     }
 
     private static void OnReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (sender is not Slider slider)
-            return;
+        if (sender is Slider slider)
+            Deactivate(slider);
+    }
 
+    private static void Deactivate(Slider slider)
+    {
         SetActive(slider, false);
         DisarmTopLevelRelease(slider);
     }
@@ -307,15 +311,6 @@ public static class SliderInteraction
         else if (!present)
             thumb.Classes.Remove(name);
     }
-    private static void OnCaptureLost(object? sender, PointerCaptureLostEventArgs e)
-    {
-        if (sender is not Slider slider)
-            return;
-
-        SetActive(slider, false);
-        DisarmTopLevelRelease(slider);
-    }
-
     private static void ArmTopLevelRelease(Slider slider)
     {
         DisarmTopLevelRelease(slider);
@@ -351,7 +346,10 @@ public static class SliderInteraction
         if (sender is Slider slider && slider.GetValue(ThumbProperty) is { } thumb)
         {
             if (active && !thumb.Classes.Contains(ActiveClass))
+            {
+                thumb.Classes.Add(HeldReadyClass);
                 thumb.Classes.Add(ActiveClass);
+            }
             else if (!active)
                 thumb.Classes.Remove(ActiveClass);
         }
