@@ -7,6 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 
 namespace Cupertino.Controls;
 
@@ -183,7 +184,7 @@ public class CupertinoMonthGrid : Control
             return;
 
         if (change.Property == SelectedDateProperty &&
-            change.NewValue is DateTimeOffset selected)
+            change.NewValue is DateTimeOffset selected && IsShown)
         {
             _poppingSelection = selected.Date;
             _popStart = MotionClock.Now;
@@ -192,7 +193,7 @@ public class CupertinoMonthGrid : Control
         else if (change.Property == DisplayMonthProperty &&
                  change.OldValue is DateTime oldMonth &&
                  change.NewValue is DateTime newMonth &&
-                 (oldMonth.Year, oldMonth.Month) != (newMonth.Year, newMonth.Month))
+                 (oldMonth.Year, oldMonth.Month) != (newMonth.Year, newMonth.Month) && IsShown)
         {
             _slideFromMonth = new DateTime(oldMonth.Year, oldMonth.Month, 1);
             _slideDirection = newMonth > oldMonth ? 1 : -1;
@@ -200,6 +201,9 @@ public class CupertinoMonthGrid : Control
             StartAnimTimer();
         }
     }
+
+    private bool IsShown =>
+        Bounds.Width > 0 && IsEffectivelyVisible && this.IsAttachedToVisualTree();
 
     private void StartAnimTimer()
     {
@@ -223,7 +227,7 @@ public class CupertinoMonthGrid : Control
             _animTimer?.Stop();
         InvalidateVisual();
         // Keep surrounding glass in step with the animation.
-        GlassSurface.PulseBehind(this);
+        GlassSurface.ForegroundChanged(this);
     }
 
     /// <inheritdoc/>
@@ -259,7 +263,10 @@ public class CupertinoMonthGrid : Control
     {
         context.FillRectangle(Brushes.Transparent, new Rect(Bounds.Size));
 
+        // Not arranged yet, as when the calendar opens on its month picker.
         var cell = Cell;
+        if (cell <= 0)
+            return;
         var colPitch = cell;
         var weekdayRow = cell * WeekdayRowRatio;
         var culture = CultureInfo.CurrentCulture;
@@ -275,7 +282,7 @@ public class CupertinoMonthGrid : Control
         var typeface = _regularTypeface;
         var bold = _boldTypeface;
 
-        if (!Equals(culture, _stringsCulture))
+        if (!ReferenceEquals(culture, _stringsCulture))
         {
             _stringsCulture = culture;
             var abbrev = culture.DateTimeFormat.AbbreviatedDayNames;
@@ -361,13 +368,13 @@ public class CupertinoMonthGrid : Control
         }
     }
 
-    private void DrawText(DrawingContext context, FormattedText text, double cx, double cy)
+    private void DrawText(DrawingContext context, Rendering.CachedText text, double cx, double cy)
     {
         // Keep Avalonia's mirrored columns and pointer coordinates, but undo
         // the reflection for glyphs; FlowDirection already handles text shaping.
         var scaleX = FlowDirection == FlowDirection.RightToLeft ? -1 : 1;
         using (context.PushTransform(Matrix.CreateScale(scaleX, 1) * Matrix.CreateTranslation(cx, cy)))
-            context.DrawText(text, new Point(-text.Width / 2, -text.Height / 2));
+            text.Draw(context, new Point(-text.Width / 2, -text.Height / 2));
     }
 
     private DateTime? DateAt(Point p)
@@ -596,8 +603,8 @@ public class CupertinoCalendarView : TemplatedControl
         _monthWheel = e.NameScope.Find<CupertinoWheel>("PART_MonthWheel");
         if (_monthWheel is not null)
         {
-            _monthWheel.Items = CultureInfo.CurrentCulture.DateTimeFormat.MonthNames
-                                           .Take(12).ToList();
+            _monthWheel.Items = WheelItems.Get(DateMath.GregorianCulture, "months",
+                c => c.DateTimeFormat.MonthNames.Take(12).ToArray());
             _monthWheel.SelectionSettled += OnWheelSettled;
         }
 
@@ -747,8 +754,9 @@ public class CupertinoCalendarView : TemplatedControl
         if (_yearWheel is null)
             return;
 
-        _yearWheel.Items = Enumerable.Range(MinYear, MaxYear - MinYear + 1)
-                                     .Select(y => y.ToString(CultureInfo.CurrentCulture)).ToList();
+        var (min, max) = (MinYear, MaxYear);
+        _yearWheel.Items = WheelItems.Get(CultureInfo.CurrentCulture, $"years:{min}:{max}",
+            c => Enumerable.Range(min, max - min + 1).Select(y => y.ToString(c)).ToArray());
     }
 
     private DateTime CoerceDisplayMonth(DateTime value)
@@ -853,6 +861,6 @@ public class CupertinoCalendarView : TemplatedControl
     {
         if (_title is null)
             return;
-        _title.Text = DisplayMonth.ToString("MMMM yyyy", CultureInfo.CurrentCulture);
+        _title.Text = DisplayMonth.ToString("MMMM yyyy", DateMath.GregorianCulture);
     }
 }

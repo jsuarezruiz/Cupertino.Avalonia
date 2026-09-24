@@ -160,10 +160,6 @@ public class CupertinoSearchView : TemplatedControl
     public static readonly StyledProperty<Func<object, string?>?> SearchTextSelectorProperty =
         AvaloniaProperty.Register<CupertinoSearchView, Func<object, string?>?>(nameof(SearchTextSelector));
 
-    // Mirrored so a filter pass reads a field per item rather than a styled property.
-    private Func<object, string, int, bool>? _filter;
-    private Func<object, string?>? _searchTextSelector;
-
     /// <summary>
     /// The custom item filter, or null to use the default match. Assignable from XAML.
     /// </summary>
@@ -373,16 +369,8 @@ public class CupertinoSearchView : TemplatedControl
             UpdateEmptyContent();
         else if (change.Property == SelectedItemProperty && _results is not null && !_syncing)
             _results.SelectedItem = SelectedItem;
-        else if (change.Property == FilterProperty)
-        {
-            _filter = Filter;
+        else if (change.Property == FilterProperty || change.Property == SearchTextSelectorProperty)
             ApplyFilter();
-        }
-        else if (change.Property == SearchTextSelectorProperty)
-        {
-            _searchTextSelector = SearchTextSelector;
-            ApplyFilter();
-        }
     }
 
     private void OnSourceCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

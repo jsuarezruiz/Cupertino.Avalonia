@@ -3,7 +3,9 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -219,6 +221,62 @@ public class ResourceLifecycleTests
             GlassSurface.PulseBehind(animatedContent);
 
             Assert.True(glass.HasActivePulse);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Glass_fading_in_from_transparent_resumes_sampling()
+    {
+        var glass = new GlassSurface { Width = 200, Height = 100, Opacity = 0 };
+        var window = Show(glass);
+        try
+        {
+            Thread.Sleep(400);
+            Assert.False(glass.HasActivePulse);
+
+            glass.Opacity = 1;
+
+            Assert.True(glass.HasActivePulse);
+        }
+        finally { window.Close(); }
+    }
+
+    private sealed class CountingGlass : GlassSurface
+    {
+        public int Renders;
+
+        public override void Render(DrawingContext context)
+        {
+            Renders++;
+            base.Render(context);
+        }
+    }
+
+    [AvaloniaFact]
+    public void Glass_under_a_transparent_ancestor_does_not_repaint_on_activity()
+    {
+        var glass = new CountingGlass { Width = 100, Height = 40 };
+        var window = Show(new Border { Opacity = 0, Child = glass });
+        try
+        {
+            Thread.Sleep(400);
+            for (var i = 0; i < 5; i++)
+            {
+                AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+                Dispatcher.UIThread.RunJobs();
+            }
+            var before = glass.Renders;
+
+            window.MouseDown(new Point(10, 10), MouseButton.Left);
+            window.MouseUp(new Point(10, 10), MouseButton.Left);
+            for (var i = 0; i < 10; i++)
+            {
+                AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+                Dispatcher.UIThread.RunJobs();
+            }
+
+            Assert.Equal(before, glass.Renders);
         }
         finally { window.Close(); }
     }

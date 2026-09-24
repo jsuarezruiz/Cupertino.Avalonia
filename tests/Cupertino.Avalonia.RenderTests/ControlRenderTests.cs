@@ -1,5 +1,6 @@
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -345,6 +346,80 @@ public class ListRenderTests
         var card = luma[180, 110];
         var page = luma[10, 10];
         Assert.True(card > page, $"card {card} should sit above the grouped page {page}");
+    }
+}
+
+public class CalendarViewRenderTests
+{
+    [AvaloniaFact]
+    public void Calendar_created_on_its_month_picker_closes_to_the_same_grid()
+    {
+        var previousMotion = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = true;
+        var month = new System.DateTime(2026, 7, 1);
+        var opened = new CupertinoCalendarView { DisplayMonth = month, IsMonthPickerOpen = true };
+        var openedWindow = Show(opened);
+        var closedWindow = Show(new CupertinoCalendarView { DisplayMonth = month });
+        try
+        {
+            Capture(openedWindow);
+            opened.IsMonthPickerOpen = false;
+            Assert.Equal(Capture(closedWindow), Capture(openedWindow));
+        }
+        finally
+        {
+            openedWindow.Close();
+            closedWindow.Close();
+            CupertinoAccessibility.ReduceMotion = previousMotion;
+        }
+    }
+
+    private static Window Show(Control content)
+    {
+        var window = new Window { Width = 360, Height = 440, Background = Brushes.White, Content = content };
+        window.Show();
+        return window;
+    }
+
+    private static byte[] Capture(Window window)
+    {
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        window.UpdateLayout();
+        global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        using var frame = window.CaptureRenderedFrame()!;
+        using var stream = new System.IO.MemoryStream();
+        frame.Save(stream, global::Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
+        return stream.ToArray();
+    }
+}
+
+public class CachedTextRenderTests
+{
+    [AvaloniaTheory]
+    [InlineData("Plain")]
+    [InlineData("A\u2028B")]
+    [InlineData("C\u2029D")]
+    [InlineData("E\u0085F")]
+    [InlineData("Line\nTwo")]
+    public void Cached_text_draws_like_formatted_text(string text)
+    {
+        var culture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+        var typeface = new Typeface(FontFamily.Default);
+        using var cached = new Cupertino.Rendering.CachedText(text, culture, FlowDirection.LeftToRight, typeface, 20, Brushes.Black);
+        var formatted = new FormattedText(text, culture, FlowDirection.LeftToRight, typeface, 20, Brushes.Black);
+
+        Assert.Equal(Draw(dc => dc.DrawText(formatted, new global::Avalonia.Point(4, 4))),
+            Draw(dc => cached.Draw(dc, new global::Avalonia.Point(4, 4))));
+    }
+
+    private static byte[] Draw(System.Action<DrawingContext> draw)
+    {
+        using var bitmap = new global::Avalonia.Media.Imaging.RenderTargetBitmap(new global::Avalonia.PixelSize(160, 120));
+        using (var context = bitmap.CreateDrawingContext())
+            draw(context);
+        using var stream = new System.IO.MemoryStream();
+        bitmap.Save(stream, global::Avalonia.Media.Imaging.PngBitmapEncoderOptions.Default);
+        return stream.ToArray();
     }
 }
 

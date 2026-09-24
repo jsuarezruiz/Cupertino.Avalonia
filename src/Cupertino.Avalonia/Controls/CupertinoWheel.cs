@@ -125,6 +125,7 @@ public class CupertinoWheel : Control
     private double? _measuredWidth;
     private (CultureInfo Culture, FontFamily Family, double Size, FlowDirection Direction)? _measurementStyle;
     private double _pressY;
+    private double _wheelRemainder;
     private double _travelled;
     private double _velocity;
     private long _lastMove;
@@ -181,6 +182,7 @@ public class CupertinoWheel : Control
             if (!_committingSelection)
             {
                 CancelGesture();
+                _wheelRemainder = 0;
                 _offset = normalized;
                 InvalidateVisual();
             }
@@ -189,6 +191,7 @@ public class CupertinoWheel : Control
         {
             if (change.Property == ItemsProperty)
             {
+                _wheelRemainder = 0;
                 DisconnectItems();
                 ConnectItems();
                 _measuredWidth = null;
@@ -213,6 +216,12 @@ public class CupertinoWheel : Control
     {
         base.OnAttachedToVisualTree(e);
         _isAttached = true;
+        // Only shared lists are immutable; others may have changed while detached.
+        if (Items is not WheelItems)
+        {
+            _measuredWidth = null;
+            InvalidateMeasure();
+        }
         ConnectItems();
     }
 
@@ -220,9 +229,9 @@ public class CupertinoWheel : Control
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         _isAttached = false;
+        _wheelRemainder = 0;
         DisconnectItems();
         _textCache.Clear();
-        _measuredWidth = null;
         CancelGesture();
         _offset = NormalizeIndex(SelectedIndex);
         InvalidateVisual();
@@ -271,16 +280,26 @@ public class CupertinoWheel : Control
         }
         if (_measuredWidth is null)
         {
-            var width = 0.0;
-            if (Items is { Count: > 0 })
-                foreach (var text in Items)
-                    width = Math.Max(width, Measure(text).Width);
+            var shared = Items as WheelItems;
+            if (shared is null || !shared.TryGetWidth(style, out var width))
+            {
+                // Measure every row without caching it; only drawn rows need formatted text.
+                width = 0.0;
+                if (Items is { Count: > 0 })
+                    foreach (var text in Items)
+                        width = Math.Max(width, new FormattedText(text, style.CurrentCulture, FlowDirection,
+                            CurrentTypeface(), FontSize, Foreground).Width);
+                shared?.SetWidth(style, width);
+            }
             _measuredWidth = width;
         }
         return new Size(Math.Min(_measuredWidth.Value, availableSize.Width), h);
     }
 
-    private FormattedText Measure(string text)
+    private Rendering.CachedText Measure(string text) =>
+        _textCache.Get(text, CultureInfo.CurrentCulture, FlowDirection, CurrentTypeface(), FontSize, Foreground);
+
+    private Typeface CurrentTypeface()
     {
         var family = TextElement.GetFontFamily(this);
         if (!Equals(family, _cachedFontFamily))
@@ -288,8 +307,7 @@ public class CupertinoWheel : Control
             _cachedFontFamily = family;
             _cachedTypeface = new Typeface(family);
         }
-        return _textCache.Get(text, CultureInfo.CurrentCulture, FlowDirection,
-                              _cachedTypeface, FontSize, Foreground);
+        return _cachedTypeface;
     }
 
     /// <inheritdoc/>
@@ -349,7 +367,7 @@ public class CupertinoWheel : Control
                 var scaleX = FlowDirection == FlowDirection.RightToLeft ? -1 : 1;
                 using (context.PushTransform(Matrix.CreateScale(scaleX, 1) *
                            Matrix.CreateTranslation(x + ft.Width / 2, y)))
-                    context.DrawText(ft, new Point(-ft.Width / 2, -ft.Height / 2));
+                    ft.Draw(context, new Point(-ft.Width / 2, -ft.Height / 2));
             }
         }
     }
@@ -412,6 +430,7 @@ public class CupertinoWheel : Control
         if (Items is null || Items.Count == 0)
             return;
 
+        _wheelRemainder = 0;
         _timer?.Stop();
         _dragging = true;
         _settling = false;
@@ -476,7 +495,7 @@ public class CupertinoWheel : Control
         _lastY = y;
         _lastMove = now;
         InvalidateVisual();
-        GlassSurface.PulseBehind(this);
+        GlassSurface.ForegroundChanged(this);
         e.Handled = true;
     }
 
@@ -515,9 +534,18 @@ public class CupertinoWheel : Control
         if (Items is null || Items.Count == 0)
             return;
 
-        var target = Math.Round(Clamp((_settling ? _settleTo : _offset) - e.Delta.Y));
-        SettleTo(target);
         e.Handled = true;
+        if (e.Delta.Y == 0)
+            return;
+        if (Math.Sign(e.Delta.Y) != Math.Sign(_wheelRemainder))
+            _wheelRemainder = 0;
+        _wheelRemainder += e.Delta.Y;
+        var rows = Math.Truncate(Math.Round(_wheelRemainder, 6));
+        if (rows == 0)
+            return;
+
+        _wheelRemainder -= rows;
+        SettleTo(Math.Round(Clamp((_settling ? _settleTo : _offset) - rows)));
     }
 
     /// <inheritdoc/>
@@ -596,7 +624,7 @@ public class CupertinoWheel : Control
         Tick();
         InvalidateVisual();
         // Keep surrounding glass in step with the spring.
-        GlassSurface.PulseBehind(this);
+        GlassSurface.ForegroundChanged(this);
 
         if (Math.Abs(_offset - _settleTo) < 0.005 && Math.Abs(_springVel) < 0.02)
         {

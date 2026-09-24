@@ -57,7 +57,7 @@
                    Width="37" Height="48"
                    Margin="0,12,0,-36"
                    HorizontalAlignment="Center" VerticalAlignment="Top"
-                   ClipToBounds="True" Opacity="0"
+                   ClipToBounds="True" Opacity="0" IsVisible="False"
                    IsHitTestVisible="False">
               <Panel.Transitions>
                 <Transitions>
@@ -96,7 +96,7 @@
             <ContentControl x:Name="ThumbHeld"
                             Theme="{StaticResource CupertinoKnobHeld}"
                             Background="{DynamicResource CupertinoSliderThumbDragBaseBrush}"
-                            Opacity="0">
+                            Opacity="0" IsVisible="False">
               <ContentControl.Transitions>
                 <Transitions>
                   <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 90}" />
@@ -183,6 +183,11 @@
     </Style>
     <Style Selector="^.cupertino-active /template/ Panel#ThumbDragShadow">
       <Setter Property="Opacity" Value="1" />
+    </Style>
+    <!-- The held thumb is built on the first press, not for every slider. -->
+    <Style Selector="^.cupertino-held-ready /template/ ContentControl#ThumbHeld,
+                     ^.cupertino-held-ready /template/ Panel#ThumbDragShadow">
+      <Setter Property="IsVisible" Value="True" />
     </Style>
     <Style Selector="^.cupertino-active /template/ ContentControl#ThumbHeld">
       <Setter Property="Opacity" Value="1" />

@@ -120,13 +120,15 @@ public class CupertinoActivityIndicator : Control
     {
         base.OnPropertyChanged(change);
         if (change.Property == IsActiveProperty || change.Property == IsVisibleProperty
-            || change.Property == SweepFractionProperty)
+            || change.Property == SweepFractionProperty
+            || change.Property == OpacityProperty
+               && change.GetOldValue<double>() > 0 != change.GetNewValue<double>() > 0)
             UpdateTimer();
     }
 
     private void UpdateTimer()
     {
-        var shouldRun = IsActive && SweepFraction >= 1 && IsEffectivelyVisible
+        var shouldRun = IsActive && SweepFraction >= 1 && Opacity > 0 && IsEffectivelyVisible
                         && TopLevel.GetTopLevel(this) is not null;
 
         if (!shouldRun)
@@ -141,7 +143,7 @@ public class CupertinoActivityIndicator : Control
                                        {
                                            _step = (_step + 1) % Spokes;
                                            InvalidateVisual();
-                                           GlassSurface.PulseBehind(this);
+                                           GlassSurface.ForegroundChanged(this);
                                        });
         _timer.Start();
     }

@@ -1,6 +1,5 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:motion="clr-namespace:Cupertino.Animation"
         x:Class="Cupertino.Themes.CupertinoTheme">
 
   <Styles.Resources>
@@ -199,57 +198,57 @@
       <ResourceDictionary.MergedDictionaries>
         <!-- Shared prerequisites. Keep these first because later themes use
              their named resources through StaticResource. -->
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Icons.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/GlassSurface.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Knob.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Button.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TextBox.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Icons.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/GlassSurface.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Knob.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Button.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TextBox.axaml" />
 
         <!-- Input and selection controls. -->
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/AutoCompleteBox.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ButtonVariants.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Calendar.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CalendarDatePicker.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CheckBox.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/RadioButton.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ColorPicker.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ComboBox.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Pickers.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoPickers.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/NumericUpDown.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Slider.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ToggleSwitch.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/AutoCompleteBox.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ButtonVariants.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Calendar.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CalendarDatePicker.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CheckBox.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/RadioButton.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ColorPicker.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ComboBox.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Pickers.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoPickers.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/NumericUpDown.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Slider.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ToggleSwitch.axaml" />
 
         <!-- Content, status and layout controls. -->
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoBadge.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Carousel.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoRows.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Expander.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/GridSplitter.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Label.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ListBox.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoPageControl.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ProgressBar.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Refresh.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ScrollBar.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoSearchView.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Section.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/SplitView.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoSwipeView.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TabControl.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TreeView.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoBadge.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Carousel.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoRows.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Expander.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/GridSplitter.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Label.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ListBox.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoPageControl.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ProgressBar.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Refresh.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ScrollBar.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoSearchView.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Section.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/SplitView.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoSwipeView.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TabControl.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/TreeView.axaml" />
 
         <!-- Transient surfaces and navigation. -->
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Dialog.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ContextMenu.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/FlyoutPresenter.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Menu.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/MenuFlyout.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Navigation.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Notifications.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoSheetPresenter.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoToolbar.axaml" />
-        <ResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ToolTip.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Dialog.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ContextMenu.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/FlyoutPresenter.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Menu.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/MenuFlyout.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Navigation.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/Notifications.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoSheetPresenter.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/CupertinoToolbar.axaml" />
+        <MergeResourceInclude Source="avares://Cupertino.Avalonia/Themes/Controls/ToolTip.axaml" />
       </ResourceDictionary.MergedDictionaries>
 
     </ResourceDictionary>
@@ -271,24 +270,6 @@
   </Style>
   <Style Selector="Button.swipe-destructive">
     <Setter Property="Background" Value="{DynamicResource CupertinoSystemRedBrush}" />
-  </Style>
-
-  <Style Selector="Panel.cupertino-popover:not(.cupertino-source-transition)">
-    <Setter Property="RenderTransformOrigin" Value="50%,0%" />
-    <Style.Animations>
-      <Animation Duration="{motion:MotionDuration 180}" Easing="QuadraticEaseOut">
-        <KeyFrame Cue="0%">
-          <Setter Property="Opacity" Value="0" />
-          <Setter Property="ScaleTransform.ScaleX" Value="0.94" />
-          <Setter Property="ScaleTransform.ScaleY" Value="0.94" />
-        </KeyFrame>
-        <KeyFrame Cue="100%">
-          <Setter Property="Opacity" Value="1" />
-          <Setter Property="ScaleTransform.ScaleX" Value="1" />
-          <Setter Property="ScaleTransform.ScaleY" Value="1" />
-        </KeyFrame>
-      </Animation>
-    </Style.Animations>
   </Style>
 
 </Styles>

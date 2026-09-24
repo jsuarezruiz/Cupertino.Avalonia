@@ -3,6 +3,47 @@
                     xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
 
+  <!-- Every variant layer; shared by CupertinoButton and buttons that combine variants. -->
+  <ControlTemplate x:Key="CupertinoButtonTemplate" TargetType="Button">
+    <Panel ClipToBounds="False">
+      <controls:GlassSurface x:Name="GlassBg"
+                             Theme="{StaticResource CupertinoGlassButtonSurface}">
+        <controls:GlassSurface.Transitions>
+          <Transitions>
+            <ColorTransition Property="Tint" Duration="{motion:MotionDuration 130}" />
+          </Transitions>
+        </controls:GlassSurface.Transitions>
+      </controls:GlassSurface>
+      <Border x:Name="FlatBg"
+              CornerRadius="999"
+              IsVisible="False"
+              Background="{DynamicResource CupertinoBorderedFillBrush}" />
+      <!-- The resting prominent material has a thin luminous rim. -->
+      <Border x:Name="ProminentRim" CornerRadius="999" IsVisible="False"
+              BorderThickness="0.667" IsHitTestVisible="False"
+              BorderBrush="{DynamicResource CupertinoProminentRimBrush}" />
+      <ContentPresenter x:Name="PART_ContentPresenter"
+                        Content="{TemplateBinding Content}"
+                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                        Padding="{TemplateBinding Padding}"
+                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                        Background="Transparent" />
+      <Border x:Name="FocusRing"
+              CornerRadius="999"
+              Margin="-4"
+              BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+              BorderThickness="2"
+              Opacity="0">
+        <Border.Transitions>
+          <Transitions>
+            <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
+          </Transitions>
+        </Border.Transitions>
+      </Border>
+    </Panel>
+  </ControlTemplate>
+
   <ControlTheme x:Key="CupertinoButton" TargetType="Button">
     <Setter Property="FocusAdorner" Value="{x:Null}" />
     <Setter Property="Foreground" Value="{DynamicResource CupertinoLabelBrush}" />
@@ -20,47 +61,7 @@
         <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
       </Transitions>
     </Setter>
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Panel ClipToBounds="False">
-          <controls:GlassSurface x:Name="GlassBg"
-                                 Theme="{StaticResource CupertinoGlassButtonSurface}">
-            <controls:GlassSurface.Transitions>
-              <Transitions>
-                <ColorTransition Property="Tint" Duration="{motion:MotionDuration 130}" />
-              </Transitions>
-            </controls:GlassSurface.Transitions>
-          </controls:GlassSurface>
-          <Border x:Name="FlatBg"
-                  CornerRadius="999"
-                  IsVisible="False"
-                  Background="{DynamicResource CupertinoBorderedFillBrush}" />
-          <!-- The resting prominent material has a thin luminous rim. -->
-          <Border x:Name="ProminentRim" CornerRadius="999" IsVisible="False"
-                  BorderThickness="0.667" IsHitTestVisible="False"
-                  BorderBrush="{DynamicResource CupertinoProminentRimBrush}" />
-          <ContentPresenter x:Name="PART_ContentPresenter"
-                            Content="{TemplateBinding Content}"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            Padding="{TemplateBinding Padding}"
-                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                            Background="Transparent" />
-          <Border x:Name="FocusRing"
-                  CornerRadius="999"
-                  Margin="-4"
-                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
-                  BorderThickness="2"
-                  Opacity="0">
-            <Border.Transitions>
-              <Transitions>
-                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
-              </Transitions>
-            </Border.Transitions>
-          </Border>
-        </Panel>
-      </ControlTemplate>
-    </Setter>
+    <Setter Property="Template" Value="{StaticResource CupertinoButtonTemplate}" />
 
     <Style Selector="^:pointerover /template/ controls|GlassSurface#GlassBg">
       <Setter Property="LightIntensity" Value="1.0" />
@@ -146,8 +147,141 @@
     </Style>
   </ControlTheme>
 
+  <!-- Buttons build only the layers their variant shows; CupertinoButton keeps every layer for derived themes. -->
   <ControlTheme x:Key="{x:Type Button}"
                 TargetType="Button"
-                BasedOn="{StaticResource CupertinoButton}" />
+                BasedOn="{StaticResource CupertinoButton}">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel ClipToBounds="False">
+          <controls:GlassSurface x:Name="GlassBg"
+                                 Theme="{StaticResource CupertinoGlassButtonSurface}">
+            <controls:GlassSurface.Transitions>
+              <Transitions>
+                <ColorTransition Property="Tint" Duration="{motion:MotionDuration 130}" />
+              </Transitions>
+            </controls:GlassSurface.Transitions>
+          </controls:GlassSurface>
+          <ContentPresenter x:Name="PART_ContentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                            Background="Transparent" />
+          <Border x:Name="FocusRing"
+                  CornerRadius="999"
+                  Margin="-4"
+                  BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                  BorderThickness="2"
+                  Opacity="0">
+            <Border.Transitions>
+              <Transitions>
+                <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
+              </Transitions>
+            </Border.Transitions>
+          </Border>
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+    <Style Selector="^.prominent">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel ClipToBounds="False">
+            <controls:GlassSurface x:Name="GlassBg"
+                                   Theme="{StaticResource CupertinoGlassButtonSurface}">
+              <controls:GlassSurface.Transitions>
+                <Transitions>
+                  <ColorTransition Property="Tint" Duration="{motion:MotionDuration 130}" />
+                </Transitions>
+              </controls:GlassSurface.Transitions>
+            </controls:GlassSurface>
+            <Border x:Name="ProminentRim" CornerRadius="999"
+                    BorderThickness="0.667" IsHitTestVisible="False"
+                    BorderBrush="{DynamicResource CupertinoProminentRimBrush}" />
+            <ContentPresenter x:Name="PART_ContentPresenter"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Padding="{TemplateBinding Padding}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                              Background="Transparent" />
+            <Border x:Name="FocusRing"
+                    CornerRadius="999"
+                    Margin="-4"
+                    BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                    BorderThickness="2"
+                    Opacity="0">
+              <Border.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^.bordered">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel ClipToBounds="False">
+            <Border x:Name="FlatBg"
+                    CornerRadius="999"
+                    Background="{DynamicResource CupertinoBorderedFillBrush}" />
+            <ContentPresenter x:Name="PART_ContentPresenter"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Padding="{TemplateBinding Padding}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                              Background="Transparent" />
+            <Border x:Name="FocusRing"
+                    CornerRadius="999"
+                    Margin="-4"
+                    BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                    BorderThickness="2"
+                    Opacity="0">
+              <Border.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^.plain">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel ClipToBounds="False">
+            <ContentPresenter x:Name="PART_ContentPresenter"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                              Padding="{TemplateBinding Padding}"
+                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                              Background="Transparent" />
+            <Border x:Name="FocusRing"
+                    CornerRadius="999"
+                    Margin="-4"
+                    BorderBrush="{DynamicResource CupertinoFocusRingBrush}"
+                    BorderThickness="2"
+                    Opacity="0">
+              <Border.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="{motion:MotionDuration 100}" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="^.prominent.bordered, ^.prominent.plain, ^.bordered.plain">
+      <Setter Property="Template" Value="{StaticResource CupertinoButtonTemplate}" />
+    </Style>
+  </ControlTheme>
 
 </ResourceDictionary>

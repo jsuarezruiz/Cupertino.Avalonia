@@ -56,14 +56,6 @@
     <Setter Property="Template">
       <ControlTemplate>
         <Panel>
-          <controls:GlassSurface x:Name="GlassBg"
-                                 IsVisible="False"
-                                 CornerRadius="{TemplateBinding CornerRadius}"
-                                 BlurRadius="14" GlassThickness="7"
-                                 RefractionStrength="8" ChromaticAberration="0.15"
-                                 LightIntensity="0.15" FresnelStrength="0.3"
-                                 ShadowOpacity="0.10" ShadowBlur="8" ShadowOffset="2"
-                                 Tint="{DynamicResource CupertinoGlassButtonTint}" />
           <Border x:Name="FlatBg"
                   Background="{DynamicResource CupertinoCardBrush}"
                   BorderBrush="{TemplateBinding BorderBrush}"
@@ -75,65 +67,120 @@
               </Transitions>
             </Border.Transitions>
           </Border>
-
-          <Grid ColumnDefinitions="Auto,*" Margin="{TemplateBinding Padding}">
-            <Path x:Name="SearchGlyph"
-                  Grid.Column="0"
-                  Data="{StaticResource CupertinoSearchGeometry}"
-                  Stroke="{DynamicResource CupertinoSecondaryLabelBrush}"
-                  StrokeThickness="1.67"
-                  StrokeLineCap="Round"
-                  Width="17" Height="17"
-                  Stretch="None"
-                  IsVisible="False"
-                  Margin="0,0,8,0"
-                  VerticalAlignment="Center" />
-
-            <ScrollViewer Grid.Column="1"
-                          Name="PART_ScrollViewer"
-                          HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
-                          VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
-                          IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
-                          AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
-              <Panel>
-                <TextBlock x:Name="PART_Watermark"
-                           Text="{TemplateBinding PlaceholderText}"
-                           Opacity="0"
-                           TextAlignment="{TemplateBinding TextAlignment}"
-                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                           Foreground="{DynamicResource CupertinoPlaceholderBrush}" />
-                <TextPresenter Name="PART_TextPresenter"
-                               Text="{TemplateBinding Text, Mode=TwoWay}"
-                               CaretIndex="{TemplateBinding CaretIndex}"
-                               SelectionStart="{TemplateBinding SelectionStart}"
-                               SelectionEnd="{TemplateBinding SelectionEnd}"
-                               TextAlignment="{TemplateBinding TextAlignment}"
-                               TextWrapping="{TemplateBinding TextWrapping}"
-                               LineHeight="{TemplateBinding LineHeight}"
-                               PasswordChar="{TemplateBinding PasswordChar}"
-                               RevealPassword="{TemplateBinding RevealPassword}"
-                               SelectionBrush="{TemplateBinding SelectionBrush}"
-                               SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
-                               CaretBrush="{TemplateBinding CaretBrush}"
-                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                <controls:CupertinoSearchCaret x:Name="SearchCaret"
-                                               IsVisible="False"
-                                               IsHitTestVisible="False"
-                                               Brush="{DynamicResource CupertinoSearchCaretBrush}"
-                                               CaretWidth="2" CaretHeight="23" />
-              </Panel>
-            </ScrollViewer>
-
-            <Button x:Name="ClearButton"
-                    Grid.Column="1"
-                    Theme="{StaticResource CupertinoTextBoxClearButton}"
-                    IsVisible="False"
-                    Command="{Binding $parent[TextBox].Clear}"
-                    HorizontalAlignment="Right" VerticalAlignment="Center" />
-          </Grid>
+          <ScrollViewer Name="PART_ScrollViewer" Margin="{TemplateBinding Padding}"
+                        HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                        VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                        IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                        AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
+            <Panel>
+              <TextBlock x:Name="PART_Watermark"
+                         Text="{TemplateBinding PlaceholderText}"
+                         Opacity="0"
+                         TextAlignment="{TemplateBinding TextAlignment}"
+                         VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                         Foreground="{DynamicResource CupertinoPlaceholderBrush}" />
+              <TextPresenter Name="PART_TextPresenter"
+                             Text="{TemplateBinding Text, Mode=TwoWay}"
+                             CaretIndex="{TemplateBinding CaretIndex}"
+                             SelectionStart="{TemplateBinding SelectionStart}"
+                             SelectionEnd="{TemplateBinding SelectionEnd}"
+                             TextAlignment="{TemplateBinding TextAlignment}"
+                             TextWrapping="{TemplateBinding TextWrapping}"
+                             LineHeight="{TemplateBinding LineHeight}"
+                             PasswordChar="{TemplateBinding PasswordChar}"
+                             RevealPassword="{TemplateBinding RevealPassword}"
+                             SelectionBrush="{TemplateBinding SelectionBrush}"
+                             SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                             CaretBrush="{TemplateBinding CaretBrush}"
+                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </Panel>
+          </ScrollViewer>
         </Panel>
       </ControlTemplate>
     </Setter>
+    <Style Selector="^.search, ^.glass">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Panel>
+            <controls:GlassSurface x:Name="GlassBg"
+                                   IsVisible="False"
+                                   CornerRadius="{TemplateBinding CornerRadius}"
+                                   BlurRadius="14" GlassThickness="7"
+                                   RefractionStrength="8" ChromaticAberration="0.15"
+                                   LightIntensity="0.15" FresnelStrength="0.3"
+                                   ShadowOpacity="0.10" ShadowBlur="8" ShadowOffset="2"
+                                   Tint="{DynamicResource CupertinoGlassButtonTint}" />
+            <Border x:Name="FlatBg"
+                    Background="{DynamicResource CupertinoCardBrush}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}">
+              <Border.Transitions>
+                <Transitions>
+                  <BrushTransition Property="BorderBrush" Duration="{motion:MotionDuration 150}" />
+                </Transitions>
+              </Border.Transitions>
+            </Border>
+
+            <Grid ColumnDefinitions="Auto,*" Margin="{TemplateBinding Padding}">
+              <Path x:Name="SearchGlyph"
+                    Grid.Column="0"
+                    Data="{StaticResource CupertinoSearchGeometry}"
+                    Stroke="{DynamicResource CupertinoSecondaryLabelBrush}"
+                    StrokeThickness="1.67"
+                    StrokeLineCap="Round"
+                    Width="17" Height="17"
+                    Stretch="None"
+                    IsVisible="False"
+                    Margin="0,0,8,0"
+                    VerticalAlignment="Center" />
+
+              <ScrollViewer Grid.Column="1"
+                            Name="PART_ScrollViewer"
+                            HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                            VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
+                            IsScrollChainingEnabled="{TemplateBinding (ScrollViewer.IsScrollChainingEnabled)}"
+                            AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
+                <Panel>
+                  <TextBlock x:Name="PART_Watermark"
+                             Text="{TemplateBinding PlaceholderText}"
+                             Opacity="0"
+                             TextAlignment="{TemplateBinding TextAlignment}"
+                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                             Foreground="{DynamicResource CupertinoPlaceholderBrush}" />
+                  <TextPresenter Name="PART_TextPresenter"
+                                 Text="{TemplateBinding Text, Mode=TwoWay}"
+                                 CaretIndex="{TemplateBinding CaretIndex}"
+                                 SelectionStart="{TemplateBinding SelectionStart}"
+                                 SelectionEnd="{TemplateBinding SelectionEnd}"
+                                 TextAlignment="{TemplateBinding TextAlignment}"
+                                 TextWrapping="{TemplateBinding TextWrapping}"
+                                 LineHeight="{TemplateBinding LineHeight}"
+                                 PasswordChar="{TemplateBinding PasswordChar}"
+                                 RevealPassword="{TemplateBinding RevealPassword}"
+                                 SelectionBrush="{TemplateBinding SelectionBrush}"
+                                 SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                 CaretBrush="{TemplateBinding CaretBrush}"
+                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                  <controls:CupertinoSearchCaret x:Name="SearchCaret"
+                                                 IsVisible="False"
+                                                 IsHitTestVisible="False"
+                                                 Brush="{DynamicResource CupertinoSearchCaretBrush}"
+                                                 CaretWidth="2" CaretHeight="23" />
+                </Panel>
+              </ScrollViewer>
+
+              <Button x:Name="ClearButton"
+                      Grid.Column="1"
+                      Theme="{StaticResource CupertinoTextBoxClearButton}"
+                      IsVisible="False"
+                      Command="{Binding $parent[TextBox].Clear}"
+                      HorizontalAlignment="Right" VerticalAlignment="Center" />
+            </Grid>
+          </Panel>
+        </ControlTemplate>
+      </Setter>
+    </Style>
 
     <Style Selector="^:empty /template/ TextBlock#PART_Watermark">
       <Setter Property="Opacity" Value="1" />

@@ -66,6 +66,62 @@ public class RtlTextRenderTests
         }
     }
 
+    [AvaloniaFact]
+    public void Glass_renders_mirrored_in_right_to_left_layouts()
+    {
+        var backdrop = new Border
+        {
+            Background = new LinearGradientBrush
+            {
+                StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+                EndPoint = new RelativePoint(1, 0, RelativeUnit.Relative),
+                GradientStops = { new GradientStop(Colors.Red, 0), new GradientStop(Colors.Blue, 1) },
+            },
+        };
+        var glass = new GlassSurface
+        {
+            Width = 160,
+            Height = 100,
+            CornerRadius = new CornerRadius(40, 0, 0, 0),
+            LightIntensity = 0,
+            FresnelStrength = 0,
+            ChromaticAberration = 0,
+            IsAdaptive = false,
+            ShadowOpacity = 0,
+        };
+        var window = new Window
+        {
+            Width = 240,
+            Height = 160,
+            Background = Brushes.White,
+            Content = new Grid { Children = { backdrop, glass } },
+        };
+        try
+        {
+            window.Show();
+            using var ltr = Capture(window);
+            window.FlowDirection = FlowDirection.RightToLeft;
+            using var rtl = Capture(window);
+
+            var different = 0;
+            var total = 0;
+            for (var y = 30; y < 130; y++)
+            {
+                for (var x = 40; x < 200; x++)
+                {
+                    var l = ltr.GetPixel(x, y);
+                    var r = rtl.GetPixel(ltr.Width - 1 - x, y);
+                    total++;
+                    if (Math.Abs(l.Red - r.Red) > 8 || Math.Abs(l.Green - r.Green) > 8 ||
+                        Math.Abs(l.Blue - r.Blue) > 8)
+                        different++;
+                }
+            }
+            Assert.True(different < total / 50, $"{different} of {total} glass pixels differ from the mirrored render");
+        }
+        finally { window.Close(); }
+    }
+
     private static SKBitmap Capture(Window window)
     {
         using var frame = window.CaptureRenderedFrame();

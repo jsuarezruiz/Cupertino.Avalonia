@@ -44,7 +44,7 @@
                  controls:CupertinoFlyoutTransition.IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
                  IsLightDismissEnabled="False"
                  Placement="RightEdgeAlignedTop">
-            <Panel Classes="cupertino-popover cupertino-source-transition" Margin="18,10,18,18">
+            <Panel Classes="cupertino-popover" Margin="18,10,18,18">
               <Grid x:Name="PopupLayout" MinWidth="220">
                 <controls:GlassSurface Classes="cupertino-source-transition-material"
                                        Theme="{StaticResource CupertinoPopoverSurface}"
@@ -106,7 +106,7 @@
   <ControlTheme x:Key="{x:Type MenuFlyoutPresenter}" TargetType="MenuFlyoutPresenter">
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Classes="cupertino-popover cupertino-source-transition" Margin="18,10,18,18">
+        <Panel Classes="cupertino-popover" Margin="18,10,18,18">
           <Grid MinWidth="220">
             <controls:GlassSurface Classes="cupertino-source-transition-material"
                                      Theme="{StaticResource CupertinoPopoverSurface}"

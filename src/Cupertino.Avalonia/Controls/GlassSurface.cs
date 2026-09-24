@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Cupertino.Rendering;
 
@@ -12,7 +13,8 @@ namespace Cupertino.Controls;
 /// </summary>
 /// <remarks>
 /// Supports translation and axis-aligned scaling. Rotation, skew and perspective use a flat
-/// tinted fill, as do Reduce Transparency and backends that cannot compile the effect.
+/// tinted fill, as do Reduce Transparency, software-rendered browsers and backends that cannot
+/// compile the effect.
 /// </remarks>
 public class GlassSurface : Decorator
 {
@@ -321,13 +323,26 @@ public class GlassSurface : Decorator
 
     private static readonly ConditionalWeakTable<TopLevel, TopLevelPulseCoordinator> Coordinators = new();
 
+    private static bool UsesFlatMaterial =>
+        CupertinoAccessibility.ReduceTransparency || LiquidGlassDrawOperation.IsBrowserRaster;
+
+    internal static void InvalidateAllSurfaces()
+    {
+        foreach (var pair in Coordinators)
+            pair.Value.InvalidateSurfaces();
+    }
+
     private long _pulseUntil;
+    private long _foregroundAt = long.MinValue;
+    private LiquidGlassDrawOperation.ForegroundState? _foreground;
+    private DispatcherTimer? _sampleRelease;
     private TopLevelPulseCoordinator? _coordinator;
     private FrozenBackdrop _frozenBackdrop = new();
 
     // Keep sampling briefly after input or layout activity, sharing one frame
     // callback per top level instead of a timer for every surface.
     private const int PulseMilliseconds = 350;
+    private const int ForegroundSampleMilliseconds = 1000;
 
     /// <inheritdoc/>
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -352,6 +367,7 @@ public class GlassSurface : Decorator
         CupertinoAccessibility.Changed -= OnAccessibilityChanged;
         _coordinator?.Remove(this);
         _coordinator = null;
+        _sampleRelease?.Stop();
         ResetFrozenBackdrop();
     }
 
@@ -361,8 +377,8 @@ public class GlassSurface : Decorator
         _frozenBackdrop = new FrozenBackdrop();
     }
 
-    // Runs per pointer event and animation tick; reuse the dedup set across calls.
     [ThreadStatic] private static HashSet<GlassSurface>? _pulsedScratch;
+    [ThreadStatic] private static List<GlassSurface>? _behindScratch;
 
     /// <summary>
     /// Repaints the glass behind a control for the next few frames.
@@ -371,36 +387,47 @@ public class GlassSurface : Decorator
     /// Call this from controls that run their own animation, so nearby glass does not
     /// sample a stale backdrop.
     /// </remarks>
-    public static void PulseBehind(Visual visual)
+    public static void PulseBehind(Visual visual) => ForEachBehind(visual, extend: true);
+
+    // Step animations inside glass: redraw from the glass's clean sample, or repaint its backdrop once.
+    internal static void ForegroundChanged(Visual visual) => ForEachBehind(visual, extend: false);
+
+    private static void ForEachBehind(Visual visual, bool extend)
     {
         ArgumentNullException.ThrowIfNull(visual);
-        // Fast path: with no glass registered for this top level the walk below
-        // could pulse nothing. Animation ticks call this often (wheel settle,
-        // calendar, activity indicator), so skip the ancestor scan entirely.
-        if (TopLevel.GetTopLevel(visual) is not { } top
+        if (UsesFlatMaterial
+            || TopLevel.GetTopLevel(visual) is not { } top
             || !Coordinators.TryGetValue(top, out var coordinator)
             || !coordinator.HasSurfaces)
             return;
 
         var pulsed = _pulsedScratch ??= new HashSet<GlassSurface>();
+        var behind = _behindScratch ??= new List<GlassSurface>();
         pulsed.Clear();
+        behind.Clear();
         var branch = visual;
         while (branch.GetVisualParent() is { } parent)
         {
             // Ancestors, and earlier siblings as in popover and picker templates.
             if (parent is GlassSurface ancestor && pulsed.Add(ancestor))
-                ancestor.PulseNow();
+                behind.Add(ancestor);
 
             if (parent is Panel panel && branch is Control child)
             {
                 var branchIndex = panel.Children.IndexOf(child);
                 for (var i = 0; i < branchIndex; ++i)
                     if (panel.Children[i] is GlassSurface sibling && pulsed.Add(sibling))
-                        sibling.PulseNow();
+                        behind.Add(sibling);
             }
 
             branch = parent;
         }
+
+        // Other glass over the control samples it, so it needs the full repaint.
+        var reuse = !extend && behind.Count > 0 && !coordinator.HasOtherSurfaceOver(visual, pulsed);
+        foreach (var surface in behind)
+            surface.PulseNow(visual, extend, reuse);
+        behind.Clear();
     }
 
     /// <summary>
@@ -414,18 +441,69 @@ public class GlassSurface : Decorator
 
     // Only for controls already invalidated this frame; other paths stay deferred
     // because a synchronous repaint during resize layout breaks macOS full screen.
-    private void PulseNow()
+    private void PulseNow(Visual source, bool extend, bool reuse = false)
     {
+        if (!extend)
+        {
+            _foregroundAt = MotionClock.Now;
+            ScheduleSampleRelease();
+            // Redraw rects grow slightly past the control; stay clear of the rounded edge.
+            if (reuse && source.TransformToVisual(this) is { } transform
+                && new Rect(source.Bounds.Size).TransformToAABB(transform).Inflate(2) is var area
+                && _foreground is { HasCleanSample: true } foreground
+                && LiquidGlassDrawOperation.InsideShape(area, new Rect(Bounds.Size).Deflate(1), CornerRadius))
+            {
+                foreground.Mark(area);
+                return;
+            }
+            _coordinator?.InvalidateNow(this);
+            return;
+        }
         _pulseUntil = MotionClock.Now + PulseMilliseconds;
         _coordinator?.PulseNow(this);
     }
 
     internal bool HasActivePulse => _pulseUntil > MotionClock.Now;
 
+    // Once content stops animating, redraw once so the kept sample is released.
+    private void ScheduleSampleRelease()
+    {
+        if (_sampleRelease is null)
+        {
+            _sampleRelease = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(ForegroundSampleMilliseconds) };
+            _sampleRelease.Tick += OnSampleRelease;
+        }
+        _sampleRelease.Stop();
+        _sampleRelease.Start();
+    }
+
+    private void OnSampleRelease(object? sender, EventArgs e)
+    {
+        _sampleRelease!.Stop();
+        if (_foreground is { HasCleanSample: true })
+            InvalidateVisual();
+    }
+
+    // A transparent ancestor hides the glass as surely as its own opacity.
+    private bool IsShown
+    {
+        get
+        {
+            if (!IsEffectivelyVisible)
+                return false;
+            for (Visual? visual = this; visual is not null; visual = visual.GetVisualParent())
+                if (visual.Opacity <= 0)
+                    return false;
+            return true;
+        }
+    }
+
     internal static int GetBackdropInvalidationCount(TopLevel top) =>
         Coordinators.TryGetValue(top, out var coordinator) ? coordinator.BackdropInvalidations : 0;
 
     internal FrozenBackdrop BackdropCapture => _frozenBackdrop;
+
+    internal object? RedrawState => _foreground;
 
     /// <inheritdoc/>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -439,7 +517,9 @@ public class GlassSurface : Decorator
             else
                 Pulse();
         }
-        else if (change.Property == IsLiveProperty && change.GetNewValue<bool>())
+        else if (change.Property == IsLiveProperty && change.GetNewValue<bool>()
+                 || change.Property == OpacityProperty && change.GetOldValue<double>() <= 0
+                    && change.GetNewValue<double>() > 0)
             Pulse();
     }
 
@@ -476,7 +556,30 @@ public class GlassSurface : Decorator
 
         public void Add(GlassSurface surface) => _surfaces.Add(surface);
 
+        public bool HasOtherSurfaceOver(Visual source, HashSet<GlassSurface> behind)
+        {
+            if (source.TransformToVisual(_top) is not { } transform)
+                return true;
+            var area = new Rect(source.Bounds.Size).TransformToAABB(transform);
+            foreach (var surface in _surfaces)
+            {
+                if (behind.Contains(surface) || !surface.IsShown)
+                    continue;
+                if (surface.TransformToVisual(_top) is not { } other
+                    || new Rect(surface.Bounds.Size).TransformToAABB(other).Intersects(area))
+                    return true;
+            }
+            return false;
+        }
+
         internal bool HasSurfaces => _surfaces.Count != 0;
+
+        public void InvalidateSurfaces()
+        {
+            foreach (var surface in _surfaces)
+                surface.InvalidateVisual();
+            RequestFrame();
+        }
 
         public void Remove(GlassSurface surface)
         {
@@ -500,7 +603,7 @@ public class GlassSurface : Decorator
                 if (!surface.IsBackdropFrozen)
                 {
                     surface._pulseUntil = until;
-                    armed |= surface.IsEffectivelyVisible;
+                    armed |= surface.IsShown;
                 }
 
             // Skip a full-window frame when nothing visible needs it.
@@ -533,22 +636,23 @@ public class GlassSurface : Decorator
         // its own previous output.
         public void PulseNow(GlassSurface surface)
         {
-            if (_disposed || CupertinoAccessibility.ReduceTransparency)
+            InvalidateNow(surface);
+            RequestFrame();
+        }
+
+        public void InvalidateNow(GlassSurface surface)
+        {
+            if (_disposed || UsesFlatMaterial || !surface.IsShown)
                 return;
 
-            if (surface.IsEffectivelyVisible)
-            {
-                _top.InvalidateVisual();
-                surface.InvalidateVisual();
-                ++BackdropInvalidations;
-            }
-
-            RequestFrame();
+            _top.InvalidateVisual();
+            surface.InvalidateVisual();
+            ++BackdropInvalidations;
         }
 
         public void RequestFrame()
         {
-            if (_disposed || _framePending || _surfaces.Count == 0 || CupertinoAccessibility.ReduceTransparency)
+            if (_disposed || _framePending || _surfaces.Count == 0 || UsesFlatMaterial)
                 return;
 
             _framePending = true;
@@ -561,7 +665,7 @@ public class GlassSurface : Decorator
         private void OnFrame(TimeSpan _)
         {
             _framePending = false;
-            if (_disposed || CupertinoAccessibility.ReduceTransparency)
+            if (_disposed || UsesFlatMaterial)
                 return;
 
             _surfaces.RemoveWhere(_isDetached);
@@ -573,16 +677,24 @@ public class GlassSurface : Decorator
             }
 
             var now = MotionClock.Now;
+            var waitingLive = false;
             _due.Clear();
             foreach (var surface in _surfaces)
             {
-                if (surface.IsBackdropFrozen || !surface.IsEffectivelyVisible
-                    || (!surface.IsLive && now >= surface._pulseUntil))
+                if (surface.IsBackdropFrozen || (!surface.IsLive && now >= surface._pulseUntil))
                     continue;
+                if (!surface.IsShown)
+                {
+                    // Live glass behind a fading ancestor must resume without a pulse.
+                    waitingLive |= surface.IsLive && surface.IsEffectivelyVisible;
+                    continue;
+                }
 
                 _due.Add(surface);
             }
-            if (_due.Count > 0)
+            if (_due.Count == 0 && waitingLive)
+                RequestFrame();
+            else if (_due.Count > 0)
             {
                 // Repaint the backdrop before sampling; invalidating only the
                 // glass can leave previously rendered glass in retained pixels.
@@ -611,7 +723,7 @@ public class GlassSurface : Decorator
     private void OnAccessibilityChanged(object? sender, EventArgs e)
     {
         InvalidateVisual();
-        if (!CupertinoAccessibility.ReduceTransparency)
+        if (!UsesFlatMaterial)
             Pulse();
     }
 
@@ -628,14 +740,25 @@ public class GlassSurface : Decorator
             : 0;
         var opBounds = extent > 0 ? bounds.Inflate(extent) : bounds;
 
-        if (CupertinoAccessibility.ReduceTransparency)
+        if (UsesFlatMaterial)
         {
+            _foreground = null;
+            if (LiquidGlassDrawOperation.IsBrowserRaster)
+                context.Custom(new BrowserBackendProbe(bounds));
             RenderPlain(context, bounds);
             return;
         }
 
-        context.Custom(new LiquidGlassDrawOperation(
-            bounds, opBounds, GlassParams.From(this), IsBackdropFrozen ? _frozenBackdrop : null));
+        // Keep a sample only while content inside is animating.
+        var operation = new LiquidGlassDrawOperation(
+            bounds, opBounds, GlassParams.From(this), IsBackdropFrozen ? _frozenBackdrop : null,
+            retainSample: _foregroundAt > MotionClock.Now - ForegroundSampleMilliseconds);
+        context.Custom(operation);
+        // RenderTargetBitmap and VisualBrush draw it at once and never dispose it.
+        if (operation.HasDrawn)
+            operation.Dispose();
+        else
+            _foreground = operation.Foreground;
     }
 
     // Flat fallback for Reduce Transparency.

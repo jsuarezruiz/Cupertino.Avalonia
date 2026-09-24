@@ -41,6 +41,66 @@ public class BoundaryAndCollectionTests
     }
 
     [AvaloniaFact]
+    public void Popover_opened_with_reduced_motion_closes_after_motion_returns()
+    {
+        var previousMotion = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = true;
+        var anchor = new Button { Content = "Open" };
+        var window = new Window { Width = 400, Height = 400, Content = anchor };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            CupertinoPopover.Show(anchor, new Border { Width = 100, Height = 100 }, 20, null);
+            Dispatcher.UIThread.RunJobs();
+
+            CupertinoAccessibility.ReduceMotion = false;
+            CupertinoPopover.Close(anchor);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(CupertinoPopover.IsOpen(anchor));
+        }
+        finally
+        {
+            CupertinoPopover.CloseImmediately(anchor);
+            window.Close();
+            CupertinoAccessibility.ReduceMotion = previousMotion;
+        }
+    }
+
+    [AvaloniaFact]
+    public void Flyout_opened_with_reduced_motion_closes_after_motion_returns()
+    {
+        var previousMotion = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = true;
+        var flyout = new Flyout { Content = new TextBlock { Text = "Details" } };
+        var anchor = new Button { Content = "Open", Flyout = flyout };
+        var window = new Window { Width = 400, Height = 400, Content = anchor };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            flyout.ShowAt(anchor);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(flyout.IsOpen);
+
+            CupertinoAccessibility.ReduceMotion = false;
+            flyout.Hide();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(flyout.IsOpen);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            flyout.Hide();
+            window.Close();
+            CupertinoAccessibility.ReduceMotion = previousMotion;
+        }
+    }
+
+    [AvaloniaFact]
     public void Popover_takes_keyboard_focus_and_escape_restores_the_anchor()
     {
         var previousMotion = CupertinoAccessibility.ReduceMotion;
@@ -333,6 +393,70 @@ public class BoundaryAndCollectionTests
     }
 }
 
+public class SharedStateTests
+{
+    [AvaloniaFact]
+    public void Wheel_remeasures_items_that_changed_while_detached()
+    {
+        var items = new ObservableCollection<string> { "a", "b" };
+        var wheel = new CupertinoWheel { Items = items, HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left };
+        var host = new Border { Child = wheel };
+        var window = new Window { Width = 400, Height = 300, Content = host };
+        window.Show();
+        try
+        {
+            window.UpdateLayout();
+            var narrow = wheel.Bounds.Width;
+
+            host.Child = null;
+            items.Add("a much longer entry");
+            host.Child = wheel;
+            window.UpdateLayout();
+
+            Assert.True(wheel.Bounds.Width > narrow, $"{wheel.Bounds.Width} should exceed {narrow}");
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Button_with_two_variants_keeps_every_variant_layer()
+    {
+        var button = new Button { Content = "Go", Classes = { "prominent", "bordered" } };
+        var window = new Window { Width = 200, Height = 100, Content = button };
+        window.Show();
+        try
+        {
+            window.UpdateLayout();
+            var names = button.GetVisualDescendants().OfType<Control>().Select(c => c.Name).ToHashSet();
+            Assert.Contains("ProminentRim", names);
+            Assert.Contains("FlatBg", names);
+            Assert.Contains("GlassBg", names);
+        }
+        finally { window.Close(); }
+    }
+
+    [Fact]
+    public void Writable_cultures_are_not_cached()
+    {
+        var writable = new CultureInfo("en-US");
+        string[] Period(CultureInfo c) => [c.DateTimeFormat.AMDesignator, c.DateTimeFormat.PMDesignator];
+        var first = WheelItems.Get(writable, "period", Period);
+        writable.DateTimeFormat.AMDesignator = "a.m.";
+        Assert.Equal("a.m.", WheelItems.Get(writable, "period", Period)[0]);
+        Assert.NotEqual("a.m.", first[0]);
+
+        var fixedCulture = CultureInfo.GetCultureInfo("en-US");
+        Assert.Same(WheelItems.Get(fixedCulture, "period", Period), WheelItems.Get(fixedCulture, "period", Period));
+
+        var thai = new CultureInfo("th-TH");
+        var gregorian = DateMath.Gregorian(thai);
+        thai.DateTimeFormat.AbbreviatedMonthNames = thai.DateTimeFormat.AbbreviatedMonthNames.Select(n => n.Length == 0 ? n : n + "!").ToArray();
+        Assert.NotSame(gregorian, DateMath.Gregorian(thai));
+        var readOnlyThai = CultureInfo.GetCultureInfo("th-TH");
+        Assert.Same(DateMath.Gregorian(readOnlyThai), DateMath.Gregorian(readOnlyThai));
+    }
+}
+
 public class DatePickerFormatTests
 {
     [Theory]
@@ -353,6 +477,62 @@ public class DatePickerFormatTests
             Assert.Equal(expected, picker.DisplayText);
         }
         finally { CultureInfo.CurrentCulture = previous; }
+    }
+
+    private static CultureInfo WithGregorianCalendar(string name)
+    {
+        var culture = (CultureInfo)CultureInfo.GetCultureInfo(name).Clone();
+        culture.DateTimeFormat.Calendar = culture.OptionalCalendars.OfType<GregorianCalendar>().First();
+        return culture;
+    }
+
+    [Theory]
+    [InlineData("ar-SA")]
+    [InlineData("fa-IR")]
+    [InlineData("th-TH")]
+    public void Date_text_uses_gregorian_dates_in_any_culture(string culture)
+    {
+        var previous = CultureInfo.CurrentCulture;
+        try
+        {
+            CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+            var picker = new CupertinoDatePicker
+            {
+                SelectedDate = new DateTimeOffset(2080, 8, 3, 0, 0, 0, TimeSpan.Zero),
+            };
+            Assert.Contains("2080", picker.DisplayText);
+        }
+        finally { CultureInfo.CurrentCulture = previous; }
+    }
+
+    [AvaloniaTheory]
+    [InlineData("ar-SA")]
+    [InlineData("fa-IR")]
+    [InlineData("th-TH")]
+    public void Calendar_labels_use_gregorian_months_in_any_culture(string culture)
+    {
+        var previous = CultureInfo.CurrentCulture;
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+        var view = new CupertinoCalendarView { DisplayMonth = new DateTime(2077, 12, 1) };
+        var window = new Window { Width = 400, Height = 500, Content = view };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            view.DisplayMonth = new DateTime(2078, 1, 1);
+            Dispatcher.UIThread.RunJobs();
+
+            var gregorian = WithGregorianCalendar(culture);
+            var title = view.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "PART_Title");
+            Assert.Equal(new DateTime(2078, 1, 1).ToString("MMMM yyyy", gregorian), title.Text);
+            var months = view.GetVisualDescendants().OfType<CupertinoWheel>().First(w => w.Name == "PART_MonthWheel");
+            Assert.Equal(gregorian.DateTimeFormat.MonthNames[0], months.Items![0]);
+        }
+        finally
+        {
+            window.Close();
+            CultureInfo.CurrentCulture = previous;
+        }
     }
 
     [AvaloniaFact]

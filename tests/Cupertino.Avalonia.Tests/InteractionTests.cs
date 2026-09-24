@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
@@ -238,6 +239,42 @@ public class InteractionTests
     }
 
     [AvaloniaFact]
+    public void A_cancelled_context_menu_opening_leaves_the_next_menu_visible()
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = false;
+        var menu = new ContextMenu { ItemsSource = new[] { "Copy" } };
+        var cancel = true;
+        menu.Opening += (_, e) =>
+        {
+            if (cancel)
+                e.Cancel = true;
+        };
+        var host = new Border { Width = 200, Height = 60, ContextMenu = menu };
+        var window = ShowHosting(host);
+        try
+        {
+            host.RaiseEvent(new ContextRequestedEventArgs());
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Assert.False(menu.IsOpen);
+
+            cancel = false;
+            host.RaiseEvent(new ContextRequestedEventArgs());
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.True(menu.IsOpen);
+            Assert.Equal(1, menu.Opacity);
+        }
+        finally
+        {
+            CupertinoAccessibility.ReduceMotion = true;
+            menu.Close();
+            CupertinoAccessibility.ReduceMotion = old;
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
     public async Task Opening_a_context_menu_closes_the_previous_menu_and_scrim()
     {
         var old = CupertinoAccessibility.ReduceMotion;
@@ -384,6 +421,50 @@ public class InteractionTests
         }
     }
 
+    [AvaloniaTheory]
+    [InlineData(FlowDirection.LeftToRight)]
+    [InlineData(FlowDirection.RightToLeft)]
+    public void Auto_complete_popup_matches_the_control_width(FlowDirection direction)
+    {
+        var old = CupertinoAccessibility.ReduceMotion;
+        CupertinoAccessibility.ReduceMotion = true;
+        var autoComplete = new AutoCompleteBox
+        {
+            Width = 260,
+            HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Left,
+            Margin = new Thickness(20, 0, 0, 0),
+            ItemsSource = new[] { "Apple", "Apricot" },
+        };
+        var window = ShowHosting(autoComplete);
+
+        try
+        {
+            window.FlowDirection = direction;
+            window.UpdateLayout();
+            var popup = autoComplete.GetVisualDescendants().OfType<Popup>().Single();
+            var popupPanel = Assert.IsAssignableFrom<Panel>(popup.Child);
+
+            Assert.Equal(autoComplete.Bounds.Width, popupPanel.MinWidth, 3);
+
+            autoComplete.Text = "a";
+            autoComplete.IsDropDownOpen = true;
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            var field = autoComplete.GetVisualDescendants().OfType<TextBox>().First();
+            var list = popupPanel.Children.OfType<Border>().Single();
+            var fieldRect = field.GetTransformedBounds()!.Value.Clip;
+            var listRect = list.GetTransformedBounds()!.Value.Clip;
+            Assert.Equal(fieldRect.Left, listRect.Left, 1);
+            Assert.Equal(fieldRect.Right, listRect.Right, 1);
+        }
+        finally
+        {
+            window.Close();
+            CupertinoAccessibility.ReduceMotion = old;
+        }
+    }
+
     [AvaloniaFact]
     public void Slider_live_lens_clips_and_changes_fill_at_both_endpoints()
     {
@@ -421,9 +502,13 @@ public class InteractionTests
         var slider = new Slider { Width = 140, Minimum = 0, Maximum = 100, Value = 60 };
         slider.Resources["CupertinoAccentBrush"] = customFill;
 
-        ShowHosting(slider);
+        var window = ShowHosting(slider);
 
         var thumb = slider.GetVisualDescendants().OfType<Thumb>().Single();
+        var grip = thumb.TranslatePoint(new Point(thumb.Bounds.Width / 2, thumb.Bounds.Height / 2), window)!.Value;
+        window.MouseDown(grip, MouseButton.Left);
+        window.MouseUp(grip, MouseButton.Left);
+        window.UpdateLayout();
         Assert.Equal(customFill.Color, Assert.IsType<SolidColorBrush>(slider.Foreground).Color);
         Assert.Equal(customFill.Color, Assert.IsType<SolidColorBrush>(thumb.Foreground).Color);
 
@@ -739,6 +824,29 @@ public class CalendarTests
         Assert.Equal(1, wheel.SelectedIndex);
         items.Clear();
         Assert.Equal(0, wheel.SelectedIndex);
+    }
+
+    [AvaloniaFact]
+    public void Wheel_accumulates_fractional_scroll_deltas()
+    {
+        var wheel = new CupertinoWheel
+        {
+            Items = new ObservableCollection<string> { "One", "Two", "Three", "Four" },
+            ShouldLoop = false,
+        };
+        var window = new Window { Width = 200, Height = 260, Content = wheel };
+        window.Show();
+        window.UpdateLayout();
+        try
+        {
+            for (var i = 0; i < 9; i++)
+                window.MouseWheel(new Point(100, 130), new Vector(0, -0.1));
+            Assert.Equal(0, wheel.SelectedIndex);
+
+            window.MouseWheel(new Point(100, 130), new Vector(0, -0.1));
+            Assert.Equal(1, wheel.SelectedIndex);
+        }
+        finally { window.Close(); }
     }
 
     [AvaloniaFact]
@@ -1100,6 +1208,25 @@ public class NavigationBarTests
         scroller.Offset = new Vector(0, bar.CollapseDistance / 2);
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
         Assert.Equal(0.5, bar.CollapseProgress, 2);
+
+        bar.Scroller = null;
+        Assert.Equal(0, bar.CollapseProgress);
+    }
+
+    [AvaloniaFact]
+    public void Collapse_set_without_a_scroller_survives_attaching()
+    {
+        var bar = new CupertinoNavigationBar { Title = "Settings", Width = 402, CollapseProgress = 1 };
+        var window = new Window { Width = 402, Height = 600, Content = bar };
+        try
+        {
+            window.Show();
+            window.UpdateLayout();
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(1, bar.CollapseProgress);
+        }
+        finally { window.Close(); }
     }
 }
 
@@ -1712,7 +1839,7 @@ public class ButtonInteractionTests
                     - targetOrigin.Y - panel.Bounds.Height / 2);
             Assert.Equal(expectedOffset.X, openingTransform.Value.M31, 3);
             Assert.Equal(expectedOffset.Y, openingTransform.Value.M32, 3);
-            Assert.Equal(Matrix.Identity, panel.RenderTransform?.Value);
+            Assert.Equal(Matrix.Identity, panel.RenderTransform?.Value ?? Matrix.Identity);
             Assert.Equal(1, button.Opacity);
             Assert.True(flyout.Popup.ShouldUseOverlayLayer);
 
@@ -1723,6 +1850,14 @@ public class ButtonInteractionTests
             Assert.Equal(1, content.Opacity);
             Assert.Null(panel.Clip);
             Assert.True(Assert.IsType<TransformOperations>(glass.RenderTransform).IsIdentity);
+            var glassTransitions = Assert.IsType<Transitions>(glass.Transitions);
+            Assert.Collection(glassTransitions,
+                transition => Assert.Equal(
+                    Visual.RenderTransformProperty,
+                    Assert.IsType<TransformOperationsTransition>(transition).Property),
+                transition => Assert.Equal(
+                    Visual.OpacityProperty,
+                    Assert.IsType<DoubleTransition>(transition).Property));
             Assert.Equal(1, button.Opacity);
             Assert.True(button.IsVisible);
             Assert.True(button.IsHitTestVisible);

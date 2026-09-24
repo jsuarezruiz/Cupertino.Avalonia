@@ -1,14 +1,17 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
+using Avalonia.VisualTree;
 using Cupertino.Controls;
 using SkiaSharp;
 using Xunit;
@@ -167,6 +170,272 @@ public class GlassRepaintTests
             using var updated = Capture(window);
 
             Assert.Equal(center, updated.GetPixel(updated.Width / 2, updated.Height / 2));
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public async Task Wheel_steps_inside_glass_redraw_from_one_backdrop_sample()
+    {
+        var backdrop = new PatternBackdrop();
+        var patch = new Border
+        {
+            Width = 24,
+            Height = 24,
+            Background = Brushes.Red,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+        var wheel = new CupertinoWheel
+        {
+            Items = Enumerable.Range(1, 30).Select(i => i.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray(),
+            SelectedIndex = 10,
+            Width = 80,
+            Height = 150,
+        };
+        var glass = new GlassSurface
+        {
+            Width = 200,
+            Height = 200,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Child = wheel,
+        };
+        var window = new Window { Width = 400, Height = 300, Content = new Grid { Children = { backdrop, patch, glass } } };
+        try
+        {
+            window.Show();
+            Capture(window).Dispose();
+            var start = wheel.TranslatePoint(new Point(wheel.Bounds.Width / 2, wheel.Bounds.Height / 2), window)!.Value;
+            window.MouseMove(start);
+            window.MouseDown(start, MouseButton.Left);
+            await Task.Delay(450);
+            var before = GlassSurface.GetBackdropInvalidationCount(window);
+
+            SKBitmap? stepped = null;
+            for (var i = 1; i <= 6; i++)
+            {
+                window.MouseMove(start + new Point(0, -8 * i));
+                stepped?.Dispose();
+                stepped = Capture(window);
+            }
+            using (stepped)
+            {
+                // Only the first step repaints the backdrop; the rest reuse its sample.
+                Assert.Equal(before + 1, GlassSurface.GetBackdropInvalidationCount(window));
+                backdrop.InvalidateVisual();
+                using var fresh = Capture(window);
+                AssertMatches(fresh, stepped!);
+            }
+
+            // A change behind the glass still reaches it between steps.
+            using var beforePatch = Capture(window);
+            patch.Background = Brushes.Lime;
+            window.MouseMove(start + new Point(0, -56));
+            using var afterPatch = Capture(window);
+            var center = new SKPointI(afterPatch.Width / 2, afterPatch.Height / 2 + 60);
+            Assert.NotEqual(beforePatch.GetPixel(center.X, center.Y), afterPatch.GetPixel(center.X, center.Y));
+        }
+        finally
+        {
+            window.MouseUp(new Point(1, 1), MouseButton.Left);
+            window.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public async Task Glass_over_an_animating_wheel_keeps_the_full_repaint()
+    {
+        var (window, backdrop, wheel, _) = WheelInGlass(overlay: true);
+        try
+        {
+            var start = await PressWheel(window, wheel);
+            var before = GlassSurface.GetBackdropInvalidationCount(window);
+            SKBitmap? stepped = null;
+            for (var i = 1; i <= 4; i++)
+            {
+                window.MouseMove(start + new Point(0, -8 * i));
+                stepped?.Dispose();
+                stepped = Capture(window);
+            }
+            using (stepped)
+            {
+                Assert.Equal(before + 4, GlassSurface.GetBackdropInvalidationCount(window));
+                backdrop.InvalidateVisual();
+                using var fresh = Capture(window);
+                AssertMatches(fresh, stepped!);
+            }
+        }
+        finally { Release(window); }
+    }
+
+    [AvaloniaFact]
+    public async Task Glass_drops_its_backdrop_sample_once_content_stops()
+    {
+        var (window, _, wheel, _) = WheelInGlass(overlay: false);
+        try
+        {
+            var start = await PressWheel(window, wheel);
+            for (var i = 1; i <= 3; i++)
+            {
+                window.MouseMove(start + new Point(0, -8 * i));
+                Capture(window).Dispose();
+            }
+            await Task.Delay(1300);
+            Capture(window).Dispose();
+
+            var before = GlassSurface.GetBackdropInvalidationCount(window);
+            window.MouseMove(start + new Point(0, -32));
+            Capture(window).Dispose();
+            Assert.Equal(before + 1, GlassSurface.GetBackdropInvalidationCount(window));
+        }
+        finally { Release(window); }
+    }
+
+    [AvaloniaFact]
+    public async Task Offscreen_render_leaves_the_glass_redraw_state_alone()
+    {
+        var (window, _, wheel, scene) = WheelInGlass(overlay: false);
+        try
+        {
+            var start = await PressWheel(window, wheel);
+            window.MouseMove(start + new Point(0, -8));
+            Capture(window).Dispose();
+            var glass = (GlassSurface)scene.Children[1];
+            var state = glass.RedrawState;
+            Assert.NotNull(state);
+
+            using (var offscreen = new global::Avalonia.Media.Imaging.RenderTargetBitmap(new PixelSize(400, 300)))
+                offscreen.Render(scene);
+
+            Assert.Same(state, glass.RedrawState);
+        }
+        finally { Release(window); }
+    }
+
+    [AvaloniaFact]
+    public async Task Hovering_a_tab_in_a_glass_bar_matches_a_full_repaint()
+    {
+        var backdrop = new PatternBackdrop();
+        var tabs = new TabControl { Classes = { "bottom" }, SelectedIndex = 0 };
+        foreach (var header in new[] { "Home", "New", "Settings" })
+            tabs.Items.Add(new TabItem { Header = header, Content = new Border() });
+        var window = new Window { Width = 420, Height = 300, Content = new Grid { Children = { backdrop, tabs } } };
+        try
+        {
+            window.Show();
+            await Task.Delay(450);
+            Capture(window).Dispose();
+            var item = tabs.GetVisualDescendants().OfType<TabItem>().ElementAt(1);
+            window.MouseMove(item.TranslatePoint(new Point(item.Bounds.Width / 2, item.Bounds.Height / 2), window)!.Value);
+            SKBitmap? hovered = null;
+            for (var i = 0; i < 10; i++)
+            {
+                await Task.Delay(20);
+                hovered?.Dispose();
+                hovered = Capture(window);
+            }
+            using (hovered)
+            {
+                backdrop.InvalidateVisual();
+                using var fresh = Capture(window);
+                AssertMatches(fresh, hovered!);
+            }
+        }
+        finally { window.Close(); }
+    }
+
+    private static (Window Window, PatternBackdrop Backdrop, CupertinoWheel Wheel, Grid Scene) WheelInGlass(bool overlay)
+    {
+        var backdrop = new PatternBackdrop();
+        var wheel = new CupertinoWheel
+        {
+            Items = Enumerable.Range(1, 30).Select(i => i.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray(),
+            SelectedIndex = 10,
+            Width = 80,
+            Height = 150,
+        };
+        var content = new Grid { Children = { wheel } };
+        if (overlay)
+            content.Children.Add(new GlassSurface { Width = 120, Height = 36, CornerRadius = new CornerRadius(18) });
+        var glass = new GlassSurface
+        {
+            Width = 200,
+            Height = 200,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Child = content,
+        };
+        var scene = new Grid { Children = { backdrop, glass } };
+        var window = new Window { Width = 400, Height = 300, Content = scene };
+        window.Show();
+        return (window, backdrop, wheel, scene);
+    }
+
+    private static async Task<Point> PressWheel(Window window, CupertinoWheel wheel)
+    {
+        Capture(window).Dispose();
+        var start = wheel.TranslatePoint(new Point(wheel.Bounds.Width / 2, wheel.Bounds.Height / 2 + 40), window)!.Value;
+        window.MouseMove(start);
+        window.MouseDown(start, MouseButton.Left);
+        await Task.Delay(450);
+        return start;
+    }
+
+    private static void Release(Window window)
+    {
+        window.MouseUp(new Point(1, 1), MouseButton.Left);
+        window.Close();
+    }
+
+    [AvaloniaTheory]
+    [InlineData(40, true)]
+    [InlineData(double.NaN, false)]
+    public async Task Spinner_inside_glass_matches_a_full_repaint(double size, bool reuses)
+    {
+        var backdrop = new PatternBackdrop();
+        var glass = new GlassSurface
+        {
+            Width = 120,
+            Height = 80,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Child = new CupertinoActivityIndicator { IsActive = true, Width = size, Height = size },
+        };
+        var window = new Window { Width = 400, Height = 240, Content = new Grid { Children = { backdrop, glass } } };
+        try
+        {
+            window.Show();
+            await Task.Delay(450);
+            using var first = Capture(window);
+            var before = GlassSurface.GetBackdropInvalidationCount(window);
+            SKBitmap? spun = null;
+            for (var i = 0; i < 5; i++)
+            {
+                await Task.Delay(110);
+                spun?.Dispose();
+                spun = Capture(window);
+            }
+            using (spun)
+            {
+                var cx = first.Width / 2;
+                var cy = first.Height / 2;
+                var changed = 0;
+                for (var y = cy - 15; y < cy + 15; y++)
+                    for (var x = cx - 15; x < cx + 15; x++)
+                        if (ChannelDelta(first.GetPixel(x, y), spun!.GetPixel(x, y)) > 3)
+                            changed++;
+                Assert.True(changed > 0, "The spinner did not advance.");
+                // A spinner reaching the rounded edge repaints the backdrop on every step instead.
+                var repaints = GlassSurface.GetBackdropInvalidationCount(window) - before;
+                if (reuses)
+                    Assert.InRange(repaints, 0, 1);
+                else
+                    Assert.True(repaints >= 4, $"{repaints} backdrop repaints.");
+                backdrop.InvalidateVisual();
+                using var fresh = Capture(window);
+                AssertMatches(fresh, spun!);
+            }
         }
         finally { window.Close(); }
     }

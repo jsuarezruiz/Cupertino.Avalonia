@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:motion="clr-namespace:Cupertino.Animation">
 
   <ControlTheme x:Key="CupertinoPickerCapsule" TargetType="Button">
     <Setter Property="Background" Value="{DynamicResource CupertinoPickerFieldBrush}" />
@@ -73,6 +74,23 @@
     <Style Selector="^:disabled">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
+    <Style Selector="^ /template/ Panel.cupertino-popover">
+      <Setter Property="RenderTransformOrigin" Value="50%,0%" />
+      <Style.Animations>
+        <Animation Duration="{motion:MotionDuration 180}" Easing="QuadraticEaseOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="ScaleTransform.ScaleX" Value="0.94" />
+            <Setter Property="ScaleTransform.ScaleY" Value="0.94" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="ScaleTransform.ScaleX" Value="1" />
+            <Setter Property="ScaleTransform.ScaleY" Value="1" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
   </ControlTheme>
 
   <ControlTheme x:Key="{x:Type TimePicker}" TargetType="TimePicker">
@@ -120,6 +138,23 @@
     </Setter>
     <Style Selector="^:disabled">
       <Setter Property="Opacity" Value="0.4" />
+    </Style>
+    <Style Selector="^ /template/ Panel.cupertino-popover">
+      <Setter Property="RenderTransformOrigin" Value="50%,0%" />
+      <Style.Animations>
+        <Animation Duration="{motion:MotionDuration 180}" Easing="QuadraticEaseOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="ScaleTransform.ScaleX" Value="0.94" />
+            <Setter Property="ScaleTransform.ScaleY" Value="0.94" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="1" />
+            <Setter Property="ScaleTransform.ScaleX" Value="1" />
+            <Setter Property="ScaleTransform.ScaleY" Value="1" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
     </Style>
   </ControlTheme>
 

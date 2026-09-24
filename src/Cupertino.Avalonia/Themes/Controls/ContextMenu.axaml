@@ -6,7 +6,7 @@
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Classes="cupertino-popover cupertino-source-transition" Margin="18,10,18,18">
+        <Panel Classes="cupertino-popover" Margin="18,10,18,18">
           <Grid MinWidth="220">
             <controls:GlassSurface Classes="cupertino-source-transition-material"
                                    Theme="{StaticResource CupertinoPopoverSurface}"

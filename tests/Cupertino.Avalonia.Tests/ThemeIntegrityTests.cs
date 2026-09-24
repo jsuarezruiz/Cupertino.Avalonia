@@ -294,6 +294,11 @@ public class ThemeIntegrityTests
         window.Show();
         window.UpdateLayout();
         global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        var thumb = slider.GetVisualDescendants().OfType<Thumb>().Single();
+        var grip = thumb.TranslatePoint(new Point(thumb.Bounds.Width / 2, thumb.Bounds.Height / 2), window)!.Value;
+        window.MouseDown(grip, MouseButton.Left);
+        window.MouseUp(grip, MouseButton.Left);
+        window.UpdateLayout();
 
         Assert.True(slider.TryFindResource("CupertinoSliderDragRailBrush", variant, out var resource));
         var rail = Assert.IsType<LinearGradientBrush>(resource);

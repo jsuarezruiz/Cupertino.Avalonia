@@ -1,6 +1,5 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:motion="clr-namespace:Cupertino.Animation"
                     xmlns:controls="clr-namespace:Cupertino.Controls">
 
   <ControlTheme x:Key="CupertinoTopLevelMenuItem" TargetType="MenuItem">
@@ -25,7 +24,7 @@
                  controls:CupertinoFlyoutTransition.IsOpen="{TemplateBinding IsSubMenuOpen, Mode=TwoWay}"
                  IsLightDismissEnabled="False"
                  Placement="BottomEdgeAlignedLeft">
-            <Panel Classes="cupertino-popover cupertino-source-transition" Margin="18,6,18,18">
+            <Panel Classes="cupertino-popover" Margin="18,6,18,18">
               <Grid MinWidth="180">
                 <controls:GlassSurface Classes="cupertino-source-transition-material"
                                        Theme="{StaticResource CupertinoPopoverSurface}"

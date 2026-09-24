@@ -257,24 +257,27 @@ public class CupertinoTimePicker : TemplatedControl
         {
             TextAlignment = Avalonia.Media.TextAlignment.Right,
             Items = Mode == CupertinoTimePickerMode.CountdownDuration
-                ? Enumerable.Range(0, durationHours + 1).Select(h => h.ToString(culture)).ToList()
+                ? WheelItems.Get(culture, "hours:" + durationHours,
+                    c => Enumerable.Range(0, durationHours + 1).Select(h => h.ToString(c)).ToArray())
                 : Is12Hour
-                ? Enumerable.Range(1, 12).Select(h => h.ToString(culture)).ToList()
-                : Enumerable.Range(0, 24).Select(h => h.ToString("00", culture)).ToList(),
+                ? WheelItems.Get(culture, "hours12",
+                    c => Enumerable.Range(1, 12).Select(h => h.ToString(c)).ToArray())
+                : WheelItems.Get(culture, "hours24",
+                    c => Enumerable.Range(0, 24).Select(h => h.ToString("00", c)).ToArray()),
         };
         _minutes = new CupertinoWheel
         {
             TextAlignment = Avalonia.Media.TextAlignment.Left,
-            Items = Enumerable.Range(0, 59 / step + 1)
-                              .Select(i => (i * step).ToString("00", culture)).ToList(),
+            Items = WheelItems.Get(culture, "minutes:" + step,
+                c => Enumerable.Range(0, 59 / step + 1).Select(i => (i * step).ToString("00", c)).ToArray()),
         };
         _period = new CupertinoWheel
         {
             TextAlignment = Avalonia.Media.TextAlignment.Left,
             ShouldLoop = false,
             IsVisible = Is12Hour && Mode == CupertinoTimePickerMode.Time,
-            Items = new List<string> { culture.DateTimeFormat.AMDesignator,
-                                       culture.DateTimeFormat.PMDesignator },
+            Items = WheelItems.Get(culture, "period",
+                c => [c.DateTimeFormat.AMDesignator, c.DateTimeFormat.PMDesignator]),
         };
 
         foreach (var w in new[] { _hours, _minutes, _period })

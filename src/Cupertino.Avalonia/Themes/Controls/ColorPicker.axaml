@@ -1,6 +1,5 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:Cupertino.Controls"
                     xmlns:conv="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls.ColorPicker">
 
   <!-- Part names are required by Avalonia's ColorPicker controls. -->
@@ -288,7 +287,7 @@
     <Setter Property="Padding" Value="0" />
     <Setter Property="Template">
       <ControlTemplate>
-        <Panel Classes="cupertino-popover cupertino-source-transition" Margin="12">
+        <Panel Classes="cupertino-popover" Margin="12">
           <Grid>
             <Border Classes="cupertino-source-transition-material"
                     Background="{TemplateBinding Background}"

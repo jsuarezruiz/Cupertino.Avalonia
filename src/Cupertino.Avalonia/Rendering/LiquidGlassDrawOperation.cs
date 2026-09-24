@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Media;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
+using Avalonia.Threading;
 using SkiaSharp;
 
 namespace Cupertino.Rendering;
@@ -213,19 +214,94 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         return filter;
     }
 
+    private const int BackendUnknown = 0, BackendRaster = 1, BackendGpu = 2;
+    private static int _browserBackend;
+
+    // Software canvas in the browser: the flat material replaces glass.
+    internal static bool IsBrowserRaster => Volatile.Read(ref _browserBackend) == BackendRaster;
+
+    // Offscreen bitmaps are raster too, so a GPU frame always wins.
+    internal static bool IsBrowserRasterFrame(ISkiaSharpApiLease lease)
+    {
+        if (!OperatingSystem.IsBrowser() || lease.SkSurface is null)
+            return false;
+        if (lease.GrContext is not null)
+        {
+            if (Interlocked.Exchange(ref _browserBackend, BackendGpu) == BackendRaster)
+                Dispatcher.UIThread.Post(Controls.GlassSurface.InvalidateAllSurfaces);
+            return false;
+        }
+        if (Interlocked.CompareExchange(ref _browserBackend, BackendRaster, BackendUnknown) == BackendUnknown)
+            Dispatcher.UIThread.Post(Controls.GlassSurface.InvalidateAllSurfaces);
+        return IsBrowserRaster;
+    }
+
     private readonly GlassParams _params;
 
     private readonly Rect _surface;
     private readonly FrozenBackdrop? _frozenBackdrop;
+    private readonly bool _retainSample;
+    private readonly object _sampleGate = new();
+    private Sample? _sample;
+    private bool _rendered;
+    private bool _disposed;
+    private volatile bool _drawn;
+    // GPU images are released on the render thread, where their context is current.
+    private static readonly System.Collections.Concurrent.ConcurrentQueue<IDisposable> Retired = new();
+    // Larger glass keeps sampling the retained frame rather than holding a copy.
+    private const double MaxKeptBackdropPixels = 2_000_000;
+    private SKSurface? _backdrop;
+    private SKRectI _backdropRect;
+    private IntPtr _backdropSurface;
+    private IntPtr _backdropContext;
 
     public LiquidGlassDrawOperation(
-        Rect surface, Rect bounds, GlassParams parameters, FrozenBackdrop? frozenBackdrop)
+        Rect surface, Rect bounds, GlassParams parameters, FrozenBackdrop? frozenBackdrop,
+        bool retainSample = false)
     {
         _surface = surface;
         Bounds = bounds;
         _params = parameters;
         _frozenBackdrop = frozenBackdrop;
         _frozenBackdrop?.AddHolder();
+        _retainSample = retainSample || frozenBackdrop is not null;
+    }
+
+    internal ForegroundState Foreground { get; } = new();
+
+    // True once drawn; immediate renderers draw while recording.
+    internal bool HasDrawn => _drawn;
+
+    // Shared with the owning surface on the UI thread.
+    internal sealed class ForegroundState
+    {
+        private readonly object _gate = new();
+        private Rect? _pending;
+        private volatile bool _hasCleanSample;
+
+        // True while the first sample is kept and no other redraw has touched the backdrop since.
+        public bool HasCleanSample
+        {
+            get => _hasCleanSample;
+            internal set => _hasCleanSample = value;
+        }
+
+        // Content above the glass changed inside this local rect; its backdrop did not.
+        public void Mark(Rect local)
+        {
+            lock (_gate)
+                _pending = _pending is { } pending ? pending.Union(local) : local;
+        }
+
+        // Marks last for the operation: UI ticks can run ahead of the frame being rendered.
+        internal Rect? Current
+        {
+            get
+            {
+                lock (_gate)
+                    return _pending;
+            }
+        }
     }
 
     public Rect Bounds { get; }
@@ -237,10 +313,42 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
 
     public void Dispose()
     {
+        lock (_sampleGate)
+        {
+            _disposed = true;
+            if (_sample is { } sample)
+            {
+                if (sample.OnGpu)
+                    Retired.Enqueue(sample);
+                else
+                    sample.Dispose();
+                _sample = null;
+            }
+            if (_backdrop is not null)
+            {
+                if (_backdropContext != IntPtr.Zero)
+                    Retired.Enqueue(_backdrop);
+                else
+                    _backdrop.Dispose();
+                _backdrop = null;
+            }
+            Foreground.HasCleanSample = false;
+        }
         _frozenBackdrop?.ReleaseIfRetired();
     }
 
     public void Render(ImmediateDrawingContext context)
+    {
+        _drawn = true;
+        var foreground = Foreground.Current;
+        lock (_sampleGate)
+        {
+            if (!_disposed)
+                Render(context, foreground);
+        }
+    }
+
+    private void Render(ImmediateDrawingContext context, Rect? foreground)
     {
         var leaseFeature = context.TryGetFeature<ISkiaSharpApiLeaseFeature>();
         if (leaseFeature is null)
@@ -253,12 +361,22 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         }
 
         using var lease = leaseFeature.Lease();
+        while (Retired.TryDequeue(out var retired))
+            retired.Dispose();
         var canvas = lease.SkCanvas;
         var surface = lease.SkSurface;
 
+        var opacity = (float)Math.Clamp(lease.CurrentOpacity, 0, 1);
+
         if (surface is null)
         {
-            RenderFallback(canvas, null, default, 1f);
+            RenderFallback(canvas, null, default, default, opacity);
+            return;
+        }
+
+        if (IsBrowserRasterFrame(lease))
+        {
+            RenderFallback(canvas, null, default, default, opacity);
             return;
         }
 
@@ -267,18 +385,24 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         // deviceRect already contains the transformed size.  Use the vertical
         // scale for radii and optical distances so a source-bound flyout morph
         // never switches to the flat fallback while approaching scale(1).
-        if (!float.IsFinite(ctm.ScaleX) || ctm.ScaleX <= 0.001f ||
+        if (!float.IsFinite(ctm.ScaleX) || MathF.Abs(ctm.ScaleX) <= 0.001f ||
             !float.IsFinite(ctm.ScaleY) || ctm.ScaleY <= 0.001f ||
             ctm.SkewX != 0 || ctm.SkewY != 0 ||
             ctm.Persp0 != 0 || ctm.Persp1 != 0 || ctm.Persp2 != 1)
         {
-            RenderFallback(canvas, null, default, 1f);
+            RenderFallback(canvas, null, default, default, opacity);
             return;
         }
         var localBounds = new SKRect(0, 0, (float)_surface.Width, (float)_surface.Height);
         var deviceRect = ctm.MapRect(localBounds);
 
         var scale = ctm.ScaleY;
+        // Right-to-left layouts mirror the surface, swapping its left and right corners on screen.
+        var radii = ctm.ScaleX < 0
+            ? new Radii(_params.RadiusTopRight * scale, _params.RadiusTopLeft * scale,
+                        _params.RadiusBottomLeft * scale, _params.RadiusBottomRight * scale)
+            : new Radii(_params.RadiusTopLeft * scale, _params.RadiusTopRight * scale,
+                        _params.RadiusBottomRight * scale, _params.RadiusBottomLeft * scale);
 
         var sigma = _params.BlurRadius * scale * 0.5f;
         var glassPadding = MathF.Ceiling(sigma * 3f) + MathF.Ceiling((_params.Refraction * 1.35f + 2f) * scale);
@@ -296,10 +420,26 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
             paddedWidth < 1 || paddedHeight < 1 || paddedWidth > 8192 || paddedHeight > 8192 ||
             (double)paddedWidth * paddedHeight > 16 * 1024 * 1024)
         {
-            RenderFallback(canvas, null, default, 1f);
+            RenderFallback(canvas, null, default, default, opacity);
             return;
         }
         var pad = (int)padding;
+        // Frozen input never changes; otherwise only a redraw confined to marked foreground may reuse.
+        var contextHandle = lease.GrContext?.Handle ?? IntPtr.Zero;
+        if (_sample is { } kept && kept.Matches(ctm, surface.Handle, contextHandle)
+            && (_frozenBackdrop is not null
+                || kept.Clean && foreground is { } local && Covers(ctm.MapRect(ToSKRect(local)), canvas.DeviceClipBounds)
+                   && InsideShape(canvas.DeviceClipBounds, deviceRect, radii)))
+        {
+            DrawShadow(canvas, kept.Shadow, deviceRect, pad, opacity);
+            DrawGlass(canvas, kept.Blurred, kept.Luma, deviceRect, radii, scale, pad, opacity);
+            return;
+        }
+        // Only a new operation's first draw repaints its whole backdrop.
+        var first = !_rendered;
+        _rendered = true;
+        ReplaceSample(null);
+
         var info = new SKImageInfo((int)paddedWidth, (int)paddedHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
         // Budgeted so Skia can recycle it.
         using var blurSurface = lease.GrContext is { } grContext
@@ -307,7 +447,7 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
             : SKSurface.Create(info);
         if (blurSurface is null)
         {
-            RenderFallback(canvas, null, default, 1f);
+            RenderFallback(canvas, null, default, default, opacity);
             return;
         }
 
@@ -321,7 +461,7 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
             : null;
         if (croppedBackdrop is null && _frozenBackdrop is null)
         {
-            RenderFallback(canvas, null, default, 1f);
+            RenderFallback(canvas, null, default, default, opacity);
             return;
         }
 
@@ -329,78 +469,217 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         // Skia clamps the crop to the surface.
         var snapshotLeft = croppedBackdrop is null ? 0 : Math.Max(0, cropLeft);
         var snapshotTop = croppedBackdrop is null ? 0 : Math.Max(0, cropTop);
+        using var merged = croppedBackdrop is null
+            ? null
+            : MergeBackdrop(lease.GrContext, croppedBackdrop, snapshotLeft, snapshotTop,
+                ctm.MapRect(ToSKRect(Bounds)), canvas.DeviceClipBounds, surface.Handle, contextHandle);
+        if (merged is not null)
+            snapshot = merged;
 
         var bc = blurSurface.Canvas;
-
-        // Rasterize the shadow offscreen too (same macOS issue), before the blur pass
-        // reuses the target.
-        if (_params.ShadowOpacity > 0.002f)
+        SKImage? shadow = null;
+        SKImage? blurred = null;
+        SKShader? lumaTexture = null;
+        try
         {
-            var rTL = _params.RadiusTopLeft * scale;
-            var rTR = _params.RadiusTopRight * scale;
-            var rBR = _params.RadiusBottomRight * scale;
-            var rBL = _params.RadiusBottomLeft * scale;
-            var localRect = SKRect.Create(pad, pad, deviceRect.Width, deviceRect.Height);
-
-            bc.Clear(SKColors.Transparent);
-            bc.Save();
-            var keepOut = SKRect.Inflate(localRect, -0.75f, -0.75f);
-            bc.ClipRoundRect(
-                CreateRoundRect(
-                    keepOut,
-                    Math.Max(0, rTL - 0.75f), Math.Max(0, rTR - 0.75f),
-                    Math.Max(0, rBR - 0.75f), Math.Max(0, rBL - 0.75f)),
-                SKClipOperation.Difference, true);
-
-            // The layers sum to ShadowContactOverdraw x opacity; the weight splits it.
-            var wc = Math.Clamp(_params.ShadowContactWeight, 0f, 1f);
-            DrawShadowLayer(bc, localRect, rTL, rTR, rBR, rBL,
-                _params.ShadowOpacity * wc, _params.ShadowBlur * 0.55f, _params.ShadowOffset, scale);
-            DrawShadowLayer(bc, localRect, rTL, rTR, rBR, rBL,
-                _params.ShadowOpacity * (ShadowContactOverdraw - wc), _params.ShadowBlur * 1.8f, _params.ShadowOffset * 0.6f, scale);
-            bc.Restore();
-
-            using (var shadow = blurSurface.Snapshot())
+            // Rasterize the shadow offscreen too (same macOS issue), before the blur pass
+            // reuses the target.
+            if (_params.ShadowOpacity > 0.002f)
             {
-                canvas.Save();
-                canvas.SetMatrix(SKMatrix.Identity);
-                canvas.DrawImage(shadow, deviceRect.Left - pad, deviceRect.Top - pad);
-                canvas.Restore();
+                var (rTL, rTR, rBR, rBL) = radii;
+                var localRect = SKRect.Create(pad, pad, deviceRect.Width, deviceRect.Height);
+
+                bc.Clear(SKColors.Transparent);
+                bc.Save();
+                var keepOut = SKRect.Inflate(localRect, -0.75f, -0.75f);
+                bc.ClipRoundRect(
+                    CreateRoundRect(
+                        keepOut,
+                        Math.Max(0, rTL - 0.75f), Math.Max(0, rTR - 0.75f),
+                        Math.Max(0, rBR - 0.75f), Math.Max(0, rBL - 0.75f)),
+                    SKClipOperation.Difference, true);
+
+                // The layers sum to ShadowContactOverdraw x opacity; the weight splits it.
+                var wc = Math.Clamp(_params.ShadowContactWeight, 0f, 1f);
+                DrawShadowLayer(bc, localRect, rTL, rTR, rBR, rBL,
+                    _params.ShadowOpacity * wc, _params.ShadowBlur * 0.55f, _params.ShadowOffset, scale);
+                DrawShadowLayer(bc, localRect, rTL, rTR, rBR, rBL,
+                    _params.ShadowOpacity * (ShadowContactOverdraw - wc), _params.ShadowBlur * 1.8f, _params.ShadowOffset * 0.6f, scale);
+                bc.Restore();
+
+                shadow = blurSurface.Snapshot();
+                DrawShadow(canvas, shadow, deviceRect, pad, opacity);
+                // A kept snapshot makes the next write copy the target.
+                if (!_retainSample)
+                {
+                    shadow.Dispose();
+                    shadow = null;
+                }
+            }
+
+            // Pass 1: crop, blur and saturate into the padded offscreen surface.
+            bc.Clear(SKColors.Transparent);
+            var blurFilter = BlurFilter(sigma);
+            var saturationFilter = SaturationFilter(_params.Saturation);
+            using (var blurPaint = new SKPaint { ImageFilter = blurFilter, ColorFilter = saturationFilter })
+                bc.DrawImage(
+                    snapshot,
+                    snapshotLeft + pad - deviceRect.Left,
+                    snapshotTop + pad - deviceRect.Top,
+                    blurPaint);
+
+            blurred = blurSurface.Snapshot();
+
+            // Pass 2: render the glass effect in device space.
+            if (LiquidGlassShader.Effect is null)
+            {
+                RenderFallback(canvas, blurred, deviceRect, radii, opacity, pad);
+                return;
+            }
+
+            // Average luma once per frame, not per fragment.
+            if (_params.Adaptive > 0.5f)
+            {
+                using var blurredShader = BlurredShader(blurred, pad);
+                lumaTexture = CreateLumaTexture(lease.GrContext, blurredShader, deviceRect, pad);
+            }
+
+            DrawGlass(canvas, blurred, lumaTexture, deviceRect, radii, scale, pad, opacity);
+
+            // A partial redraw without a kept backdrop samples retained glass pixels; do not reuse it.
+            if (_retainSample && (first || merged is not null || _frozenBackdrop is not null))
+            {
+                ReplaceSample(new Sample(ctm, surface.Handle, contextHandle, first || merged is not null,
+                    shadow, blurred, lumaTexture));
+                shadow = null;
+                blurred = null;
+                lumaTexture = null;
             }
         }
+        finally
+        {
+            shadow?.Dispose();
+            blurred?.Dispose();
+            lumaTexture?.Dispose();
+        }
+    }
 
-        // Pass 1: crop, blur and saturate into the padded offscreen surface.
-        bc.Clear(SKColors.Transparent);
-        var blurFilter = BlurFilter(sigma);
-        var saturationFilter = SaturationFilter(_params.Saturation);
-        using (var blurPaint = new SKPaint { ImageFilter = blurFilter, ColorFilter = saturationFilter })
-            bc.DrawImage(
-                snapshot,
-                snapshotLeft + pad - deviceRect.Left,
-                snapshotTop + pad - deviceRect.Top,
-                blurPaint);
+    private void ReplaceSample(Sample? sample)
+    {
+        _sample?.Dispose();
+        _sample = sample;
+        Foreground.HasCleanSample = sample is { Clean: true };
+    }
 
-        using var blurred = blurSurface.Snapshot();
+    // Outside a partial redraw's clip, the surface still holds last frame's output, glass included.
+    // Under the glass that is replaced by the backdrop kept from earlier draws.
+    private SKImage? MergeBackdrop(
+        GRContext? grContext, SKImage live, int left, int top, SKRect opDevice, SKRectI clip,
+        IntPtr surfaceHandle, IntPtr contextHandle)
+    {
+        var liveRect = SKRectI.Create(left, top, live.Width, live.Height);
+        if ((double)live.Width * live.Height > MaxKeptBackdropPixels)
+        {
+            _backdrop?.Dispose();
+            _backdrop = null;
+            return null;
+        }
+        if (_backdrop is null || _backdropRect != liveRect
+            || _backdropSurface != surfaceHandle || _backdropContext != contextHandle)
+        {
+            _backdrop?.Dispose();
+            var info = new SKImageInfo(live.Width, live.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+            _backdrop = grContext is not null
+                ? SKSurface.Create(grContext, true, info) ?? SKSurface.Create(grContext, false, info)
+                : SKSurface.Create(info);
+            (_backdropRect, _backdropSurface, _backdropContext) = (liveRect, surfaceHandle, contextHandle);
+            if (_backdrop is null)
+                return null;
+            using var copy = new SKPaint { BlendMode = SKBlendMode.Src };
+            _backdrop.Canvas.DrawImage(live, 0, 0, copy);
+            return null;
+        }
 
-        using var blurredShader = blurred.ToShader(
+        var inner = new SKRectI(
+            (int)MathF.Ceiling(opDevice.Left) - left, (int)MathF.Ceiling(opDevice.Top) - top,
+            (int)MathF.Floor(opDevice.Right) - left, (int)MathF.Floor(opDevice.Bottom) - top);
+        var redrawn = new SKRectI(clip.Left - left, clip.Top - top, clip.Right - left, clip.Bottom - top);
+        var canvas = _backdrop.Canvas;
+        using var paint = new SKPaint { BlendMode = SKBlendMode.Src };
+        canvas.Save();
+        canvas.ClipRect(inner, SKClipOperation.Difference);
+        canvas.DrawImage(live, 0, 0, paint);
+        canvas.Restore();
+        canvas.Save();
+        canvas.ClipRect(redrawn);
+        canvas.DrawImage(live, 0, 0, paint);
+        canvas.Restore();
+        return _backdrop.Snapshot();
+    }
+
+    private static SKShader BlurredShader(SKImage blurred, int pad) =>
+        blurred.ToShader(
             SKShaderTileMode.Clamp, SKShaderTileMode.Clamp,
             new SKSamplingOptions(SKFilterMode.Linear),
             SKMatrix.CreateTranslation(-pad, -pad));
 
-        // Pass 2: render the glass effect in device space.
-        var effect = LiquidGlassShader.Effect;
-        if (effect is null)
+    private static SKRect ToSKRect(Rect rect) =>
+        new((float)rect.Left, (float)rect.Top, (float)rect.Right, (float)rect.Bottom);
+
+    // Dirty rects are inflated and snapped to device pixels.
+    private static bool Covers(SKRect area, SKRectI clip) =>
+        !clip.IsEmpty
+        && clip.Left >= MathF.Floor(area.Left) - 2 && clip.Top >= MathF.Floor(area.Top) - 2
+        && clip.Right <= MathF.Ceiling(area.Right) + 2 && clip.Bottom <= MathF.Ceiling(area.Bottom) + 2;
+
+    // A redraw clip crossing the rounded edge changes its antialiasing, so only interiors reuse.
+    private static bool InsideShape(SKRectI clip, SKRect deviceRect, Radii radii) =>
+        CreateRoundRect(
+            SKRect.Inflate(deviceRect, -1, -1),
+            Math.Max(0, radii.TopLeft - 1), Math.Max(0, radii.TopRight - 1),
+            Math.Max(0, radii.BottomRight - 1), Math.Max(0, radii.BottomLeft - 1))
+        .Contains(new SKRect(clip.Left, clip.Top, clip.Right, clip.Bottom));
+
+    // Local-space counterpart used to decide before the frame is rendered.
+    internal static bool InsideShape(Rect area, Rect shape, CornerRadius radius)
+    {
+        var (tl, tr, br, bl) = (radius.TopLeft, radius.TopRight, radius.BottomRight, radius.BottomLeft);
+        var fit = Math.Min(1, Math.Min(
+            Math.Min(shape.Width / Math.Max(tl + tr, 1e-9), shape.Width / Math.Max(bl + br, 1e-9)),
+            Math.Min(shape.Height / Math.Max(tl + bl, 1e-9), shape.Height / Math.Max(tr + br, 1e-9))));
+        (tl, tr, br, bl) = (tl * fit, tr * fit, br * fit, bl * fit);
+        return shape.Contains(area.TopLeft) && shape.Contains(area.BottomRight)
+            && Inside(area.TopLeft, shape.Left + tl, shape.Top + tl, tl, -1, -1)
+            && Inside(area.TopRight, shape.Right - tr, shape.Top + tr, tr, 1, -1)
+            && Inside(area.BottomRight, shape.Right - br, shape.Bottom - br, br, 1, 1)
+            && Inside(area.BottomLeft, shape.Left + bl, shape.Bottom - bl, bl, -1, 1);
+
+        static bool Inside(Point p, double cx, double cy, double r, int sx, int sy)
         {
-            RenderFallback(canvas, blurred, deviceRect, scale, pad);
-            return;
+            var dx = (p.X - cx) * sx;
+            var dy = (p.Y - cy) * sy;
+            return dx <= 0 || dy <= 0 || dx * dx + dy * dy <= r * r;
         }
+    }
 
+    private static void DrawShadow(SKCanvas canvas, SKImage? shadow, SKRect deviceRect, int pad, float opacity)
+    {
+        if (shadow is null)
+            return;
+        canvas.Save();
+        canvas.SetMatrix(SKMatrix.Identity);
+        using var shadowPaint = opacity < 1 ? new SKPaint { Color = SKColors.White.WithAlpha(ToByte(opacity)) } : null;
+        canvas.DrawImage(shadow, deviceRect.Left - pad, deviceRect.Top - pad, shadowPaint);
+        canvas.Restore();
+    }
+
+    private void DrawGlass(
+        SKCanvas canvas, SKImage blurred, SKShader? lumaTexture,
+        SKRect deviceRect, Radii radii, float scale, int pad, float opacity)
+    {
+        var effect = LiquidGlassShader.Effect!;
         var lightRad = _params.LightAngleDegrees * MathF.PI / 180f;
-
-        // Average luma once per frame, not per fragment.
-        using var lumaTexture = _params.Adaptive > 0.5f
-            ? CreateLumaTexture(lease.GrContext, blurredShader, deviceRect, pad)
-            : null;
+        using var blurredShader = BlurredShader(blurred, pad);
 
         using var uniforms = new SKRuntimeEffectUniforms(effect)
         {
@@ -408,11 +687,7 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
             ["uOrigin"] = Pair(ref _origin, deviceRect.Left, deviceRect.Top),
             ["uSize"] = Pair(ref _size, deviceRect.Width, deviceRect.Height),
             ["uCornerRadii"] = Quad(
-                ref _radii,
-                _params.RadiusTopLeft * scale,
-                _params.RadiusTopRight * scale,
-                _params.RadiusBottomRight * scale,
-                _params.RadiusBottomLeft * scale),
+                ref _radii, radii.TopLeft, radii.TopRight, radii.BottomRight, radii.BottomLeft),
             // Avoid division by zero in the rim mask.
             ["uThickness"] = MathF.Max(0.01f, _params.Thickness * scale),
             ["uRefraction"] = _params.Refraction * scale,
@@ -435,20 +710,37 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         };
 
         using var glassShader = effect.ToShader(uniforms, children);
-        using var paint = new SKPaint { Shader = glassShader };
+        using var paint = new SKPaint { Shader = glassShader, Color = SKColors.White.WithAlpha(ToByte(opacity)) };
 
         canvas.Save();
         canvas.SetMatrix(SKMatrix.Identity);
         canvas.ClipRoundRect(
             CreateRoundRect(
-                deviceRect,
-                _params.RadiusTopLeft * scale,
-                _params.RadiusTopRight * scale,
-                _params.RadiusBottomRight * scale,
-                _params.RadiusBottomLeft * scale),
+                deviceRect, radii.TopLeft, radii.TopRight, radii.BottomRight, radii.BottomLeft),
             antialias: true);
         canvas.DrawRect(SKRect.Inflate(deviceRect, 1, 1), paint);
         canvas.Restore();
+    }
+
+    private sealed class Sample(
+        SKMatrix matrix, IntPtr surface, IntPtr context, bool clean,
+        SKImage? shadow, SKImage blurred, SKShader? luma) : IDisposable
+    {
+        public bool Clean { get; } = clean;
+        public SKImage? Shadow { get; } = shadow;
+        public SKImage Blurred { get; } = blurred;
+        public SKShader? Luma { get; } = luma;
+
+        public bool OnGpu => context != IntPtr.Zero;
+
+        public bool Matches(SKMatrix m, IntPtr s, IntPtr c) => m == matrix && s == surface && c == context;
+
+        public void Dispose()
+        {
+            Shadow?.Dispose();
+            Blurred.Dispose();
+            Luma?.Dispose();
+        }
     }
 
     private static SKShader? CreateLumaTexture(
@@ -505,13 +797,13 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
 
     // Fallback when runtime effects or a readable render surface are unavailable.
     private void RenderFallback(
-        SKCanvas canvas, SKImage? blurred, SKRect deviceRect, float scale, int pad = 0)
+        SKCanvas canvas, SKImage? blurred, SKRect deviceRect, Radii radii, float opacity, int pad = 0)
     {
         using var paint = new SKPaint
         {
             Color = new SKColor(
                 (byte)(_params.TintR * 255), (byte)(_params.TintG * 255), (byte)(_params.TintB * 255),
-                (byte)Math.Clamp(_params.TintA * 255 + 60, 0, 255)),
+                ToByte(Math.Clamp(_params.TintA + 60f / 255f, 0, 1) * opacity)),
             IsAntialias = true,
         };
 
@@ -521,19 +813,16 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
             canvas.SetMatrix(SKMatrix.Identity);
             canvas.ClipRoundRect(
                 CreateRoundRect(
-                    deviceRect,
-                    _params.RadiusTopLeft * scale,
-                    _params.RadiusTopRight * scale,
-                    _params.RadiusBottomRight * scale,
-                    _params.RadiusBottomLeft * scale),
+                    deviceRect, radii.TopLeft, radii.TopRight, radii.BottomRight, radii.BottomLeft),
                 antialias: true);
             var source = new SKRect(
                 pad, pad,
                 Math.Max(pad, blurred.Width - pad),
                 Math.Max(pad, blurred.Height - pad));
+            using var imagePaint = opacity < 1 ? new SKPaint { Color = SKColors.White.WithAlpha(ToByte(opacity)) } : null;
             canvas.DrawImage(
                 blurred, source, deviceRect,
-                new SKSamplingOptions(SKFilterMode.Linear), null);
+                new SKSamplingOptions(SKFilterMode.Linear), imagePaint);
             canvas.DrawRect(deviceRect, paint);
             canvas.Restore();
             return;
@@ -549,6 +838,10 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
                 _params.RadiusBottomLeft),
             paint);
     }
+
+    private readonly record struct Radii(float TopLeft, float TopRight, float BottomRight, float BottomLeft);
+
+    private static byte ToByte(float unit) => (byte)MathF.Round(Math.Clamp(unit, 0, 1) * 255);
 
     private static SKRoundRect CreateRoundRect(
         SKRect rect,
@@ -578,5 +871,27 @@ internal sealed class LiquidGlassDrawOperation : ICustomDrawOperation
         m[10] = ir;    m[11] = ig;     m[12] = ib + s; m[13] = 0; m[14] = 0;
         m[15] = 0;     m[16] = 0;      m[17] = 0;      m[18] = 1; m[19] = 0;
         return m;
+    }
+}
+
+// Keeps observing the backend while flat glass draws nothing through the effect.
+internal sealed class BrowserBackendProbe(Rect bounds) : ICustomDrawOperation
+{
+    public Rect Bounds => bounds;
+
+    public bool HitTest(Point p) => false;
+
+    public bool Equals(ICustomDrawOperation? other) => false;
+
+    public void Dispose()
+    {
+    }
+
+    public void Render(ImmediateDrawingContext context)
+    {
+        if (context.TryGetFeature<ISkiaSharpApiLeaseFeature>() is not { } feature)
+            return;
+        using var lease = feature.Lease();
+        LiquidGlassDrawOperation.IsBrowserRasterFrame(lease);
     }
 }
