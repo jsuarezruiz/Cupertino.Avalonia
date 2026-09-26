@@ -4,12 +4,17 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 ## [Unreleased]
 
+## [0.2.0-preview] - 2026-09-26
+
 ### Added
 
+- Published the documentation and live gallery, and added third-party license notices.
 - The browser gallery shows Avalonia's frame-rate and render-time overlay with `?fps`, and can force its software-rendering fallback with `?software` for diagnostics.
 
 ### Changed
 
+- The package now requires Avalonia 12.x and declares trimming and AOT compatibility.
+- Improved resource customization, accessibility, search state preservation and browser download size.
 - Reduced browser download size and startup work, and improved control creation performance.
 - Text boxes, buttons and sliders build fewer template parts.
 - Pickers, wheels and calendars draw text faster and reuse their item lists, so pickers open faster and hold less memory.
@@ -17,6 +22,8 @@ All notable changes to this project are recorded here. The format follows [Keep 
 
 ### Fixed
 
+- Improved Liquid Glass rendering and reduced idle repainting and per-frame allocations.
+- Fixed calendar, picker, animation, gesture, font, notification and gallery issues.
 - Improved browser glass performance and removed flyout shadow flashes. Glass now follows its opacity, and uses the flat material when the browser renders without a GPU.
 - The AutoCompleteBox suggestion list matches the width and position of its field.
 - Fixed navigation transitions and several calendar, picker, activity-indicator and tab-bar interactions.
@@ -28,22 +35,6 @@ All notable changes to this project are recorded here. The format follows [Keep 
 - A context menu whose opening is cancelled no longer stays invisible the next time it opens.
 - A calendar created with its month picker open no longer crashes.
 - Glass no longer shows a lighter rectangle behind a hovered or pressed item, such as a tab in the bottom tab bar.
-
-## [0.2.0-preview] - 2026-09-21
-
-### Added
-
-- Published the documentation and live gallery, and added third-party license notices.
-
-### Changed
-
-- The package now requires Avalonia 12.x and declares trimming and AOT compatibility.
-- Improved resource customization, accessibility, search state preservation and browser download size.
-
-### Fixed
-
-- Improved Liquid Glass rendering and reduced idle repainting and per-frame allocations.
-- Fixed calendar, picker, animation, gesture, font, notification and gallery issues.
 
 ### Removed
 
