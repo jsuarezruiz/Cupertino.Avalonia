@@ -336,18 +336,24 @@ public class GlassRepaintTests
             Capture(window).Dispose();
             var item = tabs.GetVisualDescendants().OfType<TabItem>().ElementAt(1);
             window.MouseMove(item.TranslatePoint(new Point(item.Bounds.Width / 2, item.Bounds.Height / 2), window)!.Value);
-            SKBitmap? hovered = null;
-            for (var i = 0; i < 10; i++)
+            // Wait for the hover fade to settle; slow machines run it longer.
+            var hovered = Capture(window);
+            var deadline = DateTime.UtcNow.AddSeconds(10);
+            while (DateTime.UtcNow < deadline)
             {
-                await Task.Delay(20);
-                hovered?.Dispose();
-                hovered = Capture(window);
+                await Task.Delay(50);
+                var next = Capture(window);
+                var settled = next.Bytes.AsSpan().SequenceEqual(hovered.Bytes);
+                hovered.Dispose();
+                hovered = next;
+                if (settled)
+                    break;
             }
             using (hovered)
             {
                 backdrop.InvalidateVisual();
                 using var fresh = Capture(window);
-                AssertMatches(fresh, hovered!);
+                AssertMatches(fresh, hovered);
             }
         }
         finally { window.Close(); }
@@ -402,13 +408,14 @@ public class GlassRepaintTests
     public async Task Spinner_inside_glass_matches_a_full_repaint(double size, bool reuses)
     {
         var backdrop = new PatternBackdrop();
+        var spinner = new CupertinoActivityIndicator { IsActive = true, Width = size, Height = size };
         var glass = new GlassSurface
         {
             Width = 120,
             Height = 80,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            Child = new CupertinoActivityIndicator { IsActive = true, Width = size, Height = size },
+            Child = spinner,
         };
         var window = new Window { Width = 400, Height = 240, Content = new Grid { Children = { backdrop, glass } } };
         try
@@ -438,9 +445,13 @@ public class GlassRepaintTests
                     Assert.InRange(repaints, 0, 1);
                 else
                     Assert.True(repaints >= steps, $"{repaints} backdrop repaints for {steps} steps.");
+
+                // A running spinner can step between the two captures below.
+                spinner.IsActive = false;
+                using var stopped = Capture(window);
                 backdrop.InvalidateVisual();
                 using var fresh = Capture(window);
-                AssertMatches(fresh, spun);
+                AssertMatches(fresh, stopped);
             }
         }
         finally { window.Close(); }

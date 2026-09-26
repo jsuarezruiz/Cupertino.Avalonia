@@ -119,6 +119,9 @@ public class CupertinoActivityIndicator : Control
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
+        // Starting, stopping or sweeping redraws the spinner like a step does.
+        if (change.Property == IsActiveProperty || change.Property == SweepFractionProperty)
+            GlassSurface.ForegroundChanged(this);
         if (change.Property == IsActiveProperty || change.Property == IsVisibleProperty
             || change.Property == SweepFractionProperty
             || change.Property == OpacityProperty
